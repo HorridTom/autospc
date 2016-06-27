@@ -1,0 +1,133 @@
+//This is Tom's copy of the code to run the SPC algorithm
+//Questions:
+//1) Why use Vector<Double[]> and not just Vector<Double>?
+//2) Why add the data to vals iteratively? Why not just pass a Vector to
+//SPCCalculator spcCalc?
+
+
+
+
+package uk.ac.ic.doc.wishnwl.tw;
+
+import java.util.Iterator;
+import java.util.Vector;
+
+import org.eclipse.birt.data.engine.api.aggregation.Accumulator;
+import org.eclipse.birt.data.engine.core.DataException;
+import org.eclipse.birt.data.engine.i18n.ResourceConstants;
+
+public class SPCAccumulator extends Accumulator {
+
+	/**
+	 * Does this accumulator return limits (true) or means (false)
+	 */
+	private boolean limits = false;
+	int index = -1;
+	boolean firstPass = true;
+	SPCCalculator spcCalc;
+	boolean isNull = false;
+	Vector<Double> vals = new Vector<Double>();
+
+	public SPCAccumulator(boolean limits) {
+		this.limits = limits;
+	}
+	
+	public void start() {
+		index = -1;
+	}
+	
+	public void finish() {
+		// at the end of the first pass, all data is loaded into the SPCCalculator object
+		// and it can calculate the limits according to the algorithm.
+		if (firstPass) {
+			firstPass = false;
+			spcCalc = new SPCCalculator(vals);
+			spcCalc.calculate();
+		}
+	}
+	
+	@Override
+	public Object getValue() throws DataException {
+		if (firstPass) return null;
+		
+		if (isNull) return null;
+		else if (limits) return spcCalc.getLimit(index);
+		else return spcCalc.get(index);
+	}
+
+	@Override
+	public void onRow(Object[] args) throws DataException {
+		assert (args.length > 0);
+		if (args[0] != null) {
+			isNull = false;
+			index++;
+			if (firstPass) {
+				try {
+					vals.add(new Double(((Number)args[0]).doubleValue()));
+				} catch (Exception e) {
+					throw new DataException(ResourceConstants.DATATYPEUTIL_ERROR, e);
+				}
+			}
+		}
+		else isNull = true;
+	}
+	public static void main(String[] args) throws DataException {
+		Vector<Double[]> testVals = new Vector<Double[]>();
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(3)});
+		testVals.add(new Double[]{new Double(3)});
+		testVals.add(new Double[]{null});
+		testVals.add(new Double[]{new Double(4)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(3)});
+		testVals.add(new Double[]{new Double(6)});
+		testVals.add(new Double[]{new Double(5)});
+		testVals.add(new Double[]{new Double(4)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(3)});
+		testVals.add(new Double[]{new Double(4)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(4)});
+		testVals.add(new Double[]{null});
+		testVals.add(new Double[]{null});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(1)});
+		testVals.add(new Double[]{new Double(2)});
+		testVals.add(new Double[]{new Double(1)});
+
+		SPCAccumulator spca = new SPCAccumulator(true);
+		
+		//First pass - load data into vals, pass to SPCCalculator spcCalc
+		spca.start();
+		for (Iterator<Double[]> i = testVals.iterator(); i.hasNext();) {
+			spca.onRow(i.next());
+		}
+		spca.finish();
+		
+		//Get the mean or average moving range from spcCalc and add it to ret
+		Vector ret = new Vector();
+		spca.start();
+		for (Iterator<Double[]> i = testVals.iterator(); i.hasNext();) {
+			spca.onRow(i.next());
+			ret.add(spca.getValue());
+		}
+		spca.finish();
+		
+		//Print the returned results out to the console
+		for (Iterator i = ret.iterator(); i.hasNext();) {
+			System.out.println(i.next());
+		}
+		
+	}
+
+}

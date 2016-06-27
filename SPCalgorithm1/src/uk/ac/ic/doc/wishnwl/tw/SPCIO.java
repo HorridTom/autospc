@@ -1,3 +1,6 @@
+// This class runs SPCAccumulator on the data in each .csv file in a specified directory
+// and saves the output as a new .csv file in the same directory.
+
 package uk.ac.ic.doc.wishnwl.tw;
 
 import java.util.Iterator;

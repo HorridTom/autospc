@@ -1,11 +1,6 @@
 //This is Tom's copy of the code to run the SPC algorithm
 //Questions:
-//1) Why use Vector<Double[]> and not just Vector<Double>?
-//2) Why add the data to vals iteratively? Why not just pass a Vector to
-//SPCCalculator spcCalc?
-
-
-
+//TODO: 1) Why use Vector<Double[]> and not just Vector<Double>?
 
 package uk.ac.ic.doc.wishnwl.tw;
 
@@ -31,11 +26,11 @@ public class SPCAccumulator extends Accumulator {
 	public SPCAccumulator(boolean limits) {
 		this.limits = limits;
 	}
-	
+
 	public void start() {
 		index = -1;
 	}
-	
+
 	public void finish() {
 		// at the end of the first pass, all data is loaded into the SPCCalculator object
 		// and it can calculate the limits according to the algorithm.
@@ -45,11 +40,11 @@ public class SPCAccumulator extends Accumulator {
 			spcCalc.calculate();
 		}
 	}
-	
+
 	@Override
 	public Object getValue() throws DataException {
 		if (firstPass) return null;
-		
+
 		if (isNull) return null;
 		else if (limits) return spcCalc.getLimit(index);
 		else return spcCalc.get(index);
@@ -63,6 +58,7 @@ public class SPCAccumulator extends Accumulator {
 			index++;
 			if (firstPass) {
 				try {
+					//Add the passed value to vals as a double, catching errors
 					vals.add(new Double(((Number)args[0]).doubleValue()));
 				} catch (Exception e) {
 					throw new DataException(ResourceConstants.DATATYPEUTIL_ERROR, e);
@@ -72,7 +68,11 @@ public class SPCAccumulator extends Accumulator {
 		else isNull = true;
 	}
 	public static void main(String[] args) throws DataException {
+		// Create a Vector to hold the data that will be analysed
+		// TODO: TW: I don't understand why Double[] or Vector<Double> wouldn't do the job here
 		Vector<Double[]> testVals = new Vector<Double[]>();
+
+		// Populate with example data
 		testVals.add(new Double[]{new Double(2)});
 		testVals.add(new Double[]{new Double(1)});
 		testVals.add(new Double[]{new Double(1)});
@@ -105,16 +105,17 @@ public class SPCAccumulator extends Accumulator {
 		testVals.add(new Double[]{new Double(2)});
 		testVals.add(new Double[]{new Double(1)});
 
+		// Create a SPCAccumulator object - this will hold the data and perform the analysis
 		SPCAccumulator spca = new SPCAccumulator(true);
-		
+
 		//First pass - load data into vals, pass to SPCCalculator spcCalc
 		spca.start();
 		for (Iterator<Double[]> i = testVals.iterator(); i.hasNext();) {
 			spca.onRow(i.next());
 		}
 		spca.finish();
-		
-		//Get the mean or average moving range from spcCalc and add it to ret
+
+		//Second pass - Get the mean or average moving range from spcCalc and add it to ret
 		Vector ret = new Vector();
 		spca.start();
 		for (Iterator<Double[]> i = testVals.iterator(); i.hasNext();) {
@@ -122,12 +123,12 @@ public class SPCAccumulator extends Accumulator {
 			ret.add(spca.getValue());
 		}
 		spca.finish();
-		
+
 		//Print the returned results out to the console
 		for (Iterator i = ret.iterator(); i.hasNext();) {
 			System.out.println(i.next());
 		}
-		
+
 	}
 
 }

@@ -20,3 +20,4 @@ hs_err_pid*
 # classpath and project files
 *.classpath
 *.project
+/bin/

@@ -7,9 +7,10 @@ setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 #DONE: Add timestamp to output filename
 #DONE: Consolidate the plot_chart and pdf_chart functions into one
 #DONE: Explore options for aspect ratio of plots
-#TODO: Sort out the scale on the vertical axis
-#TODO: Label the axes
-#TODO: Label the charts
+#DONE: Sort out the scale on the vertical axis
+#TODO: Better solution when error in algorithm output - ignore infinite values
+#DONE: Label the axes
+#DONE: Label the charts
 
 
 load_spc_analyses <- function() {
@@ -29,7 +30,10 @@ load_analysis_files <- function(path = getwd(), mask) {
 							colnames(x) <- c("X","Mean","AMR")
 							x
 							})
-
+	for (i in 1:length(fl)) {
+		attr(files[[i]],"title")=fl[[i]]
+	}
+	
 	files
 }
 
@@ -43,13 +47,19 @@ add_control_limits <- function(list.data) {
 
 plot_chart <- function(x) {
 
+	# Define a vector for the horizontal axis values
 	t <- c(1:nrow(x))
+
+	# Get the desired vertical axis range
 	vr <- get_v_axis_range(x)
+
+	# Plot the chart, ensuring an infinite axis range is not passed.
 	par(pch=19, col="black")
 	if (all(is.finite(vr))) {
-		plot(t, x[,"X"], type="n", ylim = vr)
+		plot(t, x[,"X"], type="n", ylim = vr, xlab='', ylab='')
 		}
-	else plot(t, x[,"X"], type="n")
+	else plot(t, x[,"X"], type="n", ylab='', xlab='')
+	title(xlab="i", ylab="X_i", main=attributes(x)$title)
 	lines(t, x[,"X"], type="o")
 	lines(t, x[,"Mean"], type="l", lty=1)
 	lines(t, x[,"LCL"], type="l", lty=2)
@@ -60,7 +70,7 @@ plot_chart <- function(x) {
 plot_charts <- function(list.data) {
 	lapply(list.data, function(x) {
 						dev.new()
-						plot_chart
+						plot_chart(x)
 						})
 }
 

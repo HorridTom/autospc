@@ -8,7 +8,7 @@ setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 #DONE: Consolidate the plot_chart and pdf_chart functions into one
 #DONE: Explore options for aspect ratio of plots
 #DONE: Sort out the scale on the vertical axis
-#TODO: Better solution when error in algorithm output - ignore infinite values
+#DONE: Better solution when error in algorithm output - ignore infinite values
 #DONE: Label the axes
 #DONE: Label the charts
 
@@ -84,8 +84,9 @@ pdf_charts <- function(list.data) {
 
 get_v_axis_range <- function(x) {
 
-	chart_min <- min(x[,colnames(x) %in% c("X","Mean","LCL","UCL")])
-	chart_max <- max(x[,colnames(x) %in% c("X","Mean","LCL","UCL")])
+	x <- x[,colnames(x) %in% c("X","Mean","LCL","UCL")]
+	chart_min <- min(x[x>-Inf & x<Inf])
+	chart_max <- max(x[x>-Inf & x<Inf])
 	chart_range <- chart_max - chart_min
 
 	vertical_min <- chart_min - 0.15*chart_range

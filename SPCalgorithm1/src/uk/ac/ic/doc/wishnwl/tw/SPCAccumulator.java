@@ -1,6 +1,7 @@
 //This is Tom's copy of the code to run the SPC algorithm
 //Questions:
 //TODO: 1) Why use Vector<Double[]> and not just Vector<Double>?
+//TODO: Bug - in both UCLH test datasets, the average moving range takes the value Infinity at least once
 
 package uk.ac.ic.doc.wishnwl.tw;
 

@@ -11,7 +11,7 @@ public class SPCCalculator {
 	double[] means;
 	double[] amrs;
 	boolean[] breakPoints;
-	
+
 	public SPCCalculator(Vector vals2) {
 		this.vals = vals2;
 		rawVals = new double[vals.size()];
@@ -19,9 +19,9 @@ public class SPCCalculator {
 			double v = vals.elementAt(i).doubleValue();
 			rawVals[i] = v;
 		}
-		initArrays();	
+		initArrays();
 	}
-	
+
 	public SPCCalculator(double[] vals2) {
 		this.rawVals = vals2;
 		initArrays();
@@ -45,7 +45,7 @@ public class SPCCalculator {
 		double mean = sum / rawVals.length;
 		for (int i = 0; i < means.length; i++) {
 			means[i] = mean;
-		}	
+		}
 	}
 
 	public String toString() {
@@ -72,11 +72,11 @@ public class SPCCalculator {
 		}
 		return sb.toString();
 	}
-	
+
 	public Object get(int index) {
 		return new Double(means[index]);
 	}
-	
+
 	public Object getLimit(int index) {
 		return new Double(amrs[index]);
 	}
@@ -133,10 +133,10 @@ public class SPCCalculator {
 			amrs[j] = l;
 		}
 	}
-	
+
 	/**
 	 *  Checks for a break based on the rule 2a.
-	 *  
+	 *
 	 * @param startIndex The point from which the method starts looking for the breakpoint.
 	 * @return null if no Break2a, otherwise the start and end indices in the arrays where the run occurs
 	 */
@@ -147,7 +147,7 @@ public class SPCCalculator {
 		}
 		return null;
 	}
-	
+
 	private int break2a(int i) {
 		int seq = 0;
 		while ((i + seq < rawVals.length) && (rawVals[i + seq] > means[i+seq]) ){
@@ -161,14 +161,14 @@ public class SPCCalculator {
 		}
 		if (seq >= 8) // there is a run of at least 8 points
 			return i+seq-1; //return the index of the last point
-		
+
 		return -1;
 	}
-	
+
 	/**
 	 * Alternative version of the algorithm, with provided mean, used for hypothetical testing.
 	 * @param i
-	 * @return 
+	 * @return
 	 */
 	private Pair existsBreak2aM(int startIndex, int endIndex, double m) {
 		for (int i = startIndex; i < endIndex; i++){
@@ -177,8 +177,8 @@ public class SPCCalculator {
 		}
 		return null;
 	}
-	
-	
+
+
 	private int break2aM(int i, double m) {
 		int seq = 0;
 		while ((i + seq < rawVals.length) && (rawVals[i + seq] > m)){
@@ -192,10 +192,10 @@ public class SPCCalculator {
 		}
 		if (seq >= 8) // there is a run of at least 8 points
 			return i+seq-1; //return the index of the last point
-		
+
 		return -1;
 	}
-	
+
 	private boolean existsBreakPointBefore(int breakEnd) {
 		for (int i = 0; i < breakEnd; i++) {
 			if (breakPoints[i]) return true;
@@ -213,7 +213,7 @@ public class SPCCalculator {
 		}
 		return secondLast;
 	}
-	
+
 	private int getBreakPointBefore(int p) {
 		int last = 0;
 		for (int i = 0; i < p; i++) {
@@ -223,33 +223,33 @@ public class SPCCalculator {
 		}
 		return last;
 	}
-	
+
 	public void calculate() {
-		
+
 		while(true) {
 			recalculateMeans();
 			int breakSearchStart = 0;
-			
+
 			while(true) {
 				Pair breakIndexRun = existsBreak2a(breakSearchStart);
 				if (breakIndexRun == null) return;
 				int breakStart = breakIndexRun.a;
 				int breakEnd = breakIndexRun.b;
-				
+
 				if (breakStart < 5 ||
-						breakPoints[breakStart] || 
-						breakPoints[breakStart-1] || 
-						breakPoints[breakStart-2] || 
-						breakPoints[breakStart-3] || 
-						breakPoints[breakStart-4] || 
+						breakPoints[breakStart] ||
+						breakPoints[breakStart-1] ||
+						breakPoints[breakStart-2] ||
+						breakPoints[breakStart-3] ||
+						breakPoints[breakStart-4] ||
 						breakPoints[breakStart-5]) {
-					
+
 					if (breakEnd >= (breakPoints.length - 5) ||
-							breakPoints[breakEnd] || 
-							breakPoints[breakEnd+1] || 
-							breakPoints[breakEnd+2] || 
-							breakPoints[breakEnd+3] || 
-							breakPoints[breakEnd+4] || 
+							breakPoints[breakEnd] ||
+							breakPoints[breakEnd+1] ||
+							breakPoints[breakEnd+2] ||
+							breakPoints[breakEnd+3] ||
+							breakPoints[breakEnd+4] ||
 							breakPoints[breakEnd+5]) {
 						//note: don't break!
 					}
@@ -266,21 +266,21 @@ public class SPCCalculator {
 						}
 						break;
 					}
-					
+
 				}
 				else {
 					breakPoints[breakStart] = true;
 					break;
 				}
-				breakSearchStart++;		
+				breakSearchStart++;
 			}
 
-			
+
 
 		}
-		
+
 	}
-	
+
 	class Pair
 	{
 		int a;
@@ -291,7 +291,7 @@ public class SPCCalculator {
 		}
 		public String toString() { return "("+ a + ", " + b + ")"; }
 	}
-	
+
 	public static void main(String[] args) {
 		double[] testVals = {0.1875,
 				0.0625,

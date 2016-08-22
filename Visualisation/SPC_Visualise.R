@@ -1,8 +1,12 @@
-setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
+#setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 #source("SPC_Visualise.R")
-#spc_outputs <- load_spc_analyses()
-#spc_outputs <- add_control_limits(spc_outputs)
-#plot_charts(spc_outputs)
+
+batch_visualise_spc <- function(path = "C:/Users/tw299/git/spc-algorithm/SPCalgorithm1/data") {
+	setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
+	spc_outputs <- load_spc_analyses(path=path)
+	spc_outputs <- add_control_limits(spc_outputs)
+	pdf_charts(spc_outputs)
+}
 
 #DONE: Add timestamp to output filename
 #DONE: Consolidate the plot_chart and pdf_chart functions into one
@@ -13,16 +17,18 @@ setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 #DONE: Label the charts
 
 
-load_spc_analyses <- function() {
-	load_analysis_files(path="C:/Users/tw299/git/spc-algorithm/SPCalgorithm1/data" , mask = "^.*_OUT.csv$")
+load_spc_analyses <- function(path=getwd()) {
+	load_analysis_files(path=path , mask = "^.*_OUT.csv$")
 }
 
 load_analysis_files <- function(path = getwd(), mask) {
 	#Load all files in 'path' with filename matching regex 'mask'
-	
-	fl <- list.files(path = path, pattern = mask)
 	current.path <- getwd()
 	setwd(path)
+	fl <- list.files(path = path, pattern = mask)
+	nonempty <- !(file.info(fl)$size == 0)
+	fl <- fl[nonempty]
+	
 	files <- lapply(fl, function(x) read.csv(x, header = FALSE))
 	setwd(current.path)
 
@@ -33,6 +39,8 @@ load_analysis_files <- function(path = getwd(), mask) {
 	for (i in 1:length(fl)) {
 		attr(files[[i]],"title")=fl[[i]]
 	}
+
+	files <- lapply(files, remove_nulls_df)
 	
 	files
 }
@@ -94,4 +102,22 @@ get_v_axis_range <- function(x) {
 
 	c(vertical_min,vertical_max)
 
+}
+
+remove_nulls_df <- function(x) {
+	title <- attr(x, "title")
+	x <- as.data.frame(sapply(x, remove_nulls_col))
+	attr(x, "title") = title
+	x
+}
+
+remove_nulls_col <- function(v) {
+	if (is.factor(v)) {
+	v <- as.numeric(levels(v))[v]
+	v <- v[!is.na(v)] }
+	v
+}
+
+write_cols_csv <- function(df) {
+	sapply(colnames(df), function(x) write.table(df[!is.na(df[,x]),x], file=paste(c(gsub("\\.","_",x),".csv"),collapse=""), sep=",",row.names=FALSE, col.names=FALSE))
 }

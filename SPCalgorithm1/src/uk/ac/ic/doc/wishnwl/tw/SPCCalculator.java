@@ -223,7 +223,9 @@ public class SPCCalculator {
 		}
 		return last;
 	}
-
+// TODO: give option to terminate algorithm after a specified maximum number of loops (default infty)
+// TODO: parametrise this method to allow user to vary the rulebreak padding constants - currently hard-wired to 5.
+// TODO: parametrise whether the algorithm uses breakpoint removal - currently always does.
 	public void calculate() {
 
 		while(true) {

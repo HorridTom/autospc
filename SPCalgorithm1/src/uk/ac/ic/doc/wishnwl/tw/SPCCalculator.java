@@ -5,6 +5,7 @@ import java.util.Vector;
 
 public class SPCCalculator {
 
+	private int defaultMaximumNumberOfLoops = 0;
 	Vector<Double> vals;
 	double[] rawVals;
 	double[] deltas;
@@ -227,7 +228,7 @@ public class SPCCalculator {
 	// allow user to see the various stages the algorithm goes through by stopping it.
 // TODO: parametrise this method to allow user to vary the rulebreak padding constants - currently hard-wired to 5.
 // TODO: parametrise whether the algorithm uses breakpoint removal - currently always does.
-	public void calculate() {
+	public void calculate(int maximumNumberOfLoops) {
 
 		while(true) {
 			recalculateMeans();
@@ -282,6 +283,11 @@ public class SPCCalculator {
 
 		}
 
+	}
+
+	//Overload to make maximumNumberOfLoops optional, defaulting to defaultMaximumNumberOfLoops
+	public void calculate() {
+		calculate(defaultMaximumNumberOfLoops);
 	}
 
 	class Pair

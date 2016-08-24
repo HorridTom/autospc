@@ -6,6 +6,7 @@ import java.util.Vector;
 public class SPCCalculator {
 
 	private int defaultMaximumNumberOfLoops = 0;
+	public int maximumNumberOfLoops;
 	Vector<Double> vals;
 	double[] rawVals;
 	double[] deltas;
@@ -13,7 +14,8 @@ public class SPCCalculator {
 	double[] amrs;
 	boolean[] breakPoints;
 
-	public SPCCalculator(Vector vals2) {
+	public SPCCalculator(Vector vals2, int maxLoops) {
+		this.maximumNumberOfLoops = maxLoops;
 		this.vals = vals2;
 		rawVals = new double[vals.size()];
 		for (int i = 0; i < vals.size(); i++) {
@@ -23,9 +25,18 @@ public class SPCCalculator {
 		initArrays();
 	}
 
-	public SPCCalculator(double[] vals2) {
+	public SPCCalculator(double[] vals2, int maxLoops) {
+		this.maximumNumberOfLoops = maxLoops;
 		this.rawVals = vals2;
 		initArrays();
+	}
+
+	public SPCCalculator(Vector vals2) {
+		this(vals2, 0);
+	}
+
+	public SPCCalculator(double[] vals2) {
+		this(vals2, 0);
 	}
 
 	private void initArrays() {
@@ -228,9 +239,10 @@ public class SPCCalculator {
 	// allow user to see the various stages the algorithm goes through by stopping it.
 // TODO: parametrise this method to allow user to vary the rulebreak padding constants - currently hard-wired to 5.
 // TODO: parametrise whether the algorithm uses breakpoint removal - currently always does.
-	public void calculate(int maximumNumberOfLoops) {
+	public void calculate() {
 
-		while(true) {
+		int numberOfLoops = 0;
+		while(maximumNumberOfLoops == 0 || numberOfLoops < maximumNumberOfLoops) {
 			recalculateMeans();
 			int breakSearchStart = 0;
 
@@ -280,15 +292,11 @@ public class SPCCalculator {
 			}
 
 
-
+			numberOfLoops++;
 		}
 
 	}
 
-	//Overload to make maximumNumberOfLoops optional, defaulting to defaultMaximumNumberOfLoops
-	public void calculate() {
-		calculate(defaultMaximumNumberOfLoops);
-	}
 
 	class Pair
 	{
@@ -391,7 +399,7 @@ public class SPCCalculator {
 //		testVals2.add(new Double(0.0487805));
 //		testVals2.add(new Double(0.0909091));
 
-		SPCCalculator calc = new SPCCalculator(testVals);
+		SPCCalculator calc = new SPCCalculator(testVals, 0);
 		System.out.println("Before:\n" + calc);
 		calc.calculate();
 		System.out.println("After:\n" + calc);

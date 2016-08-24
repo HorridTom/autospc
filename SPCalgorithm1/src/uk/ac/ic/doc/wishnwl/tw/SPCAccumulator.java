@@ -13,19 +13,24 @@ import org.eclipse.birt.data.engine.core.DataException;
 import org.eclipse.birt.data.engine.i18n.ResourceConstants;
 
 public class SPCAccumulator extends Accumulator {
-
 	/**
 	 * Does this accumulator return limits (true) or means (false)
 	 */
 	private boolean limits = false;
+	public int maxIterations;
 	int index = -1;
 	boolean firstPass = true;
 	SPCCalculator spcCalc;
 	boolean isNull = false;
 	Vector<Double> vals = new Vector<Double>();
 
-	public SPCAccumulator(boolean limits) {
+	public SPCAccumulator(boolean limits, int maxIts) {
 		this.limits = limits;
+		this.maxIterations = maxIts;
+	}
+
+	public SPCAccumulator(boolean limits) {
+		this(limits, 0);
 	}
 
 	public void start() {
@@ -37,7 +42,7 @@ public class SPCAccumulator extends Accumulator {
 		// and it can calculate the limits according to the algorithm.
 		if (firstPass) {
 			firstPass = false;
-			spcCalc = new SPCCalculator(vals);
+			spcCalc = new SPCCalculator(vals, maxIterations);
 			spcCalc.calculate();
 		}
 	}

@@ -6,6 +6,8 @@ import java.util.Vector;
 public class SPCCalculator {
 
 	public int maximumNumberOfLoops;
+	//private int defaultBreakPadding = 5;
+	public int breakPadding;
 	Vector<Double> vals;
 	double[] rawVals;
 	double[] deltas;
@@ -13,8 +15,9 @@ public class SPCCalculator {
 	double[] amrs;
 	boolean[] breakPoints;
 
-	public SPCCalculator(Vector vals2, int maxLoops) {
+	public SPCCalculator(Vector vals2, int maxLoops, int padding) {
 		this.maximumNumberOfLoops = maxLoops;
+		this.breakPadding = padding;
 		this.vals = vals2;
 		rawVals = new double[vals.size()];
 		for (int i = 0; i < vals.size(); i++) {
@@ -24,18 +27,19 @@ public class SPCCalculator {
 		initArrays();
 	}
 
-	public SPCCalculator(double[] vals2, int maxLoops) {
+	public SPCCalculator(double[] vals2, int maxLoops, int padding) {
 		this.maximumNumberOfLoops = maxLoops;
+		this.breakPadding = padding;
 		this.rawVals = vals2;
 		initArrays();
 	}
 
 	public SPCCalculator(Vector vals2) {
-		this(vals2, 0);
+		this(vals2, 0, 5);
 	}
 
 	public SPCCalculator(double[] vals2) {
-		this(vals2, 0);
+		this(vals2, 0, 5);
 	}
 
 	private void initArrays() {
@@ -242,8 +246,7 @@ public class SPCCalculator {
 		}
 		return last;
 	}
-// TODO: give option to terminate algorithm after a specified maximum number of loops (default infty). This is to
-	// allow user to see the various stages the algorithm goes through by stopping it.
+
 // TODO: parametrise this method to allow user to vary the rulebreak padding constants - currently hard-wired to 5.
 // TODO: parametrise whether the algorithm uses breakpoint removal - currently always does.
 	public void calculate() {
@@ -409,7 +412,7 @@ public class SPCCalculator {
 //		testVals2.add(new Double(0.0487805));
 //		testVals2.add(new Double(0.0909091));
 
-		SPCCalculator calc = new SPCCalculator(testVals, 0);
+		SPCCalculator calc = new SPCCalculator(testVals, 0, 5);
 		System.out.println("Before:\n" + calc);
 		calc.calculate();
 		System.out.println("After:\n" + calc);

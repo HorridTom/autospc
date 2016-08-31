@@ -226,6 +226,10 @@ public class SPCIO {
 		String fileName = new String();
 		int nloops = 0;
 
+		//Set this flag to true to save output of each stage of the algorithm,
+		//or false to only save final result.
+		boolean outputStages = true;
+
 		for (int i = 0;i < listOfFiles.length; i++) {
 			fileName = listOfFiles[i].getAbsolutePath();
 			//SPCIO.csvSPC(fileName, 0);
@@ -233,14 +237,17 @@ public class SPCIO {
 			Vector<Double[]> result = new Vector<Double[]>();
 			endResult = analyseCsv(fileName);
 			saveSpcToCsv(fileName, "endresult", 0, endResult);
-			nloops = 0;
-			while(!equalVectors(endResult, result)) {
-				nloops++;
-				result = analyseCsv(fileName, nloops);
-				saveSpcToCsv(fileName, String.valueOf(nloops), nloops, result);
+			if(outputStages){
+				nloops = 0;
+				while(!equalVectors(endResult, result)) {
+					nloops++;
+					result = analyseCsv(fileName, nloops);
+					saveSpcToCsv(fileName, String.valueOf(nloops), nloops, result);
+				}
 			}
 			result = null;
 			endResult = null;
+
 		}
 
 

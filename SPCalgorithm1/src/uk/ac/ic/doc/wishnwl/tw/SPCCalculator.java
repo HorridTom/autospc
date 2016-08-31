@@ -5,7 +5,6 @@ import java.util.Vector;
 
 public class SPCCalculator {
 
-	private int defaultMaximumNumberOfLoops = 0;
 	public int maximumNumberOfLoops;
 	Vector<Double> vals;
 	double[] rawVals;

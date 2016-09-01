@@ -12,6 +12,7 @@ import java.io.File;
 import org.eclipse.birt.data.engine.core.DataException;
 import org.junit.Test;
 
+
 public class SPCIOTest {
 
 	@Test
@@ -86,10 +87,48 @@ public class SPCIOTest {
 
 	private boolean csvContentEqual(List<String[]> myEntries,
 			List<String[]> myEntries2) {
-		// TODO Write csvContentEqual method to compare contents of two csv files, passed as List<String[]>
 
-
-		return false;
+		
+		if (myEntries.size() != myEntries2.size()) return false;
+		//
+		int i;
+		int l;
+		int l2;
+		//int j = 0;
+		String[] a, a2;
+		
+		Iterator<String[]> iter = myEntries.iterator();
+		Iterator<String[]> iter2 = myEntries2.iterator();
+				
+		while (iter.hasNext() && iter2.hasNext()) {
+			//j++;
+			//System.out.println("Index: " + j);
+			
+			a = iter.next();
+			a2 = iter2.next();
+			
+			
+			//System.out.println("Next Array (1)..." + iter.next().length);
+			l = a.length;
+			l2 = a2.length;
+			
+			if (l != l2) return false;
+			
+			for (i=0; i < l; i++) {
+				
+				//System.out.println(i + ": " + a[i] + ", " + a2[i]);
+				//System.out.println(a[i].equals(a2[i]));
+				if (!a[i].equals(a2[i])) return false;
+				
+				//System.out.println(i);
+				//System.out.println(iter.next()[i]);
+			}
+			
+			
+		}
+		
+		//System.out.println("End");
+		return true;
 	}
 
 }

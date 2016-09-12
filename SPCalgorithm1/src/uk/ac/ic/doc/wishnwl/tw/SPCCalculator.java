@@ -272,6 +272,10 @@ public class SPCCalculator {
 						if (breakEnd + 1 < breakPoints.length) breakPoints[breakEnd+1] = true;
 						if (existsBreakPointBefore(breakEnd)) {
 							int bp = getSecondBreakPointBefore(breakEnd);
+							//There are two issues here:
+							// 1) the mean calculator does not include breakEnd - it should
+							// 2) in checking for a run, runs going outside the period are allowed - they should not be
+							// TODO: resolve these issues!
 							double m = calcMean(bp, breakEnd);
 							Pair p = existsBreak2aM(bp, breakEnd, m);
 							if (p == null) {

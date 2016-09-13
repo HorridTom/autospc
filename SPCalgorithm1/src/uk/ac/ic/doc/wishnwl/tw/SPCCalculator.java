@@ -112,7 +112,11 @@ public class SPCCalculator {
 	}
 	private double calcLimit(int start, int end) {
 		double sum = 0.0D;
-		for (int i = start; i < end; i++) {
+		//Original ...int i = start...
+		//Should be ...int i = start + 1... because
+		//Amr should ignore the meaningless first value
+
+		for (int i = start + 1; i < end; i++) {
 			sum += deltas[i];
 		}
 		//Original:
@@ -160,7 +164,6 @@ public class SPCCalculator {
 	}
 
 	private int break2a(int i) {
-		//FIXME: check whether this method needs modifying as per break2aM.
 		int seq = 0;
 		while ((i + seq < rawVals.length) && (rawVals[i + seq] > means[i+seq]) ){
 			seq++;
@@ -183,18 +186,19 @@ public class SPCCalculator {
 	 * @return
 	 */
 	private Pair existsBreak2aM(int startIndex, int endIndex, double m) {
+		// Modified this function so rule breaks are only returned if they fall
+		// entirely within the specified range.
+
 		for (int i = startIndex; i < endIndex; i++){
 			int breakEnd = break2aM(i, m);
-			if (breakEnd > -1) return new Pair(i, breakEnd);
+			if ((breakEnd > -1) && (endIndex - i >= 8)) return new Pair(i, breakEnd);
 		}
 		return null;
 	}
 
 
 	private int break2aM(int i, double m) {
-		//FIXME: modify this function to take start and end indices, and to stop counting
-		// if it hits the end. I.e. rule breaks should only be detected if they fall
-		// entirely within the specified range.
+
 		int seq = 0;
 		while ((i + seq < rawVals.length) && (rawVals[i + seq] > m)){
 			seq++;
@@ -276,11 +280,10 @@ public class SPCCalculator {
 						if (breakEnd + 1 < breakPoints.length) breakPoints[breakEnd+1] = true;
 						if (existsBreakPointBefore(breakEnd)) {
 							int bp = getSecondBreakPointBefore(breakEnd);
-							//There are two issues here:
-							// 1) the mean calculator does not include breakEnd - it should
-							// 2) in checking for a run, runs going outside the period are allowed - they should not be
-							// FIXME: resolve these issues!
-							double m = calcMean(bp, breakEnd);
+							// modified so that the mean is calculated correctly - including the last point of the period in question
+							// TODO: tidy this up - clumsy way of ensuring calcMean is not passed an end parameter out of range
+							int meanEnd = Math.min(breakEnd + 1, breakPoints.length);
+							double m = calcMean(bp, meanEnd);
 							Pair p = existsBreak2aM(bp, breakEnd, m);
 							if (p == null) {
 								int last = getBreakPointBefore(breakEnd);

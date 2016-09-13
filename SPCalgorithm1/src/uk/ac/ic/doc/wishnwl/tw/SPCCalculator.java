@@ -160,6 +160,7 @@ public class SPCCalculator {
 	}
 
 	private int break2a(int i) {
+		//FIXME: check whether this method needs modifying as per break2aM.
 		int seq = 0;
 		while ((i + seq < rawVals.length) && (rawVals[i + seq] > means[i+seq]) ){
 			seq++;
@@ -191,6 +192,9 @@ public class SPCCalculator {
 
 
 	private int break2aM(int i, double m) {
+		//FIXME: modify this function to take start and end indices, and to stop counting
+		// if it hits the end. I.e. rule breaks should only be detected if they fall
+		// entirely within the specified range.
 		int seq = 0;
 		while ((i + seq < rawVals.length) && (rawVals[i + seq] > m)){
 			seq++;
@@ -275,7 +279,7 @@ public class SPCCalculator {
 							//There are two issues here:
 							// 1) the mean calculator does not include breakEnd - it should
 							// 2) in checking for a run, runs going outside the period are allowed - they should not be
-							// TODO: resolve these issues!
+							// FIXME: resolve these issues!
 							double m = calcMean(bp, breakEnd);
 							Pair p = existsBreak2aM(bp, breakEnd, m);
 							if (p == null) {

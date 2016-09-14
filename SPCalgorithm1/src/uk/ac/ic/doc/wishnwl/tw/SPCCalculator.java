@@ -162,6 +162,7 @@ public class SPCCalculator {
 	private Pair existsBreak2a(int startIndex) {
 		for (int i = startIndex; i < rawVals.length; i++){
 			int breakEnd = break2a(i);
+
 			if (breakEnd > -1) return new Pair(i, breakEnd);
 		}
 		return null;
@@ -169,13 +170,16 @@ public class SPCCalculator {
 
 	private int break2a(int i) {
 		int seq = 0;
-		while ((i + seq < rawVals.length) && (rawVals[i + seq] > means[i+seq]) ){
+		boolean breakDuringRun = false;
+		while ((i + seq < rawVals.length) && (rawVals[i + seq] > means[i+seq]) && !breakDuringRun){
+			if (seq != 0) breakDuringRun = breakDuringRun || breakPoints[i + seq];
 			seq++;
 		}
 		if (seq >= 8) // there is a run of at least 8 points
 			return i+seq-1; //return the index of the last point
 		seq = 0;
-		while ((i + seq < rawVals.length) && (rawVals[i + seq] < means[i+seq]) ){
+		while ((i + seq < rawVals.length) && (rawVals[i + seq] < means[i+seq]) && !breakDuringRun){
+			if (seq != 0) breakDuringRun = breakDuringRun || breakPoints[i + seq];
 			seq++;
 		}
 		if (seq >= 8) // there is a run of at least 8 points
@@ -262,21 +266,23 @@ public class SPCCalculator {
 				int breakStart = breakIndexRun.a;
 				int breakEnd = breakIndexRun.b;
 
-				if (breakStart < 5 ||
+				if (existsBreakPointWithin(breakStart, breakPadding, false)) {
+				/*if (breakStart < 5 ||
 						breakPoints[breakStart] ||
 						breakPoints[breakStart-1] ||
 						breakPoints[breakStart-2] ||
 						breakPoints[breakStart-3] ||
 						breakPoints[breakStart-4] ||
-						breakPoints[breakStart-5]) {
+						breakPoints[breakStart-5]) {*/
 
-					if (breakEnd >= (breakPoints.length - 5) ||
+					if (existsBreakPointWithin(breakEnd, breakPadding, true)) {
+					/*if (breakEnd >= (breakPoints.length - 5) ||
 							breakPoints[breakEnd] ||
 							breakPoints[breakEnd+1] ||
 							breakPoints[breakEnd+2] ||
 							breakPoints[breakEnd+3] ||
 							breakPoints[breakEnd+4] ||
-							breakPoints[breakEnd+5]) {
+							breakPoints[breakEnd+5]) {*/
 						//note: don't break!
 					}
 					else {
@@ -310,6 +316,20 @@ public class SPCCalculator {
 
 	}
 
+	private boolean existsBreakPointWithin(int p, int tol, boolean forwards) {
+
+		if (!forwards) {
+			if (p < tol) return true;
+		} else {
+			if (p >= breakPoints.length - tol) return true;
+		}
+		int direction = -1;
+		if (forwards) direction = 1;
+		for (int i = 0; i <= tol; i++) {
+			if (breakPoints[p + direction*i]) return true;
+		}
+		return false;
+	}
 
 	class Pair
 	{

@@ -19,31 +19,31 @@ import org.junit.runners.Parameterized;
 
 @RunWith(value = Parameterized.class)
 public class SPCIOTest {
-	
+
 	String dataFileName;
 	SPCIO testIO;
 	SPCIO correctIO;
-	
+
 	@Before
 	public void initialize() {
 		this.testIO = new SPCIO();
 		this.correctIO = new SPCIO();
 	}
-	
+
 	//Constructor takes parameter from list and passes to test
 	public SPCIOTest (String fileName) {
 		this.dataFileName = fileName;
 	}
-	
+
 	//Returns a list of data files to test the algorithm on.
 	//For each file in the list there must be a pre-analysed output file
 	//in the same folder, against which the algorithm's output
 	//will be tested.
-	@Parameterized.Parameters
+	@Parameterized.Parameters( name = "{index}: {0}")
 	public static Collection<Object[]> dataSets() {
 		Collection<Object[]> fileListResult = new ArrayList<Object[]>();
 		String fileName;
-		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\testdata");
+		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\testdata-20160914");
 		List<File> listOfFiles = new ArrayList<>(Arrays.asList(folder.listFiles()));
 
 		//Remove any files from the list where their filename ends with "OUT.csv"
@@ -54,7 +54,7 @@ public class SPCIOTest {
 				iter.remove();
 			}
 		}
-		
+
 		// Populate the output Collection with the filenames
 		for (Iterator<File> iter = listOfFiles.iterator(); iter.hasNext();) {
 			fileName = iter.next().getAbsolutePath();
@@ -65,13 +65,13 @@ public class SPCIOTest {
 		// Return the list of filenames to be used as parameters for the test.
 		return fileListResult;
 	}
-	
+
 	@Test
 	public void testSPCIO() {
 		String testOutputFileName = new String();
 		String correctOutputFileName = new String();
 		Vector<Double[]> result = new Vector<Double[]>();
-		
+
 		//Run the current algorithm on fileName...
 		try {
 			result = SPCIO.analyseCsv(dataFileName);
@@ -99,9 +99,9 @@ public class SPCIOTest {
 
 		//Assert that the test run gave the same results as the original.
 		assertTrue(csvContentEqual(testIO.myEntries,correctIO.myEntries));
-		
+
 	}
-	
+
 	//Method to test whether the contents of two csv files are the same.
 	private boolean csvContentEqual(List<String[]> myEntries,
 			List<String[]> myEntries2) {
@@ -113,22 +113,22 @@ public class SPCIOTest {
 		int l;
 		int l2;
 		String[] a, a2;
-		
+
 		Iterator<String[]> iter = myEntries.iterator();
 		Iterator<String[]> iter2 = myEntries2.iterator();
-				
+
 		while (iter.hasNext() && iter2.hasNext()) {
-			
+
 			a = iter.next();
 			a2 = iter2.next();
-			
+
 			l = a.length;
 			l2 = a2.length;
-			
+
 			// If there are a different number of entries in a given row, the
 			// two csv files cannot be equal.
 			if (l != l2) return false;
-			
+
 			for (i=0; i < l; i++) {
 				// If any individual cell differs, the two csv files cannot
 				// be equal.

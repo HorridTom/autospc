@@ -18,6 +18,9 @@ public class SPCIO {
 	 CSVReader reader;
      List<String[]> myEntries;
      Vector<Double[]> csvVals;
+    //Alter the distance the algorithm looks for neighbouring breakpoints
+   	//before adding a new one - steps 4 and 6.
+   	public static int padding = 5;
 
 	public void loadCsv(String filename) {
 
@@ -137,7 +140,7 @@ public class SPCIO {
 	}
 
 	public static Vector<Double[]> analyseCsv(String fName) throws DataException {
-		return analyseCsv(fName, 0, 5);
+		return analyseCsv(fName, 0, padding);
 	}
 
 	public static void saveSpcToCsv(String fName, String label, int maxIterations, Vector<Double[]> v) {
@@ -197,7 +200,7 @@ public class SPCIO {
 	}
 
 	public static void csvSPC(String fName) throws DataException {
-		csvSPC(fName, 0, 5);
+		csvSPC(fName, 0, padding);
 	}
 
 	public static boolean equalVectors (Vector<Double[]> u, Vector<Double[]> v) {
@@ -230,18 +233,19 @@ public class SPCIO {
 		//or false to only save final result.
 		boolean outputStages = true;
 
+
 		for (int i = 0;i < listOfFiles.length; i++) {
 			fileName = listOfFiles[i].getAbsolutePath();
 			//SPCIO.csvSPC(fileName, 0);
 			Vector<Double[]> endResult = new Vector<Double[]>();
 			Vector<Double[]> result = new Vector<Double[]>();
-			endResult = analyseCsv(fileName);
+			endResult = analyseCsv(fileName, 0, padding);
 			saveSpcToCsv(fileName, "endresult", 0, endResult);
 			if(outputStages){
 				nloops = 0;
 				while(!equalVectors(endResult, result)) {
 					nloops++;
-					result = analyseCsv(fileName, nloops, 5);
+					result = analyseCsv(fileName, nloops, padding);
 					saveSpcToCsv(fileName, String.valueOf(nloops), nloops, result);
 				}
 				System.out.println("Data in file " + fileName + " analysed in " + nloops + " stages.");

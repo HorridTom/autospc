@@ -5,6 +5,7 @@ batch_visualise_spc <- function(path = "C:/Users/tw299/git/spc-algorithm/SPCalgo
 	setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 	spc_outputs <- load_spc_analyses(path=path)
 	spc_outputs <- add_control_limits(spc_outputs)
+	spc_outputs <- add_rule_breaks(spc_outputs)
 	pdf_charts(spc_outputs)
 }
 
@@ -53,6 +54,25 @@ add_control_limits <- function(list.data) {
 						})
 }
 
+add_rule_breaks <- function(list.data) {
+	lapply(list.data, function(x) {
+						x[,"rule1"] <- (x[,"X"] > x[,"UCL"]) | (x[,"X"] < x[,"LCL"])
+						x <- rule_two(x)
+						x
+						})
+}
+
+rule_two <- function(df) {
+	
+	runs <- rle(ifelse(df[,"X"] > df[,"Mean"],1,-1))
+	rulebreakingruns <- runs$lengths >= 8
+	runs$values <- rulebreakingruns
+	partofrun <- inverse.rle(runs)
+	df$rule2 <- partofrun
+	df
+
+}
+
 plot_chart <- function(x) {
 
 	# Define a vector for the horizontal axis values
@@ -60,7 +80,10 @@ plot_chart <- function(x) {
 
 	# Get the desired vertical axis range
 	vr <- get_v_axis_range(x)
-
+	
+	# Make vector of marker types
+	mark <- ifelse(x$rule1, 1, ifelse(x$rule2, 0, 19))
+	
 	# Plot the chart, ensuring an infinite axis range is not passed.
 	par(pch=19, col="black")
 	if (all(is.finite(vr))) {
@@ -68,7 +91,7 @@ plot_chart <- function(x) {
 		}
 	else plot(t, x[,"X"], type="n", ylab='', xlab='')
 	title(xlab="i", ylab="X_i", main=attributes(x)$title)
-	lines(t, x[,"X"], type="o")
+	lines(t, x[,"X"], type="o", pch=mark)
 	lines(t, x[,"Mean"], type="l", lty=1)
 	lines(t, x[,"LCL"], type="l", lty=2)
 	lines(t, x[,"UCL"], type="l", lty=2)

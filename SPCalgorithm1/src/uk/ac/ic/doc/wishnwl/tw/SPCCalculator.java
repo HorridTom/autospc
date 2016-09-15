@@ -255,6 +255,9 @@ public class SPCCalculator {
 // TODO: parametrise whether the algorithm uses breakpoint removal - currently always does.
 	public void calculate() {
 
+		boolean startPadding = true;
+		boolean endPadding = true;
+
 		int numberOfLoops = 0;
 		while(maximumNumberOfLoops == 0 || numberOfLoops < maximumNumberOfLoops) {
 			recalculateMeans();
@@ -287,7 +290,7 @@ public class SPCCalculator {
 					}
 					else {
 						if (breakEnd + 1 < breakPoints.length) breakPoints[breakEnd+1] = true;
-						if (existsBreakPointBefore(breakEnd)) {
+						if (existsBreakPointBefore(breakEnd) && endPadding == true) {
 							int bp = getSecondBreakPointBefore(breakEnd);
 							// modified so that the mean is calculated correctly - including the last point of the period in question
 							// TODO: tidy this up - clumsy way of ensuring calcMean is not passed an end parameter out of range
@@ -305,6 +308,18 @@ public class SPCCalculator {
 				}
 				else {
 					breakPoints[breakStart] = true;
+					if (existsBreakPointBefore(breakStart) && startPadding == true) {
+						int bp = getSecondBreakPointBefore(breakStart);
+						// modified so that the mean is calculated correctly - including the last point of the period in question
+						int meanEnd = breakStart + 1;
+						double m = calcMean(bp, meanEnd);
+						Pair p = existsBreak2aM(bp, breakStart, m);
+						if (p == null) {
+							int last = getBreakPointBefore(breakStart);
+							breakPoints[last] = false;
+						}
+					}
+
 					break;
 				}
 				breakSearchStart++;

@@ -20,7 +20,7 @@ public class SPCIO {
      Vector<Double[]> csvVals;
     //Alter the distance the algorithm looks for neighbouring breakpoints
    	//before adding a new one - steps 4 and 6.
-   	public static int padding = 5;
+   	public static int padding = 11;
 
 	public void loadCsv(String filename) {
 

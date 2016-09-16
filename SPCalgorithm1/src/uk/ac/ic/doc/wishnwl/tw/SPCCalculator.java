@@ -251,11 +251,10 @@ public class SPCCalculator {
 		return last;
 	}
 
-// TODO: parametrise this method to allow user to vary the rulebreak padding constants - currently hard-wired to 5.
-// TODO: parametrise whether the algorithm uses breakpoint removal - currently always does.
+// TODO: parametrise whether the algorithm uses breakpoint removal - currently hard coded below.
 	public void calculate() {
 
-		boolean startPadding = true;
+		boolean startPadding = false;
 		boolean endPadding = true;
 
 		int numberOfLoops = 0;
@@ -270,22 +269,10 @@ public class SPCCalculator {
 				int breakEnd = breakIndexRun.b;
 
 				if (existsBreakPointWithin(breakStart, breakPadding, false)) {
-				/*if (breakStart < 5 ||
-						breakPoints[breakStart] ||
-						breakPoints[breakStart-1] ||
-						breakPoints[breakStart-2] ||
-						breakPoints[breakStart-3] ||
-						breakPoints[breakStart-4] ||
-						breakPoints[breakStart-5]) {*/
+
 
 					if (existsBreakPointWithin(breakEnd, breakPadding, true)) {
-					/*if (breakEnd >= (breakPoints.length - 5) ||
-							breakPoints[breakEnd] ||
-							breakPoints[breakEnd+1] ||
-							breakPoints[breakEnd+2] ||
-							breakPoints[breakEnd+3] ||
-							breakPoints[breakEnd+4] ||
-							breakPoints[breakEnd+5]) {*/
+
 						//note: don't break!
 					}
 					else {

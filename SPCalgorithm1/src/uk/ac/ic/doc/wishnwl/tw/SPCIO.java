@@ -20,7 +20,7 @@ public class SPCIO {
      Vector<Double[]> csvVals;
     //Alter the distance the algorithm looks for neighbouring breakpoints
    	//before adding a new one - steps 4 and 6.
-   	public static int padding = 11;
+   	public static int padding = 5;
 
 	public void loadCsv(String filename) {
 
@@ -231,7 +231,7 @@ public class SPCIO {
 
 		//Set this flag to true to save output of each stage of the algorithm,
 		//or false to only save final result.
-		boolean outputStages = true;
+		boolean outputStages = false;
 
 
 		for (int i = 0;i < listOfFiles.length; i++) {

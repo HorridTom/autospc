@@ -253,15 +253,10 @@ public class SPCCalculator {
 
 // TODO: parametrise whether the algorithm uses breakpoint removal - currently hard coded below.
 	public void calculate() {
-<<<<<<< Upstream, based on branch 'master' of https://github.com/HorridTom/spc-algorithm.git
-
-		boolean startPadding = false;
-=======
 		
 		// These two parameters switch on an off the "padding" function
 		// TODO: These should be passed as arguments like other params.
 		boolean startPadding = true;
->>>>>>> 25e80d0 Pre-Tokyo
 		boolean endPadding = true;
 
 		int numberOfLoops = 0;

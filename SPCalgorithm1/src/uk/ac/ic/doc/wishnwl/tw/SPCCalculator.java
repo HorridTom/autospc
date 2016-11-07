@@ -256,11 +256,12 @@ public class SPCCalculator {
 
 		boolean startPadding = false;
 		boolean endPadding = true;
+		int startMin = 0;
 
 		int numberOfLoops = 0;
 		while(maximumNumberOfLoops == 0 || numberOfLoops < maximumNumberOfLoops) {
 			recalculateMeans();
-			int breakSearchStart = 0;
+			int breakSearchStart = startMin;
 
 			while(true) {
 				Pair breakIndexRun = existsBreak2a(breakSearchStart);
@@ -276,7 +277,10 @@ public class SPCCalculator {
 						//note: don't break!
 					}
 					else {
-						if (breakEnd + 1 < breakPoints.length) breakPoints[breakEnd+1] = true;
+						if (breakEnd + 1 < breakPoints.length) {
+							breakPoints[breakEnd+1] = true;
+							startMin = breakEnd + 1;
+						}
 						if (existsBreakPointBefore(breakEnd) && endPadding == true) {
 							int bp = getSecondBreakPointBefore(breakEnd);
 							// modified so that the mean is calculated correctly - including the last point of the period in question
@@ -284,7 +288,7 @@ public class SPCCalculator {
 							int meanEnd = Math.min(breakEnd + 1, breakPoints.length);
 							double m = calcMean(bp, meanEnd);
 							Pair p = existsBreak2aM(bp, breakEnd, m);
-							if (p == null) {
+							if (p == null || calcOverlap(breakIndexRun, p) <= 8 ) {
 								int last = getBreakPointBefore(breakEnd);
 								breakPoints[last] = false;
 							}
@@ -295,13 +299,15 @@ public class SPCCalculator {
 				}
 				else {
 					breakPoints[breakStart] = true;
+					startMin = breakStart;
 					if (existsBreakPointBefore(breakStart) && startPadding == true) {
 						int bp = getSecondBreakPointBefore(breakStart);
 						// modified so that the mean is calculated correctly - including the last point of the period in question
 						int meanEnd = breakStart + 1;
 						double m = calcMean(bp, meanEnd);
 						Pair p = existsBreak2aM(bp, breakStart, m);
-						if (p == null) {
+						if (p == null || calcOverlap(breakIndexRun, p) <= 8 ) {
+
 							int last = getBreakPointBefore(breakStart);
 							breakPoints[last] = false;
 						}
@@ -317,6 +323,24 @@ public class SPCCalculator {
 		}
 
 	}
+
+	private int calcOverlap(Pair x, Pair y) {
+
+		Pair p = new Pair(0,0);
+		Pair q = new Pair(0,0);
+
+		if (x.a <= y.a) {
+			p = x;
+			q = y;
+		} else {
+			p = y;
+			q = x;
+		}
+
+		if (q.a > p.b) return 0;
+		return Math.min(q.b-q.a+1,p.b-p.a+1);
+
+}
 
 	private boolean existsBreakPointWithin(int p, int tol, boolean forwards) {
 

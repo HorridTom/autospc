@@ -20,7 +20,7 @@ public class SPCIO {
      Vector<Double[]> csvVals;
     //Alter the distance the algorithm looks for neighbouring breakpoints
    	//before adding a new one - steps 4 and 6.
-   	public static int padding = 9;
+   	public static int padding = 20;
 
 	public void loadCsv(String filename) {
 
@@ -224,14 +224,14 @@ public class SPCIO {
 
 	public static void main(String[] args) throws DataException {
 
-		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\efit_data");
+		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\data");
 		File[] listOfFiles = folder.listFiles();
 		String fileName = new String();
 		int nloops = 0;
 
 		//Set this flag to true to save output of each stage of the algorithm,
 		//or false to only save final result.
-		boolean outputStages = false;
+		boolean outputStages = true;
 
 
 		for (int i = 0;i < listOfFiles.length; i++) {

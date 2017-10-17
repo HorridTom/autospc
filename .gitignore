@@ -26,3 +26,6 @@ hs_err_pid*
 /bin/
 
 bin/
+
+# Rhistory files
+*.Rhistory

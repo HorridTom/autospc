@@ -21,7 +21,7 @@ public class SPCAccumulator extends Accumulator {
 	public int breakPadding;
 	int index = -1;
 	boolean firstPass = true;
-	SPCCalculator2 spcCalc;
+	SPCCalculator spcCalc;
 	boolean isNull = false;
 	Vector<Double> vals = new Vector<Double>();
 
@@ -40,11 +40,11 @@ public class SPCAccumulator extends Accumulator {
 	}
 
 	public void finish() {
-		// at the end of the first pass, all data is loaded into the SPCCalculator2 object
+		// at the end of the first pass, all data is loaded into the SPCCalculator object
 		// and it can calculate the limits according to the algorithm.
 		if (firstPass) {
 			firstPass = false;
-			spcCalc = new SPCCalculator2(vals, maxIterations, breakPadding);
+			spcCalc = new SPCCalculator(vals, maxIterations, breakPadding);
 			spcCalc.calculate();
 		}
 	}

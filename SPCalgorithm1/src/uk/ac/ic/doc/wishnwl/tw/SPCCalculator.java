@@ -265,7 +265,37 @@ public class SPCCalculator {
 
 			while(true) {
 				Pair breakIndexRun = existsBreak2a(breakSearchStart);
-				if (breakIndexRun == null) return;
+				
+				if (breakIndexRun == null) {
+					recalculateMeans();
+					int lastDataPosition = breakPoints.length - 1;
+					
+					int lastPass = 0;
+					for (lastPass = 0; lastPass<lastDataPosition; lastPass++) {
+					
+						if (breakPoints[lastPass]) {
+							int numBreaks = countBreakPoints();
+							int lastBreak = getBreakPointBefore(lastPass);
+							if (lastBreak != 0) {
+								System.out.println(breakPoints[lastPass]);
+								breakPoints[lastPass] = false;
+								recalculateMeans();
+								int numBreaks2 = countBreakPoints();
+								System.out.println("Final BP (" + lastPass + ") removal difference: " + numBreaks2 + " vs " + numBreaks);
+								if (numBreaks2 > numBreaks) {
+									breakPoints[lastPass] = true;
+								}
+								if (lastPass - lastBreak < 20) {
+									breakPoints[lastPass] = false;
+								}
+							}
+							System.out.println(breakPoints[lastPass]);
+						}
+					
+					}
+					
+					return;
+				}
 				int breakStart = breakIndexRun.a;
 				int breakEnd = breakIndexRun.b;
 
@@ -321,7 +351,24 @@ public class SPCCalculator {
 
 			numberOfLoops++;
 		}
-
+		
+	}
+	
+	private int countBreakPoints() {
+		int numBreaks = 0;
+		int j = 0;
+		while (j < breakPoints.length - 1) {
+			Pair pCount = existsBreak2a(j);
+			if (pCount == null) {
+				break;
+			}
+			else {
+				numBreaks++;
+				j = pCount.b;
+			}
+		}
+		
+		return numBreaks;
 	}
 
 	private int calcOverlap(Pair x, Pair y) {

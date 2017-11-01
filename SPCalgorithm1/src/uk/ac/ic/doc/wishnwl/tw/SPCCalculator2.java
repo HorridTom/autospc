@@ -289,6 +289,8 @@ public class SPCCalculator2 {
 		// the rule break persists - in these cases (i) would still recalculate
 		// but (ii) would not. So (ii) is more conservative.
 
+		//Note 2017-11-01: (ii) is too conservative. e.g. efit R1F_571n. ?only do not recalc if a) stillbreak starts within first 7? b) enough non-stillbreak points to form limits?
+
 		// Specify the minimum period length n_b
 		int periodMin = 12;
 		// Specify the run length to trigger rule break n_r
@@ -306,7 +308,7 @@ public class SPCCalculator2 {
 		Pair stillBreaks;
 
 		for (int s = breakSearchStart; s < rawVals.length; s++) {
-			//System.out.println(s);
+			System.out.println(s);
 			breakIndexRun = existsBreak2a(s, maxRunLength);
 
 			// On finding a rule break starting at position s...
@@ -315,26 +317,26 @@ public class SPCCalculator2 {
 				int breakEnd = breakIndexRun.b;
 				// figure out the direction of the rule break
 				int breakDir = (int) Math.signum(rawVals[breakStart] - means[breakStart]);
-				//System.out.println("RB@" + breakStart + "-" + breakEnd + ":" + breakDir);
+				System.out.println("RB@" + breakStart + "-" + breakEnd + ":" + breakDir);
 
 				// ... check to see whether there are sufficient data points
 				// to form a new period...
 				if (rawVals.length - breakStart >= recalcPeriodMin) {
-					//System.out.println("Sufficient data");
+					System.out.println("Sufficient data");
 					// calculate the new mean for the new period
 					testMean = calcMean(breakStart, rawVals.length);
 					// check for any rule breaks occuring within the same
 					// interval as the triggering rule break.
 					stillBreaks = null;
 					for (int br = breakStart; br <= breakEnd - maxRunLength; br++) {
-						//System.out.println("stillBreaks check" + breakStart + "-" + (breakEnd - maxRunLength) + ": " + br);
-						//System.out.println(br + ":" + breakEnd + ":" + testMean);
+						System.out.println("stillBreaks check" + breakStart + "-" + (breakEnd - maxRunLength) + ": " + br);
+						System.out.println(br + ":" + breakEnd + ":" + testMean);
 						stillBreaks = existsBreak2aM(br, breakEnd, testMean, maxRunLength);
 						if (stillBreaks != null) break;
 					}
 
 					if (stillBreaks == null) {
-						//System.out.println("RB does not persist");
+						System.out.println("RB does not persist");
 						// ... if now no rule break, insert the breakpoint ...
 						breakPoints[breakStart] = true;
 						break;
@@ -347,12 +349,12 @@ public class SPCCalculator2 {
 						// opposite direction to the triggering rule break,
 						// also insert the breakpoint ...
 						if (breakDir*testBreakDir == -1) {
-							//System.out.println("Rule break opposite dir");
+							System.out.println("Rule break opposite dir");
 							breakPoints[breakStart] = true;
 							break;
 						}
 
-						//System.out.println("Rule break same dir - no breakpoint inserted");
+						System.out.println("Rule break same dir - no breakpoint inserted");
 						s = breakEnd;
 					}
 				} else {

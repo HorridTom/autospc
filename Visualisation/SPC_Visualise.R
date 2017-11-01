@@ -4,6 +4,7 @@
 batch_visualise_spc <- function(path = "C:/Users/tw299/git/spc-algorithm/SPCalgorithm1/data") {
 	setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 	spc_outputs <- load_spc_analyses(path=path)
+	spc_outputs <- spc_outputs[!(sapply(spc_outputs, nrow) == 0)]
 	spc_outputs <- add_control_limits(spc_outputs)
 	spc_outputs <- add_rule_breaks(spc_outputs)
 	pdf_charts(spc_outputs)

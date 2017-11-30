@@ -289,6 +289,16 @@ public class SPCCalculator2 {
 		// the rule break persists - in these cases (i) would still recalculate
 		// but (ii) would not. So (ii) is more conservative.
 
+		// So three cases given a rule break a) same direction, rule break disappears b) same direction, rule break persists
+		// c) different direction, rule break persists
+
+		// Three level parameter of the algorithm
+		// 0: recalculate in a, b & c = never remove the rule break
+		// 1: recalculate in a, b = remove rule break if rule break persists
+		// 2: recalculate in a = remove rule break if new average is in opposite direction
+
+		// Need to refactor to parametrise this.
+
 		//Note 2017-11-01: (ii) is too conservative. e.g. efit R1F_571n. ?only do not recalc if a) stillbreak starts within first 7? b) enough non-stillbreak points to form limits?
 
 		// Specify the minimum period length n_b
@@ -297,6 +307,8 @@ public class SPCCalculator2 {
 		int maxRunLength = 7;
 		// Specify how many data points required in new period before recalculating n_p
 		int recalcPeriodMin = 12;
+		// Specify whether to prevent recalculation if there the rule break persists afterwards
+		boolean checkStillBreaks = false;
 
 		// Calculate the mean and amr based on current break points
 		recalculateMeans(periodMin);
@@ -335,9 +347,9 @@ public class SPCCalculator2 {
 						if (stillBreaks != null) break;
 					}
 
-					if (stillBreaks == null) {
-						System.out.println("RB does not persist");
-						// ... if now no rule break, insert the breakpoint ...
+					if (stillBreaks == null || checkStillBreaks == false) {
+						System.out.println("RB does not persist or we aren't checking" + (stillBreaks == null) + (checkStillBreaks == false));
+						// ... if now no rule break, or if we're not checking, insert the breakpoint ...
 						breakPoints[breakStart] = true;
 						break;
 					} else {

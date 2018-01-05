@@ -27,5 +27,9 @@ hs_err_pid*
 
 bin/
 
-# Rhistory files
+# Rhistory and RData files
 *.Rhistory
+*.RData
+
+# .DS_Store
+.DS_Store

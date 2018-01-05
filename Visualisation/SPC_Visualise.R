@@ -1,8 +1,8 @@
 #setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 #source("SPC_Visualise.R")
 
-batch_visualise_spc <- function(path = "C:/Users/tw299/git/spc-algorithm/SPCalgorithm1/data") {
-	setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
+batch_visualise_spc <- function(path = "/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data") {
+	setwd("/Users/Thomas/code/eclipse-workspace/spc-algorithm/Visualisation")
 	spc_outputs <- load_spc_analyses(path=path)
 	spc_outputs <- spc_outputs[!(sapply(spc_outputs, nrow) == 0)]
 	spc_outputs <- add_control_limits(spc_outputs)

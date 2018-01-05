@@ -300,7 +300,30 @@ public class SPCCalculator2 {
 		// Need to refactor to parametrise this.
 
 		//Note 2017-11-01: (ii) is too conservative. e.g. efit R1F_571n. ?only do not recalc if a) stillbreak starts within first 7? b) enough non-stillbreak points to form limits?
-
+		
+		//Note 2017-12-12: I'm thinking go with (i) for now. Need to carefully consider disadvantages of this.
+		//Note 2017-12-12: Motivated by AMHS_CNWL_GP65 - even rule-breaks after the period of the original
+		//recalculation-inducing rule-break (RB1) can indicate a return to previous process.
+		// SO if enough data following RB1 to form new period, do so, otherwise leave as special cause RB
+		// against prevailing process.
+		
+		//***NEXT BEST IDEA***
+		//AH so the problem occurs if the n_p points after RB1-start *end* with a run (however long)
+		//in the opposite direction to RB1 against its original context process - i.e. back towards that process
+		//This is problematic because it *could* turn into a rule-breaking run back to the old process.
+		// So potential solution: wait until enough points to recalculate *that do not end in such a run*
+		// Then 'label' RB1 as resolved - a special cause signal against the prevailing process.
+		
+		//Note 2017-12-13 Will we still need to deal with case of persisting rule break? Possibly.
+		//Up down up? But then imagine RB1 hugely higher, slight but persistent down, ending above new mean.
+		//This would be better recalculated, whereas for a small leap at RB1, better not. That depends on whether
+		//The period beyond RB1 constitutes a rule break against RB1's original context process.
+		//If so, keep break at RB1-start, if not, don't insert break at RB1-start??
+	
+		
+		//TODO: Once the above is resolved, need to deal with multiple recalculation points
+		//(as of v2, so far have only dealt with first. Would be great to do this by making it recursive).
+		
 		// Specify the minimum period length n_b
 		int periodMin = 12;
 		// Specify the run length to trigger rule break n_r
@@ -344,6 +367,8 @@ public class SPCCalculator2 {
 						System.out.println("stillBreaks check" + breakStart + "-" + (breakEnd - maxRunLength) + ": " + br);
 						System.out.println(br + ":" + breakEnd + ":" + testMean);
 						stillBreaks = existsBreak2aM(br, breakEnd, testMean, maxRunLength);
+						// If find a break in this interval, stop searching 
+						// TODO: Need to deal with the case in which the first RB in this interval is in opposite direction, but another is in the same direction.
 						if (stillBreaks != null) break;
 					}
 

@@ -224,7 +224,7 @@ public class SPCIO {
 
 	public static void main(String[] args) throws DataException {
 
-		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\efit_data");
+		File folder = new File("/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data");
 		File[] listOfFiles = folder.listFiles();
 		String fileName = new String();
 		int nloops = 0;

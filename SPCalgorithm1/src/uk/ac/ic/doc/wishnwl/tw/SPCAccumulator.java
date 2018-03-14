@@ -17,22 +17,14 @@ public class SPCAccumulator extends Accumulator {
 	 * Does this accumulator return limits (true) or means (false)
 	 */
 	private boolean limits = false;
-	public int maxIterations;
-	public int breakPadding;
 	int index = -1;
 	boolean firstPass = true;
-	SPCCalculator2 spcCalc;
+	SPCCalculator spcCalc;
 	boolean isNull = false;
 	Vector<Double> vals = new Vector<Double>();
 
-	public SPCAccumulator(boolean limits, int maxIts, int padding) {
-		this.limits = limits;
-		this.maxIterations = maxIts;
-		this.breakPadding = padding;
-	}
-
 	public SPCAccumulator(boolean limits) {
-		this(limits, 0, 5);
+		this.limits = limits;
 	}
 
 	public void start() {
@@ -44,7 +36,7 @@ public class SPCAccumulator extends Accumulator {
 		// and it can calculate the limits according to the algorithm.
 		if (firstPass) {
 			firstPass = false;
-			spcCalc = new SPCCalculator2(vals, maxIterations, breakPadding);
+			spcCalc = new SPCCalculator(vals);
 			spcCalc.calculate();
 		}
 	}

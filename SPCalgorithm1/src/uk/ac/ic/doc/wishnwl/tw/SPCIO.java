@@ -63,14 +63,14 @@ public class SPCIO {
 
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName, int maxIterations, int breakPadding) throws DataException {
+	public static Vector<Double[]> analyseCsv(String fName) throws DataException {
 		SPCIO testIO = new SPCIO();
 		testIO.loadCsv(fName);
 		testIO.makeVector();
 
 		//System.out.println("Begin Accumulator");
 
-		SPCAccumulator spca = new SPCAccumulator(false, maxIterations, breakPadding);
+		SPCAccumulator spca = new SPCAccumulator(false);
 
 		//First pass - load data into vals, pass to SPCCalculator spcCalc
 		spca.start();
@@ -92,7 +92,7 @@ public class SPCIO {
 
 		//System.out.println("Begin Accumulator");
 
-		SPCAccumulator spcm = new SPCAccumulator(true, maxIterations, breakPadding);
+		SPCAccumulator spcm = new SPCAccumulator(true);
 
 		//First pass - load data into vals, pass to SPCCalculator spcCalc
 		spcm.start();
@@ -139,11 +139,8 @@ public class SPCIO {
 		return vOut;
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName) throws DataException {
-		return analyseCsv(fName, 0, padding);
-	}
 
-	public static void saveSpcToCsv(String fName, String label, int maxIterations, Vector<Double[]> v) {
+	public static void saveSpcToCsv(String fName, String label, Vector<Double[]> v) {
 		int n = v.size();
 
 		CSVWriter writer;
@@ -191,16 +188,12 @@ public class SPCIO {
 	}
 
 
-	public static void csvSPC(String fName, int maxIterations, int breakPadding) throws DataException {
+	public static void csvSPC(String fName) throws DataException {
 
 		Vector<Double[]> vOut = new Vector<Double[]>();
-		vOut = analyseCsv(fName, maxIterations, breakPadding);
-		saveSpcToCsv(fName, "", maxIterations, vOut);
+		vOut = analyseCsv(fName);
+		saveSpcToCsv(fName, "", vOut);
 
-	}
-
-	public static void csvSPC(String fName) throws DataException {
-		csvSPC(fName, 0, padding);
 	}
 
 	public static boolean equalVectors (Vector<Double[]> u, Vector<Double[]> v) {
@@ -227,32 +220,21 @@ public class SPCIO {
 		File folder = new File("/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data");
 		File[] listOfFiles = folder.listFiles();
 		String fileName = new String();
-		int nloops = 0;
 
 		//Set this flag to true to save output of each stage of the algorithm,
 		//or false to only save final result.
-		boolean outputStages = false;
-
 
 		for (int i = 0;i < listOfFiles.length; i++) {
 			fileName = listOfFiles[i].getAbsolutePath();
 			//SPCIO.csvSPC(fileName, 0);
 			Vector<Double[]> endResult = new Vector<Double[]>();
-			Vector<Double[]> result = new Vector<Double[]>();
-			endResult = analyseCsv(fileName, 0, padding);
-			saveSpcToCsv(fileName, "endresult", 0, endResult);
-			if(outputStages){
-				nloops = 0;
-				while(!equalVectors(endResult, result)) {
-					nloops++;
-					result = analyseCsv(fileName, nloops, padding);
-					saveSpcToCsv(fileName, String.valueOf(nloops), nloops, result);
-				}
-				System.out.println("Data in file " + fileName + " analysed in " + nloops + " stages.");
-			}
-			result = null;
+			System.out.println("\n*********************************************************************************************************");
+			System.out.println("Analysing data in file: " + fileName + " ...");
+			endResult = analyseCsv(fileName);
+			saveSpcToCsv(fileName, "endresult", endResult);
+			System.out.println("...data in file " + fileName + " analysed.");
 			endResult = null;
-
+			System.out.println("*********************************************************************************************************");
 		}
 
 

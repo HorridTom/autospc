@@ -2,22 +2,22 @@ package uk.ac.ic.doc.wishnwl.tw;
 
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
+
+//import uk.ac.ic.doc.wishnwl.tw.SPCCalculator.Pair;
 
 public class SPCCalculator {
 
-	public int maximumNumberOfLoops;
-	//private int defaultBreakPadding = 5;
-	public int breakPadding;
 	Vector<Double> vals;
 	double[] rawVals;
 	double[] deltas;
 	double[] means;
 	double[] amrs;
-	boolean[] breakPoints;
+	ArrayList<Period> periods;
 
-	public SPCCalculator(Vector vals2, int maxLoops, int padding) {
-		this.maximumNumberOfLoops = maxLoops;
-		this.breakPadding = padding;
+	public SPCCalculator(Vector vals2) {
+
 		this.vals = vals2;
 		rawVals = new double[vals.size()];
 		for (int i = 0; i < vals.size(); i++) {
@@ -27,25 +27,17 @@ public class SPCCalculator {
 		initArrays();
 	}
 
-	public SPCCalculator(double[] vals2, int maxLoops, int padding) {
-		this.maximumNumberOfLoops = maxLoops;
-		this.breakPadding = padding;
+	public SPCCalculator(double[] vals2) {
+
 		this.rawVals = vals2;
 		initArrays();
-	}
-
-	public SPCCalculator(Vector vals2) {
-		this(vals2, 0, 5);
-	}
-
-	public SPCCalculator(double[] vals2) {
-		this(vals2, 0, 5);
 	}
 
 	private void initArrays() {
 		double sum = 0.0D;
 		means = new double[rawVals.length];
-		breakPoints = new boolean[rawVals.length];
+		periods = new ArrayList<Period>();
+		if (rawVals.length > 0) {periods.add(new Period(0, rawVals.length - 1));}
 		deltas = new double[rawVals.length];
 		amrs = new double[rawVals.length];
 		if (deltas.length > 0) deltas[0] = 0.0D;
@@ -54,12 +46,13 @@ public class SPCCalculator {
 			double v = rawVals[i];
 			sum += v;
 			if (i > 0) deltas[i] = Math.abs(v - prev);
-			breakPoints[i] = false;
 			prev = v;
 		}
-		double mean = sum / rawVals.length;
-		for (int i = 0; i < means.length; i++) {
-			means[i] = mean;
+		if (rawVals.length > 0) {
+			double mean = sum / rawVals.length;
+			for (int i = 0; i < means.length; i++) {
+				means[i] = mean;
+			}
 		}
 	}
 
@@ -80,10 +73,9 @@ public class SPCCalculator {
 			if (i < amrs.length - 1) sb.append(amrs[i] + ",");
 			else sb.append(amrs[i] + "]\n");
 		}
-		sb.append("breakPoints:[");
-		for (int i = 0; i < breakPoints.length; i++) {
-			if (i < breakPoints.length - 1) sb.append(breakPoints[i] + ",");
-			else sb.append(breakPoints[i] + "]\n");
+		sb.append("Periods:[");
+		for (int i = 0; i < periods.size(); i++) {
+			sb.append(periods.get(i).toString());
 		}
 		return sb.toString();
 	}
@@ -96,280 +88,218 @@ public class SPCCalculator {
 		return new Double(amrs[index]);
 	}
 
-	//public void add(double rawValue) {
-		// TODO Auto-generated method stub
-	//	vals.add(new Double(rawValue));
-	//}
 
 	/**
 	 * Calculate the mean of a segment defined by start and end points.
 	 * @param start Start of segment (inclusive).
-	 * @param end End of segment (exclusive).
+	 * @param end End of segment (inclusive).
 	 */
-	private double calcMean(int start, int end) {
+	private double calcMeanInclusive(int start, int end) {
 		double sum = 0.0D;
-		for (int i = start; i < end; i++) {
+		for (int i = start; i <= end; i++) {
 			sum += rawVals[i];
 		}
-		double m = sum / (end - start);
+		double m = sum / (end - start + 1);
 		return m;
 	}
-	private double calcLimit(int start, int end) {
-		double sum = 0.0D;
-		//Original ...int i = start...
-		//Should be ...int i = start + 1... because
-		//Amr should ignore the meaningless first value
 
-		for (int i = start + 1; i < end; i++) {
+	
+	private double calcAmrInclusive(int start, int end) {
+		double sum = 0.0D;
+		
+		for (int i = start + 1; i <= end; i++) {
 			sum += deltas[i];
 		}
-		//Original:
-		//double m = sum / (end - start);
-		//I think this is a mistake - it should be:
-		double m = sum / (end - start - 1);
-		// - because the average moving range is found
-		//by dividing by one less than the number of data
-		return m;
+		
+		double amr = sum / (end - start);
+		return amr;
 	}
-	private void recalculateMeans() {
-		int segmentStart = 0;
-		for (int i = 0; i < rawVals.length; i++) {
-			if (breakPoints[i]) {
-				double m = calcMean(segmentStart, i);
-				double l = calcLimit(segmentStart, i);
-				for (int j = segmentStart; j < i; j++) {
-					means[j] = m;
-					amrs[j] = l;
-				}
-				segmentStart = i;
-			}
-		}
-		// have to do the last segment manually
-		double m = calcMean(segmentStart, rawVals.length);
-		double l = calcLimit(segmentStart, rawVals.length);
-		for (int j = segmentStart; j < rawVals.length; j++) {
-			means[j] = m;
-			amrs[j] = l;
-		}
-	}
+	
+	//PRIVATE
+	public void recalculate() {
 
-	/**
-	 *  Checks for a break based on the rule 2a.
-	 *
-	 * @param startIndex The point from which the method starts looking for the breakpoint.
-	 * @return null if no Break2a, otherwise the start and end indices in the arrays where the run occurs
-	 */
-	private Pair existsBreak2a(int startIndex) {
-		for (int i = startIndex; i < rawVals.length; i++){
-			int breakEnd = break2a(i);
-
-			if (breakEnd > -1) return new Pair(i, breakEnd);
-		}
-		return null;
-	}
-
-	private int break2a(int i) {
-		int seq = 0;
-		boolean breakDuringRun = false;
-		while ((i + seq < rawVals.length) && (rawVals[i + seq] > means[i+seq]) && !breakDuringRun){
-			if (seq != 0) breakDuringRun = breakDuringRun || breakPoints[i + seq];
-			seq++;
-		}
-		if (seq >= 8) // there is a run of at least 8 points
-			return i+seq-1; //return the index of the last point
-		seq = 0;
-		while ((i + seq < rawVals.length) && (rawVals[i + seq] < means[i+seq]) && !breakDuringRun){
-			if (seq != 0) breakDuringRun = breakDuringRun || breakPoints[i + seq];
-			seq++;
-		}
-		if (seq >= 8) // there is a run of at least 8 points
-			return i+seq-1; //return the index of the last point
-
-		return -1;
-	}
-
-	/**
-	 * Alternative version of the algorithm, with provided mean, used for hypothetical testing.
-	 * @param i
-	 * @return
-	 */
-	private Pair existsBreak2aM(int startIndex, int endIndex, double m) {
-		// Modified this function so rule breaks are only returned if they fall
-		// entirely within the specified range.
-
-		for (int i = startIndex; i < endIndex; i++){
-			int breakEnd = break2aM(i, m);
-			if ((breakEnd > -1) && (endIndex - i >= 8)) return new Pair(i, breakEnd);
-		}
-		return null;
-	}
-
-
-	private int break2aM(int i, double m) {
-
-		int seq = 0;
-		while ((i + seq < rawVals.length) && (rawVals[i + seq] > m)){
-			seq++;
-		}
-		if (seq >= 8) // there is a run of at least 8 points
-			return i+seq-1; //return the index of the last point
-		seq = 0;
-		while ((i + seq < rawVals.length) && (rawVals[i + seq] < m)){
-			seq++;
-		}
-		if (seq >= 8) // there is a run of at least 8 points
-			return i+seq-1; //return the index of the last point
-
-		return -1;
-	}
-
-	private boolean existsBreakPointBefore(int breakEnd) {
-		for (int i = 0; i < breakEnd; i++) {
-			if (breakPoints[i]) return true;
-		}
-		return false;
-	}
-	private int getSecondBreakPointBefore(int p) {
-		int last = 0;
-		int secondLast = 0;
-		for (int i = 0; i < p; i++) {
-			if (breakPoints[i]) {
-				secondLast = last;
-				last = i;
-			}
-		}
-		return secondLast;
-	}
-
-	private int getBreakPointBefore(int p) {
-		int last = 0;
-		for (int i = 0; i < p; i++) {
-			if (breakPoints[i]) {
-				last = i;
-			}
-		}
-		return last;
-	}
-
-// TODO: parametrise whether the algorithm uses breakpoint removal - currently hard coded below.
-	public void calculate() {
-
-		boolean startPadding = false;
-		boolean endPadding = true;
-		int startMin = 0;
-
-		int numberOfLoops = 0;
-		while(maximumNumberOfLoops == 0 || numberOfLoops < maximumNumberOfLoops) {
-			recalculateMeans();
-			int breakSearchStart = startMin;
-
-			while(true) {
-				Pair breakIndexRun = existsBreak2a(breakSearchStart);
-				
-				if (breakIndexRun == null) {
-					recalculateMeans();
-					int lastDataPosition = breakPoints.length - 1;
-					
-					int lastPass = 0;
-					for (lastPass = 0; lastPass<lastDataPosition; lastPass++) {
-					
-						if (breakPoints[lastPass]) {
-							int numBreaks = countBreakPoints();
-							int lastBreak = getBreakPointBefore(lastPass);
-							if (lastBreak != 0) {
-								System.out.println(breakPoints[lastPass]);
-								breakPoints[lastPass] = false;
-								recalculateMeans();
-								int numBreaks2 = countBreakPoints();
-								System.out.println("Final BP (" + lastPass + ") removal difference: " + numBreaks2 + " vs " + numBreaks);
-								if (numBreaks2 > numBreaks) {
-									breakPoints[lastPass] = true;
-								}
-								if (lastPass - lastBreak < 20) {
-									breakPoints[lastPass] = false;
-								}
-							}
-							System.out.println(breakPoints[lastPass]);
-						}
-					
-					}
-					
-					return;
-				}
-				int breakStart = breakIndexRun.a;
-				int breakEnd = breakIndexRun.b;
-
-				if (existsBreakPointWithin(breakStart, breakPadding, false)) {
-
-
-					if (existsBreakPointWithin(breakEnd, breakPadding, true)) {
-
-						//note: don't break!
-					}
-					else {
-						if (breakEnd + 1 < breakPoints.length) {
-							breakPoints[breakEnd+1] = true;
-							startMin = breakEnd + 1;
-						}
-						if (existsBreakPointBefore(breakEnd) && endPadding == true) {
-							int bp = getSecondBreakPointBefore(breakEnd);
-							// modified so that the mean is calculated correctly - including the last point of the period in question
-							// TODO: tidy this up - clumsy way of ensuring calcMean is not passed an end parameter out of range
-							int meanEnd = Math.min(breakEnd + 1, breakPoints.length);
-							double m = calcMean(bp, meanEnd);
-							Pair p = existsBreak2aM(bp, breakEnd, m);
-							if (p == null || calcOverlap(breakIndexRun, p) <= 8 ) {
-								int last = getBreakPointBefore(breakEnd);
-								breakPoints[last] = false;
-							}
-						}
-						break;
-					}
-
-				}
-				else {
-					breakPoints[breakStart] = true;
-					startMin = breakStart;
-					if (existsBreakPointBefore(breakStart) && startPadding == true) {
-						int bp = getSecondBreakPointBefore(breakStart);
-						// modified so that the mean is calculated correctly - including the last point of the period in question
-						int meanEnd = breakStart + 1;
-						double m = calcMean(bp, meanEnd);
-						Pair p = existsBreak2aM(bp, breakStart, m);
-						if (p == null || calcOverlap(breakIndexRun, p) <= 8 ) {
-
-							int last = getBreakPointBefore(breakStart);
-							breakPoints[last] = false;
-						}
-					}
-
-					break;
-				}
-				breakSearchStart++;
-			}
-
-
-			numberOfLoops++;
+		for (Period P : periods) {
+			setMean(P.dispInterval, P.mean());
+			setAmr(P.dispInterval, P.amr());
 		}
 		
 	}
 	
-	private int countBreakPoints() {
-		int numBreaks = 0;
-		int j = 0;
-		while (j < breakPoints.length - 1) {
-			Pair pCount = existsBreak2a(j);
-			if (pCount == null) {
-				break;
-			}
-			else {
-				numBreaks++;
-				j = pCount.b;
-			}
+	//PRIVATE
+	public void setMean(Pair p, double v) {
+		int i = p.a;
+		while(i <= p.b) {
+			this.means[i] = v;
+			i++;
 		}
 		
-		return numBreaks;
 	}
+	
+	//PRIVATE
+	public void setAmr(Pair p, double v) {
+		int i = p.a;
+		while(i <= p.b) {
+			this.amrs[i] = v;
+			i++;
+		}
+		
+	}
+	
+
+	//*************************************************************************
+	//
+	//The algorithm itself is specified by this method.
+	//Its effect is to modify the breakPoints attribute to its desired state
+	//reflecting the result of the recalculation algorithm.
+	//
+	//*************************************************************************
+	public void calculate() {
+		System.out.println("Calculate commencing ---------------------------------------------------------------------------");
+		// Specify the minimum period length n_p
+		int periodMin = 20;
+		// Specify the run length to trigger rule break n_r
+		int maxRunLength = 8;
+		// Check for potential run starts at the end of a new period?
+		boolean newPeriodEndCheck = false;
+
+		// Step -1: Check there is sufficient data to calculate limits
+		if (rawVals.length < periodMin) {
+			// Insufficient data
+			// For now, ignore this fact, and leave as one period
+			System.out.println("Insufficient data");
+			return;
+		}
+		
+		// Step 0: Form the baseline period and check if sufficient data for any
+		// additional periods
+		Period P0 = new Period(0, periodMin - 1, 0, rawVals.length - 1);
+		periods.clear();
+		periods.add(P0);
+		// Step 1: Calculate mean
+		this.recalculate();
+		if (rawVals.length < 2*periodMin) {
+			// Only enough data for one period.
+			System.out.println("Enough data for one period only");
+			return;
+		}
+		
+		// Counter to keep track of how much of the dataset has been analysed
+		int s = periodMin;
+		
+		// Loop whilst still enough data to potentially form new period
+		while (rawVals.length - s + 1 >= periodMin) {
+			// First refresh the mean/limits
+			System.out.println("Algorithm loop: s=" + s + "=========================================================");
+			System.out.println("Periods: " + periods);
+			this.recalculate();
+			
+			int lastPeriod = periods.size() - 1;
+			
+			Pair intervalToCheck = new Pair(s, periods.get(lastPeriod).dispInterval.b);
+			List<Pair> ruleBreakingRuns = getRuleBreakingRuns(periods.get(lastPeriod), maxRunLength, intervalToCheck);
+			
+			if (ruleBreakingRuns.size() == 0) {
+				System.out.println("No rule-breaking runs.");
+				// Step 2: If there are no rule-breaking-runs, finish
+				// otherwise continue...
+				return;
+			}
+			
+			// There is at least one rbr; the first of these triggers consideration of a recalculation...
+			Pair firstRBRun = ruleBreakingRuns.get(0);
+			int startIndex = firstRBRun.a;
+			int runLength = firstRBRun.length();
+			int runDirection = isRuleBreakingRun(firstRBRun, periods.get(lastPeriod), maxRunLength);
+			
+			// Check enough data after start of run to potentially
+			// form new period
+			if (rawVals.length - startIndex < periodMin) {
+				System.out.println("Run too close to end of data");
+				return;
+			}
+			
+			// Identify new candidate period, and check for any rule-breaking-runs within it
+			Period newP = new Period(startIndex, startIndex + periodMin - 1);
+			System.out.println("Checking for RBRs against candidate period " + newP);
+			List<Pair> rbrsNewP = getRuleBreakingRuns(newP, maxRunLength, false);
+			List<Pair> rbrsNewPTowardsOriginal = new ArrayList<Pair>();
+				for (Pair r : rbrsNewP) {
+					// Step 4: Check to see if any of these rbrs are in the opposite direction to the triggering rule-break,
+					// i.e. back towards the original process.
+					int runDirection2 = isRuleBreakingRun(r, newP, maxRunLength);
+					if (runDirection2 == -runDirection) {
+						rbrsNewPTowardsOriginal.add(r);
+					}
+				}
+			if (rbrsNewPTowardsOriginal.size() == 0) {
+				System.out.println("No RBRs back to original process within candidate period, adding...");
+				// If no rule-breaks back towards the original process,
+				// put the new period in and continue.
+				
+				//TODO: Here implement "Strict no-regret" option
+				//if newPeriodEndCheck = true
+				
+				// Add newP to periods
+				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
+				periods.add(new Period(startIndex, startIndex + periodMin - 1, startIndex, rawVals.length - 1));
+				
+				// Recalculate
+				this.recalculate();
+				
+				// Increment counter
+				s = newP.calcInterval.b + 1;
+				
+				//go to next while loop
+				continue;
+			} else {
+				// Now we know that there is at least one rule-break back towards
+				// the original process, and rbrsNewPTowardsOriginal is a list of these
+				
+				// Check whether all of these are rule-breaking against the original process
+				// in the same direction as the triggering run
+				boolean runConsistentWithOriginalProcess = false;
+				for (Pair r : rbrsNewPTowardsOriginal) {
+					if(isRuleBreakingRun(r, periods.get(lastPeriod), maxRunLength) != runDirection) {
+						runConsistentWithOriginalProcess = true;
+					}
+				}
+				if (!runConsistentWithOriginalProcess) {
+				System.out.println("All RBRs in candidate period are RB wrt original, adding...");
+				// If so, put the new period in and continue.
+				
+				// TODO: DNRYS - this is same as above!
+				
+				//TODO: Here implement "Strict no-regret" option
+				//if newPeriodEndCheck = true
+				
+				// Add newP to periods
+				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
+				periods.add(new Period(startIndex, startIndex + periodMin - 1, startIndex, rawVals.length - 1));
+				
+				// Recalculate
+				this.recalculate();
+				
+				// Increment counter
+				s = newP.calcInterval.b + 1;
+				
+				//go to next while loop
+				continue;
+				} else {
+					// If not, do not add this period, and start looking from after the
+					// triggering run.
+					System.out.println("At least one RBR in new period consistent with original process. si=" + startIndex + " rl=" + runLength);
+					s = startIndex + runLength;
+					continue;
+				}
+			}
+		} 
+		
+		return;
+
+	}
+	//*************************************************************************
+	//*************************************************************************
+
 
 	private int calcOverlap(Pair x, Pair y) {
 
@@ -389,22 +319,8 @@ public class SPCCalculator {
 
 }
 
-	private boolean existsBreakPointWithin(int p, int tol, boolean forwards) {
 
-		if (!forwards) {
-			if (p < tol) return true;
-		} else {
-			if (p >= breakPoints.length - tol) return true;
-		}
-		int direction = -1;
-		if (forwards) direction = 1;
-		for (int i = 0; i <= tol; i++) {
-			if (breakPoints[p + direction*i]) return true;
-		}
-		return false;
-	}
-
-	class Pair
+	public class Pair
 	{
 		int a;
 		int b;
@@ -412,7 +328,140 @@ public class SPCCalculator {
 			this.a = a;
 			this.b = b;
 		}
+		public int length() { return Math.max(a, b) - Math.min(a, b) + 1; }
 		public String toString() { return "("+ a + ", " + b + ")"; }
+	}
+	
+	public class Period
+	{
+		Pair calcInterval;
+		Pair dispInterval;
+		Period (Pair c, Pair d) {
+			this.calcInterval = c;
+			this.dispInterval = d;
+		}
+		Period (int c0, int c1, int d0, int d1) {
+			this.calcInterval = new Pair(c0, c1);
+			this.dispInterval = new Pair(d0, d1);
+		}
+		Period (int a, int b) {
+			this.calcInterval = new Pair(a,b);
+			this.dispInterval = new Pair(a, b);
+		}
+		public double mean() {
+			return calcMeanInclusive(this.calcInterval.a, this.calcInterval.b);
+		}
+		public double amr() {
+			return calcAmrInclusive(this.calcInterval.a, this.calcInterval.b);
+		}
+		
+		public String toString() {return "[" + calcInterval.toString() + "," + dispInterval.toString() + "]";}
+	}
+	
+	
+	public List<Pair> getRuleBreakingRuns(Period P, int runLength, Pair within) {
+		
+		List<Pair> runList = new ArrayList<Pair>();
+		int i = within.a;
+		
+		Pair run;
+		
+		while(i <= within.b) {
+			run = new Pair(i, getRunEnd(i, P));
+			if (run.length() >= runLength) {
+				runList.add(run);
+			}
+			i = run.b;
+			i++;
+		}
+		
+		return runList;
+	}
+	
+	
+	public List<Pair> getRuleBreakingRuns(Period P, int runLength, boolean startPostCalc) {
+		int start;
+		if (startPostCalc) {
+			start = P.calcInterval.b + 1;
+		} else {
+			start = P.dispInterval.a;
+		}
+		Pair pWithin = new Pair(start, P.dispInterval.b);
+		
+		return getRuleBreakingRuns(P, runLength, pWithin);
+
+	}
+	
+	
+	public int getRunEnd(int i, Period P) {
+		double m = P.mean();
+		int initDir;
+		int dir;
+		int j = i;
+		initDir = (int) Math.signum(rawVals[i] - m);
+		dir = initDir;
+		while(dir == initDir || dir == 0) {
+			j++;
+			if (j == rawVals.length) {break;}
+			dir = (int) Math.signum(rawVals[j] - m);
+		}
+		j--;
+		
+		return j;
+	}
+	
+	public int isRuleBreakingRun(Pair candidateRun, Period P, int runLength) {
+		// Returns 0 if the data points covered by candidateRun do not form a
+		// rule-breaking-run w.r.t. P; if they do,
+		// return 1 if the run is above P's mean and
+		// return -1 if the run is below P's mean.
+		if (candidateRun.length() < runLength) {return 0;} else {
+		
+			int[] signature;
+			int[] sigNoZeros;
+			int sigTrace;
+			double m = P.mean();
+			signature = new int[candidateRun.length()];
+			for (int i = candidateRun.a; i <= candidateRun.b; i++) {
+				signature[i - candidateRun.a] = (int) Math.signum(rawVals[i] - m);
+			}
+			sigNoZeros = removeSignatureZeros(signature);
+			if (sigNoZeros.length < runLength) {return 0;} else {
+				sigTrace = sigTrace(sigNoZeros);
+				if (sigTrace == -1) { return 0; } else {
+					return sigNoZeros[0];
+				}
+			}
+		}
+	}
+	
+	public static int[] removeSignatureZeros(int[] sig) {
+		int j = 0;
+		int[] sigNoZeros;
+			for (int i = 0; i < sig.length; i++) {
+				if(sig[i] == 1 || sig[i] == -1) {j++;}
+			}
+			sigNoZeros = new int[j];
+			int k = 0;
+			for (int i = 0; i < sig.length; i++) {
+				if(sig[i] == 1 || sig[i] == -1) {
+					sigNoZeros[k] = sig[i];
+					k++;
+				}
+			}
+		// TODO: Handle case where all elements of sig are 0
+		return sigNoZeros;
+	}
+	
+	public static int sigTrace(int[] sig) {
+		int sameSign = 1;
+		for (int i = 1; i < sig.length; i++) {
+			if (sig[i] != sig[0]) {
+				sameSign = -1;
+				break;
+			}
+		}
+		return sameSign;
 	}
 
 	public static void main(String[] args) {
@@ -505,10 +554,65 @@ public class SPCCalculator {
 //		testVals2.add(new Double(0.0487805));
 //		testVals2.add(new Double(0.0909091));
 
-		SPCCalculator calc = new SPCCalculator(testVals, 0, 5);
+		SPCCalculator calc = new SPCCalculator(testVals);
 		System.out.println("Before:\n" + calc);
 		calc.calculate();
 		System.out.println("After:\n" + calc);
 	}
 
+
+	
 }
+
+
+
+//feature - extension of baseline/period mean&limits - done by virtue
+		//of ability to restrict period used for calculation to length calcLen
+		//feature - wait for additional data before recalculating
+		//TODO: add feature - only recalculate if (i) new period average in same dir as break
+		//TODO: add feature - only recalculate if (ii) same rule break no longer present after recalc.
+		// NB (ii) => (i) but the converse is not true
+		// so any recalculation under (ii) is also under (i), but not vice-versa.
+		// In other words, there exist series/recalculation pairs for which the
+		// mew period average is in the same direction as the break, but where
+		// the rule break persists - in these cases (i) would still recalculate
+		// but (ii) would not. So (ii) is more conservative.
+
+		// So three cases given a rule break a) same direction, rule break disappears b) same direction, rule break persists
+		// c) different direction, rule break persists
+
+		// Three level parameter of the algorithm
+		// 0: recalculate in a, b & c = never remove the rule break
+		// 1: recalculate in a, b = remove rule break if rule break persists
+		// 2: recalculate in a = remove rule break if new average is in opposite direction
+
+		// Need to refactor to parametrise this.
+
+		//Note 2017-11-01: (ii) is too conservative. e.g. efit R1F_571n. ?only do not recalc if a) stillbreak starts within first 7? b) enough non-stillbreak points to form limits?
+		
+		//Note 2017-12-12: I'm thinking go with (i) for now. Need to carefully consider disadvantages of this.
+		//Note 2017-12-12: Motivated by AMHS_CNWL_GP65 - even rule-breaks after the period of the original
+		//recalculation-inducing rule-break (RB1) can indicate a return to previous process.
+		// SO if enough data following RB1 to form new period, do so, otherwise leave as special cause RB
+		// against prevailing process.
+		
+		//***NEXT BEST IDEA***
+		//AH so the problem occurs if the n_p points after RB1-start *end* with a run (however long)
+		//in the opposite direction to RB1 against its original context process - i.e. back towards that process
+		//This is problematic because it *could* turn into a rule-breaking run back to the old process.
+		// So potential solution: wait until enough points to recalculate *that do not end in such a run*
+		// Then 'label' RB1 as resolved - a special cause signal against the prevailing process.
+		
+		//Note 2017-12-13 Will we still need to deal with case of persisting rule break? Possibly.
+		//Up down up? But then imagine RB1 hugely higher, slight but persistent down, ending above new mean.
+		//This would be better recalculated, whereas for a small leap at RB1, better not. That depends on whether
+		//The period beyond RB1 constitutes a rule break against RB1's original context process.
+		//If so, keep break at RB1-start, if not, don't insert break at RB1-start??
+	
+		
+		//TODO: Once the above is resolved, need to deal with multiple recalculation points
+		//(as of v2, so far have only dealt with first. Would be great to do this by making it recursive).
+
+
+
+		

@@ -33,3 +33,6 @@ bin/
 
 # .DS_Store
 .DS_Store
+# Algorithm and visualisation outputs
+/Visualisation/*.txt
+/Visualisation/*.xls*

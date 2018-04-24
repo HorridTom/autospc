@@ -8,6 +8,8 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.ic.doc.wishnwl.tw.SPCCalculator.Period;
+
 
 public class SPCCalculatorTest {
 	
@@ -150,6 +152,25 @@ public class SPCCalculatorTest {
 		assertArrayEquals(testMeans, spcCalc.means, 1e-6d);
 		
 	}
+	
+	@Test
+	public void testMaxPairLength() {
+		
+		SPCCalculator.Pair p1 = spcCalc.new Pair(0,5);
+		SPCCalculator.Pair p2 = spcCalc.new Pair(19,30);
+		SPCCalculator.Pair p3 = spcCalc.new Pair(41,49);
+		
+		List<SPCCalculator.Pair> pairs = new ArrayList<SPCCalculator.Pair>();
+		pairs.add(p1);
+		pairs.add(p2);
+		pairs.add(p3);
+		
+		int result = spcCalc.maxPairLength(pairs);
+		
+		assertEquals(30 - 19 + 1, result);
+		
+	}
+	
 	
 	@Test
 	public void testRecalculate() {

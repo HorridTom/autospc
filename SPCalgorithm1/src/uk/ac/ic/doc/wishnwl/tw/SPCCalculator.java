@@ -15,6 +15,7 @@ public class SPCCalculator {
 	double[] means;
 	double[] amrs;
 	ArrayList<Period> periods;
+	//ArrayList<double[]> output;
 
 	public SPCCalculator(Vector vals2) {
 
@@ -159,9 +160,26 @@ public class SPCCalculator {
 		int periodMin = 20;
 		// Specify the run length to trigger rule break n_r
 		int maxRunLength = 8;
-		// Check for potential run starts at the end of a new period?
-		boolean newPeriodEndCheck = false;
+		// Check for potential run starts at the end of a new period? NOT IMPLEMENTED
+		// boolean newPeriodEndCheck = false;
+		// This first one overrides the below parameters
+		boolean forceNewPeriodOnRBR = false;
+		// Only disqualify a new Period if the run back to original process is longer than
+		// the triggering run
+		boolean onlyScreenReboundRBRsLongerThanTrigger = false;
+		// A run back to the original process disqualifies a new Period even if
+		// it doesn't reach maxRunLength until after the end of the new calc period.
+		boolean screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod = true;
+		// 
+		boolean doNotAddPeriodIfTriggerIsStillRBRInSameDir = true;
+		
 
+		System.out.println("Algorithm parameters:");
+		System.out.println("n_p = " + periodMin + ", n_r = " + maxRunLength);
+		System.out.println("forceNewPeriodOnRBR: " + forceNewPeriodOnRBR);
+		System.out.println("onlyScreenReboundRBRsLongerThanTrigger: " + onlyScreenReboundRBRsLongerThanTrigger +
+				". screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod: " + screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod);
+		System.out.println("doNotAddPeriodIfTriggerIsStillRBRInSameDir: " + doNotAddPeriodIfTriggerIsStillRBRInSameDir);
 		// Step -1: Check there is sufficient data to calculate limits
 		if (rawVals.length < periodMin) {
 			// Insufficient data
@@ -220,19 +238,57 @@ public class SPCCalculator {
 			
 			// Identify new candidate period, and check for any rule-breaking-runs within it
 			Period newP = new Period(startIndex, startIndex + periodMin - 1);
+			
+			if(forceNewPeriodOnRBR) {
+				System.out.println("RBR forces new period");
+				// Add newP to periods
+				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
+				periods.add(new Period(startIndex, startIndex + periodMin - 1, startIndex, rawVals.length - 1));
+				
+				// Recalculate
+				this.recalculate();
+				
+				// Increment counter
+				s = newP.calcInterval.b + 1;
+				
+				//go to next while loop
+				continue;
+			}
+			
+			
 			System.out.println("Checking for RBRs against candidate period " + newP);
 			List<Pair> rbrsNewP = getRuleBreakingRuns(newP, maxRunLength, false);
+			// First check that the triggering rule break is not still a RBR in the same direction...
+			boolean triggerIsStillRBRSameDir;
+			if (rbrsNewP.size() == 0) {
+				triggerIsStillRBRSameDir = false;
+			} else {
+			triggerIsStillRBRSameDir = rbrsNewP.get(0).a <= startIndex && rbrsNewP.get(0).b >= firstRBRun.b &&
+					isRuleBreakingRun(rbrsNewP.get(0), newP, maxRunLength) == runDirection;
+			}
+			if (doNotAddPeriodIfTriggerIsStillRBRInSameDir && triggerIsStillRBRSameDir) {
+				// If it is, do not add this period, and start looking from after the
+				// triggering run.
+				System.out.println("Triggering run is still RBR in same direction. si=" + startIndex + " rl=" + runLength);
+				s = startIndex + runLength;
+				continue;
+			}
+			// Now check for RBRs back towards the original process...
 			List<Pair> rbrsNewPTowardsOriginal = new ArrayList<Pair>();
 				for (Pair r : rbrsNewP) {
 					// Step 4: Check to see if any of these rbrs are in the opposite direction to the triggering rule-break,
 					// i.e. back towards the original process.
+					// Ignore any that start less than n_r from the end of the candidate calculation period.
 					int runDirection2 = isRuleBreakingRun(r, newP, maxRunLength);
-					if (runDirection2 == -runDirection) {
+					if (runDirection2 == -runDirection &&
+							(screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod || r.a <= newP.calcInterval.b - maxRunLength + 1)) {
 						rbrsNewPTowardsOriginal.add(r);
 					}
 				}
-			if (rbrsNewPTowardsOriginal.size() == 0) {
-				System.out.println("No RBRs back to original process within candidate period, adding...");
+			if (rbrsNewPTowardsOriginal.size() == 0 || 
+					(onlyScreenReboundRBRsLongerThanTrigger && maxPairLength(rbrsNewPTowardsOriginal) < runLength)) {
+				System.out.println("No RBRs, or none longer than triggering run, back to original process within candidate period, adding...");
+				System.out.println("[Number of RBRs in direction of original:" + rbrsNewPTowardsOriginal.size() + "]");
 				// If no rule-breaks back towards the original process,
 				// put the new period in and continue.
 				
@@ -288,6 +344,11 @@ public class SPCCalculator {
 					// If not, do not add this period, and start looking from after the
 					// triggering run.
 					System.out.println("At least one RBR in new period consistent with original process. si=" + startIndex + " rl=" + runLength);
+					System.out.println("RBRs in new period towards original process: ");
+					for (Pair p : rbrsNewPTowardsOriginal) {
+						System.out.println(p);
+						System.out.println(isRuleBreakingRun(p, periods.get(lastPeriod), maxRunLength));
+					}
 					s = startIndex + runLength;
 					continue;
 				}
@@ -331,6 +392,7 @@ public class SPCCalculator {
 		public int length() { return Math.max(a, b) - Math.min(a, b) + 1; }
 		public String toString() { return "("+ a + ", " + b + ")"; }
 	}
+	
 	
 	public class Period
 	{
@@ -408,6 +470,26 @@ public class SPCCalculator {
 		j--;
 		
 		return j;
+	}
+	
+	public int maxPairLength(List<Pair> pairList) throws IllegalArgumentException {
+		
+		if (pairList.size() == 0) {
+			throw new IllegalArgumentException();
+		}
+		int [] pairLengths = new int[pairList.size()];
+		int i = 0;
+		int maxLength = pairList.get(0).length();
+		
+		for (Pair p : pairList) {
+			pairLengths[i] = p.length();
+			i++;
+		}
+		for (i = 0; i < pairList.size(); i++) {
+			maxLength = Math.max(maxLength, pairLengths[i]);
+		}
+		
+		return maxLength;
 	}
 	
 	public int isRuleBreakingRun(Pair candidateRun, Period P, int runLength) {

@@ -13,7 +13,7 @@ hs_err_pid*
 
 # csv files
 *.csv
-
+/**/*.xlsx
 # pdf files
 *.pdf
 
@@ -35,4 +35,6 @@ bin/
 .DS_Store
 # Algorithm and visualisation outputs
 /Visualisation/*.txt
+/Visualisation/*.rtf
 /Visualisation/*.xls*
+/Visualisation/Flow_diagram/*

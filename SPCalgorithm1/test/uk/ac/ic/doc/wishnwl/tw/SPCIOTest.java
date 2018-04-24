@@ -43,7 +43,7 @@ public class SPCIOTest {
 	public static Collection<Object[]> dataSets() {
 		Collection<Object[]> fileListResult = new ArrayList<Object[]>();
 		String fileName;
-		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\testdata-20160914");
+		File folder = new File("/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/test-data");
 		List<File> listOfFiles = new ArrayList<>(Arrays.asList(folder.listFiles()));
 
 		//Remove any files from the list where their filename ends with "OUT.csv"
@@ -58,9 +58,11 @@ public class SPCIOTest {
 		// Populate the output Collection with the filenames
 		for (Iterator<File> iter = listOfFiles.iterator(); iter.hasNext();) {
 			fileName = iter.next().getAbsolutePath();
-			String[] paramArray = new String[1];
-			paramArray[0] = fileName;
-			fileListResult.add(paramArray);
+			if(!fileName.contains("DS_Store")) {
+				String[] paramArray = new String[1];
+				paramArray[0] = fileName;
+				fileListResult.add(paramArray);
+			}
 		}
 		// Return the list of filenames to be used as parameters for the test.
 		return fileListResult;
@@ -84,7 +86,7 @@ public class SPCIOTest {
 		//...and save the result.
 		//TODO: Shouldn't have to pass the maximum number of iterations to saveSpcToCsv method
 		//TODO: Consider making saveSpcToCsv return the actual file name used if successful?
-		SPCIO.saveSpcToCsv(dataFileName, "TEST", 0, result);
+		SPCIO.saveSpcToCsv(dataFileName, "TEST", result);
 
 		//Reconstruct the filename that the test result will have been saved as.
 		testOutputFileName = dataFileName.substring(0, dataFileName.length() - 4) + "_" + "TEST" + "_OUT.csv";

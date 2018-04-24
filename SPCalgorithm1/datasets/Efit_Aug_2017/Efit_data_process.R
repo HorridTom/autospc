@@ -1,6 +1,7 @@
 library(gdata)
 
-efit_data <- read.xls("C:/Users/tw299/git/spc-algorithm/SPCalgorithm1/datasets/Efit_Aug_2017/Efit_SPCdata_Test.xlsx")
+#efit_data <- read.xls("/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/datasets/Efit_Aug_2017/Efit_SPCdata_Test.xlsx")
+efit_data <- readxl::read_xlsx("/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/datasets/Efit_Aug_2017/Efit_SPCdata_Test.xlsx")
 efit_data$month <- as.Date(efit_data$Period)
 
 save_efit_data_for_algorithm <- function(efit_data, sv_dir =

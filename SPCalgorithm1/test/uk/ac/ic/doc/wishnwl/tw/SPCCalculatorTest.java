@@ -89,26 +89,26 @@ public class SPCCalculatorTest {
 	}
 	
 	@Test
-	public void testGetRunEnd() {
+	public void testRunEnd() {
 		
 		SPCCalculator.Period P = spcCalc.periods.get(0);
 		
-		assertEquals(29, spcCalc.getRunEnd(0, P));
-		assertEquals(29, spcCalc.getRunEnd(2, P));
-		assertEquals(49, spcCalc.getRunEnd(41, P));
-		assertEquals(30, spcCalc.getRunEnd(30, P));
-		assertEquals(31, spcCalc.getRunEnd(31, P));
-		assertEquals(34, spcCalc.getRunEnd(32, P));
-		assertEquals(78, spcCalc.getRunEnd(76, P));
+		assertEquals(29, spcCalc.runEnd(0, P));
+		assertEquals(29, spcCalc.runEnd(2, P));
+		assertEquals(49, spcCalc.runEnd(41, P));
+		assertEquals(30, spcCalc.runEnd(30, P));
+		assertEquals(31, spcCalc.runEnd(31, P));
+		assertEquals(34, spcCalc.runEnd(32, P));
+		assertEquals(78, spcCalc.runEnd(76, P));
 
 	}
 	
 	@Test
-	public void testGetRuleBreakingRuns() {
+	public void testRuleBreakingRuns() {
 		
-		SPCCalculator.Period P = spcCalc.periods.get(0);
+		SPCCalculator.Period P = spcCalc.getPeriods().get(0);
 		
-		List<SPCCalculator.Pair> ruleBreakingRuns = spcCalc.getRuleBreakingRuns(P, 8, false);
+		List<SPCCalculator.Pair> ruleBreakingRuns = spcCalc.ruleBreakingRuns(P, 8, false);
 		
 		// Correct result is: [(0,29),(41,49), (61,72)]
 		SPCCalculator.Pair correct_p1 = spcCalc.new Pair(0,29);
@@ -128,10 +128,10 @@ public class SPCCalculatorTest {
 	@Test
 	public void testConstructorMean() {
 		
-		double[] defaultMean = new double[spcCalc.rawVals.length];
+		double[] defaultMean = new double[spcCalc.getRawVals().length];
 		Arrays.fill(defaultMean, (double) 0.201256823);
 		
-		assertArrayEquals(defaultMean, spcCalc.means, 1e-6d);
+		assertArrayEquals(defaultMean, spcCalc.getCentres(), 1e-6d);
 		
 	}
 	
@@ -141,7 +141,7 @@ public class SPCCalculatorTest {
 		double testValue = 3.14159d;
 		SPCCalculator.Pair testPair = spcCalc.new Pair(5,9);
 		
-		double[] testMeans = new double[spcCalc.rawVals.length];
+		double[] testMeans = new double[spcCalc.getRawVals().length];
 		Arrays.fill(testMeans, (double) 0.201256823);
 		for (int i = 5; i<=9; i++) {
 			testMeans[i] = testValue;
@@ -149,7 +149,7 @@ public class SPCCalculatorTest {
 		
 		spcCalc.setMean(testPair, testValue);
 		
-		assertArrayEquals(testMeans, spcCalc.means, 1e-6d);
+		assertArrayEquals(testMeans, spcCalc.getCentres(), 1e-6d);
 		
 	}
 	
@@ -175,25 +175,27 @@ public class SPCCalculatorTest {
 	@Test
 	public void testRecalculate() {
 		
-		double[] defaultMean = new double[spcCalc.rawVals.length];
+		int dataLength = spcCalc.getRawVals().length;
+		
+		double[] defaultMean = new double[dataLength];
 		Arrays.fill(defaultMean, 0.201256823d);
 		
-		double[] recalcMean1 = new double[spcCalc.rawVals.length];
+		double[] recalcMean1 = new double[dataLength];
 		Arrays.fill(recalcMean1, 0.121413093d);
-		for (int i=40; i<spcCalc.rawVals.length; i++) {recalcMean1[i] = 0.283147828d;}
+		for (int i=40; i<dataLength; i++) {recalcMean1[i] = 0.283147828d;}
 		
-		double[] recalcMean2 = new double[spcCalc.rawVals.length];
+		double[] recalcMean2 = new double[dataLength];
 		Arrays.fill(recalcMean2, 0.06374923d);
-		for (int i=40; i<spcCalc.rawVals.length; i++) {recalcMean2[i] = 0.283147828d;}
+		for (int i=40; i<dataLength; i++) {recalcMean2[i] = 0.283147828d;}
 		
 		// Check that recalculation with the default period does not change the mean
 		spcCalc.recalculate();
 
-		assertArrayEquals(defaultMean, spcCalc.means, 1e-6d);
+		assertArrayEquals(defaultMean, spcCalc.getCentres(), 1e-6d);
 		
 		// Now artificially change the periods, and check recalculation works accordingly
 		SPCCalculator.Period P1 = spcCalc.new Period(0,39);
-		SPCCalculator.Period P2 = spcCalc.new Period(40, spcCalc.rawVals.length - 1);
+		SPCCalculator.Period P2 = spcCalc.new Period(40, dataLength - 1);
 		ArrayList<SPCCalculator.Period> testPeriods = new ArrayList<SPCCalculator.Period>();
 		testPeriods.add(P1);
 		testPeriods.add(P2);
@@ -202,7 +204,7 @@ public class SPCCalculatorTest {
 		
 		spcCalc.recalculate();
 		
-		assertArrayEquals(recalcMean1, spcCalc.means, 1e-6d);
+		assertArrayEquals(recalcMean1, spcCalc.getCentres(), 1e-6d);
 		
 		// Check an example with a period with differing display and calculation periods
 		SPCCalculator.Period P1a = spcCalc.new Period(0,19,0,39);
@@ -214,7 +216,7 @@ public class SPCCalculatorTest {
 		
 		spcCalc.recalculate();
 		
-		assertArrayEquals(recalcMean2, spcCalc.means, 1e-6d);
+		assertArrayEquals(recalcMean2, spcCalc.getCentres(), 1e-6d);
 
 	}
 	

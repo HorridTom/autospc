@@ -12,14 +12,17 @@ public class SPCCalculator {
 	int periodMin;
 	int maxRunLength;
 	boolean forceNewPeriodOnRBR;
-	Vector<Double> vals;
-	double[] rawVals;
-	double[] deltas;
-	double[] means;
-	double[] amrs;
+	private Vector<Double> vals;
+	private double[] rawVals;
+	private double[] deltas;
+	private double[] means;
+	private double[] amrs;
 	ArrayList<Period> periods;
 	//ArrayList<double[]> output;
-
+	
+	//
+	// Constructors
+	//
 	public SPCCalculator(Vector vals2, int minimumPeriodLength, int runRuleLength, boolean alwaysRecalc) {
 
 		this.periodMin = minimumPeriodLength;
@@ -51,7 +54,9 @@ public class SPCCalculator {
 		this(vals2, 20, 8, false);
 	}
 	
-
+	//
+	// Initialisation
+	//
 	private void initArrays() {
 		double sum = 0.0D;
 		means = new double[rawVals.length];
@@ -74,7 +79,10 @@ public class SPCCalculator {
 			}
 		}
 	}
-
+	
+	//
+	// Print to text
+	//
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("rawVals:[");
@@ -99,6 +107,9 @@ public class SPCCalculator {
 		return sb.toString();
 	}
 
+	//
+	// Getters and setters
+	//
 	public Object get(int index) {
 		return new Double(means[index]);
 	}
@@ -106,8 +117,47 @@ public class SPCCalculator {
 	public Object getLimit(int index) {
 		return new Double(amrs[index]);
 	}
+	
+	public double[] getRawVals() {
+		return this.rawVals;
+	}
+	
+	public double[] getDeltas() {
+		return this.deltas;
+	}
+	
+	public double[] getCentres() {
+		return this.means;
+	}
+	
+	public double[] getAmrs() {
+		return this.amrs;
+	}
+	
+	public ArrayList<Period> getPeriods() {
+		return this.periods;
+	}
 
-
+	//PRIVATE
+	public void setMean(Pair p, double v) {
+		int i = p.a;
+		while(i <= p.b) {
+			this.means[i] = v;
+			i++;
+		}
+		
+	}
+	
+	//PRIVATE
+	public void setAmr(Pair p, double v) {
+		int i = p.a;
+		while(i <= p.b) {
+			this.amrs[i] = v;
+			i++;
+		}
+		
+	}
+	
 	/**
 	 * Calculate the mean of a segment defined by start and end points.
 	 * @param start Start of segment (inclusive).
@@ -140,26 +190,6 @@ public class SPCCalculator {
 		for (Period P : periods) {
 			setMean(P.dispInterval, P.mean());
 			setAmr(P.dispInterval, P.amr());
-		}
-		
-	}
-	
-	//PRIVATE
-	public void setMean(Pair p, double v) {
-		int i = p.a;
-		while(i <= p.b) {
-			this.means[i] = v;
-			i++;
-		}
-		
-	}
-	
-	//PRIVATE
-	public void setAmr(Pair p, double v) {
-		int i = p.a;
-		while(i <= p.b) {
-			this.amrs[i] = v;
-			i++;
 		}
 		
 	}
@@ -232,7 +262,7 @@ public class SPCCalculator {
 			int lastPeriod = periods.size() - 1;
 			
 			Pair intervalToCheck = new Pair(s, periods.get(lastPeriod).dispInterval.b);
-			List<Pair> ruleBreakingRuns = getRuleBreakingRuns(periods.get(lastPeriod), this.maxRunLength, intervalToCheck);
+			List<Pair> ruleBreakingRuns = ruleBreakingRuns(periods.get(lastPeriod), this.maxRunLength, intervalToCheck);
 			
 			if (ruleBreakingRuns.size() == 0) {
 				System.out.println("No rule-breaking runs.");
@@ -277,7 +307,7 @@ public class SPCCalculator {
 			
 			
 			System.out.println("Checking for RBRs against candidate period " + newP);
-			List<Pair> rbrsNewP = getRuleBreakingRuns(newP, this.maxRunLength, false);
+			List<Pair> rbrsNewP = ruleBreakingRuns(newP, this.maxRunLength, false);
 			// First check that the triggering rule break is not still a RBR in the same direction...
 			boolean triggerIsStillRBRSameDir;
 			if (rbrsNewP.size() == 0) {
@@ -316,10 +346,10 @@ public class SPCCalculator {
 
 				if (newPeriodEndCheck && 
 						(int) Math.signum(rawVals[newP.calcInterval.b] - newP.mean()) == -runDirection) {
-					int startLastRunInNewPcalc = getRunStart(newP.calcInterval.b, newP);
+					int startLastRunInNewPcalc = runStart(newP.calcInterval.b, newP);
 					int numRemaining = rawVals.length - startLastRunInNewPcalc;
 					if (numRemaining < this.maxRunLength) {
-						int endLastRunInNewPcalc = getRunEnd(newP.calcInterval.b, newP);
+						int endLastRunInNewPcalc = runEnd(newP.calcInterval.b, newP);
 						if (endLastRunInNewPcalc >= rawVals.length - 1) {
 							System.out.println("Last run in new calc. period may trigger in future: " + startLastRunInNewPcalc + ", " + endLastRunInNewPcalc);
 							s = startIndex + runLength;
@@ -361,8 +391,8 @@ public class SPCCalculator {
 				//"Strict no-regret" option
 				if (newPeriodEndCheck && 
 						(int) Math.signum(rawVals[newP.calcInterval.b] - newP.mean()) == -runDirection) {
-					int startLastRunInNewPcalc = getRunStart(newP.calcInterval.b, newP);
-					int endLastRunInNewPcalc = getRunEnd(newP.calcInterval.b, newP);
+					int startLastRunInNewPcalc = runStart(newP.calcInterval.b, newP);
+					int endLastRunInNewPcalc = runEnd(newP.calcInterval.b, newP);
 					int numRemaining = rawVals.length - startLastRunInNewPcalc;
 					if (numRemaining < this.maxRunLength) {
 						if (endLastRunInNewPcalc >= rawVals.length - 1 ||
@@ -470,7 +500,7 @@ public class SPCCalculator {
 	}
 	
 	
-	public List<Pair> getRuleBreakingRuns(Period P, int runLength, Pair within) {
+	public List<Pair> ruleBreakingRuns(Period P, int runLength, Pair within) {
 		
 		List<Pair> runList = new ArrayList<Pair>();
 		int i = within.a;
@@ -478,7 +508,7 @@ public class SPCCalculator {
 		Pair run;
 		
 		while(i <= within.b) {
-			run = new Pair(i, getRunEnd(i, P));
+			run = new Pair(i, runEnd(i, P));
 			if (run.length() >= runLength) {
 				runList.add(run);
 			}
@@ -490,7 +520,7 @@ public class SPCCalculator {
 	}
 	
 	
-	public List<Pair> getRuleBreakingRuns(Period P, int runLength, boolean startPostCalc) {
+	public List<Pair> ruleBreakingRuns(Period P, int runLength, boolean startPostCalc) {
 		int start;
 		if (startPostCalc) {
 			start = P.calcInterval.b + 1;
@@ -499,12 +529,12 @@ public class SPCCalculator {
 		}
 		Pair pWithin = new Pair(start, P.dispInterval.b);
 		
-		return getRuleBreakingRuns(P, runLength, pWithin);
+		return ruleBreakingRuns(P, runLength, pWithin);
 
 	}
 	
 	
-	public int getRunEnd(int i, Period P) {
+	public int runEnd(int i, Period P) {
 		double m = P.mean();
 		int initDir;
 		int dir;
@@ -521,7 +551,7 @@ public class SPCCalculator {
 		return j;
 	}
 	
-	public int getRunStart(int i, Period P) {
+	public int runStart(int i, Period P) {
 		double m = P.mean();
 		int initDir;
 		int dir;

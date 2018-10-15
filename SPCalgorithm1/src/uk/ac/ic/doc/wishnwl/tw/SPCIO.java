@@ -1,4 +1,4 @@
-// This class runs SPCAccumulator on the data in each .csv file in a specified directory
+// This class runs SPCCalculator on the data in each .csv file in a specified directory
 // and saves the output as a new .csv file in the same directory.
 
 package uk.ac.ic.doc.wishnwl.tw;
@@ -17,7 +17,7 @@ public class SPCIO {
 	
 	CSVReader reader;
     List<String[]> myEntries;
-    Vector<Double[]> csvVals;
+    Vector<Double> csvVals;
 
 
 	public void loadCsv(String filename) {
@@ -41,7 +41,7 @@ public class SPCIO {
 
 	public void makeVector() {
 
-		this.csvVals = new Vector<Double[]>();
+		this.csvVals = new Vector<Double>();
 		Double x = new Double(0);
 
 		for (String[] s : myEntries) {
@@ -54,7 +54,7 @@ public class SPCIO {
 				x = null;
 			}
 			finally {
-				csvVals.add(new Double[]{x});
+				csvVals.add(new Double(x));
 			}
 
 		}
@@ -65,61 +65,30 @@ public class SPCIO {
 		SPCIO testIO = new SPCIO();
 		testIO.loadCsv(fName);
 		testIO.makeVector();
+		
+		SPCCalculator spcc = new SPCCalculator(testIO.csvVals, minimumPeriodLength, runRuleLength, forceRecalc);
+		spcc.calculate();
 
-		//System.out.println("Begin Accumulator");
-
-		SPCAccumulator spca = new SPCAccumulator(false, minimumPeriodLength, runRuleLength, forceRecalc);
-
-		//First pass - load data into vals, pass to SPCCalculator spcCalc
-		spca.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spca.onRow(i.next());
-		}
-		spca.finish();
-
-		//Get the mean from spcCalc and add it to ret
+		//Get the mean and add it to ret
 		Vector ret = new Vector();
-		spca.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spca.onRow(i.next());
-			ret.add(spca.getValue());
+		for (double m : spcc.getCentres()) {
+			ret.add(new Double(m));
 		}
-		spca.finish();
 
-		//System.out.println("End Accumulator");
-
-		//System.out.println("Begin Accumulator");
-
-		SPCAccumulator spcm = new SPCAccumulator(true, minimumPeriodLength, runRuleLength, forceRecalc);
-
-		//First pass - load data into vals, pass to SPCCalculator spcCalc
-		spcm.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spcm.onRow(i.next());
-		}
-		spcm.finish();
-
-		//Get the average moving range from spcCalc and add it to ret
+		//Get the average moving range and add it to retm
 		Vector retm = new Vector();
-		spcm.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spcm.onRow(i.next());
-			retm.add(spcm.getValue());
+		for (double a : spcc.getAmrs()) {
+			retm.add(new Double(a));
 		}
-		spcm.finish();
-
-		//System.out.println("End Accumulator");
 
 		//structure the output
 		int n = ret.size();
 		Vector<Double[]> vOut = new Vector<Double[]>(n);
 
-
-
 		//System.out.println("Structure Output");
 		for (int i = 0; i < n; i++) {
 			Double[] vItem = new Double[3];
-			vItem[0] = testIO.csvVals.get(i)[0];
+			vItem[0] = testIO.csvVals.get(i);
 			if (ret.get(i) != null) {
 				vItem[1] = Double.valueOf(String.valueOf(ret.get(i)));
 			} else {

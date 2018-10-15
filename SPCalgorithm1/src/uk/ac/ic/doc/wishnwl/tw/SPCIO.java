@@ -14,13 +14,11 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 public class SPCIO {
+	
+	CSVReader reader;
+    List<String[]> myEntries;
+    Vector<Double[]> csvVals;
 
-	 CSVReader reader;
-     List<String[]> myEntries;
-     Vector<Double[]> csvVals;
-    //Alter the distance the algorithm looks for neighbouring breakpoints
-   	//before adding a new one - steps 4 and 6.
-   	public static int padding = 9;
 
 	public void loadCsv(String filename) {
 
@@ -63,14 +61,14 @@ public class SPCIO {
 
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName) throws DataException {
+	public static Vector<Double[]> analyseCsv(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) throws DataException {
 		SPCIO testIO = new SPCIO();
 		testIO.loadCsv(fName);
 		testIO.makeVector();
 
 		//System.out.println("Begin Accumulator");
 
-		SPCAccumulator spca = new SPCAccumulator(false);
+		SPCAccumulator spca = new SPCAccumulator(false, minimumPeriodLength, runRuleLength, forceRecalc);
 
 		//First pass - load data into vals, pass to SPCCalculator spcCalc
 		spca.start();
@@ -92,7 +90,7 @@ public class SPCIO {
 
 		//System.out.println("Begin Accumulator");
 
-		SPCAccumulator spcm = new SPCAccumulator(true);
+		SPCAccumulator spcm = new SPCAccumulator(true, minimumPeriodLength, runRuleLength, forceRecalc);
 
 		//First pass - load data into vals, pass to SPCCalculator spcCalc
 		spcm.start();
@@ -188,10 +186,10 @@ public class SPCIO {
 	}
 
 
-	public static void csvSPC(String fName) throws DataException {
+	public static void csvSPC(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) throws DataException {
 
 		Vector<Double[]> vOut = new Vector<Double[]>();
-		vOut = analyseCsv(fName);
+		vOut = analyseCsv(fName, minimumPeriodLength, runRuleLength, forceRecalc);
 		saveSpcToCsv(fName, "", vOut);
 
 	}
@@ -216,21 +214,23 @@ public class SPCIO {
 	}
 
 	public static void main(String[] args) throws DataException {
-
-		File folder = new File("/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data");
+		
+		int minimumPeriodLength = Integer.parseInt(args[1]);
+		int runRuleLength = Integer.parseInt(args[2]);
+		boolean forceRecalc = Boolean.parseBoolean(args[3]);
+		// "/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data"
+		File folder = new File(args[0]);
 		File[] listOfFiles = folder.listFiles();
 		String fileName = new String();
 
-		//Set this flag to true to save output of each stage of the algorithm,
-		//or false to only save final result.
-
+		
 		for (int i = 0;i < listOfFiles.length; i++) {
 			fileName = listOfFiles[i].getAbsolutePath();
 			//SPCIO.csvSPC(fileName, 0);
 			Vector<Double[]> endResult = new Vector<Double[]>();
 			System.out.println("\n*********************************************************************************************************");
 			System.out.println("Analysing data in file: " + fileName + " ...");
-			endResult = analyseCsv(fileName);
+			endResult = analyseCsv(fileName, minimumPeriodLength, runRuleLength, forceRecalc);
 			saveSpcToCsv(fileName, "endresult", endResult);
 			System.out.println("...data in file " + fileName + " analysed.");
 			endResult = null;

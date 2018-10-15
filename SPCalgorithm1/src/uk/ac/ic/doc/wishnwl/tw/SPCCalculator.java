@@ -8,7 +8,10 @@ import java.util.ArrayList;
 //import uk.ac.ic.doc.wishnwl.tw.SPCCalculator.Pair;
 
 public class SPCCalculator {
-
+	
+	int periodMin;
+	int maxRunLength;
+	boolean forceNewPeriodOnRBR;
 	Vector<Double> vals;
 	double[] rawVals;
 	double[] deltas;
@@ -17,8 +20,11 @@ public class SPCCalculator {
 	ArrayList<Period> periods;
 	//ArrayList<double[]> output;
 
-	public SPCCalculator(Vector vals2) {
+	public SPCCalculator(Vector vals2, int minimumPeriodLength, int runRuleLength, boolean alwaysRecalc) {
 
+		this.periodMin = minimumPeriodLength;
+		this.maxRunLength = runRuleLength;
+		this.forceNewPeriodOnRBR = alwaysRecalc;
 		this.vals = vals2;
 		rawVals = new double[vals.size()];
 		for (int i = 0; i < vals.size(); i++) {
@@ -28,11 +34,23 @@ public class SPCCalculator {
 		initArrays();
 	}
 
-	public SPCCalculator(double[] vals2) {
-
+	public SPCCalculator(double[] vals2, int minimumPeriodLength, int runRuleLength, boolean alwaysRecalc) {
+		
+		this.periodMin = minimumPeriodLength;
+		this.maxRunLength = runRuleLength;
+		this.forceNewPeriodOnRBR = alwaysRecalc;
 		this.rawVals = vals2;
 		initArrays();
 	}
+	
+	public SPCCalculator(Vector vals2) {
+		this(vals2, 20, 8, false);
+	}
+	
+	public SPCCalculator(double[] vals2) {
+		this(vals2, 20, 8, false);
+	}
+	
 
 	private void initArrays() {
 		double sum = 0.0D;
@@ -157,31 +175,31 @@ public class SPCCalculator {
 	public void calculate() {
 		System.out.println("Calculate commencing ---------------------------------------------------------------------------");
 		// Specify the minimum period length n_p
-		int periodMin = 20;
+		// int this.periodMin = 20;
 		// Specify the run length to trigger rule break n_r
-		int maxRunLength = 8;
-		// Check for potential run starts at the end of a new period? NOT IMPLEMENTED
-		// boolean newPeriodEndCheck = false;
+		// int this.maxRunLength = 8;
+		// Check for potential run starts at the end of a new period?
+		boolean newPeriodEndCheck = true;
 		// This first one overrides the below parameters
-		boolean forceNewPeriodOnRBR = false;
+		// boolean this.forceNewPeriodOnRBR = false;
 		// Only disqualify a new Period if the run back to original process is longer than
 		// the triggering run
 		boolean onlyScreenReboundRBRsLongerThanTrigger = false;
 		// A run back to the original process disqualifies a new Period even if
-		// it doesn't reach maxRunLength until after the end of the new calc period.
+		// it doesn't reach this.maxRunLength until after the end of the new calc period.
 		boolean screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod = true;
 		// 
 		boolean doNotAddPeriodIfTriggerIsStillRBRInSameDir = true;
 		
 
 		System.out.println("Algorithm parameters:");
-		System.out.println("n_p = " + periodMin + ", n_r = " + maxRunLength);
-		System.out.println("forceNewPeriodOnRBR: " + forceNewPeriodOnRBR);
+		System.out.println("n_p = " + this.periodMin + ", n_r = " + this.maxRunLength);
+		System.out.println("this.forceNewPeriodOnRBR: " + this.forceNewPeriodOnRBR);
 		System.out.println("onlyScreenReboundRBRsLongerThanTrigger: " + onlyScreenReboundRBRsLongerThanTrigger +
 				". screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod: " + screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod);
 		System.out.println("doNotAddPeriodIfTriggerIsStillRBRInSameDir: " + doNotAddPeriodIfTriggerIsStillRBRInSameDir);
 		// Step -1: Check there is sufficient data to calculate limits
-		if (rawVals.length < periodMin) {
+		if (rawVals.length < this.periodMin) {
 			// Insufficient data
 			// For now, ignore this fact, and leave as one period
 			System.out.println("Insufficient data");
@@ -190,22 +208,22 @@ public class SPCCalculator {
 		
 		// Step 0: Form the baseline period and check if sufficient data for any
 		// additional periods
-		Period P0 = new Period(0, periodMin - 1, 0, rawVals.length - 1);
+		Period P0 = new Period(0, this.periodMin - 1, 0, rawVals.length - 1);
 		periods.clear();
 		periods.add(P0);
 		// Step 1: Calculate mean
 		this.recalculate();
-		if (rawVals.length < 2*periodMin) {
+		if (rawVals.length < 2*this.periodMin) {
 			// Only enough data for one period.
 			System.out.println("Enough data for one period only");
 			return;
 		}
 		
 		// Counter to keep track of how much of the dataset has been analysed
-		int s = periodMin;
+		int s = this.periodMin;
 		
 		// Loop whilst still enough data to potentially form new period
-		while (rawVals.length - s + 1 >= periodMin) {
+		while (rawVals.length - s + 1 >= this.periodMin) {
 			// First refresh the mean/limits
 			System.out.println("Algorithm loop: s=" + s + "=========================================================");
 			System.out.println("Periods: " + periods);
@@ -214,7 +232,7 @@ public class SPCCalculator {
 			int lastPeriod = periods.size() - 1;
 			
 			Pair intervalToCheck = new Pair(s, periods.get(lastPeriod).dispInterval.b);
-			List<Pair> ruleBreakingRuns = getRuleBreakingRuns(periods.get(lastPeriod), maxRunLength, intervalToCheck);
+			List<Pair> ruleBreakingRuns = getRuleBreakingRuns(periods.get(lastPeriod), this.maxRunLength, intervalToCheck);
 			
 			if (ruleBreakingRuns.size() == 0) {
 				System.out.println("No rule-breaking runs.");
@@ -227,23 +245,25 @@ public class SPCCalculator {
 			Pair firstRBRun = ruleBreakingRuns.get(0);
 			int startIndex = firstRBRun.a;
 			int runLength = firstRBRun.length();
-			int runDirection = isRuleBreakingRun(firstRBRun, periods.get(lastPeriod), maxRunLength);
+			int runDirection = isRuleBreakingRun(firstRBRun, periods.get(lastPeriod), this.maxRunLength);
 			
 			// Check enough data after start of run to potentially
 			// form new period
-			if (rawVals.length - startIndex < periodMin) {
+			if (rawVals.length - startIndex < this.periodMin) {
 				System.out.println("Run too close to end of data");
 				return;
 			}
 			
 			// Identify new candidate period, and check for any rule-breaking-runs within it
-			Period newP = new Period(startIndex, startIndex + periodMin - 1);
+			Pair newPcalc = new Pair(startIndex, startIndex + this.periodMin - 1);
+			Pair newPdisp = new Pair(startIndex, rawVals.length - 1);
+			Period newP = new Period(newPcalc, newPdisp);
 			
-			if(forceNewPeriodOnRBR) {
+			if(this.forceNewPeriodOnRBR) {
 				System.out.println("RBR forces new period");
 				// Add newP to periods
 				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
-				periods.add(new Period(startIndex, startIndex + periodMin - 1, startIndex, rawVals.length - 1));
+				periods.add(new Period(startIndex, startIndex + this.periodMin - 1, startIndex, rawVals.length - 1));
 				
 				// Recalculate
 				this.recalculate();
@@ -257,14 +277,14 @@ public class SPCCalculator {
 			
 			
 			System.out.println("Checking for RBRs against candidate period " + newP);
-			List<Pair> rbrsNewP = getRuleBreakingRuns(newP, maxRunLength, false);
+			List<Pair> rbrsNewP = getRuleBreakingRuns(newP, this.maxRunLength, false);
 			// First check that the triggering rule break is not still a RBR in the same direction...
 			boolean triggerIsStillRBRSameDir;
 			if (rbrsNewP.size() == 0) {
 				triggerIsStillRBRSameDir = false;
 			} else {
 			triggerIsStillRBRSameDir = rbrsNewP.get(0).a <= startIndex && rbrsNewP.get(0).b >= firstRBRun.b &&
-					isRuleBreakingRun(rbrsNewP.get(0), newP, maxRunLength) == runDirection;
+					isRuleBreakingRun(rbrsNewP.get(0), newP, this.maxRunLength) == runDirection;
 			}
 			if (doNotAddPeriodIfTriggerIsStillRBRInSameDir && triggerIsStillRBRSameDir) {
 				// If it is, do not add this period, and start looking from after the
@@ -278,10 +298,10 @@ public class SPCCalculator {
 				for (Pair r : rbrsNewP) {
 					// Step 4: Check to see if any of these rbrs are in the opposite direction to the triggering rule-break,
 					// i.e. back towards the original process.
-					// Ignore any that start less than n_r from the end of the candidate calculation period.
-					int runDirection2 = isRuleBreakingRun(r, newP, maxRunLength);
-					if (runDirection2 == -runDirection &&
-							(screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod || r.a <= newP.calcInterval.b - maxRunLength + 1)) {
+					// 
+					int runDirection2 = isRuleBreakingRun(r, newP, this.maxRunLength);
+					if (runDirection2 == -runDirection && r.a <= newP.calcInterval.b &&
+							(screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod || r.a <= newP.calcInterval.b - this.maxRunLength + 1)) {
 						rbrsNewPTowardsOriginal.add(r);
 					}
 				}
@@ -292,12 +312,25 @@ public class SPCCalculator {
 				// If no rule-breaks back towards the original process,
 				// put the new period in and continue.
 				
-				//TODO: Here implement "Strict no-regret" option
-				//if newPeriodEndCheck = true
+				//"Strict no-regret" option
+
+				if (newPeriodEndCheck && 
+						(int) Math.signum(rawVals[newP.calcInterval.b] - newP.mean()) == -runDirection) {
+					int startLastRunInNewPcalc = getRunStart(newP.calcInterval.b, newP);
+					int numRemaining = rawVals.length - startLastRunInNewPcalc;
+					if (numRemaining < this.maxRunLength) {
+						int endLastRunInNewPcalc = getRunEnd(newP.calcInterval.b, newP);
+						if (endLastRunInNewPcalc >= rawVals.length - 1) {
+							System.out.println("Last run in new calc. period may trigger in future: " + startLastRunInNewPcalc + ", " + endLastRunInNewPcalc);
+							s = startIndex + runLength;
+							continue;
+						}	
+					} 
+				}
 				
 				// Add newP to periods
 				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
-				periods.add(new Period(startIndex, startIndex + periodMin - 1, startIndex, rawVals.length - 1));
+				periods.add(new Period(startIndex, startIndex + this.periodMin - 1, startIndex, rawVals.length - 1));
 				
 				// Recalculate
 				this.recalculate();
@@ -315,22 +348,38 @@ public class SPCCalculator {
 				// in the same direction as the triggering run
 				boolean runConsistentWithOriginalProcess = false;
 				for (Pair r : rbrsNewPTowardsOriginal) {
-					if(isRuleBreakingRun(r, periods.get(lastPeriod), maxRunLength) != runDirection) {
+					if(isRuleBreakingRun(r, periods.get(lastPeriod), this.maxRunLength) != runDirection) {
 						runConsistentWithOriginalProcess = true;
 					}
 				}
 				if (!runConsistentWithOriginalProcess) {
-				System.out.println("All RBRs in candidate period are RB wrt original, adding...");
-				// If so, put the new period in and continue.
+				
+				System.out.println("All RBRs in candidate period are RB wrt original");
 				
 				// TODO: DNRYS - this is same as above!
 				
-				//TODO: Here implement "Strict no-regret" option
-				//if newPeriodEndCheck = true
+				//"Strict no-regret" option
+				if (newPeriodEndCheck && 
+						(int) Math.signum(rawVals[newP.calcInterval.b] - newP.mean()) == -runDirection) {
+					int startLastRunInNewPcalc = getRunStart(newP.calcInterval.b, newP);
+					int endLastRunInNewPcalc = getRunEnd(newP.calcInterval.b, newP);
+					int numRemaining = rawVals.length - startLastRunInNewPcalc;
+					if (numRemaining < this.maxRunLength) {
+						if (endLastRunInNewPcalc >= rawVals.length - 1 ||
+								isRuleBreakingRun(new Pair(startLastRunInNewPcalc, endLastRunInNewPcalc), newP, this.maxRunLength) == -runDirection) {
+							System.out.println("Last run in new calc. period rebounds or may rebound in future: " + startLastRunInNewPcalc + ", " + endLastRunInNewPcalc);
+							s = startIndex + runLength;
+							continue;
+						}	
+					} 
+				}
+				
+				
+				// put the new period in and continue.
 				
 				// Add newP to periods
 				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
-				periods.add(new Period(startIndex, startIndex + periodMin - 1, startIndex, rawVals.length - 1));
+				periods.add(new Period(startIndex, startIndex + this.periodMin - 1, startIndex, rawVals.length - 1));
 				
 				// Recalculate
 				this.recalculate();
@@ -347,7 +396,7 @@ public class SPCCalculator {
 					System.out.println("RBRs in new period towards original process: ");
 					for (Pair p : rbrsNewPTowardsOriginal) {
 						System.out.println(p);
-						System.out.println(isRuleBreakingRun(p, periods.get(lastPeriod), maxRunLength));
+						System.out.println(isRuleBreakingRun(p, periods.get(lastPeriod), this.maxRunLength));
 					}
 					s = startIndex + runLength;
 					continue;
@@ -468,6 +517,23 @@ public class SPCCalculator {
 			dir = (int) Math.signum(rawVals[j] - m);
 		}
 		j--;
+		
+		return j;
+	}
+	
+	public int getRunStart(int i, Period P) {
+		double m = P.mean();
+		int initDir;
+		int dir;
+		int j = i;
+		initDir = (int) Math.signum(rawVals[i] - m);
+		dir = initDir;
+		while(dir == initDir || dir == 0) {
+			j--;
+			if (j == -1) {break;}
+			dir = (int) Math.signum(rawVals[j] - m);
+		}
+		j++;
 		
 		return j;
 	}

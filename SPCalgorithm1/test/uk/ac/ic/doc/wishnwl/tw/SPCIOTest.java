@@ -76,7 +76,7 @@ public class SPCIOTest {
 
 		//Run the current algorithm on fileName...
 		try {
-			result = SPCIO.analyseCsv(dataFileName);
+			result = SPCIO.analyseCsv(dataFileName, 20, 8, false);
 		} catch (DataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

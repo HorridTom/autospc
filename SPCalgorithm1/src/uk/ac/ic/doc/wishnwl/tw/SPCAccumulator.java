@@ -17,14 +17,20 @@ public class SPCAccumulator extends Accumulator {
 	 * Does this accumulator return limits (true) or means (false)
 	 */
 	private boolean limits = false;
+	public int minP;
+	public int maxR;
+	public boolean forceR;
 	int index = -1;
 	boolean firstPass = true;
 	SPCCalculator spcCalc;
 	boolean isNull = false;
 	Vector<Double> vals = new Vector<Double>();
 
-	public SPCAccumulator(boolean limits) {
+	public SPCAccumulator(boolean limits, int minP, int maxR, boolean forceR) {
 		this.limits = limits;
+		this.minP = minP;
+		this.maxR = maxR;
+		this.forceR = forceR;
 	}
 
 	public void start() {
@@ -36,7 +42,7 @@ public class SPCAccumulator extends Accumulator {
 		// and it can calculate the limits according to the algorithm.
 		if (firstPass) {
 			firstPass = false;
-			spcCalc = new SPCCalculator(vals);
+			spcCalc = new SPCCalculator(vals, this.minP, this.maxR, this.forceR);
 			spcCalc.calculate();
 		}
 	}
@@ -106,7 +112,7 @@ public class SPCAccumulator extends Accumulator {
 		testVals.add(new Double[]{new Double(1)});
 
 		// Create a SPCAccumulator object - this will hold the data and perform the analysis
-		SPCAccumulator spca = new SPCAccumulator(true);
+		SPCAccumulator spca = new SPCAccumulator(true, 20, 8, false);
 
 		//First pass - load data into vals, pass to SPCCalculator spcCalc
 		spca.start();

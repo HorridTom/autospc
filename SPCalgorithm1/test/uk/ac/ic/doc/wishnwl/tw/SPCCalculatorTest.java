@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.Range;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,15 +64,15 @@ public class SPCCalculatorTest {
 		SPCCalculator.Period P = spcCalc.periods.get(0);
 		
 		// A run of 8 below the mean
-		SPCCalculator.Pair p1 = spcCalc.new Pair(0,7);
+		Range<Integer> p1 = Range.between(0,7);
 		// A non-run (mixture of above and below)
-		SPCCalculator.Pair p2 = spcCalc.new Pair(28,35);
+		Range<Integer> p2 = Range.between(28,35);
 		// A run of 12 above the mean
-		SPCCalculator.Pair p3 = spcCalc.new Pair(61,72);
+		Range<Integer> p3 = Range.between(61,72);
 		// A non-run (last point below)
-		SPCCalculator.Pair p4 = spcCalc.new Pair(61,73);
+		Range<Integer> p4 = Range.between(61,73);
 		// A run of 5 above the mean
-		SPCCalculator.Pair p5 = spcCalc.new Pair(51,55);
+		Range<Integer> p5 = Range.between(51,55);
 		
 		int result1 = spcCalc.isRuleBreakingRun(p1, P, 8);
 		int result2 = spcCalc.isRuleBreakingRun(p2, P, 8);
@@ -106,20 +108,20 @@ public class SPCCalculatorTest {
 		
 		SPCCalculator.Period P = spcCalc.getPeriods().get(0);
 		
-		List<SPCCalculator.Pair> ruleBreakingRuns = spcCalc.ruleBreakingRuns(P, 8, false);
+		List<Range<Integer>> ruleBreakingRuns = spcCalc.ruleBreakingRuns(P, 8, false);
 		
 		// Correct result is: [(0,29),(41,49), (61,72)]
-		SPCCalculator.Pair correct_p1 = spcCalc.new Pair(0,29);
-		SPCCalculator.Pair correct_p2 = spcCalc.new Pair(41,49);
-		SPCCalculator.Pair correct_p3 = spcCalc.new Pair(61,72);
+		Range<Integer> correct_p1 = Range.between(0,29);
+		Range<Integer> correct_p2 = Range.between(41,49);
+		Range<Integer> correct_p3 = Range.between(61,72);
 		
 		assertEquals(3, ruleBreakingRuns.size());
-		assertEquals(correct_p1.a, ruleBreakingRuns.get(0).a);
-		assertEquals(correct_p1.b, ruleBreakingRuns.get(0).b);
-		assertEquals(correct_p2.a, ruleBreakingRuns.get(1).a);
-		assertEquals(correct_p2.b, ruleBreakingRuns.get(1).b);
-		assertEquals(correct_p3.a, ruleBreakingRuns.get(2).a);
-		assertEquals(correct_p3.b, ruleBreakingRuns.get(2).b);
+		assertEquals(correct_p1.getMinimum(), ruleBreakingRuns.get(0).getMinimum());
+		assertEquals(correct_p1.getMaximum(), ruleBreakingRuns.get(0).getMaximum());
+		assertEquals(correct_p2.getMinimum(), ruleBreakingRuns.get(1).getMinimum());
+		assertEquals(correct_p2.getMaximum(), ruleBreakingRuns.get(1).getMaximum());
+		assertEquals(correct_p3.getMinimum(), ruleBreakingRuns.get(2).getMinimum());
+		assertEquals(correct_p3.getMaximum(), ruleBreakingRuns.get(2).getMaximum());
 		
 	}
 	
@@ -137,7 +139,7 @@ public class SPCCalculatorTest {
 	public void testSetMean() {
 		
 		double testValue = 3.14159d;
-		SPCCalculator.Pair testPair = spcCalc.new Pair(5,9);
+		Range<Integer> testRange = Range.between(5,9);
 		
 		double[] testMeans = new double[spcCalc.getRawVals().length];
 		Arrays.fill(testMeans, (double) 0.201256823);
@@ -145,25 +147,25 @@ public class SPCCalculatorTest {
 			testMeans[i] = testValue;
 		}
 		
-		spcCalc.setMean(testPair, testValue);
+		spcCalc.setMean(testRange, testValue);
 		
 		assertArrayEquals(testMeans, spcCalc.getCentres(), 1e-6d);
 		
 	}
 	
 	@Test
-	public void testMaxPairLength() {
+	public void testMaxRangeLength() {
 		
-		SPCCalculator.Pair p1 = spcCalc.new Pair(0,5);
-		SPCCalculator.Pair p2 = spcCalc.new Pair(19,30);
-		SPCCalculator.Pair p3 = spcCalc.new Pair(41,49);
+		Range<Integer> p1 = Range.between(0,5);
+		Range<Integer> p2 = Range.between(19,30);
+		Range<Integer> p3 = Range.between(41,49);
 		
-		List<SPCCalculator.Pair> pairs = new ArrayList<SPCCalculator.Pair>();
-		pairs.add(p1);
-		pairs.add(p2);
-		pairs.add(p3);
+		List<Range<Integer>> ranges = new ArrayList<Range<Integer>>();
+		ranges.add(p1);
+		ranges.add(p2);
+		ranges.add(p3);
 		
-		int result = spcCalc.maxPairLength(pairs);
+		int result = spcCalc.maxRangeLength(ranges);
 		
 		assertEquals(30 - 19 + 1, result);
 		

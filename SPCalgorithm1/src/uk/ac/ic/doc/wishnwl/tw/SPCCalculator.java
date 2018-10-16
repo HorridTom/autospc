@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.Range;
 
 public class SPCCalculator {
 	
@@ -137,9 +138,9 @@ public class SPCCalculator {
 	}
 
 	//PRIVATE
-	public void setMean(Pair p, double v) {
-		int i = p.a;
-		while(i <= p.b) {
+	public void setMean(Range<Integer> p, double v) {
+		int i = p.getMinimum();
+		while(i <= p.getMaximum()) {
 			this.means[i] = v;
 			i++;
 		}
@@ -147,9 +148,9 @@ public class SPCCalculator {
 	}
 	
 	//PRIVATE
-	public void setAmr(Pair p, double v) {
-		int i = p.a;
-		while(i <= p.b) {
+	public void setAmr(Range<Integer> p, double v) {
+		int i = p.getMinimum();
+		while(i <= p.getMaximum()) {
 			this.amrs[i] = v;
 			i++;
 		}
@@ -259,8 +260,8 @@ public class SPCCalculator {
 			
 			int lastPeriod = periods.size() - 1;
 			
-			Pair intervalToCheck = new Pair(s, periods.get(lastPeriod).dispInterval.b);
-			List<Pair> ruleBreakingRuns = ruleBreakingRuns(periods.get(lastPeriod), this.maxRunLength, intervalToCheck);
+			Range<Integer> intervalToCheck = Range.between(s, periods.get(lastPeriod).dispInterval.getMaximum());
+			List<Range<Integer>> ruleBreakingRuns = ruleBreakingRuns(periods.get(lastPeriod), this.maxRunLength, intervalToCheck);
 			
 			if (ruleBreakingRuns.size() == 0) {
 				System.out.println("No rule-breaking runs.");
@@ -270,9 +271,9 @@ public class SPCCalculator {
 			}
 			
 			// There is at least one rbr; the first of these triggers consideration of a recalculation...
-			Pair firstRBRun = ruleBreakingRuns.get(0);
-			int startIndex = firstRBRun.a;
-			int runLength = firstRBRun.length();
+			Range<Integer> firstRBRun = ruleBreakingRuns.get(0);
+			int startIndex = firstRBRun.getMinimum();
+			int runLength = rangeLength(firstRBRun);
 			int runDirection = isRuleBreakingRun(firstRBRun, periods.get(lastPeriod), this.maxRunLength);
 			
 			// Check enough data after start of run to potentially
@@ -283,21 +284,24 @@ public class SPCCalculator {
 			}
 			
 			// Identify new candidate period, and check for any rule-breaking-runs within it
-			Pair newPcalc = new Pair(startIndex, startIndex + this.periodMin - 1);
-			Pair newPdisp = new Pair(startIndex, rawVals.length - 1);
+			Range<Integer> newPcalc = Range.between(startIndex, startIndex + this.periodMin - 1);
+			Range<Integer> newPdisp = Range.between(startIndex, rawVals.length - 1);
 			Period newP = new Period(newPcalc, newPdisp);
 			
 			if(this.forceNewPeriodOnRBR) {
 				System.out.println("RBR forces new period");
 				// Add newP to periods
-				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
+				Range<Integer> lastPeriodDisp = periods.get(lastPeriod).dispInterval;
+				Range<Integer> newLastPeriodDisp = Range.between(lastPeriodDisp.getMinimum(), startIndex - 1);
+				Period newLastPeriod = new Period(periods.get(lastPeriod).calcInterval, newLastPeriodDisp);
+				periods.set(periods.size() - 1, newLastPeriod);
 				periods.add(new Period(startIndex, startIndex + this.periodMin - 1, startIndex, rawVals.length - 1));
 				
 				// Recalculate
 				this.recalculate();
 				
 				// Increment counter
-				s = newP.calcInterval.b + 1;
+				s = newP.calcInterval.getMaximum() + 1;
 				
 				//go to next while loop
 				continue;
@@ -305,13 +309,14 @@ public class SPCCalculator {
 			
 			
 			System.out.println("Checking for RBRs against candidate period " + newP);
-			List<Pair> rbrsNewP = ruleBreakingRuns(newP, this.maxRunLength, false);
+			List<Range<Integer>> rbrsNewP = ruleBreakingRuns(newP, this.maxRunLength, false);
 			// First check that the triggering rule break is not still a RBR in the same direction...
 			boolean triggerIsStillRBRSameDir;
 			if (rbrsNewP.size() == 0) {
 				triggerIsStillRBRSameDir = false;
 			} else {
-			triggerIsStillRBRSameDir = rbrsNewP.get(0).a <= startIndex && rbrsNewP.get(0).b >= firstRBRun.b &&
+			triggerIsStillRBRSameDir = rbrsNewP.get(0).getMinimum() <= startIndex &&
+					rbrsNewP.get(0).getMaximum() >= firstRBRun.getMaximum() &&
 					isRuleBreakingRun(rbrsNewP.get(0), newP, this.maxRunLength) == runDirection;
 			}
 			if (doNotAddPeriodIfTriggerIsStillRBRInSameDir && triggerIsStillRBRSameDir) {
@@ -322,19 +327,20 @@ public class SPCCalculator {
 				continue;
 			}
 			// Now check for RBRs back towards the original process...
-			List<Pair> rbrsNewPTowardsOriginal = new ArrayList<Pair>();
-				for (Pair r : rbrsNewP) {
+			List<Range<Integer>> rbrsNewPTowardsOriginal = new ArrayList<Range<Integer>>();
+				for (Range<Integer> r : rbrsNewP) {
 					// Step 4: Check to see if any of these rbrs are in the opposite direction to the triggering rule-break,
 					// i.e. back towards the original process.
 					// 
 					int runDirection2 = isRuleBreakingRun(r, newP, this.maxRunLength);
-					if (runDirection2 == -runDirection && r.a <= newP.calcInterval.b &&
-							(screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod || r.a <= newP.calcInterval.b - this.maxRunLength + 1)) {
+					if (runDirection2 == -runDirection && r.getMinimum() <= newP.calcInterval.getMaximum() &&
+							(screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod ||
+									r.getMinimum() <= newP.calcInterval.getMaximum() - this.maxRunLength + 1)) {
 						rbrsNewPTowardsOriginal.add(r);
 					}
 				}
 			if (rbrsNewPTowardsOriginal.size() == 0 || 
-					(onlyScreenReboundRBRsLongerThanTrigger && maxPairLength(rbrsNewPTowardsOriginal) < runLength)) {
+					(onlyScreenReboundRBRsLongerThanTrigger && maxRangeLength(rbrsNewPTowardsOriginal) < runLength)) {
 				System.out.println("No RBRs, or none longer than triggering run, back to original process within candidate period, adding...");
 				System.out.println("[Number of RBRs in direction of original:" + rbrsNewPTowardsOriginal.size() + "]");
 				// If no rule-breaks back towards the original process,
@@ -343,11 +349,11 @@ public class SPCCalculator {
 				//"Strict no-regret" option
 
 				if (newPeriodEndCheck && 
-						(int) Math.signum(rawVals[newP.calcInterval.b] - newP.mean()) == -runDirection) {
-					int startLastRunInNewPcalc = runStart(newP.calcInterval.b, newP);
+						(int) Math.signum(rawVals[newP.calcInterval.getMaximum()] - newP.mean()) == -runDirection) {
+					int startLastRunInNewPcalc = runStart(newP.calcInterval.getMaximum(), newP);
 					int numRemaining = rawVals.length - startLastRunInNewPcalc;
 					if (numRemaining < this.maxRunLength) {
-						int endLastRunInNewPcalc = runEnd(newP.calcInterval.b, newP);
+						int endLastRunInNewPcalc = runEnd(newP.calcInterval.getMaximum(), newP);
 						if (endLastRunInNewPcalc >= rawVals.length - 1) {
 							System.out.println("Last run in new calc. period may trigger in future: " + startLastRunInNewPcalc + ", " + endLastRunInNewPcalc);
 							s = startIndex + runLength;
@@ -357,14 +363,17 @@ public class SPCCalculator {
 				}
 				
 				// Add newP to periods
-				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
+				Range<Integer> lastPeriodDisp = periods.get(lastPeriod).dispInterval;
+				Range<Integer> newLastPeriodDisp = Range.between(lastPeriodDisp.getMinimum(), startIndex - 1);
+				Period newLastPeriod = new Period(periods.get(lastPeriod).calcInterval, newLastPeriodDisp);
+				periods.set(periods.size() - 1, newLastPeriod);
 				periods.add(new Period(startIndex, startIndex + this.periodMin - 1, startIndex, rawVals.length - 1));
 				
 				// Recalculate
 				this.recalculate();
 				
 				// Increment counter
-				s = newP.calcInterval.b + 1;
+				s = newP.calcInterval.getMaximum() + 1;
 				
 				//go to next while loop
 				continue;
@@ -375,7 +384,7 @@ public class SPCCalculator {
 				// Check whether all of these are rule-breaking against the original process
 				// in the same direction as the triggering run
 				boolean runConsistentWithOriginalProcess = false;
-				for (Pair r : rbrsNewPTowardsOriginal) {
+				for (Range<Integer> r : rbrsNewPTowardsOriginal) {
 					if(isRuleBreakingRun(r, periods.get(lastPeriod), this.maxRunLength) != runDirection) {
 						runConsistentWithOriginalProcess = true;
 					}
@@ -388,13 +397,13 @@ public class SPCCalculator {
 				
 				//"Strict no-regret" option
 				if (newPeriodEndCheck && 
-						(int) Math.signum(rawVals[newP.calcInterval.b] - newP.mean()) == -runDirection) {
-					int startLastRunInNewPcalc = runStart(newP.calcInterval.b, newP);
-					int endLastRunInNewPcalc = runEnd(newP.calcInterval.b, newP);
+						(int) Math.signum(rawVals[newP.calcInterval.getMaximum()] - newP.mean()) == -runDirection) {
+					int startLastRunInNewPcalc = runStart(newP.calcInterval.getMaximum(), newP);
+					int endLastRunInNewPcalc = runEnd(newP.calcInterval.getMaximum(), newP);
 					int numRemaining = rawVals.length - startLastRunInNewPcalc;
 					if (numRemaining < this.maxRunLength) {
 						if (endLastRunInNewPcalc >= rawVals.length - 1 ||
-								isRuleBreakingRun(new Pair(startLastRunInNewPcalc, endLastRunInNewPcalc), newP, this.maxRunLength) == -runDirection) {
+								isRuleBreakingRun(Range.between(startLastRunInNewPcalc, endLastRunInNewPcalc), newP, this.maxRunLength) == -runDirection) {
 							System.out.println("Last run in new calc. period rebounds or may rebound in future: " + startLastRunInNewPcalc + ", " + endLastRunInNewPcalc);
 							s = startIndex + runLength;
 							continue;
@@ -406,14 +415,17 @@ public class SPCCalculator {
 				// put the new period in and continue.
 				
 				// Add newP to periods
-				periods.get(lastPeriod).dispInterval.b = startIndex - 1;
+				Range<Integer> lastPeriodDisp = periods.get(lastPeriod).dispInterval;
+				Range<Integer> newLastPeriodDisp = Range.between(lastPeriodDisp.getMinimum(), startIndex - 1);
+				Period newLastPeriod = new Period(periods.get(lastPeriod).calcInterval, newLastPeriodDisp);
+				periods.set(periods.size() - 1, newLastPeriod);
 				periods.add(new Period(startIndex, startIndex + this.periodMin - 1, startIndex, rawVals.length - 1));
 				
 				// Recalculate
 				this.recalculate();
 				
 				// Increment counter
-				s = newP.calcInterval.b + 1;
+				s = newP.calcInterval.getMaximum() + 1;
 				
 				//go to next while loop
 				continue;
@@ -422,7 +434,7 @@ public class SPCCalculator {
 					// triggering run.
 					System.out.println("At least one RBR in new period consistent with original process. si=" + startIndex + " rl=" + runLength);
 					System.out.println("RBRs in new period towards original process: ");
-					for (Pair p : rbrsNewPTowardsOriginal) {
+					for (Range<Integer> p : rbrsNewPTowardsOriginal) {
 						System.out.println(p);
 						System.out.println(isRuleBreakingRun(p, periods.get(lastPeriod), this.maxRunLength));
 					}
@@ -437,80 +449,53 @@ public class SPCCalculator {
 	}
 	//*************************************************************************
 	//*************************************************************************
-
-
-	private int calcOverlap(Pair x, Pair y) {
-
-		Pair p = new Pair(0,0);
-		Pair q = new Pair(0,0);
-
-		if (x.a <= y.a) {
-			p = x;
-			q = y;
-		} else {
-			p = y;
-			q = x;
-		}
-
-		if (q.a > p.b) return 0;
-		return Math.min(q.b-q.a+1,p.b-p.a+1);
-
-}
-
-
-	public class Pair
-	{
-		int a;
-		int b;
-		Pair (int a, int b) {
-			this.a = a;
-			this.b = b;
-		}
-		public int length() { return Math.max(a, b) - Math.min(a, b) + 1; }
-		public String toString() { return "("+ a + ", " + b + ")"; }
+	
+	
+	public static int rangeLength(Range<Integer> r) {
+		return r.getMaximum() - r.getMinimum() + 1;
 	}
 	
 	
-	public class Period
-	{
-		Pair calcInterval;
-		Pair dispInterval;
-		Period (Pair c, Pair d) {
+	public class Period {
+
+		Range<Integer> calcInterval;
+		Range<Integer> dispInterval;
+		Period (Range<Integer> c, Range<Integer> d) {
 			this.calcInterval = c;
 			this.dispInterval = d;
 		}
 		Period (int c0, int c1, int d0, int d1) {
-			this.calcInterval = new Pair(c0, c1);
-			this.dispInterval = new Pair(d0, d1);
+			this.calcInterval = Range.between(c0, c1);
+			this.dispInterval = Range.between(d0, d1);
 		}
 		Period (int a, int b) {
-			this.calcInterval = new Pair(a,b);
-			this.dispInterval = new Pair(a, b);
+			this.calcInterval = Range.between(a, b);
+			this.dispInterval = Range.between(a, b);
 		}
 		public double mean() {
-			return calcMeanInclusive(this.calcInterval.a, this.calcInterval.b);
+			return calcMeanInclusive(this.calcInterval.getMinimum(), this.calcInterval.getMaximum());
 		}
 		public double amr() {
-			return calcAmrInclusive(this.calcInterval.a, this.calcInterval.b);
+			return calcAmrInclusive(this.calcInterval.getMinimum(), this.calcInterval.getMaximum());
 		}
 		
 		public String toString() {return "[" + calcInterval.toString() + "," + dispInterval.toString() + "]";}
 	}
 	
 	
-	public List<Pair> ruleBreakingRuns(Period P, int runLength, Pair within) {
+	public List<Range<Integer>> ruleBreakingRuns(Period P, int runLength, Range<Integer> within) {
 		
-		List<Pair> runList = new ArrayList<Pair>();
-		int i = within.a;
+		List<Range<Integer>> runList = new ArrayList<Range<Integer>>();
+		int i = within.getMinimum();
 		
-		Pair run;
+		Range<Integer> run;
 		
-		while(i <= within.b) {
-			run = new Pair(i, runEnd(i, P));
-			if (run.length() >= runLength) {
+		while(i <= within.getMaximum()) {
+			run = Range.between(i, runEnd(i, P));
+			if (rangeLength(run) >= runLength) {
 				runList.add(run);
 			}
-			i = run.b;
+			i = run.getMaximum();
 			i++;
 		}
 		
@@ -518,14 +503,14 @@ public class SPCCalculator {
 	}
 	
 	
-	public List<Pair> ruleBreakingRuns(Period P, int runLength, boolean startPostCalc) {
+	public List<Range<Integer>> ruleBreakingRuns(Period P, int runLength, boolean startPostCalc) {
 		int start;
 		if (startPostCalc) {
-			start = P.calcInterval.b + 1;
+			start = P.calcInterval.getMaximum() + 1;
 		} else {
-			start = P.dispInterval.a;
+			start = P.dispInterval.getMinimum();
 		}
-		Pair pWithin = new Pair(start, P.dispInterval.b);
+		Range<Integer> pWithin = Range.between(start, P.dispInterval.getMaximum());
 		
 		return ruleBreakingRuns(P, runLength, pWithin);
 
@@ -566,40 +551,40 @@ public class SPCCalculator {
 		return j;
 	}
 	
-	public int maxPairLength(List<Pair> pairList) throws IllegalArgumentException {
+	public int maxRangeLength(List<Range<Integer>> rangeList) throws IllegalArgumentException {
 		
-		if (pairList.size() == 0) {
+		if (rangeList.size() == 0) {
 			throw new IllegalArgumentException();
 		}
-		int [] pairLengths = new int[pairList.size()];
+		int [] rangeLengths = new int[rangeList.size()];
 		int i = 0;
-		int maxLength = pairList.get(0).length();
+		int maxLength = rangeLength(rangeList.get(0));
 		
-		for (Pair p : pairList) {
-			pairLengths[i] = p.length();
+		for (Range<Integer> p : rangeList) {
+			rangeLengths[i] = rangeLength(p);
 			i++;
 		}
-		for (i = 0; i < pairList.size(); i++) {
-			maxLength = Math.max(maxLength, pairLengths[i]);
+		for (i = 0; i < rangeList.size(); i++) {
+			maxLength = Math.max(maxLength, rangeLengths[i]);
 		}
 		
 		return maxLength;
 	}
 	
-	public int isRuleBreakingRun(Pair candidateRun, Period P, int runLength) {
+	public int isRuleBreakingRun(Range<Integer> candidateRun, Period P, int runLength) {
 		// Returns 0 if the data points covered by candidateRun do not form a
 		// rule-breaking-run w.r.t. P; if they do,
 		// return 1 if the run is above P's mean and
 		// return -1 if the run is below P's mean.
-		if (candidateRun.length() < runLength) {return 0;} else {
+		if (rangeLength(candidateRun) < runLength) {return 0;} else {
 		
 			int[] signature;
 			int[] sigNoZeros;
 			int sigTrace;
 			double m = P.mean();
-			signature = new int[candidateRun.length()];
-			for (int i = candidateRun.a; i <= candidateRun.b; i++) {
-				signature[i - candidateRun.a] = (int) Math.signum(rawVals[i] - m);
+			signature = new int[rangeLength(candidateRun)];
+			for (int i = candidateRun.getMinimum(); i <= candidateRun.getMaximum(); i++) {
+				signature[i - candidateRun.getMinimum()] = (int) Math.signum(rawVals[i] - m);
 			}
 			sigNoZeros = removeSignatureZeros(signature);
 			if (sigNoZeros.length < runLength) {return 0;} else {

@@ -3,12 +3,9 @@
 
 package uk.ac.ic.doc.wishnwl.tw;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.io.*;
-
-import org.eclipse.birt.data.engine.core.DataException;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -61,7 +58,7 @@ public class SPCIO {
 
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) throws DataException {
+	public static Vector<Double[]> analyseCsv(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) {
 		SPCIO testIO = new SPCIO();
 		testIO.loadCsv(fName);
 		testIO.makeVector();
@@ -155,7 +152,7 @@ public class SPCIO {
 	}
 
 
-	public static void csvSPC(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) throws DataException {
+	public static void csvSPC(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) {
 
 		Vector<Double[]> vOut = new Vector<Double[]>();
 		vOut = analyseCsv(fName, minimumPeriodLength, runRuleLength, forceRecalc);
@@ -182,7 +179,7 @@ public class SPCIO {
 		return status;
 	}
 
-	public static void main(String[] args) throws DataException {
+	public static void main(String[] args) {
 		
 		int minimumPeriodLength = Integer.parseInt(args[1]);
 		int runRuleLength = Integer.parseInt(args[2]);

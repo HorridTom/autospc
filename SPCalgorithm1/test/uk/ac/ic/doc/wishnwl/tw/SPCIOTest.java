@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.io.File;
 
-import org.eclipse.birt.data.engine.core.DataException;
-
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -77,14 +75,11 @@ public class SPCIOTest {
 		//Run the current algorithm on fileName...
 		try {
 			result = SPCIO.analyseCsv(dataFileName, 20, 8, false);
-		} catch (DataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail("Data Exception.");
+		} finally {
+			//TODO: sort error handling out!
 		}
 
 		//...and save the result.
-		//TODO: Shouldn't have to pass the maximum number of iterations to saveSpcToCsv method
 		//TODO: Consider making saveSpcToCsv return the actual file name used if successful?
 		SPCIO.saveSpcToCsv(dataFileName, "TEST", result);
 

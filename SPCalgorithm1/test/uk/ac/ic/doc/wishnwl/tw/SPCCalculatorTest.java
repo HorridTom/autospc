@@ -8,8 +8,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.ic.doc.wishnwl.tw.SPCCalculator.Period;
-
 
 public class SPCCalculatorTest {
 	

@@ -1,11 +1,9 @@
 package uk.ac.ic.doc.wishnwl.tw;
 
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.List;
 import java.util.ArrayList;
 
-//import uk.ac.ic.doc.wishnwl.tw.SPCCalculator.Pair;
 
 public class SPCCalculator {
 	

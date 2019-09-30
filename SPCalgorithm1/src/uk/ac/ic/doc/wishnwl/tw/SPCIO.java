@@ -39,31 +39,29 @@ public class SPCIO {
 	public void makeVector() {
 
 		this.csvVals = new Vector<Double>();
-		Double x = new Double(0);
+		Double x = Double.valueOf(0);
 
 		for (String[] s : myEntries) {
 			try {
 				x = Double.valueOf(String.valueOf(s[0].toCharArray()));
+				csvVals.add(Double.valueOf(x));
 			}
 			catch (NumberFormatException e) {
 //				System.out.println(String.valueOf(s[0].toCharArray())
 //						+ " is not a Double - replaced with null.");
-				x = null;
-			}
-			finally {
-				csvVals.add(new Double(x));
+				//csvVals.add(null);
 			}
 
 		}
 
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) {
+	public static Vector<Double[]> analyseCsv(String fName, int minimumPeriodLength, int runRuleLength, int baselineWait, boolean forceRecalc) {
 		SPCIO testIO = new SPCIO();
 		testIO.loadCsv(fName);
 		testIO.makeVector();
 		
-		SPCCalculator spcc = new SPCCalculator(testIO.csvVals, minimumPeriodLength, runRuleLength, forceRecalc);
+		SPCCalculator spcc = new SPCCalculator(testIO.csvVals, minimumPeriodLength, runRuleLength, baselineWait, forceRecalc);
 		spcc.calculate();
 
 		//Get the mean and add it to ret
@@ -152,10 +150,10 @@ public class SPCIO {
 	}
 
 
-	public static void csvSPC(String fName, int minimumPeriodLength, int runRuleLength, boolean forceRecalc) {
+	public static void csvSPC(String fName, int minimumPeriodLength, int runRuleLength, int baselineWait, boolean forceRecalc) {
 
 		Vector<Double[]> vOut = new Vector<Double[]>();
-		vOut = analyseCsv(fName, minimumPeriodLength, runRuleLength, forceRecalc);
+		vOut = analyseCsv(fName, minimumPeriodLength, runRuleLength, baselineWait, forceRecalc);
 		saveSpcToCsv(fName, "", vOut);
 
 	}
@@ -183,7 +181,8 @@ public class SPCIO {
 		
 		int minimumPeriodLength = Integer.parseInt(args[1]);
 		int runRuleLength = Integer.parseInt(args[2]);
-		boolean forceRecalc = Boolean.parseBoolean(args[3]);
+		int baselineWait = Integer.parseInt(args[3]);
+		boolean forceRecalc = Boolean.parseBoolean(args[4]);
 		// "/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data"
 		File folder = new File(args[0]);
 		File[] listOfFiles = folder.listFiles();
@@ -196,7 +195,7 @@ public class SPCIO {
 			Vector<Double[]> endResult = new Vector<Double[]>();
 			System.out.println("\n*********************************************************************************************************");
 			System.out.println("Analysing data in file: " + fileName + " ...");
-			endResult = analyseCsv(fileName, minimumPeriodLength, runRuleLength, forceRecalc);
+			endResult = analyseCsv(fileName, minimumPeriodLength, runRuleLength, baselineWait, forceRecalc);
 			saveSpcToCsv(fileName, "endresult", endResult);
 			System.out.println("...data in file " + fileName + " analysed.");
 			endResult = null;

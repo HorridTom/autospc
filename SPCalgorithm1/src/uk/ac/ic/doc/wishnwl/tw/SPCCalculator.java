@@ -10,6 +10,7 @@ public class SPCCalculator {
 	
 	int periodMin;
 	int maxRunLength;
+	int maxBaselineWait;
 	boolean forceNewPeriodOnRBR;
 	private Vector<Double> vals;
 	private double[] rawVals;
@@ -22,10 +23,11 @@ public class SPCCalculator {
 	//
 	// Constructors
 	//
-	public SPCCalculator(Vector vals2, int minimumPeriodLength, int runRuleLength, boolean alwaysRecalc) {
+	public SPCCalculator(Vector vals2, int minimumPeriodLength, int runRuleLength, int baselineWait, boolean alwaysRecalc) {
 
 		this.periodMin = minimumPeriodLength;
 		this.maxRunLength = runRuleLength;
+		this.maxBaselineWait = baselineWait;
 		this.forceNewPeriodOnRBR = alwaysRecalc;
 		this.vals = vals2;
 		rawVals = new double[vals.size()];
@@ -36,21 +38,22 @@ public class SPCCalculator {
 		initArrays();
 	}
 
-	public SPCCalculator(double[] vals2, int minimumPeriodLength, int runRuleLength, boolean alwaysRecalc) {
+	public SPCCalculator(double[] vals2, int minimumPeriodLength, int runRuleLength, int baselineWait, boolean alwaysRecalc) {
 		
 		this.periodMin = minimumPeriodLength;
 		this.maxRunLength = runRuleLength;
+		this.maxBaselineWait = baselineWait;
 		this.forceNewPeriodOnRBR = alwaysRecalc;
 		this.rawVals = vals2;
 		initArrays();
 	}
 	
 	public SPCCalculator(Vector vals2) {
-		this(vals2, 20, 8, false);
+		this(vals2, 20, 8, 0, false);
 	}
 	
 	public SPCCalculator(double[] vals2) {
-		this(vals2, 20, 8, false);
+		this(vals2, 20, 8, 0, false);
 	}
 	
 	//
@@ -222,7 +225,7 @@ public class SPCCalculator {
 		
 
 		System.out.println("Algorithm parameters:");
-		System.out.println("n_p = " + this.periodMin + ", n_r = " + this.maxRunLength);
+		System.out.println("n_p = " + this.periodMin + ", n_r = " + this.maxRunLength + ", n_b = " + this.maxBaselineWait);
 		System.out.println("this.forceNewPeriodOnRBR: " + this.forceNewPeriodOnRBR);
 		System.out.println("onlyScreenReboundRBRsLongerThanTrigger: " + onlyScreenReboundRBRsLongerThanTrigger +
 				". screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod: " + screenReboundRBRsEvenIfTheyTriggerAfterCalcPeriod);
@@ -235,24 +238,54 @@ public class SPCCalculator {
 			return;
 		}
 		
-		// Step 0: Form the baseline period and check if sufficient data for any
-		// additional periods
+		// Step 0: Form the naive baseline period 
 		Period P0 = new Period(0, this.periodMin - 1, 0, rawVals.length - 1);
 		periods.clear();
 		periods.add(P0);
 		// Step 1: Calculate mean
 		this.recalculate();
-		if (rawVals.length < 2*this.periodMin) {
+		// If we're waiting for baseline, check naive baseline for any rule-breaking-runs
+		if(this.maxBaselineWait != 0) {
+			System.out.println("Baseline wait: " + this.maxBaselineWait);
+			int lastPeriod = periods.size() - 1; // there is only one period so this is 0 
+			
+			List<Range<Integer>> baselineRuleBreakingRuns = ruleBreakingRuns(periods.get(lastPeriod), this.maxRunLength, periods.get(lastPeriod).calcInterval);
+			System.out.println("Found " + baselineRuleBreakingRuns.size() + " rule-breaking runs in baseline");
+			if(baselineRuleBreakingRuns.size() != 0) {
+				int minBaselineRuleBreakingRuns = baselineRuleBreakingRuns.size();
+				int optimalBaselineStart = 0;
+				for (int i = 1; i <= Math.min(this.maxBaselineWait, rawVals.length - this.periodMin); i++) {
+					List<Range<Integer>> testBaselineRBRs = ruleBreakingRuns(periods.get(lastPeriod).shift(i), this.maxRunLength, periods.get(lastPeriod).shift(i).calcInterval);
+					if(testBaselineRBRs.size() < minBaselineRuleBreakingRuns) {
+						optimalBaselineStart = i;
+						minBaselineRuleBreakingRuns = testBaselineRBRs.size();
+					}
+					System.out.println("i: " + i + ", optimal: " + optimalBaselineStart + ", min runs: " + minBaselineRuleBreakingRuns);
+				}
+				// Having identified the earliest period of minimum allowable length
+				// with the minimum number of rule breaking runs within the first
+				// minimum period length plus maximum baseline wait, reset the basleine
+				// to this period
+				Period baseline = new Period(optimalBaselineStart, optimalBaselineStart + this.periodMin - 1, 0, rawVals.length - 1);
+				periods.clear();
+				periods.add(baseline);
+				this.recalculate();
+			}
+		}
+		
+		// check if sufficient data for any
+		// additional periods
+		if (rawVals.length - 1 - periods.get(periods.size() - 1).calcInterval.getMaximum() < this.periodMin) {
 			// Only enough data for one period.
 			System.out.println("Enough data for one period only");
 			return;
 		}
 		
 		// Counter to keep track of how much of the dataset has been analysed
-		int s = this.periodMin;
+		int s = periods.get(periods.size() - 1).calcInterval.getMaximum() + 1; // start one position after the end of the baseline
 		
 		// Loop whilst still enough data to potentially form new period
-		while (rawVals.length - s + 1 >= this.periodMin) {
+		while (rawVals.length - s >= this.periodMin) {
 			// First refresh the mean/limits
 			System.out.println("Algorithm loop: s=" + s + "=========================================================");
 			System.out.println("Periods: " + periods);
@@ -478,6 +511,10 @@ public class SPCCalculator {
 		public double amr() {
 			return calcAmrInclusive(this.calcInterval.getMinimum(), this.calcInterval.getMaximum());
 		}
+		
+		public Period shift(int d) {
+			return new Period(this.calcInterval.getMinimum() + d, this.calcInterval.getMaximum() + d, this.dispInterval.getMinimum() + d, this.dispInterval.getMaximum() + d);
+			}
 		
 		public String toString() {return "[" + calcInterval.toString() + "," + dispInterval.toString() + "]";}
 	}

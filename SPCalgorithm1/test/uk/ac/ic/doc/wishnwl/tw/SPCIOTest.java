@@ -74,7 +74,7 @@ public class SPCIOTest {
 
 		//Run the current algorithm on fileName...
 		try {
-			result = SPCIO.analyseCsv(dataFileName, 20, 8, false);
+			result = SPCIO.analyseCsv(dataFileName, 20, 8, 0, false);
 		} finally {
 			//TODO: sort error handling out!
 		}

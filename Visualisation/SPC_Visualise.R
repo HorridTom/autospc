@@ -4,13 +4,13 @@
 run_recalculation_alg <- function(data_path = file.path("~","code","eclipse-workspace","spc-algorithm","SPCalgorithm1","data"),
                                   alg_path = file.path("~","code","eclipse-workspace","spc-algorithm"),
                                   deleteFilesAfterUse = TRUE, log_file_subdir = "Visualisation",
-                                  periodMin = "20", runRuleLength = "8", forceRecalc = "false",
+                                  periodMin = "20", runRuleLength = "8", baselineWait = "0", forceRecalc = "false",
                                   mask = "^.*_OUT.csv$") {
-  alg_params <- paste0(periodMin, "-", runRuleLength, "-", forceRecalc)
+  alg_params <- paste0(periodMin, "-", runRuleLength, "-", baselineWait, "-", forceRecalc)
   starting_wd <- getwd()
   setwd(alg_path)
   log_file_name <- paste0("SPCIOR",gsub(" ", "-", gsub(":", "", Sys.time())), alg_params, ".txt")
-  system(paste("java", "-jar","spcalg.jar",data_path, periodMin,runRuleLength,forceRecalc,">",file.path(log_file_subdir, log_file_name)))
+  system(paste("java", "-jar","spcalg.jar",data_path, periodMin,runRuleLength,baselineWait,forceRecalc,">",file.path(log_file_subdir, log_file_name)))
   
   batch_visualise_spc(path = data_path, deleteFilesAfterUse = deleteFilesAfterUse,
                       alg_params = alg_params, mask=mask)

@@ -58,7 +58,7 @@ batch_visualise_spc <- function(path = "/Users/Thomas/code/eclipse-workspace/spc
 	spc_outputs <- add_control_limits(spc_outputs)
 	spc_outputs <- add_rule_breaks(spc_outputs)
 	pdf_charts(spc_outputs, alg_params = alg_params)
-	if(deleteFilesAfterUse) {delete_analysis_files(path = path)}
+	if(deleteFilesAfterUse) {delete_analysis_files(path = path, mask = mask)}
 }
 
 #DONE: Add timestamp to output filename

@@ -1,8 +1,8 @@
 #setwd("C:/Users/tw299/git/spc-algorithm/Visualisation")
 #source("SPC_Visualise.R")
 
-run_recalculation_alg <- function(data_path = file.path("~","code","eclipse-workspace","spc-algorithm","SPCalgorithm1","data"),
-                                  alg_path = file.path("~","code","eclipse-workspace","spc-algorithm"),
+run_recalculation_alg <- function(data_path = file.path("C:","Users","imooc","Documents","spc-algorithm","SPCalgorithm1","data"),
+                                  alg_path = file.path("C:","Users","imooc","Documents","spc-algorithm"),
                                   deleteFilesAfterUse = TRUE, log_file_subdir = "Visualisation",
                                   periodMin = "20", runRuleLength = "8", baselineWait = "0", forceRecalc = "false",
                                   mask = "^.*_OUT.csv$") {
@@ -10,6 +10,7 @@ run_recalculation_alg <- function(data_path = file.path("~","code","eclipse-work
   starting_wd <- getwd()
   setwd(alg_path)
   log_file_name <- paste0("SPCIOR",gsub(" ", "-", gsub(":", "", Sys.time())), alg_params, ".txt")
+  check_column_heading(data_path)
   system(paste("java", "-jar","spcalg.jar",data_path, periodMin,runRuleLength,baselineWait,forceRecalc,">",file.path(log_file_subdir, log_file_name)))
   
   batch_visualise_spc(path = data_path, deleteFilesAfterUse = deleteFilesAfterUse,
@@ -17,6 +18,24 @@ run_recalculation_alg <- function(data_path = file.path("~","code","eclipse-work
   setwd(starting_wd)
 }
 
+
+check_column_heading <- function(data_path){
+  
+  files <- list.files(path = data_path, pattern = "*.csv")
+  
+  for (fname in files){
+    df <- read.csv(paste0(data_path,"/",fname), header = F)
+    
+    if(class(df[1,1]) != "character"){
+      df <- rbind(c("header"), df)
+      
+    }
+    
+    file.remove(paste0(data_path,"/",fname))
+    write.table(df, paste0(data_path,"/", fname), row.names = F, col.names = F)
+  }
+  
+}
 
 spc_analyse_vector <- function(data_vector, alg_path = file.path("~","code","eclipse-workspace","spc-algorithm"),
                                deleteFilesAfterUse = TRUE,
@@ -50,7 +69,7 @@ spc_analyse_vector <- function(data_vector, alg_path = file.path("~","code","ecl
   data_out
 }
 
-batch_visualise_spc <- function(path = "/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data",
+batch_visualise_spc <- function(path = "C:/Users/imooc/Documents/spc-algorithm/SPCalgorithm1/data",
                                 deleteFilesAfterUse = TRUE, alg_params = "unknown", mask = "^.*_OUT.csv$") {
 	# setwd("/Users/Thomas/code/eclipse-workspace/spc-algorithm/Visualisation")
 	spc_outputs <- load_spc_analyses(path=path, mask=mask)
@@ -197,7 +216,7 @@ write_cols_csv <- function(df) {
 	sapply(colnames(df), function(x) write.table(df[!is.na(df[,x]),x], file=paste(c(gsub("\\.","_",x),".csv"),collapse=""), sep=",",row.names=FALSE, col.names=FALSE))
 }
 
-delete_analysis_files <- function(path = "/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data",
+delete_analysis_files <- function(path = "C:/Users/imooc/Documents/spc-algorithm/SPCalgorithm1/data",
                                   mask = "^.*_OUT.csv$") {
   fl <- list.files(path = path, pattern = mask)
   result <- file.remove(paste0(path,'//',fl))

@@ -50,12 +50,35 @@ form_display_limits <- function(limits_table, counter){
   
 }
 
-#funtion to scan to see where the next rule 2 break is and returns point position
-rule2_break_scan <- function(){
-  
+#function to scan to see where the next rule 2 break is and returns point position
+rule2_break_scan <- function(limits_table, counter){
+  next_rule_break_position <- min(which(limits_table$rule2[counter:nrow(limits_table)] == T)) + counter - 1
+  next_rule_break_position
 }
 
 #function to identify whether there has been a rule break in the opposite direction in calc period
-indentify_opposite_break <- function(){
+#returns TRUE for rule break in opposite direction within trial calc period 
+identify_opposite_break <- function(limits_table, counter, periodMin){
   
+  cl_change <- limits_table$cl[counter - 1] - limits_table$cl[counter]
+  rule_break_direction <- ifelse(cl_change == 0, "NO CHANGE", 
+                                 ifelse(cl_change > 0, "DOWN", "UP"))
+    
+  next_rule_break_position <- min(which(limits_table$rule2[counter:(counter + periodMin)] == T)) + counter - 1
+  
+  if(next_rule_break_position == Inf){
+    #No rule break
+    FALSE
+  }else{
+    next_y_change <- limits_table$y[next_rule_break_position - 1] - limits_table$y[next_rule_break_position]
+    next_rule_break_direction <- ifelse(next_y_change > 0, "DOWN", "UP")
+    
+    #check to see whether next rule break within calc period is in the opposite direction
+    if(rule_break_direction != next_rule_break_direction){
+      list(TRUE, next_rule_break_position)
+    }else{
+      FALSE
+    }
+  }
+
 }

@@ -103,7 +103,8 @@ create_SPC_auto_limits_table <- function(data,
             trial_limits_table <- add_rule_breaks(trial_limits_table)
             
             #check whether there is a rule break in the opposite direction within calc period
-            if(!identify_opposite_break(trial_limits_table, counter = counter, periodMin = periodMin)){
+            if(!identify_opposite_break(trial_limits_table, counter = counter, periodMin = periodMin)[[1]]){
+              print("Opposite rule break in calc period.")
               #No opposite rule break in trial calculation period
               #Trial limits become real limits
               limits_table <- trial_limits_table

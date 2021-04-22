@@ -68,7 +68,7 @@ identify_opposite_break <- function(limits_table, counter, periodMin){
   
   if(next_rule_break_position == Inf){
     #No rule break
-    FALSE
+    list(FALSE)
   }else{
     next_y_change <- limits_table$y[next_rule_break_position - 1] - limits_table$y[next_rule_break_position]
     next_rule_break_direction <- ifelse(next_y_change > 0, "DOWN", "UP")
@@ -77,7 +77,7 @@ identify_opposite_break <- function(limits_table, counter, periodMin){
     if(rule_break_direction != next_rule_break_direction){
       list(TRUE, next_rule_break_position)
     }else{
-      FALSE
+      list(FALSE)
     }
   }
 

@@ -57,7 +57,7 @@ rule2_break_scan <- function(limits_table, counter){
 }
 
 #function to identify whether there has been a rule break in the opposite direction in calc period
-#returns TRUE for rule break in opposite direction within trial calc period 
+#returns TRUE for rule break in opposite direction within candidate calc period 
 identify_opposite_break <- function(limits_table, counter, periodMin){
   
   cl_change <- limits_table$cl[counter - 1] - limits_table$cl[counter]

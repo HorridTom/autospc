@@ -43,6 +43,7 @@ create_SPC_auto_limits_table <- function(data,
                           ...
 ) {
   
+  data <- mutate(data, x = as.Date(x))
   
   #set counter to zero
   counter <- 0
@@ -93,21 +94,21 @@ create_SPC_auto_limits_table <- function(data,
             
           }else{
             
-            #add new trial calculation period 
-            trial_limits_table <- form_calculation_limits(data = limits_table, periodMin = periodMin, counter = counter)
+            #add new candidate calculation period 
+            candidate_limits_table <- form_calculation_limits(data = limits_table, periodMin = periodMin, counter = counter)
             
-            #add new trial display period
-            #trial_limits_table <- form_display_limits(limits_table = trial_limits_table, counter = counter)
+            #add new candidate display period
+            #candidate_limits_table <- form_display_limits(limits_table = candidate_limits_table, counter = counter)
             
             #add rule breaks
-            trial_limits_table <- add_rule_breaks(trial_limits_table)
+            candidate_limits_table <- add_rule_breaks(candidate_limits_table)
             
             #check whether there is a rule break in the opposite direction within calc period
-            if(!identify_opposite_break(trial_limits_table, counter = counter, periodMin = periodMin)[[1]]){
-              print("Opposite rule break in calc period.")
-              #No opposite rule break in trial calculation period
-              #Trial limits become real limits
-              limits_table <- trial_limits_table
+            if(!identify_opposite_break(candidate_limits_table, counter = counter, periodMin = periodMin)[[1]]){
+              
+              #No opposite rule break in candidate calculation period
+              #candidate limits become real limits
+              limits_table <- candidate_limits_table
               
               #Set counter to end of calculation period
               counter <- counter + periodMin + 1
@@ -117,10 +118,13 @@ create_SPC_auto_limits_table <- function(data,
               limits_table <- add_rule_breaks(limits_table)
               
             }else{
-              #opposite rule break in trial calc period
-              rule2_break_position <- identify_opposite_break(trial_limits_table, counter = counter, periodMin = periodMin)
+              print("Opposite rule break in calc period.")
+              #opposite rule break in candidate calc period
+              rule2_break_position <- identify_opposite_break(candidate_limits_table, counter = counter, periodMin = periodMin)
               rule2_break_position <- rule2_break_position[[2]]
-              counter <- rule2_break_position
+              #counter <- rule2_break_position
+              counter <- counter +1 ###check this
+              print(counter)
             }
             
             

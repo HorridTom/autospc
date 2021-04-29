@@ -11,7 +11,7 @@ library(gridExtra)
 
 #source("spc_rules.R")
 
-plot_SPC <- function(df, 
+plot_auto_SPC <- function(df, 
                      r1_col = "orange", r2_col = "steelblue3", 
                      cht_title = "title",
                      place_title = "",
@@ -32,7 +32,10 @@ plot_SPC <- function(df,
   df <- create_SPC_auto_limits_table(df)
   df <- df %>%
     mutate(date = as.Date(x)) %>%
-    mutate(x = as.Date(x))
+    mutate(x = as.Date(x)) %>%
+    #overlap the limit types to make the plot aesthetics work
+    mutate(breakPoint = ifelse(periodType == dplyr::lag(periodType), F, T)) %>%
+    mutate(periodType = ifelse(breakPoint & periodType == "calculation", lag(periodType), periodType))
   
 
   pct <- ggplot(df, aes(x,y))
@@ -59,7 +62,7 @@ plot_SPC <- function(df,
     caption <- paste(chart_typ,"Shewhart Chart.","\n*Shewhart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
     lines_caption <- ifelse(add_lines == T, "\n**hospitality re-opened, gatherings up to 30 allowed.", "")
     
-    p <- format_SPC(pct, r1_col = r1_col, r2_col = r2_col) +
+    p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
       scale_x_date(labels = date_format("%Y-%m-%d"), breaks = seq(st.dt, ed.dt, date_break),
                    limits = c(st.dt, ed.dt)) +
       ggtitle(cht_title, subtitle = place_title) +
@@ -83,18 +86,23 @@ plot_SPC <- function(df,
     write.csv(cht_data, paste0("tables/", gsub(" ","_",cht_title), "_", gsub(" ","_",place_title,), ".csv"))
     
   }else{
-    cht_data
+    df
   }
 }
 
 
-format_SPC <- function(cht, r1_col, r2_col, ymin, ymax) {
+format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black")
   cht + 
     geom_line(colour = "black", size = 0.5) + 
-    geom_line(aes(x,cl), size = 0.75) +
-    geom_line(aes(x,ucl), size = 0.5) +
-    geom_line(aes(x,lcl), size = 0.5) +
+    #geom_line(data = df, aes(x,cl, linetype = periodType), size = 0.75) +
+
+    geom_line(data = mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), aes(x,cl), size = 0.75, linetype = "solid") +
+    geom_line(data = mutate(df, cl = ifelse(periodType == "display", cl, NA)), aes(x,cl), size = 0.75, linetype = "dashed") +
+    geom_line(data = mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), aes(x,ucl), size = 0.75, linetype = "solid") +
+    geom_line(data = mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), aes(x,ucl), size = 0.75, linetype = "dashed") +
+    geom_line(data = mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), aes(x,lcl), size = 0.75, linetype = "solid") +
+    geom_line(data = mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), aes(x,lcl), size = 0.75, linetype = "dashed") +
   
     geom_point(aes(colour = highlight), size = 2) +
     scale_color_manual("Rule triggered*", values = point_colours) + 

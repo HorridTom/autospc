@@ -58,27 +58,28 @@ rule2_break_scan <- function(limits_table, counter){
 
 #function to identify whether there has been a rule break in the opposite direction in calc period
 #returns TRUE for rule break in opposite direction within candidate calc period 
+#set counter to beginning of candidate limits 
 identify_opposite_break <- function(limits_table, counter, periodMin){
   
+  #state whether each point is above or below the centre line
+  limits_table <- limits_table %>% mutate(aboveOrBelowCl = ifelse(y > cl, "UP",
+                                                                  ifelse(y < cl, "DOWN", "NO CHANGE")))
+  
   cl_change <- limits_table$cl[counter - 1] - limits_table$cl[counter]
-  rule_break_direction <- ifelse(cl_change == 0, "NO CHANGE", 
-                                 ifelse(cl_change > 0, "DOWN", "UP"))
+  rule_break_direction <- ifelse(cl_change > 0, "DOWN", "UP")
     
-  next_rule_break_position <- min(which(limits_table$rule2[counter:(counter + periodMin)] == T)) + counter - 1
+  #looks for a rule break in the opposite direction within the candidate period
+  limits_table <- limits_table %>% mutate(oppositeBreak  = ifelse(rule2 & (aboveOrBelowCl != rule_break_direction), T, F))
+  next_rule_break_position <- min(which(limits_table$oppositeBreak[counter:(counter + periodMin - 1)] == T )) + counter - 1
   
   if(next_rule_break_position == Inf){
-    #No rule break
-    list(FALSE)
+    #No rule break in opposite direction
+    list(FALSE, NA, limits_table)
   }else{
-    next_y_change <- limits_table$y[next_rule_break_position - 1] - limits_table$y[next_rule_break_position]
-    next_rule_break_direction <- ifelse(next_y_change > 0, "DOWN", "UP")
-    
-    #check to see whether next rule break within calc period is in the opposite direction
-    if(rule_break_direction != next_rule_break_direction){
-      list(TRUE, next_rule_break_position)
-    }else{
-      list(FALSE)
-    }
+    # next_y_change <- limits_table$y[next_rule_break_position - 1] - limits_table$y[next_rule_break_position]
+    # next_rule_break_direction <- ifelse(next_y_change > 0, "DOWN", "UP")
+    list(TRUE, next_rule_break_position, limits_table)
+
   }
 
 }

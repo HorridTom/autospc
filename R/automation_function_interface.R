@@ -26,7 +26,7 @@
 #'
 #' @examples
 create_SPC_auto_limits_table <- function(data, 
-                          chart_typ = "C",
+                          cht_type = "C",
                           periodMin = 21,
                           runRuleLength = 8,
                           baselineWait = 0,
@@ -54,7 +54,7 @@ create_SPC_auto_limits_table <- function(data,
   }else{
 
     #form calculation limits for first period
-    limits_table <- form_calculation_limits(data = data, periodMin = periodMin, counter = counter)
+    limits_table <- form_calculation_limits(data = data, periodMin = periodMin, counter = counter, cht_type = cht_type)
     
     #set counter to end of first period
     counter <- counter + periodMin + 1
@@ -95,10 +95,10 @@ create_SPC_auto_limits_table <- function(data,
           }else{
             
             #add new candidate calculation period 
-            candidate_limits_table <- form_calculation_limits(data = limits_table, periodMin = periodMin, counter = counter)
+            candidate_limits_table <- form_calculation_limits(data = limits_table, periodMin = periodMin, counter = counter, cht_type = cht_type)
             
             #add new candidate display period
-            #candidate_limits_table <- form_display_limits(limits_table = candidate_limits_table, counter = counter)
+            candidate_limits_table <- form_display_limits(limits_table = candidate_limits_table, counter = counter + periodMin + 1)
             
             #add rule breaks
             candidate_limits_table <- add_rule_breaks(candidate_limits_table)
@@ -114,8 +114,8 @@ create_SPC_auto_limits_table <- function(data,
               counter <- counter + periodMin + 1
               
               #Extend display limits
-              limits_table <- form_display_limits(limits_table = limits_table, counter = counter)
-              limits_table <- add_rule_breaks(limits_table)
+              #limits_table <- form_display_limits(limits_table = limits_table, counter = counter)
+              #limits_table <- add_rule_breaks(limits_table)
               
             }else{
               print("Opposite rule break in calc period.")

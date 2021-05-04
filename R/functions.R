@@ -12,9 +12,21 @@ enough_data_for_new_period <- function(data, periodMin, counter){
 
 #function to form limits for a period
 #data has columns x and y
-form_calculation_limits <- function(data, counter, periodMin){
+form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
   
-  calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),], chart = 'c')
+  if(cht_type == "C"){
+    calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),], chart = 'c')
+  }else if(cht_type == "C'"){
+    calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
+                                         data = data[counter:(counter + periodMin),], chart = 'up')
+  }else if(cht_type == "P"){
+    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+                                         chart = 'p', multiply = 100)
+  }else if(cht_type == "P'"){
+    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+                                         chart = 'pp', multiply = 100)
+  }
+
   
   calculation_period <- calculation_period$data %>%
     select(x,ucl,lcl, cl) %>%

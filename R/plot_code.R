@@ -58,8 +58,8 @@ plot_auto_SPC <- function(df,
   
   if(plot_chart == T){
     
-    annotation_dist_fact <- ifelse(chart_typ == "C" | chart_typ == "C'", override_annotation_dist, override_annotation_dist_P)
-    caption <- paste(chart_typ,"Shewhart Chart.","\n*Shewhart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
+    annotation_dist_fact <- ifelse(cht_type == "C" | cht_type == "C'", override_annotation_dist, override_annotation_dist_P)
+    caption <- paste(cht_type,"Shewhart Chart.","\n*Shewhart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
     lines_caption <- ifelse(add_lines == T, "\n**hospitality re-opened, gatherings up to 30 allowed.", "")
     
     p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +

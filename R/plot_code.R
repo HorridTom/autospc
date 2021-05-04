@@ -13,9 +13,9 @@ library(gridExtra)
 
 plot_auto_SPC <- function(df, 
                      r1_col = "orange", r2_col = "steelblue3", 
-                     cht_title = "title",
-                     place_title = "",
-                     chart_typ = "C",
+                     cht_title = NULL,
+                     place_title = NULL,
+                     cht_type = "C",
                      plot_chart = T,
                      write_table = F,
                      override_y_lim = NULL,
@@ -27,15 +27,29 @@ plot_auto_SPC <- function(df,
                      df_name = df
 ) { 
   
+  #get title
+  if(is.null(cht_title)){
+    cht_title = df$title[1]
+  }
+  
+  if(is.null(place_title)){
+    place_title = df$place[1]
+  }
+  
   #get limits
   df <- mutate(df, x = as.Date(x))
-  df <- create_SPC_auto_limits_table(df)
+  df <- create_SPC_auto_limits_table(df, cht_type = cht_type)
   df <- df %>%
     mutate(date = as.Date(x)) %>%
     mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work
-    mutate(breakPoint = ifelse(periodType == dplyr::lag(periodType), F, T)) %>%
-    mutate(periodType = ifelse(breakPoint & periodType == "calculation", lag(periodType), periodType))
+    mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) %>%
+    mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) %>%
+    #get break points
+    mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
+  
+  #store break points as vector
+  breakPoints <- which(df$breakPoint)
   
 
   pct <- ggplot(df, aes(x,y))
@@ -72,8 +86,9 @@ plot_auto_SPC <- function(df,
       scale_y_continuous(limits = c(ylimlow, ylimhigh),
                          breaks = breaks_pretty(),
                          labels = number_format(accuracy = 1, big.mark = ",")) +
-      annotate("text", x=st.dt, y=cl_start + cl_start/annotation_dist_fact, label = cl_start) +
-      annotate("text", x=ed.dt, y=cl_end + cl_start/annotation_dist_fact, label = cl_end)
+      annotate("text", x = st.dt, y = cl_start + cl_start/annotation_dist_fact, label = cl_start) +
+      #annotate("text", x = ed.dt, y = cl_end + cl_start/annotation_dist_fact, label = cl_end) +
+      annotate("text", x = df$x[breakPoints] + days(2), y = df$cl[breakPoints] + cl_start/annotation_dist_fact, label = round(df$cl[breakPoints]))
     
     p
     

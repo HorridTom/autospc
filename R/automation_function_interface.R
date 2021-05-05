@@ -75,10 +75,12 @@ create_SPC_auto_limits_table <- function(data,
       }else{
         
         #scan for next rule 2 break
-        rule2_break_position <- rule2_break_scan(limits_table = limits_table, counter = counter)
+        rule2_break_positions <- rule2_break_scan(limits_table = limits_table, counter = counter)
+        rule2_break_position <- rule2_break_positions[1]
+        print(paste("rule 2 break position", rule2_break_position))
         
         #see if there are any further rule 2 breaks
-        if(rule2_break_position == Inf){
+        if(is.na(rule2_break_position)){
           print("There are no further rule breaks. Calculation complete.")
           break
           
@@ -119,12 +121,16 @@ create_SPC_auto_limits_table <- function(data,
               
             }else{
               print("Opposite rule break in calc period.")
-              #opposite rule break in candidate calc period
-              rule2_break_position <- identify_opposite_break(candidate_limits_table, counter = counter, periodMin = periodMin)
-              rule2_break_position <- rule2_break_position[[2]]
-              #counter <- rule2_break_position
-              counter <- counter +1 ###check this
-              print(counter)
+              
+              if(is.na(rule2_break_positions[2])){
+                print("There are no further rule breaks.")
+                counter = counter + 1
+                
+              }else{
+                counter <- rule2_break_positions[2]
+                print(paste("counter",counter))
+              }
+              
             }
             
             

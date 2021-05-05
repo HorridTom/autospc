@@ -30,8 +30,7 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
 
   
   calculation_period <- calculation_period$data %>%
-    select(x,y,ucl,lcl, cl) %>%
-    mutate(periodType = "calculation")
+    select(x,y,ucl,lcl, cl) 
   
   #code to exclude most extreme 3 points from calculation period
   calculation_period <- add_rule_breaks(calculation_period)
@@ -39,8 +38,9 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
     mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
                                   ifelse(rule1 & !aboveCl, lcl - y, NA)))
   
-  #values of 3 furthest extremes
+  #values of up to 3 furthest extremes
   furthest_extremes <- sort(calculation_period$rule1Distance, decreasing = T)[1:3]
+  furthest_extremes <- furthest_extremes[!is.na(furthest_extremes)]
   
   calculation_period <- calculation_period %>% mutate(exclude = ifelse(rule1Distance %in% furthest_extremes, T, F))
   exclusion_points <- which(calculation_period$exclude)

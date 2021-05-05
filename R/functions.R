@@ -1,4 +1,5 @@
 library(tidyverse)
+library(Rfast)
 
 #function to determine whether there are enough data points left to form a new period
 enough_data_for_new_period <- function(data, periodMin, counter){
@@ -29,9 +30,43 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
 
   
   calculation_period <- calculation_period$data %>%
-    select(x,ucl,lcl, cl) %>%
+    select(x,y,ucl,lcl, cl) %>%
     mutate(periodType = "calculation")
   
+  #code to exclude most extreme 3 points from calculation period
+  calculation_period <- add_rule_breaks(calculation_period)
+  calculation_period <- calculation_period %>% mutate(aboveCl = ifelse(y > cl, T,ifelse(y < cl, F, NA))) %>%
+    mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
+                                  ifelse(rule1 & !aboveCl, lcl - y, NA)))
+  
+  #values of 3 furthest extremes
+  furthest_extremes <- sort(calculation_period$rule1Distance, decreasing = T)[1:3]
+  
+  calculation_period <- calculation_period %>% mutate(exclude = ifelse(rule1Distance %in% furthest_extremes, T, F))
+  exclusion_points <- which(calculation_period$exclude)
+  
+  #re-run the calculation of limits now excluding extremes
+  if(cht_type == "C"){
+    calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),]
+                                         , chart = 'c', exclude = exclusion_points)
+  }else if(cht_type == "C'"){
+    calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
+                                         data = data[counter:(counter + periodMin),]
+                                         , chart = 'up', exclude = exclusion_points)
+  }else if(cht_type == "P"){
+    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+                                         chart = 'p', multiply = 100, exclude = exclusion_points)
+  }else if(cht_type == "P'"){
+    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+                                         chart = 'pp', multiply = 100, exclude = exclusion_points)
+  }
+  
+  calculation_period <- calculation_period$data %>%
+    select(x,ucl,lcl, cl) %>%
+    mutate(periodType = "calculation") %>%
+    mutate(excluded = ifelse(row_number() %in% exclusion_points, T, F))
+
+
   #left joins if this is the first period
   if(counter == 0){
     limits_table <- data %>%
@@ -43,7 +78,8 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
       mutate(lcl = if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
       mutate(cl = if_else(is.na(cl.y), cl.x, cl.y)) %>%
       mutate(periodType = if_else(is.na(periodType.y), periodType.x, periodType.y)) %>%
-      select(x, y, ucl, lcl, cl, periodType)
+      mutate(excluded = if_else(is.na(excluded.y), excluded.x, excluded.y)) %>%
+      select(x, y, ucl, lcl, cl, periodType, excluded)
   }
   
 }

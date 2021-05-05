@@ -56,7 +56,7 @@ plot_auto_SPC <- function(df,
   
   # chart y limit
   ylimlow <- 0
-  ylimhigh <- max(df$y) + max(df$y)/10 +10
+  ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10 
   ytitle <- "Number"
   
   #start and end dates
@@ -68,6 +68,7 @@ plot_auto_SPC <- function(df,
   }
   
   cl_start <- round(df$cl[1])
+  ucl_start <- round(df$ucl[1])
   cl_end <- round(df$cl[(nrow(df)-1)])
   
   if(plot_chart == T){
@@ -86,9 +87,10 @@ plot_auto_SPC <- function(df,
       scale_y_continuous(limits = c(ylimlow, ylimhigh),
                          breaks = breaks_pretty(),
                          labels = number_format(accuracy = 1, big.mark = ",")) +
-      annotate("text", x = st.dt, y = cl_start + cl_start/annotation_dist_fact, label = cl_start) +
-      #annotate("text", x = ed.dt, y = cl_end + cl_start/annotation_dist_fact, label = cl_end) +
-      annotate("text", x = df$x[breakPoints] + days(2), y = df$cl[breakPoints] + cl_start/annotation_dist_fact, label = round(df$cl[breakPoints]))
+      # annotate("text", x = st.dt, y = cl_start + cl_start/annotation_dist_fact, label = cl_start) +
+      # annotate("text", x = df$x[breakPoints] + days(2), y = df$cl[breakPoints] + cl_start/annotation_dist_fact, label = round(df$cl[breakPoints]))
+      annotate("text", x = st.dt, y = ucl_start + ucl_start/annotation_dist_fact, label = cl_start) +
+      annotate("text", x = df$x[breakPoints] + days(2), y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, label = round(df$cl[breakPoints]))
     
     p
     

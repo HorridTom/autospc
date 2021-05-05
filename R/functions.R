@@ -98,16 +98,24 @@ form_display_limits <- function(limits_table, counter){
   
 }
 
-#function to scan to see where the next rule 2 break is and returns point position
+#function to scan to see where start of each rule 2 break is - returns list of these points 
 rule2_break_scan <- function(limits_table, counter){
-  next_rule_break_position <- min(which(limits_table$rule2[counter:nrow(limits_table)] == T)) + counter - 1
-  next_rule_break_position
+  #add a column for start of rule 2 breaks
+  #if there is a rule 2 highlight and that is not preceded by a rule 2 highlight 
+  limits_table <- limits_table %>% mutate(startOfRule2Break = ifelse(rule2 & rule2 != lag(rule2), T, F))
+  next_rule_break_positions <- (which(limits_table$startOfRule2Break[counter:nrow(limits_table)] == T)) + counter - 1
+
 }
 
 #function to identify whether there has been a rule break in the opposite direction in calc period
 #returns TRUE for rule break in opposite direction within candidate calc period 
 #set counter to beginning of candidate limits 
 identify_opposite_break <- function(limits_table, counter, periodMin){
+  
+  #start rule breaks from candidate period as not to include "hang over" rule breaks
+  limits_table_top <- limits_table[1:(counter-1),]
+  limits_table_bottom <- add_rule_breaks(limits_table[counter:nrow(limits_table),])
+  limits_table <- bind_rows(limits_table_top, limits_table_bottom)
   
   #state whether each point is above or below the centre line
   limits_table <- limits_table %>% mutate(aboveOrBelowCl = ifelse(y > cl, "UP",

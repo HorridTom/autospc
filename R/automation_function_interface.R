@@ -79,20 +79,26 @@ create_SPC_auto_limits_table <- function(data,
         break
       }else{
         
-        #scan for next rule 2 break
-        rule2_break_positions <- rule2_break_scan(limits_table = limits_table, counter = counter)
-        rule2_break_position <- rule2_break_positions[1]
+        #check if counter is part way through a rule 2 break already
+        #provided there are at least 8 rule 2 breaks following
+        if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
+          rule2_break_position <- counter
+        }else{
+          #scan for start of next rule 2 break
+          rule2_break_positions <- rule2_break_start_positions(limits_table = limits_table, counter = counter)
+          rule2_break_position <- rule2_break_positions[1]
+        }
         print(paste("rule 2 break position", rule2_break_position))
         
         #see if there are any further rule 2 breaks
-        if(is.na(rule2_break_position)){
+        if(is.na(rule2_break_position) | rule2_break_position > nrow(data)){
           print("There are no further rule breaks. Calculation complete.")
           break
           
         }else{
           
-          #increase counter to where first rule break is
           counter <- rule2_break_position
+          
           
           #see whether there are enough points after the counter to form new period
           if(!enough_data_for_new_period(limits_table, periodMin, counter)){
@@ -125,10 +131,13 @@ create_SPC_auto_limits_table <- function(data,
               #limits_table <- add_rule_breaks(limits_table)
               
             }else{
-              print("Opposite rule break in calc period.")
+              print("Opposite rule break in candidate period.")
               
-              if(is.na(rule2_break_positions[2])){
-                print("There are no further rule breaks.")
+              #check if counter is part way through a rule 2 break already
+              #provided there are at least 8 rule 2 breaks following
+              #or no further rule breaks have been identified 
+              if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength)])){
+                print("Counter is part way through a rule break.")
                 counter = counter + 1
                 
               }else{

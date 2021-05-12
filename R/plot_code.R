@@ -67,7 +67,7 @@ plot_auto_SPC <- function(df,
   # chart y limit
   ylimlow <- 0
   ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10 
-  ytitle <- "Number"
+  ytitle <- ifelse(cht_type == "C" | cht_type == "C'", "Number", "Percentage within 4hrs")
   
   #start and end dates
   st.dt <- as.Date(min(df$x, na.rm = T))

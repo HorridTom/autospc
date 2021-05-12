@@ -120,7 +120,7 @@ form_display_limits <- function(limits_table, counter){
 }
 
 #function to scan to see where start of each rule 2 break is - returns list of these points 
-rule2_break_scan <- function(limits_table, counter){
+rule2_break_start_positions <- function(limits_table, counter){
   #add a column for start of rule 2 breaks
   #if there is a rule 2 highlight and that is not preceded by a rule 2 highlight 
   limits_table <- limits_table %>% mutate(startOfRule2Break = ifelse(rule2 & rule2 != lag(rule2), T, F))

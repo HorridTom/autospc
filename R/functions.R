@@ -15,35 +15,38 @@ enough_data_for_new_period <- function(data, periodMin, counter){
 #data has columns x and y
 form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
   
-  if(cht_type == "C"){
-    calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),], chart = 'c')
-  }else if(cht_type == "C'"){
-    calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
-                                         data = data[counter:(counter + periodMin),], chart = 'up')
-  }else if(cht_type == "P"){
-    calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
-                                         chart = 'p', multiply = 100)
-  }else if(cht_type == "P'"){
-    calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
-                                         chart = 'pp', multiply = 100)
-  }
-
+  # if(cht_type == "C"){
+  #   calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),], chart = 'c')
+  # }else if(cht_type == "C'"){
+  #   calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
+  #                                        data = data[counter:(counter + periodMin),], chart = 'up')
+  # }else if(cht_type == "P"){
+  #   calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
+  #                                        chart = 'p', multiply = 100)
+  # }else if(cht_type == "P'"){
+  #   calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
+  #                                        chart = 'pp', multiply = 100)
+  # }
+  # 
+  # 
+  # calculation_period <- calculation_period$data %>%
+  #   select(x,y,ucl,lcl, cl) 
+  # 
+  # #code to find most extreme 3 points from calculation period
+  # calculation_period <- add_rule_breaks(calculation_period)
+  # calculation_period <- calculation_period %>% 
+  #   mutate(aboveCl = ifelse(y > cl, T,ifelse(y < cl, F, NA))) %>%
+  #   mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
+  #                                 ifelse(rule1 & !aboveCl, lcl - y, NA)))
+  # 
+  # #values of up to 3 furthest extremes
+  # furthest_extremes <- sort(calculation_period$rule1Distance, decreasing = T)[1:3]
+  # furthest_extremes <- furthest_extremes[!is.na(furthest_extremes)]
+  # 
+  # calculation_period <- calculation_period %>% mutate(exclude = ifelse(rule1Distance %in% furthest_extremes, T, F))
+  # exclusion_points <- which(calculation_period$exclude)
   
-  calculation_period <- calculation_period$data %>%
-    select(x,y,ucl,lcl, cl) 
-  
-  #code to exclude most extreme 3 points from calculation period
-  calculation_period <- add_rule_breaks(calculation_period)
-  calculation_period <- calculation_period %>% mutate(aboveCl = ifelse(y > cl, T,ifelse(y < cl, F, NA))) %>%
-    mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
-                                  ifelse(rule1 & !aboveCl, lcl - y, NA)))
-  
-  #values of up to 3 furthest extremes
-  furthest_extremes <- sort(calculation_period$rule1Distance, decreasing = T)[1:3]
-  furthest_extremes <- furthest_extremes[!is.na(furthest_extremes)]
-  
-  calculation_period <- calculation_period %>% mutate(exclude = ifelse(rule1Distance %in% furthest_extremes, T, F))
-  exclusion_points <- which(calculation_period$exclude)
+  exclusion_points <- find_extremes(data, cht_type, counter, periodMin, maxNoOfExclusions = 3)
   
   #re-run the calculation of limits now excluding extremes
   if(cht_type == "C"){
@@ -107,6 +110,62 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
 
 
 
+#function to find most extreme points outside of control limits and return their positions
+find_extremes <- function(data, cht_type, counter, periodMin, maxNoOfExclusions = 3){
+  
+  #initialise variables
+  i <- 1
+  exclusion_points <- NULL
+  furthest_extremes <- NULL
+  
+  while(i <= maxNoOfExclusions){
+    if(cht_type == "C"){
+      calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),],
+                                           chart = 'c', exclude = exclusion_points)
+    }else if(cht_type == "C'"){
+      calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
+                                           data = data[counter:(counter + periodMin),],
+                                           chart = 'up', exclude = exclusion_points)
+    }else if(cht_type == "P"){
+      calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
+                                           chart = 'p', multiply = 100, exclude = exclusion_points)
+    }else if(cht_type == "P'"){
+      calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
+                                           chart = 'pp', multiply = 100, exclude = exclusion_points)
+    }
+    
+    calculation_period <- calculation_period$data %>%
+      select(x,y,ucl,lcl, cl)
+    
+    calculation_period <- add_rule_breaks(calculation_period)
+    calculation_period <- calculation_period %>% 
+      mutate(aboveCl = ifelse(y > cl, T,ifelse(y < cl, F, NA))) %>%
+      mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
+                                    ifelse(rule1 & !aboveCl, lcl - y, NA))) %>%
+      #set already established extremes as NA
+      mutate(rule1Distance = ifelse(row_number() %in% exclusion_points, NA, rule1Distance))
+    
+    # #values of up to 3 furthest extremes
+    # furthest_extremes <- sort(calculation_period$rule1Distance, decreasing = T)[1:3]
+    # furthest_extremes <- furthest_extremes[!is.na(furthest_extremes)]
+    # 
+    # calculation_period <- calculation_period %>% mutate(exclude = ifelse(rule1Distance %in% furthest_extremes, T, F))
+    # exclusion_points <- which(calculation_period$exclude)
+    
+    furthest_extreme <- max(calculation_period$rule1Distance, na.rm = T)
+    exclusion_point <- which(calculation_period$rule1Distance == furthest_extreme)
+    
+    #add next exclusion point and furthest extreme to the vectors
+    furthest_extremes <- c(furthest_extremes, furthest_extreme)
+    exclusion_points <- c(exclusion_points, exclusion_point)
+    i = i + 1
+  }
+
+  exclusion_points
+  
+}
+
+
 #function to form display limits (period extension)
 form_display_limits <- function(limits_table, counter){
   
@@ -160,3 +219,4 @@ identify_opposite_break <- function(limits_table, counter, periodMin){
   }
 
 }
+

@@ -26,6 +26,6 @@ rule_two <- function(df) {
 add_highlight <- function(df) {
   df$highlight <- ifelse(df$rule2, "Rule 2", "None")
   df$highlight <- ifelse(df$rule1, "Rule 1", df$highlight)
-  df[is.na(df$highlight),'highlight'] <- "none"
+  df[is.na(df$highlight),'highlight'] <- "None"
   df
 }

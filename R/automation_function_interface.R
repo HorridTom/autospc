@@ -45,6 +45,11 @@ create_SPC_auto_limits_table <- function(data,
   
   data <- mutate(data, x = as.Date(x))
   
+  #add y column of percentages for P and P' charts
+  if(cht_type == "P" | cht_type == "P'"){
+    data <- data %>% mutate(y = b * 100 / n)
+  }
+  
   #set counter to zero
   counter <- 0
   

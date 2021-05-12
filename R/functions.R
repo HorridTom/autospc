@@ -21,10 +21,10 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
     calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
                                          data = data[counter:(counter + periodMin),], chart = 'up')
   }else if(cht_type == "P"){
-    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+    calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
                                          chart = 'p', multiply = 100)
   }else if(cht_type == "P'"){
-    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+    calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
                                          chart = 'pp', multiply = 100)
   }
 
@@ -54,32 +54,53 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C"){
                                          data = data[counter:(counter + periodMin),]
                                          , chart = 'up', exclude = exclusion_points)
   }else if(cht_type == "P"){
-    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+    calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),], 
                                          chart = 'p', multiply = 100, exclude = exclusion_points)
   }else if(cht_type == "P'"){
-    calculation_period <- qicharts2::qic(x, y, n = n, data = data[counter:(counter + periodMin),], 
+    calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),], 
                                          chart = 'pp', multiply = 100, exclude = exclusion_points)
   }
   
+
   calculation_period <- calculation_period$data %>%
-    select(x,ucl,lcl, cl) %>%
+    select(x, y, ucl,lcl, cl) %>%
     mutate(periodType = "calculation") %>%
     mutate(excluded = ifelse(row_number() %in% exclusion_points, T, F))
 
 
-  #left joins if this is the first period
+  #first period does not already have the additional columns
   if(counter == 0){
     limits_table <- data %>%
-      left_join(calculation_period, by = "x")
+      left_join(calculation_period, by = "x") %>%
+      mutate(y = if_else(is.na(y.y), y.x, y.y)) 
+    
+    #only selects n if P chart
+    if(cht_type == "P" | cht_type == "P'"){
+      limits_table <- limits_table %>%
+        select(x, y, n, b, ucl, lcl, cl, periodType, excluded)
+    }else{
+      limits_table <- limits_table %>%
+      select(x, y, ucl, lcl, cl, periodType, excluded)
+    }
+    
   }else{
     limits_table <- data %>%
       left_join(calculation_period, by = "x") %>%
+      mutate(y = if_else(is.na(y.y), y.x, y.y)) %>%
       mutate(ucl = if_else(is.na(ucl.y), ucl.x, ucl.y)) %>%
       mutate(lcl = if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
       mutate(cl = if_else(is.na(cl.y), cl.x, cl.y)) %>%
       mutate(periodType = if_else(is.na(periodType.y), periodType.x, periodType.y)) %>%
-      mutate(excluded = if_else(is.na(excluded.y), excluded.x, excluded.y)) %>%
-      select(x, y, ucl, lcl, cl, periodType, excluded)
+      mutate(excluded = if_else(is.na(excluded.y), excluded.x, excluded.y)) 
+    
+    #only selects n if P chart
+    if(cht_type == "P" | cht_type == "P'"){
+      limits_table <- limits_table %>%
+        select(x, y, n, b, ucl, lcl, cl, periodType, excluded)
+    }else{
+      limits_table <- limits_table %>%
+        select(x, y, ucl, lcl, cl, periodType, excluded)
+    }
   }
   
 }

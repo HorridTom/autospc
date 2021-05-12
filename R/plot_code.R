@@ -11,9 +11,14 @@ library(gridExtra)
 
 #source("spc_rules.R")
 
+
+
+#data for C and C' charts should have columns x, y, title, place
+#data for P and P' should have columns x, n (total), b (number of breaches), title, place
+
 plot_auto_SPC <- function(df, 
                      r1_col = "orange", r2_col = "steelblue3",
-                     highlightExclusions = F,
+                     highlightExclusions = T,
                      cht_title = NULL,
                      place_title = NULL,
                      cht_type = "C",
@@ -65,8 +70,8 @@ plot_auto_SPC <- function(df,
   ytitle <- "Number"
   
   #start and end dates
-  st.dt <- as.Date(min(df$date))
-  ed.dt <- as.Date(max(df$date))
+  st.dt <- as.Date(min(df$x, na.rm = T))
+  ed.dt <- as.Date(max(df$x, na.rm = T))
   
   if(!is.null(override_y_lim)){
     ylimhigh <- override_y_lim

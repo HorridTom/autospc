@@ -29,10 +29,7 @@ create_SPC_auto_limits_table <- function(data,
                           cht_type = "C",
                           periodMin = 21,
                           runRuleLength = 8,
-                          baselineWait = 0,
-                          part,
-                          freeze = c(20, 80),
-                          exclude,
+                          maxNoOfExclusions = 3,
                           
                           r1_col = "orange",
                           r2_col = "steelblue3",
@@ -59,7 +56,9 @@ create_SPC_auto_limits_table <- function(data,
   }else{
 
     #form calculation limits for first period
-    limits_table <- form_calculation_limits(data = data, periodMin = periodMin, counter = counter, cht_type = cht_type)
+    limits_table <- form_calculation_limits(data = data, periodMin = periodMin, 
+                                            counter = counter, cht_type = cht_type,
+                                            maxNoOfExclusions  = maxNoOfExclusions)
     
     #set counter to end of first period
     counter <- counter + periodMin + 1
@@ -108,7 +107,11 @@ create_SPC_auto_limits_table <- function(data,
           }else{
             
             #add new candidate calculation period 
-            candidate_limits_table <- form_calculation_limits(data = limits_table, periodMin = periodMin, counter = counter, cht_type = cht_type)
+            candidate_limits_table <- form_calculation_limits(data = limits_table, 
+                                                              periodMin = periodMin, 
+                                                              counter = counter, 
+                                                              cht_type = cht_type,
+                                                              maxNoOfExclusions  = maxNoOfExclusions)
             
             #add new candidate display period
             candidate_limits_table <- form_display_limits(limits_table = candidate_limits_table, counter = counter + periodMin + 1)

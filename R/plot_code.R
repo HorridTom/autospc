@@ -19,6 +19,7 @@ library(gridExtra)
 plot_auto_SPC <- function(df, 
                      r1_col = "orange", r2_col = "steelblue3",
                      highlightExclusions = T,
+                     maxNoOfExclusions = 3,
                      cht_title = NULL,
                      place_title = NULL,
                      cht_type = "C",
@@ -44,7 +45,7 @@ plot_auto_SPC <- function(df,
   
   #get limits
   df <- mutate(df, x = as.Date(x))
-  df <- create_SPC_auto_limits_table(df, cht_type = cht_type)
+  df <- create_SPC_auto_limits_table(df, cht_type = cht_type, maxNoOfExclusions  = maxNoOfExclusions)
   df <- df %>%
     mutate(date = as.Date(x)) %>%
     mutate(x = as.Date(x)) %>%

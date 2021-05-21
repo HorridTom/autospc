@@ -13,8 +13,9 @@ add_rule_breaks <- function(x) {
 }
 
 rule_two <- function(df) {
-  
-  runs <- rle(ifelse(df$y > df$cl,1,-1))
+
+  runs <- rle(ifelse(df$y == df$cl,0,
+                     ifelse(df$y > df$cl, 1,-1)))
   rulebreakingruns <- runs$lengths >= 8
   runs$values <- rulebreakingruns
   partofrun <- inverse.rle(runs)

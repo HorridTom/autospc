@@ -1,11 +1,13 @@
-context("Return true if there are enough data points left to form a new period")
+context("Test if there is enough data to form a new period")
 library(tidyverse)
 library(testthat)
-source("functions.R")
+#source("spc-algorithm/R/functions.R")
+#testthat::test_dir("tests/testthat")
 
 
 #load in test data
-test_data <- readRDS("tests/testthat/testdata/test_data.rds")
+#test_data <- readRDS("tests/testthat/testdata/test_data.rds")
+test_data <- readRDS("testdata/test_data.rds")
 
 testthat::test_that("Determines correctly whether there are enough data point to form a new period",{
   

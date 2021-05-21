@@ -1,4 +1,4 @@
 library(testthat)
-library(spc-algorithm)
+source(spc-algorithm)
 
 test_check("spc-algorithm")

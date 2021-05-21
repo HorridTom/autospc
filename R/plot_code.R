@@ -47,13 +47,11 @@ plot_auto_SPC <- function(df,
   df <- mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, cht_type = cht_type, maxNoOfExclusions  = maxNoOfExclusions)
   df <- df %>%
-    mutate(date = as.Date(x)) %>%
     mutate(x = as.Date(x)) %>%
-    #overlap the limit types to make the plot aesthetics work
+    #overlap the limit types to make the plot aesthetics work 
+    #(i.e. so there isn't a gap between calculation and display limits)
     mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) %>%
-    mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) %>%
-    #get break points
-    mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
+    mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
   
   #store break points as vector
   breakPoints <- which(df$breakPoint)
@@ -124,11 +122,11 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   cht + 
     geom_line(colour = "black", size = 0.5) + 
     geom_line(data = mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), aes(x,cl), size = 0.75, linetype = "solid") +
-    geom_line(data = mutate(df, cl = ifelse(periodType == "display", cl, NA)), aes(x,cl), size = 0.75, linetype = "dashed") +
-    geom_line(data = mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), aes(x,ucl), size = 0.75, linetype = "solid") +
-    geom_line(data = mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), aes(x,ucl), size = 0.75, linetype = "dashed") +
-    geom_line(data = mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), aes(x,lcl), size = 0.75, linetype = "solid") +
-    geom_line(data = mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), aes(x,lcl), size = 0.75, linetype = "dashed") +
+    geom_line(data = mutate(df, cl = ifelse(periodType == "display", cl, NA)), aes(x,cl), size = 0.75, linetype = "42") +
+    geom_line(data = mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), aes(x,ucl), size = 0.5, linetype = "solid") +
+    geom_line(data = mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), aes(x,ucl), size = 0.5, linetype = "84") +
+    geom_line(data = mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), aes(x,lcl), size = 0.5, linetype = "solid") +
+    geom_line(data = mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), aes(x,lcl), size = 0.5, linetype = "84") +
   
     geom_point(aes(colour = highlight), size = 2) +
     scale_color_manual("Rule triggered*", values = point_colours) + 

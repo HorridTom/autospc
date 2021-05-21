@@ -11,13 +11,13 @@ enough_data_for_new_period <- function(data, periodMin, counter){
   }
 }
 
-#function to form limits for a period
+#function to form calculation limits for a period
 #data has columns x and y
 form_calculation_limits <- function(data, counter, periodMin, cht_type = "C", maxNoOfExclusions = 3){
   
   exclusion_points <- find_extremes(data, cht_type, counter, periodMin, maxNoOfExclusions)
   
-  #re-run the calculation of limits now excluding extremes
+  #run the calculation of limits excluding extremes for selected section of data
   if(cht_type == "C"){
     calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),]
                                          , chart = 'c', exclude = exclusion_points)
@@ -42,6 +42,8 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C", ma
 
   #first period does not already have the additional columns
   if(counter == 0){
+    
+    #joins limits to the existing data
     limits_table <- data %>%
       left_join(calculation_period, by = "x") %>%
       mutate(y = if_else(is.na(y.y), y.x, y.y)) 
@@ -56,6 +58,8 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C", ma
     }
     
   }else{
+    
+    #joins limits to the existing data, overwriting display limits 
     limits_table <- data %>%
       left_join(calculation_period, by = "x") %>%
       mutate(y = if_else(is.na(y.y), y.x, y.y)) %>%
@@ -148,7 +152,7 @@ form_display_limits <- function(limits_table, counter){
 #function to scan to see where start of each rule 2 break is - returns list of these points 
 rule2_break_start_positions <- function(limits_table, counter){
   #add a column for start of rule 2 breaks
-  #if there is a rule 2 highlight and that is not preceded by a rule 2 highlight 
+  #Flags if there is a rule 2 highlight and that is not preceded by a rule 2 highlight 
   limits_table <- limits_table %>% mutate(startOfRule2Break = ifelse(rule2 & rule2 != lag(rule2), T, F))
   next_rule_break_positions <- (which(limits_table$startOfRule2Break[counter:nrow(limits_table)] == T)) + counter - 1
   
@@ -168,11 +172,11 @@ identify_opposite_break <- function(limits_table, counter, periodMin){
   limits_table <- bind_rows(limits_table_top, limits_table_bottom)
   
   #state whether each point is above or below the centre line
-  limits_table <- limits_table %>% mutate(aboveOrBelowCl = ifelse(y > cl, "UP",
-                                                                  ifelse(y < cl, "DOWN", "NO CHANGE")))
+  limits_table <- limits_table %>% mutate(aboveOrBelowCl = ifelse(y > cl, 1,
+                                                                  ifelse(y < cl, -1, 0)))
   
   cl_change <- limits_table$cl[counter - 1] - limits_table$cl[counter]
-  rule_break_direction <- ifelse(cl_change > 0, "DOWN", "UP")
+  rule_break_direction <- ifelse(cl_change > 0, -1, 1)
     
   #looks for a rule break in the opposite direction within the candidate period
   limits_table <- limits_table %>% mutate(oppositeBreak  = ifelse(rule2 & (aboveOrBelowCl != rule_break_direction), T, F))

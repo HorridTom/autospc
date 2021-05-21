@@ -1,27 +1,21 @@
+library(tidyverse)
+
+source("R/spc_rules.R")
+source("R/functions.R")
+
 #function interface for automated SPC function
-#' plot_SPC_auto
+#' create_SPC_auto_limits_table
 #'
-#' @param data a data frame or CSV file in the standard format
-#' @param chart_typ the type of chart you wish to plot(e.g. "C", "C'", "P", "P'")
-#' @param periodMin the minimum number of points per period. (This will then be fed
-#' into the first freeze argument)
+#' @param data a data frame with columns x, y, title (optional) and place (optional)
+#' @param chart_typ the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")
+#' @param periodMin the minimum number of points per period.
 #' @param runRuleLength the number of points above or below the centre line needed
 #' for a rule 2 break
-#' @param baselineWait ??
-#' @param part a vector of part point returned from the SPC algorithm (could 
-#' happen within the function)
-#' @param excule a vector of points to exclude from any limit calculations
-#' @param r1_col the colour for points causing a rule 1 break 
-#' @param r2_col the colour for points causing a rule 2 break 
-#' @param cht_title the main title of the chart (could be extracted from the csv?)
-#' @param sub_tile can be used for the place that the data has come from (e.g. 
-#' which board)(could be extracted from the csv?)
-#' @param plot_chart if true, chart is plotted, if false, table of plot data is returned
-#' @param write_table if true, the plot data is written to a folder location 
-#' 
+#' @param maxNoOfExclusions the maximum number of extreme points to exclude from 
+#' limit calculations 
 #'
 #'
-#' @return the input df with an extra column containing the corresponding occupancy on arrival for each patient
+#' @return data frame with limits, rule breaks and additional info needed for plotting
 #'
 #'
 #' @examples
@@ -30,19 +24,13 @@ create_SPC_auto_limits_table <- function(data,
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
-                          
-                          r1_col = "orange",
-                          r2_col = "steelblue3",
-                          cht_title = "title",
-                          sub_title = "Ayrshire and Arran",
-                          plot_chart = T,
-                          write_table = F,
                           ...
 ) {
   
   data <- mutate(data, x = as.Date(x))
   
   #add y column of percentages for P and P' charts
+  #this is to avoid issues with joins later 
   if(cht_type == "P" | cht_type == "P'"){
     data <- data %>% mutate(y = b * 100 / n)
   }
@@ -64,7 +52,8 @@ create_SPC_auto_limits_table <- function(data,
     counter <- counter + periodMin + 1
     
     #extend display limits to end 
-    limits_table <- form_display_limits(limits_table = limits_table, counter = counter)
+    limits_table <- form_display_limits(limits_table = limits_table, 
+                                        counter = counter)
     
     #add rule breaks
     limits_table <- add_rule_breaks(x = limits_table)
@@ -79,12 +68,13 @@ create_SPC_auto_limits_table <- function(data,
       }else{
         
         #check if counter is part way through a rule 2 break already
-        #provided there are at least 8 rule 2 breaks following
+        #provided there are at least 8 rule 2 break points following
         if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
           rule2_break_position <- counter
         }else{
           #scan for start of next rule 2 break
-          rule2_break_positions <- rule2_break_start_positions(limits_table = limits_table, counter = counter)
+          rule2_break_positions <- rule2_break_start_positions(limits_table = limits_table, 
+                                                               counter = counter)
           rule2_break_position <- rule2_break_positions[1]
         }
         print(paste("rule 2 break position", rule2_break_position))
@@ -97,7 +87,6 @@ create_SPC_auto_limits_table <- function(data,
         }else{
           
           counter <- rule2_break_position
-          
           
           #see whether there are enough points after the counter to form new period
           if(!enough_data_for_new_period(limits_table, periodMin, counter)){
@@ -114,13 +103,15 @@ create_SPC_auto_limits_table <- function(data,
                                                               maxNoOfExclusions  = maxNoOfExclusions)
             
             #add new candidate display period
-            candidate_limits_table <- form_display_limits(limits_table = candidate_limits_table, counter = counter + periodMin + 1)
+            candidate_limits_table <- form_display_limits(limits_table = candidate_limits_table, 
+                                                          counter = counter + periodMin + 1)
             
             #add rule breaks
             candidate_limits_table <- add_rule_breaks(candidate_limits_table)
             
             #check whether there is a rule break in the opposite direction within calc period
-            if(!identify_opposite_break(candidate_limits_table, counter = counter, periodMin = periodMin)[[1]]){
+            if(!identify_opposite_break(candidate_limits_table, counter = counter, 
+                                        periodMin = periodMin)[[1]]){
               
               #No opposite rule break in candidate calculation period
               #candidate limits become real limits
@@ -128,11 +119,7 @@ create_SPC_auto_limits_table <- function(data,
               
               #Set counter to end of calculation period
               counter <- counter + periodMin + 1
-              
-              #Extend display limits
-              #limits_table <- form_display_limits(limits_table = limits_table, counter = counter)
-              #limits_table <- add_rule_breaks(limits_table)
-              
+
             }else{
               print("Opposite rule break in candidate period.")
               
@@ -144,23 +131,24 @@ create_SPC_auto_limits_table <- function(data,
                 counter = counter + 1
                 
               }else{
+                
+                #set counter to the start of the next rule 2 break 
                 counter <- rule2_break_positions[2]
                 print(paste("counter",counter))
               }
               
             }
             
-            
-            
-            
           }
           
         }
         
       }
-      #show where the breakpoints are
+      
+      #add a column to show where the breakpoints are
       limits_table <- limits_table %>% 
         mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
+      
     }#####loop ends
     
   }

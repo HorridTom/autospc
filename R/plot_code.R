@@ -51,6 +51,7 @@ plot_auto_SPC <- function(df,
                           override_y_lim = NULL,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
+                          date_break = 7,
                           r1_col = "orange",
                           r2_col = "steelblue3"
 ) { 

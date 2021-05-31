@@ -62,7 +62,7 @@ plot_auto_SPC <- function(df,
   }
   
   if(is.null(subtitle)){
-    subtitle = df$place[1]
+    subtitle = df$subtitle[1]
   }
   
   #get limits
@@ -72,8 +72,8 @@ plot_auto_SPC <- function(df,
     mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 
     #(i.e. so there isn't a gap between calculation and display limits)
-    mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) %>%
-    mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
+    mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) #%>%
+    #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
   
   #store break points as vector
   breakPoints <- which(df$breakPoint)

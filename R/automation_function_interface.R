@@ -70,6 +70,7 @@ create_SPC_auto_limits_table <- function(data,
         #check if counter is part way through a rule 2 break already
         #provided there are at least 8 rule 2 break points following
         if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
+          rule2_break_positions <- NA
           rule2_break_position <- counter
         }else{
           #scan for start of next rule 2 break
@@ -145,15 +146,14 @@ create_SPC_auto_limits_table <- function(data,
         
       }
       
-      #add a column to show where the breakpoints are
-      limits_table <- limits_table %>% 
-        mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
-      
     }#####loop ends
     
   }
 
+  #add a column to show where the breakpoints are
+  limits_table <- limits_table %>% 
+    mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
   
-limits_table
+  limits_table
   
 }

@@ -15,9 +15,9 @@ source("R/automation_function_interface.R")
 #' plot_auto_SPC
 #'
 #' @param data For a C or C' chart: a data frame with columns x, y, title (optional) 
-#' and place (optional, N.B this is the subtitle ususally used for place)
+#' and subtitle (optional)
 #' For a P or P' chart: a data frame with columns x, n (total), b (number of breaches), 
-#' title (optional), place (optional, N.B this is the subtitle ususally used for place) 
+#' title (optional), subtitle (optional) 
 #' @param chart_typ the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")
 #' @param periodMin the minimum number of points per period.
 #' @param runRuleLength the number of points above or below the centre line needed
@@ -46,6 +46,7 @@ plot_auto_SPC <- function(df,
                           subtitle = NULL,
                           plot_chart = T,
                           write_table = F,
+                          noRegrets = T,
                           
                           #overrides for plot aesthetics not detailed in roxygen skeleton
                           override_y_lim = NULL,
@@ -67,7 +68,9 @@ plot_auto_SPC <- function(df,
   
   #get limits
   df <- mutate(df, x = as.Date(x))
-  df <- create_SPC_auto_limits_table(df, cht_type = cht_type, maxNoOfExclusions  = maxNoOfExclusions)
+  df <- create_SPC_auto_limits_table(df, cht_type = cht_type, 
+                                     maxNoOfExclusions  = maxNoOfExclusions,
+                                     noRegrets = noRegrets)
   df <- df %>%
     mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 
@@ -90,6 +93,8 @@ plot_auto_SPC <- function(df,
   # chart y limit
   ylimlow <- 0
   ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10 
+  # ylim_choices <- c(50, 100, 200, 400, 600, 1000, 2000, 8000)
+  # ylimhigh <- ylim_choices[which.min(ylim_choices - max(df$y) < 0)]
   ytitle <- ifelse(cht_type == "C" | cht_type == "C'", "Number", "Percentage within 4hrs")
   
   #start and end dates

@@ -6,7 +6,10 @@ source("R/functions.R")
 #function interface for automated SPC function
 #' create_SPC_auto_limits_table
 #'
-#' @param data a data frame with columns x, y, title (optional) and place (optional)
+#' @param data For a C or C' chart: a data frame with columns x, y, title (optional) 
+#' and subtitle (optional)
+#' For a P or P' chart: a data frame with columns x, n (total), b (number of breaches), 
+#' title (optional), subtitle (optional) 
 #' @param chart_typ the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")
 #' @param periodMin the minimum number of points per period.
 #' @param runRuleLength the number of points above or below the centre line needed
@@ -24,6 +27,7 @@ create_SPC_auto_limits_table <- function(data,
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
+                          noRegrets = T,
                           ...
 ) {
   
@@ -112,7 +116,7 @@ create_SPC_auto_limits_table <- function(data,
             
             #check whether there is a rule break in the opposite direction within calc period
             if(!identify_opposite_break(candidate_limits_table, counter = counter, 
-                                        periodMin = periodMin)[[1]]){
+                                        periodMin = periodMin, noRegrets = noRegrets)[[1]]){
               
               #No opposite rule break in candidate calculation period
               #candidate limits become real limits

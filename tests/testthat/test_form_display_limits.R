@@ -1,6 +1,6 @@
 context("Test formation of display limits following calculation limits")
 library(tidyverse)
-#source("functions.R")
+source("../../R/functions.R")
 
 
 #load in test data

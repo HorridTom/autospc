@@ -1,7 +1,7 @@
 context("Test if there is enough data to form a new period")
 library(tidyverse)
 library(testthat)
-#source("spc-algorithm/R/functions.R")
+source("../../R/functions.R")
 #testthat::test_dir("tests/testthat")
 
 

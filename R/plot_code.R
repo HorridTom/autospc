@@ -46,13 +46,13 @@ plot_auto_SPC <- function(df,
                           subtitle = NULL,
                           plot_chart = T,
                           write_table = F,
-                          noRegrets = T,
+                          noRegrets = F,
                           
                           #overrides for plot aesthetics not detailed in roxygen skeleton
                           override_y_lim = NULL,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
-                          date_break = 7,
+                          date_break = 21,
                           r1_col = "orange",
                           r2_col = "steelblue3"
 ) { 

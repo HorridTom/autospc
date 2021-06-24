@@ -9,7 +9,7 @@ library(gridExtra)
 
 source("R/spc_rules.R")
 source("R/functions.R")
-source("R/automation_function_interface.R")
+source("R/algorithm.R")
 
 #function to plot automated SPC charts
 #' plot_auto_SPC

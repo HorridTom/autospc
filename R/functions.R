@@ -208,3 +208,22 @@ identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets 
 
 }
 
+
+#function to create initial limits with rule breaks
+initialise_limits <- function(data, periodMin, 
+                              counter, cht_type,
+                              maxNoOfExclusions){
+  
+  #form calculation limits for first period
+  limits_table <- form_calculation_limits(data = data, periodMin = periodMin,
+                                          counter = counter, cht_type = cht_type,
+                                          maxNoOfExclusions  = maxNoOfExclusions)
+  
+  #extend display limits to end 
+  limits_table <- form_display_limits(limits_table = limits_table, 
+                                      counter = counter + periodMin + 1)
+  
+  #add rule breaks
+  limits_table <- add_rule_breaks(x = limits_table)
+}
+

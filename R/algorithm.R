@@ -44,7 +44,13 @@ create_SPC_auto_limits_table <- function(data,
   
   #see whether there are enough data points to form one period
   if(!enough_data_for_new_period(data, periodMin, counter)){
-    ##print("There are not enough data points to form the minimum period.")
+    
+    #add a column to show where the breakpoints are
+    limits_table <- limits_table %>% 
+      mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
+    
+    return(limits_table)
+    
   }else{
 
     #form calculation limits for first period

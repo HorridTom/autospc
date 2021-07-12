@@ -1,26 +1,21 @@
-// This class runs SPCAccumulator on the data in each .csv file in a specified directory
+// This class runs SPCCalculator on the data in each .csv file in a specified directory
 // and saves the output as a new .csv file in the same directory.
 
 package uk.ac.ic.doc.wishnwl.tw;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.io.*;
-
-import org.eclipse.birt.data.engine.core.DataException;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 public class SPCIO {
+	
+	CSVReader reader;
+    List<String[]> myEntries;
+    Vector<Double> csvVals;
 
-	 CSVReader reader;
-     List<String[]> myEntries;
-     Vector<Double[]> csvVals;
-    //Alter the distance the algorithm looks for neighbouring breakpoints
-   	//before adding a new one - steps 4 and 6.
-   	public static int padding = 5;
 
 	public void loadCsv(String filename) {
 
@@ -43,85 +38,52 @@ public class SPCIO {
 
 	public void makeVector() {
 
-		this.csvVals = new Vector<Double[]>();
-		Double x = new Double(0);
+		this.csvVals = new Vector<Double>();
+		Double x = Double.valueOf(0);
 
 		for (String[] s : myEntries) {
 			try {
 				x = Double.valueOf(String.valueOf(s[0].toCharArray()));
+				csvVals.add(Double.valueOf(x));
 			}
 			catch (NumberFormatException e) {
 //				System.out.println(String.valueOf(s[0].toCharArray())
 //						+ " is not a Double - replaced with null.");
-				x = null;
-			}
-			finally {
-				csvVals.add(new Double[]{x});
+				//csvVals.add(null);
 			}
 
 		}
 
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName, int maxIterations, int breakPadding) throws DataException {
+	public static Vector<Double[]> analyseCsv(String fName, int minimumPeriodLength, int runRuleLength, int baselineWait, boolean forceRecalc) {
 		SPCIO testIO = new SPCIO();
 		testIO.loadCsv(fName);
 		testIO.makeVector();
+		
+		SPCCalculator spcc = new SPCCalculator(testIO.csvVals, minimumPeriodLength, runRuleLength, baselineWait, forceRecalc);
+		spcc.calculate();
 
-		//System.out.println("Begin Accumulator");
-
-		SPCAccumulator spca = new SPCAccumulator(false, maxIterations, breakPadding);
-
-		//First pass - load data into vals, pass to SPCCalculator spcCalc
-		spca.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spca.onRow(i.next());
-		}
-		spca.finish();
-
-		//Get the mean from spcCalc and add it to ret
+		//Get the mean and add it to ret
 		Vector ret = new Vector();
-		spca.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spca.onRow(i.next());
-			ret.add(spca.getValue());
+		for (double m : spcc.getCentres()) {
+			ret.add(new Double(m));
 		}
-		spca.finish();
 
-		//System.out.println("End Accumulator");
-
-		//System.out.println("Begin Accumulator");
-
-		SPCAccumulator spcm = new SPCAccumulator(true, maxIterations, breakPadding);
-
-		//First pass - load data into vals, pass to SPCCalculator spcCalc
-		spcm.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spcm.onRow(i.next());
-		}
-		spcm.finish();
-
-		//Get the average moving range from spcCalc and add it to ret
+		//Get the average moving range and add it to retm
 		Vector retm = new Vector();
-		spcm.start();
-		for (Iterator<Double[]> i = testIO.csvVals.iterator(); i.hasNext();) {
-			spcm.onRow(i.next());
-			retm.add(spcm.getValue());
+		for (double a : spcc.getAmrs()) {
+			retm.add(new Double(a));
 		}
-		spcm.finish();
-
-		//System.out.println("End Accumulator");
 
 		//structure the output
 		int n = ret.size();
 		Vector<Double[]> vOut = new Vector<Double[]>(n);
 
-
-
 		//System.out.println("Structure Output");
 		for (int i = 0; i < n; i++) {
 			Double[] vItem = new Double[3];
-			vItem[0] = testIO.csvVals.get(i)[0];
+			vItem[0] = testIO.csvVals.get(i);
 			if (ret.get(i) != null) {
 				vItem[1] = Double.valueOf(String.valueOf(ret.get(i)));
 			} else {
@@ -139,11 +101,8 @@ public class SPCIO {
 		return vOut;
 	}
 
-	public static Vector<Double[]> analyseCsv(String fName) throws DataException {
-		return analyseCsv(fName, 0, padding);
-	}
 
-	public static void saveSpcToCsv(String fName, String label, int maxIterations, Vector<Double[]> v) {
+	public static void saveSpcToCsv(String fName, String label, Vector<Double[]> v) {
 		int n = v.size();
 
 		CSVWriter writer;
@@ -191,16 +150,12 @@ public class SPCIO {
 	}
 
 
-	public static void csvSPC(String fName, int maxIterations, int breakPadding) throws DataException {
+	public static void csvSPC(String fName, int minimumPeriodLength, int runRuleLength, int baselineWait, boolean forceRecalc) {
 
 		Vector<Double[]> vOut = new Vector<Double[]>();
-		vOut = analyseCsv(fName, maxIterations, breakPadding);
-		saveSpcToCsv(fName, "", maxIterations, vOut);
+		vOut = analyseCsv(fName, minimumPeriodLength, runRuleLength, baselineWait, forceRecalc);
+		saveSpcToCsv(fName, "", vOut);
 
-	}
-
-	public static void csvSPC(String fName) throws DataException {
-		csvSPC(fName, 0, padding);
 	}
 
 	public static boolean equalVectors (Vector<Double[]> u, Vector<Double[]> v) {
@@ -222,37 +177,29 @@ public class SPCIO {
 		return status;
 	}
 
-	public static void main(String[] args) throws DataException {
-
-		File folder = new File("C:\\Users\\tw299\\git\\spc-algorithm\\SPCalgorithm1\\data");
+	public static void main(String[] args) {
+		
+		int minimumPeriodLength = Integer.parseInt(args[1]);
+		int runRuleLength = Integer.parseInt(args[2]);
+		int baselineWait = Integer.parseInt(args[3]);
+		boolean forceRecalc = Boolean.parseBoolean(args[4]);
+		// "/Users/Thomas/code/eclipse-workspace/spc-algorithm/SPCalgorithm1/data"
+		File folder = new File(args[0]);
 		File[] listOfFiles = folder.listFiles();
 		String fileName = new String();
-		int nloops = 0;
 
-		//Set this flag to true to save output of each stage of the algorithm,
-		//or false to only save final result.
-		boolean outputStages = false;
-
-
+		
 		for (int i = 0;i < listOfFiles.length; i++) {
 			fileName = listOfFiles[i].getAbsolutePath();
 			//SPCIO.csvSPC(fileName, 0);
 			Vector<Double[]> endResult = new Vector<Double[]>();
-			Vector<Double[]> result = new Vector<Double[]>();
-			endResult = analyseCsv(fileName, 0, padding);
-			saveSpcToCsv(fileName, "endresult", 0, endResult);
-			if(outputStages){
-				nloops = 0;
-				while(!equalVectors(endResult, result)) {
-					nloops++;
-					result = analyseCsv(fileName, nloops, padding);
-					saveSpcToCsv(fileName, String.valueOf(nloops), nloops, result);
-				}
-				System.out.println("Data in file " + fileName + " analysed in " + nloops + " stages.");
-			}
-			result = null;
+			System.out.println("\n*********************************************************************************************************");
+			System.out.println("Analysing data in file: " + fileName + " ...");
+			endResult = analyseCsv(fileName, minimumPeriodLength, runRuleLength, baselineWait, forceRecalc);
+			saveSpcToCsv(fileName, "endresult", endResult);
+			System.out.println("...data in file " + fileName + " analysed.");
 			endResult = null;
-
+			System.out.println("*********************************************************************************************************");
 		}
 
 

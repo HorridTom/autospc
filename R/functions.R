@@ -118,7 +118,13 @@ find_extremes <- function(data, cht_type, counter, periodMin, maxNoOfExclusions)
       #set already established extremes as NA
       mutate(rule1Distance = ifelse(row_number() %in% exclusion_points, NA, rule1Distance))
     
-    furthest_extreme <- max(calculation_period$rule1Distance, na.rm = T)
+    if(sum(!is.na(calculation_period$rule1Distance)) == 0) {
+      # If no extremes, set furthest_extreme to -Inf
+      furthest_extreme <- -Inf
+    } else {
+      # Otherwise, set furthest extreme to the greatest distance from limit
+      furthest_extreme <- max(calculation_period$rule1Distance, na.rm = T)
+    }
     exclusion_point <- which(calculation_period$rule1Distance == furthest_extreme)
     
     #add next exclusion point and furthest extreme to the vectors

@@ -1,7 +1,7 @@
 library(tidyverse)
 
-source("R/spc_rules.R")
-source("R/functions.R")
+#source("R/spc_rules.R")
+#source("R/functions.R")
 
 #function interface for automated SPC function
 #' create_SPC_auto_limits_table

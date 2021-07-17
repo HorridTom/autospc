@@ -1,6 +1,6 @@
 context("Test scanning of rule 2 breaks")
 library(tidyverse)
-source("../../R/functions.R")
+#source("../../R/functions.R")
 
 
 #load in test data

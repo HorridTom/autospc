@@ -1,7 +1,4 @@
 context("Test scanning of rule 2 breaks")
-library(tidyverse)
-#source("../../R/functions.R")
-
 
 #load in test data
 test_data <- readRDS("testdata/test_data_rule2_break.rds")

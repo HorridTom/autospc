@@ -18,3 +18,9 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports: 
+    dplyr (>= 1.0.5),
+    ggplot2 (>= 3.3.3),
+    lubridate (>= 1.7.10),
+    qicharts2 (>= 0.7.1),
+    scales (>= 1.1.1)

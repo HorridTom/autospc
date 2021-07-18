@@ -1,16 +1,3 @@
-library(tidyverse)
-library(qicharts2)
-library(scales)
-library(zoo)
-library(lubridate)
-library(wktmo)
-library(grid)
-library(gridExtra)
-
-# source("R/spc_rules.R")
-# source("R/functions.R")
-# source("R/algorithm.R")
-
 #function to plot automated SPC charts
 #' plot_auto_SPC
 #'
@@ -34,7 +21,7 @@ library(gridExtra)
 #'
 #' @return An SPC ggplot or corresponding data
 #'
-#'
+#' @export
 #' @examples
 plot_auto_SPC <- function(df,
                           cht_type = "C",
@@ -72,10 +59,10 @@ plot_auto_SPC <- function(df,
                                      maxNoOfExclusions  = maxNoOfExclusions,
                                      noRegrets = noRegrets)
   df <- df %>%
-    mutate(x = as.Date(x)) %>%
+    dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 
     #(i.e. so there isn't a gap between calculation and display limits)
-    mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) #%>%
+    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) #%>%
     #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
   
   #store break points as vector
@@ -83,12 +70,12 @@ plot_auto_SPC <- function(df,
   
   if(highlightExclusions){
     #show exclusions on chart
-    df <- df %>% mutate(highlight = ifelse(excluded == T & !is.na(excluded), 
+    df <- df %>% dplyr::mutate(highlight = ifelse(excluded == T & !is.na(excluded), 
                                            "Excluded from limits calculation", 
                                            highlight))
   }
   
-  pct <- ggplot(df, aes(x,y))
+  pct <- ggplot2::ggplot(df, ggplot2::aes(x,y))
   
   # chart y limit
   ylimlow <- 0
@@ -118,17 +105,18 @@ plot_auto_SPC <- function(df,
     caption <- paste(cht_type,"Shewhart Chart.","\n*Shewhart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
 
     p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
-      scale_x_date(labels = date_format("%Y-%m-%d"), breaks = seq(st.dt, ed.dt, date_break),
-                   limits = c(st.dt, ed.dt)) +
-      ggtitle(cht_title, subtitle = subtitle) +
-      labs(x = "Day", y = ytitle,
+      ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
+                            breaks = seq(st.dt, ed.dt, date_break),
+                            limits = c(st.dt, ed.dt)) +
+      ggplot2::ggtitle(cht_title, subtitle = subtitle) +
+      ggplot2::labs(x = "Day", y = ytitle,
            caption = paste0(caption),
            size = 10) +
-      scale_y_continuous(limits = c(ylimlow, ylimhigh),
-                         breaks = breaks_pretty(),
-                         labels = number_format(accuracy = 1, big.mark = ",")) +
-      annotate("text", x = st.dt, y = ucl_start + ucl_start/annotation_dist_fact, label = cl_start) +
-      annotate("text", x = df$x[breakPoints] + days(2), y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, label = round(df$cl[breakPoints]))
+      ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
+                         breaks = scales::breaks_pretty(),
+                         labels = scales::number_format(accuracy = 1, big.mark = ",")) +
+      ggplot2::annotate("text", x = st.dt, y = ucl_start + ucl_start/annotation_dist_fact, label = cl_start) +
+      ggplot2::annotate("text", x = df$x[breakPoints] + lubridate::days(2), y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, label = round(df$cl[breakPoints]))
     
     p
     
@@ -149,24 +137,26 @@ plot_auto_SPC <- function(df,
 format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black", "Excluded from limits calculation" = "grey")
   cht + 
-    geom_line(colour = "black", size = 0.5) + 
-    geom_line(data = mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), aes(x,cl), size = 0.75, linetype = "solid") +
-    geom_line(data = mutate(df, cl = ifelse(periodType == "display", cl, NA)), aes(x,cl), size = 0.75, linetype = "42") +
-    geom_line(data = mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), aes(x,ucl), size = 0.5, linetype = "solid") +
-    geom_line(data = mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), aes(x,ucl), size = 0.5, linetype = "84") +
-    geom_line(data = mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), aes(x,lcl), size = 0.5, linetype = "solid") +
-    geom_line(data = mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), aes(x,lcl), size = 0.5, linetype = "84") +
+    ggplot2::geom_line(colour = "black", size = 0.5) + 
+    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "solid") +
+    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "display", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "42") +
+    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "solid") +
+    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "84") +
+    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
+    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
   
-    geom_point(aes(colour = highlight), size = 2) +
-    scale_color_manual("Rule triggered*", values = point_colours) + 
-    theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_line(colour = "grey80"),
-          panel.grid.minor = element_blank(), panel.background = element_blank(),
-          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
-          axis.text.y = element_text(size = 14), axis.title = element_text(size = 14),
-          plot.title = element_text(size = 20, hjust = 0),
-          plot.subtitle = element_text(size = 16, face = "italic"),
-          axis.line = element_line(colour = "grey60"),
-          plot.caption = element_text(size = 10, hjust = 0.5)) 
+    ggplot2::geom_point(aes(colour = highlight), size = 2) +
+    ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
+          panel.grid.minor = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
+          axis.text.y = ggplot2::element_text(size = 14), axis.title = element_text(size = 14),
+          plot.title = ggplot2::element_text(size = 20, hjust = 0),
+          plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
+          axis.line = ggplot2::element_line(colour = "grey60"),
+          plot.caption = ggplot2::element_text(size = 10, hjust = 0.5)) 
   
 }
 

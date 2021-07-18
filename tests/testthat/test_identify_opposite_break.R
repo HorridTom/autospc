@@ -1,7 +1,4 @@
 context("Identify whether there is a rule 2 break within the calculation period in the opposite direction")
-library(tidyverse)
-#source("../../R/functions.R")
-
 
 #load in test data
 readRDS("testdata/test_data.rds")

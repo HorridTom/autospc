@@ -1,6 +1,3 @@
-library(tidyverse)
-library(Rfast)
-
 #function to determine whether there are enough data points left to form a new period
 enough_data_for_new_period <- function(data, periodMin, counter){
    
@@ -35,9 +32,9 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C", ma
   
 
   calculation_period <- calculation_period$data %>%
-    select(x, y, ucl,lcl, cl) %>%
-    mutate(periodType = "calculation") %>%
-    mutate(excluded = ifelse(row_number() %in% exclusion_points, T, F))
+    dplyr::select(x, y, ucl,lcl, cl) %>%
+    dplyr::mutate(periodType = "calculation") %>%
+    dplyr::mutate(excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F))
 
 
   #first period does not already have the additional columns
@@ -45,37 +42,37 @@ form_calculation_limits <- function(data, counter, periodMin, cht_type = "C", ma
     
     #joins limits to the existing data
     limits_table <- data %>%
-      left_join(calculation_period, by = "x") %>%
-      mutate(y = if_else(is.na(y.y), y.x, y.y)) 
+      dplyr::left_join(calculation_period, by = "x") %>%
+      dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) 
     
     #only selects n if P chart
     if(cht_type == "P" | cht_type == "P'"){
       limits_table <- limits_table %>%
-        select(x, y, n, b, ucl, lcl, cl, periodType, excluded)
+        dplyr::select(x, y, n, b, ucl, lcl, cl, periodType, excluded)
     }else{
       limits_table <- limits_table %>%
-      select(x, y, ucl, lcl, cl, periodType, excluded)
+        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded)
     }
     
   }else{
     
     #joins limits to the existing data, overwriting display limits 
     limits_table <- data %>%
-      left_join(calculation_period, by = "x") %>%
-      mutate(y = if_else(is.na(y.y), y.x, y.y)) %>%
-      mutate(ucl = if_else(is.na(ucl.y), ucl.x, ucl.y)) %>%
-      mutate(lcl = if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
-      mutate(cl = if_else(is.na(cl.y), cl.x, cl.y)) %>%
-      mutate(periodType = if_else(is.na(periodType.y), periodType.x, periodType.y)) %>%
-      mutate(excluded = if_else(is.na(excluded.y), excluded.x, excluded.y)) 
+      dplyr::left_join(calculation_period, by = "x") %>%
+      dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) %>%
+      dplyr::mutate(ucl = dplyr::if_else(is.na(ucl.y), ucl.x, ucl.y)) %>%
+      dplyr::mutate(lcl = dplyr::if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
+      dplyr::mutate(cl = dplyr::if_else(is.na(cl.y), cl.x, cl.y)) %>%
+      dplyr::mutate(periodType = dplyr::if_else(is.na(periodType.y), periodType.x, periodType.y)) %>%
+      dplyr::mutate(excluded = dplyr::if_else(is.na(excluded.y), excluded.x, excluded.y)) 
     
     #only selects n if P chart
     if(cht_type == "P" | cht_type == "P'"){
       limits_table <- limits_table %>%
-        select(x, y, n, b, ucl, lcl, cl, periodType, excluded)
+        dplyr::select(x, y, n, b, ucl, lcl, cl, periodType, excluded)
     }else{
       limits_table <- limits_table %>%
-        select(x, y, ucl, lcl, cl, periodType, excluded)
+        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded)
     }
   }
   
@@ -108,15 +105,16 @@ find_extremes <- function(data, cht_type, counter, periodMin, maxNoOfExclusions)
     }
     
     calculation_period <- calculation_period$data %>%
-      select(x,y,ucl,lcl, cl)
+      dplyr::select(x,y,ucl,lcl, cl)
     
     calculation_period <- add_rule_breaks(calculation_period)
     calculation_period <- calculation_period %>% 
-      mutate(aboveCl = ifelse(y > cl, T,ifelse(y < cl, F, NA))) %>%
-      mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
+      dplyr::mutate(aboveCl = ifelse(y > cl, T,ifelse(y < cl, F, NA))) %>%
+      dplyr::mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
                                     ifelse(rule1 & !aboveCl, lcl - y, NA))) %>%
       #set already established extremes as NA
-      mutate(rule1Distance = ifelse(row_number() %in% exclusion_points, NA, rule1Distance))
+      dplyr::mutate(rule1Distance = ifelse(dplyr::row_number() %in% 
+                                             exclusion_points, NA, rule1Distance))
     
     if(sum(!is.na(calculation_period$rule1Distance)) == 0) {
       # If no extremes, set furthest_extreme to -Inf
@@ -159,7 +157,8 @@ form_display_limits <- function(limits_table, counter){
 rule2_break_start_positions <- function(limits_table, counter){
   #add a column for start of rule 2 breaks
   #Flags if there is a rule 2 highlight and that is not preceded by a rule 2 highlight 
-  limits_table <- limits_table %>% mutate(startOfRule2Break = ifelse(rule2 & rule2 != lag(rule2), T, F))
+  limits_table <- limits_table %>% 
+    dplyr::mutate(startOfRule2Break = ifelse(rule2 & rule2 != dplyr::lag(rule2), T, F))
   next_rule_break_positions <- (which(limits_table$startOfRule2Break[counter:nrow(limits_table)] == T)) + counter - 1
   
   next_rule_break_positions
@@ -181,12 +180,12 @@ identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets 
     #but do include "hang over" into following display period
     limits_table_top <- limits_table[1:(counter-1),]
     limits_table_bottom <- add_rule_breaks(limits_table[counter:nrow(limits_table),])
-    limits_table <- bind_rows(limits_table_top, limits_table_bottom)
+    limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
   }
 
   #state whether each point is above or below the centre line
-  limits_table <- limits_table %>% mutate(aboveOrBelowCl = ifelse(y > cl, 1,
-                                                                  ifelse(y < cl, -1, 0)))
+  limits_table <- limits_table %>% 
+    dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0)))
   
   #Numerical change in centre line
   cl_change <- limits_table$cl[counter - 1] - limits_table$cl[counter]
@@ -194,7 +193,8 @@ identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets 
   rule_break_direction <- ifelse(cl_change > 0, -1, 1)
     
   #looks for a rule break in the opposite direction within the candidate period
-  limits_table <- limits_table %>% mutate(oppositeBreak  = ifelse(rule2 & (aboveOrBelowCl != rule_break_direction), T, F))
+  limits_table <- limits_table %>% 
+    dplyr::mutate(oppositeBreak  = ifelse(rule2 & (aboveOrBelowCl != rule_break_direction), T, F))
   
   if(noRegrets){
     next_rule_break_position <- min(which(limits_table$oppositeBreak == T )) + counter - 1

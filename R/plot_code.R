@@ -26,7 +26,7 @@
 #' @export
 #' @examples
 plot_auto_SPC <- function(df,
-                          chartType = "C",
+                          chartType = NULL,
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
@@ -38,9 +38,12 @@ plot_auto_SPC <- function(df,
                           noRegrets = T,
                           
                           #overrides for plot aesthetics not detailed in roxygen skeleton
+                          override_x_title = NULL,
+                          override_y_title = NULL,
                           override_y_lim = NULL,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
+                          prime_chart_volume = 1500,
                           date_break = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3"
@@ -55,6 +58,21 @@ plot_auto_SPC <- function(df,
     subtitle = df$subtitle[1]
   }
   
+  #decide whether the chart is C or P depending on data format if not specified 
+  if(is.null(chartType)){
+    if(all(c("x", "y") %in% colnames(df))){
+      #rule of thumb for when to convert use a prime chart
+      chartType <- dplyr::if_else(max(df$y) > prime_chart_volume,"C'","C")
+    }else if(all(c("x", "n", "b") %in% colnames(df))){
+      #rule of thumb for when to convert use a prime chart
+      chartType <- dplyr::if_else(max(df$n) > prime_chart_volume,"P'","P")
+    }else{
+      print("The data you have input is not in the correct format. For C charts, data
+          must contain at least columns 'x' and 'y'. For P charts data must contain
+          at least 'x', 'n' and 'b' columns.")
+    }
+  }
+
   #get control limits
   df <- dplyr::mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, chartType = chartType, 
@@ -92,7 +110,7 @@ plot_auto_SPC <- function(df,
   
   #get date breaks
   if(is.null(date_break)){
-    date_break <- as.numeric(difftime(ed.dt,st.dt, units = "days")) / 40
+    date_break <- as.numeric(difftime(ed.dt, st.dt, units = "days")) / 40
   }
   
   #get y limit

@@ -11,6 +11,8 @@
 #' for a rule 2 break
 #' @param maxNoOfExclusions the maximum number of extreme points to exclude from 
 #' limit calculations 
+#' @param noRegrets Boolean signifying which version of the algorithm should be used. 
+#' Defines whether limits can change as more data is added or not.
 #'
 #'
 #' @return data frame with limits, rule breaks and additional info needed for plotting
@@ -19,7 +21,7 @@
 #'
 #' @examples
 create_SPC_auto_limits_table <- function(data, 
-                          cht_type = "C",
+                          chartType = "C",
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
@@ -30,7 +32,7 @@ create_SPC_auto_limits_table <- function(data,
   data <- dplyr::mutate(data, x = as.Date(x))
   
   #add y column of percentages for P and P' charts. This is to avoid issues with joins later 
-  if(cht_type == "P" | cht_type == "P'"){
+  if(chartType == "P" | chartType == "P'"){
     data <- data %>% dplyr::mutate(y = b * 100 / n)
   }
   
@@ -41,7 +43,7 @@ create_SPC_auto_limits_table <- function(data,
   if(enough_data_for_new_period(data, periodMin, counter)){
     
     #[2]
-    limits_table <- initialise_limits(data, periodMin, counter, cht_type, maxNoOfExclusions)
+    limits_table <- initialise_limits(data, periodMin, counter, chartType, maxNoOfExclusions)
     
     #set counter to end of first period
     counter <- counter + periodMin + 1
@@ -79,7 +81,7 @@ create_SPC_auto_limits_table <- function(data,
             
             #[8]
             candidate_limits_table <- initialise_limits(data = limits_table, periodMin, counter,
-                                                        cht_type, maxNoOfExclusions)
+                                                        chartType, maxNoOfExclusions)
             
             #[9]check whether there is a rule break in the opposite direction within calc period
             if(!identify_opposite_break(candidate_limits_table, counter, periodMin, noRegrets)[[1]]){

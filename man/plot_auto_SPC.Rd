@@ -42,7 +42,7 @@ limit calculations}
 \item{plot_chart}{Boolean specifying whether to plot the chart or return the data}
 
 \item{write_table}{Boolean specifying whether to save the data as a CSV
-(useful for foing lots of charts at a time)}
+(useful for doing lots of charts at a time)}
 
 \item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)

@@ -21,6 +21,7 @@
 #'
 #' @return An SPC ggplot or corresponding data
 #'
+#' @importFrom magrittr %>%
 #' @export
 #' @examples
 plot_auto_SPC <- function(df,

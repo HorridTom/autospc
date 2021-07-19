@@ -6,25 +6,30 @@
 \usage{
 plot_auto_SPC(
   df,
-  cht_type = "C",
+  chartType = NULL,
   periodMin = 21,
   runRuleLength = 8,
   maxNoOfExclusions = 3,
   highlightExclusions = T,
-  cht_title = NULL,
+  title = NULL,
   subtitle = NULL,
-  plot_chart = T,
-  write_table = F,
-  noRegrets = F,
+  plotChart = T,
+  writeTable = F,
+  noRegrets = T,
+  override_x_title = NULL,
+  override_y_title = NULL,
   override_y_lim = NULL,
   override_annotation_dist = 10,
   override_annotation_dist_P = 25,
-  date_break = 21,
+  prime_chart_volume = 1500,
+  date_break = NULL,
   r1_col = "orange",
   r2_col = "steelblue3"
 )
 }
 \arguments{
+\item{chartType}{the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")}
+
 \item{periodMin}{the minimum number of points per period.}
 
 \item{runRuleLength}{the number of points above or below the centre line needed
@@ -35,21 +40,22 @@ limit calculations}
 
 \item{highlightExclusions}{Boolean signifying whether excluded points are greyed out}
 
-\item{cht_title}{A chart title to override any title specified in the data}
+\item{title}{A chart title to override any title specified in the data}
 
 \item{subtitle}{A subtitle to override any subtitle specified in the data}
 
-\item{plot_chart}{Boolean specifying whether to plot the chart or return the data}
+\item{plotChart}{Boolean specifying whether to plot the chart or return the data}
 
-\item{write_table}{Boolean specifying whether to save the data as a CSV
+\item{writeTable}{Boolean specifying whether to save the data as a CSV
 (useful for doing lots of charts at a time)}
+
+\item{noRegrets}{Boolean signifying which version of the algorithm should be used.
+Defines whether limits can change as more data is added or not.}
 
 \item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)
 For a P or P' chart: a data frame with columns x, n (total), b (number of breaches),
 title (optional), subtitle (optional)}
-
-\item{chart_typ}{the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")}
 }
 \value{
 An SPC ggplot or corresponding data

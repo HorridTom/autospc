@@ -6,7 +6,7 @@
 \usage{
 create_SPC_auto_limits_table(
   data,
-  cht_type = "C",
+  chartType = "C",
   periodMin = 21,
   runRuleLength = 8,
   maxNoOfExclusions = 3,
@@ -27,6 +27,9 @@ for a rule 2 break}
 
 \item{maxNoOfExclusions}{the maximum number of extreme points to exclude from
 limit calculations}
+
+\item{noRegrets}{Boolean signifying which version of the algorithm should be used.
+Defines whether limits can change as more data is added or not.}
 
 \item{chart_typ}{the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")}
 }

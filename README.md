@@ -1,7 +1,8 @@
 # autospc
 ## Installation
 Make sure you have the `devtools` package installed.
-`install.packages("devtools")
+
+`install.packages("devtools")`
 
 Then you can install the `autospc` package.
 
@@ -47,4 +48,5 @@ with control limits and other information.
 `autospc::plot_auto_spc(dataframe, plot_chart = F)`
 
 `limits_table <- autospc::plot_auto_spc(dataframe, plot_chart = F)`
+
 This stores the returned data in a variable called `limits_table`

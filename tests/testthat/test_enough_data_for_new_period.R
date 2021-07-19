@@ -1,9 +1,4 @@
 context("Test if there is enough data to form a new period")
-library(tidyverse)
-library(testthat)
-source("../../R/functions.R")
-#testthat::test_dir("tests/testthat")
-
 
 #load in test data
 #test_data <- readRDS("tests/testthat/testdata/test_data.rds")

@@ -1,0 +1,26 @@
+Package: autospc
+Title: Automatically Partitioned SPC Charts
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Thomas",
+           family = "Woodcock",
+           role = c("aut", "cre"),
+           email = "woodcock.thomas@gmail.com",
+           comment = c(ORCID = "0000-0002-4735-4856")),
+      person(given = "Imogen",
+           family = "O'Connor",
+           role = c("aut"),
+           email = "imogen.connor-helleur@imperial.ac.uk"))
+Description: Creates spc charts with control limits and centre line calculations
+  partitioned into distinct periods.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    dplyr (>= 1.0.5),
+    ggplot2 (>= 3.3.3),
+    lubridate (>= 1.7.10),
+    qicharts2 (>= 0.7.1),
+    scales (>= 1.1.1)

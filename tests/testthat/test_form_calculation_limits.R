@@ -1,7 +1,4 @@
 context("Test formation of calculation limits for specified period after counter")
-library(tidyverse)
-source("../../R/functions.R")
-source("../../R/spc_rules.R")
 
 #load in test data
 test_data <- readRDS("testdata/test_data.rds")

@@ -1,8 +1,3 @@
-library(tidyverse)
-
-source("R/spc_rules.R")
-source("R/functions.R")
-
 #function interface for automated SPC function
 #' create_SPC_auto_limits_table
 #'
@@ -31,11 +26,11 @@ create_SPC_auto_limits_table <- function(data,
                           ...
 ) {
   
-  data <- mutate(data, x = as.Date(x))
+  data <- dplyr::mutate(data, x = as.Date(x))
   
   #add y column of percentages for P and P' charts. This is to avoid issues with joins later 
   if(cht_type == "P" | cht_type == "P'"){
-    data <- data %>% mutate(y = b * 100 / n)
+    data <- data %>% dplyr::mutate(y = b * 100 / n)
   }
   
   #set counter to zero
@@ -130,7 +125,7 @@ create_SPC_auto_limits_table <- function(data,
     
     #add a column to show where the breakpoints are
     limits_table <- limits_table %>% 
-      mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
+      dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
     
     limits_table
     

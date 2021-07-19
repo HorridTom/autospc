@@ -16,7 +16,7 @@
 #' @param subtitle A subtitle to override any subtitle specified in the data
 #' @param plot_chart Boolean specifying whether to plot the chart or return the data
 #' @param write_table Boolean specifying whether to save the data as a CSV 
-#' (useful for foing lots of charts at a time) 
+#' (useful for doing lots of charts at a time) 
 #'
 #'
 #' @return An SPC ggplot or corresponding data
@@ -54,7 +54,7 @@ plot_auto_SPC <- function(df,
   }
   
   #get limits
-  df <- mutate(df, x = as.Date(x))
+  df <- dplyr::mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, cht_type = cht_type, 
                                      maxNoOfExclusions  = maxNoOfExclusions,
                                      noRegrets = noRegrets)
@@ -145,14 +145,14 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
     ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
     ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
   
-    ggplot2::geom_point(aes(colour = highlight), size = 2) +
+    ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
           panel.grid.minor = ggplot2::element_blank(),
           panel.background = ggplot2::element_blank(),
           axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
-          axis.text.y = ggplot2::element_text(size = 14), axis.title = element_text(size = 14),
+          axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
           plot.title = ggplot2::element_text(size = 20, hjust = 0),
           plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
           axis.line = ggplot2::element_line(colour = "grey60"),

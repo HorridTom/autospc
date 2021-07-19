@@ -67,9 +67,7 @@ plot_auto_SPC <- function(df,
       #rule of thumb for when to convert use a prime chart
       chartType <- dplyr::if_else(max(df$n) > prime_chart_volume,"P'","P")
     }else{
-      print("The data you have input is not in the correct format. For C charts, data
-          must contain at least columns 'x' and 'y'. For P charts data must contain
-          at least 'x', 'n' and 'b' columns.")
+      print("The data you have input is not in the correct format. For C charts, data must contain at least columns 'x' and 'y'. For P charts data must contain at least 'x', 'n' and 'b' columns.")
     }
   }
 

@@ -4,6 +4,7 @@ Make sure you have the `devtools` package installed.
 `install.packages("devtools")
 
 Then you can install the `autospc` package.
+
 `devtools::install_github("HorridTom/autospc")`
 
 This may then give you the option to install other packages that `autospc` is 
@@ -33,13 +34,16 @@ column if no title is needed.
 
 ## Running the charts
 Run the following code on a `dataframe` that fits the above format.
+
 `autospc::plot_auto_spc(dataframe)`
+
 There are various arguments that can be specified in this function call to change
 the appearance of the chart. Use `??autospc::plot_auto_spc` to find out more.
 
 ## Getting the data
 Run the following code on a `dataframe` in the above format to return the data 
 with control limits and other information.
+
 `autospc::plot_auto_spc(dataframe, plot_chart = F)`
 
 `limits_table <- autospc::plot_auto_spc(dataframe, plot_chart = F)`

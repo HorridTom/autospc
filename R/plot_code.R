@@ -99,9 +99,14 @@ plot_auto_SPC <- function(df,
   
   # chart y limit
   ylimlow <- 0
-  ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10 
-  # ylim_choices <- c(50, 100, 200, 400, 600, 1000, 2000, 8000)
-  # ylimhigh <- ylim_choices[which.min(ylim_choices - max(df$y) < 0)]
+  if(chartType == "C" | chartType == "C'"){
+    ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10 
+    # ylim_choices <- c(50, 100, 200, 400, 600, 1000, 2000, 8000)
+    # ylimhigh <- ylim_choices[which.min(ylim_choices - max(df$y) < 0)]
+  }else{
+    ylimhigh <- 110
+  }
+  
   ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage within 4hrs")
   
   #start and end dates

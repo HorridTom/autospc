@@ -36,7 +36,7 @@ column if no title is needed.
 ## Running the charts
 Run the following code on a `dataframe` that fits the above format.
 
-`autospc::plot_auto_spc(dataframe)`
+`autospc::plot_auto_SPC(dataframe)`
 
 There are various arguments that can be specified in this function call to change
 the appearance of the chart. Use `??autospc::plot_auto_spc` to find out more.
@@ -45,8 +45,8 @@ the appearance of the chart. Use `??autospc::plot_auto_spc` to find out more.
 Run the following code on a `dataframe` in the above format to return the data 
 with control limits and other information.
 
-`autospc::plot_auto_spc(dataframe, plot_chart = F)`
+`autospc::plot_auto_SPC(dataframe, plot_chart = F)`
 
-`limits_table <- autospc::plot_auto_spc(dataframe, plot_chart = F)`
+`limits_table <- autospc::plot_auto_SPC(dataframe, plot_chart = F)`
 
 This stores the returned data in a variable called `limits_table`

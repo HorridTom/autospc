@@ -21,7 +21,6 @@ plot_auto_SPC(
   override_y_lim = NULL,
   override_annotation_dist = 10,
   override_annotation_dist_P = 25,
-  prime_chart_volume = 1500,
   date_break = NULL,
   r1_col = "orange",
   r2_col = "steelblue3"

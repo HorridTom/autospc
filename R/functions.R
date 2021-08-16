@@ -12,6 +12,15 @@ enough_data_for_new_period <- function(data, periodMin, counter){
 #data has columns x and y
 form_calculation_limits <- function(data, counter, periodMin, chartType = "C", maxNoOfExclusions = 3){
   
+  #force columns into the correct type
+  if("y" %in% colnames(data)){
+    data$y <- as.double(data$y)
+  }
+  if(all(c("n","b") %in% colnames(data))){
+    data$n <- as.double(data$n)
+    data$b <- as.double(data$b)
+  }
+  
   exclusion_points <- find_extremes(data, chartType, counter, periodMin, maxNoOfExclusions)
   
   #run the calculation of limits excluding extremes for selected section of data

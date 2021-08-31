@@ -28,9 +28,7 @@ create_SPC_auto_limits_table <- function(data,
                           noRegrets = T,
                           ...
 ) {
-  
-  data <- dplyr::mutate(data, x = as.Date(x))
-  
+
   #add y column of percentages for P and P' charts. This is to avoid issues with joins later 
   if(chartType == "P" | chartType == "P'"){
     data <- data %>% dplyr::mutate(y = b * 100 / n)

@@ -115,6 +115,7 @@ plot_auto_SPC <- function(df,
   #start and end dates
   start_x <- min(df$x, na.rm = T)
   end_x <- max(df$x, na.rm = T)
+  print(start_x)
   
   #get y limit
   if(!is.null(override_y_lim)){
@@ -154,41 +155,45 @@ plot_auto_SPC <- function(df,
       ggplot2::annotate("text", 
                         x = df$x[breakPoints] + 2, 
                         y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, 
-                        label = round(df$cl[breakPoints])) + 
-      ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 7),
-                                limits = c(start_x, end_x))
+                        label = round(df$cl[breakPoints])) #+ 
+      # ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 7),
+      #                           limits = c(start_x, end_x))
     
-    # #formats x axis depending on x type
-    # if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
-    #   #get x axis breaks
-    #   print("got here date")
-    #   x_break <- dplyr::if_else(is.null(x_break),
-    #                             as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
-    #                             x_break)
-    # 
-    #   p <- p + ggplot2::scale_x_datetime(labels = scales::date_format("%Y-%m-%d"),
-    #                                      breaks = seq(start_x, end_x, x_break),
-    #                                      limits = c(start_x, end_x))
-    # 
-    # }else if(xType == "integer"){
-    #   #get x axis breaks
-    #   print("got here integer")
-    #   x_break <- dplyr::if_else(is.null(x_break),
-    #                             (end_x - start_x) / 40,
-    #                             x_break)
-    # 
-    #   p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
-    #                                        limits = c(start_x, end_x))
-    # }else{
-    #   #get x axis breaks
-    #   print("got here other")
-    #   x_break <- dplyr::if_else(is.null(x_break),
-    #                             (end_x - start_x) / 40,
-    #                             x_break)
-    # 
-    #   p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
-    #                                         limits = c(start_x, end_x))
-    # }
+    #formats x axis depending on x type
+    if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
+      df <- df %>% dplyr::mutate(x = as.Date(x))
+
+      #get x axis breaks
+      print("got here date")
+      x_break <- dplyr::if_else(is.null(x_break),
+                                as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
+                                x_break)
+      print(x_break)
+
+      p <- p + ggplot2::scale_x_date(#labels = scales::date_format("%Y-%m-%d")#,
+                                         #breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
+                                         #limits = c(as.Date(start_x), as.Date(end_x))
+                                     )
+
+    }else if(xType == "integer"){
+      #get x axis breaks
+      print("got here integer")
+      x_break <- dplyr::if_else(is.null(x_break),
+                                (end_x - start_x) / 40,
+                                x_break)
+
+      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
+                                           limits = c(start_x, end_x))
+    }else{
+      #get x axis breaks
+      print("got here other")
+      x_break <- dplyr::if_else(is.null(x_break),
+                                (end_x - start_x) / 40,
+                                x_break)
+
+      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+                                            limits = c(start_x, end_x))
+    }
     
     p
 

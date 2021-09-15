@@ -19,6 +19,14 @@
 #' (useful for doing lots of charts at a time) 
 #' @param noRegrets Boolean signifying which version of the algorithm should be used. 
 #' Defines whether limits can change as more data is added or not.
+#' @param x column to use as subgroups on the horizontal axis of the chart
+#' (passed using tidyselect)
+#' @param y column to use as count (vertical axis) for C and C' charts (passed
+#' using tidyselect)
+#' @param n column to use as denominator for P and P' charts (passed using
+#' tidyselect)
+#' @param b column to use as numerator for P and P' charts (passed using
+#' tidyselect)
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -36,6 +44,10 @@ plot_auto_SPC <- function(df,
                           plotChart = T,
                           writeTable = F,
                           noRegrets = T,
+                          x,
+                          y,
+                          n,
+                          b,
                           
                           #overrides for plot aesthetics not detailed in roxygen skeleton
                           override_x_title = NULL,
@@ -47,6 +59,20 @@ plot_auto_SPC <- function(df,
                           r1_col = "orange",
                           r2_col = "steelblue3"
 ) { 
+
+  # Rename columns to standard names
+  if(!missing(x)) {
+    df <- df %>% dplyr::rename(x = {{ x }})
+  }
+  if(!missing(y)) {
+    df <- df %>% dplyr::rename(y = {{ y }})
+  }
+  if(!missing(n)) {
+    df <- df %>% dplyr::rename(n = {{ n }})
+  }
+  if(!missing(b)) {
+    df <- df %>% dplyr::rename(b = {{ b }})
+  }
   
   #get title from data
   if(is.null(title)){

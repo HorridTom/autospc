@@ -242,3 +242,51 @@ initialise_limits <- function(data, periodMin,
   limits_table <- add_rule_breaks(x = limits_table)
 }
 
+
+#function to rename columns
+rename_columns <- function(df, x, y, n, b) {
+  
+  data_colnames <- colnames(df)
+  
+  x <- rlang::enquo(x)
+  y <- rlang::enquo(y)
+  n <- rlang::enquo(n)
+  b <- rlang::enquo(b)
+  
+  # Rename columns to standard names
+  if(!rlang::quo_is_missing(x)) {
+    if("x" %in% data_colnames) {
+      warning("x is present in the data and specified as an argument.
+The column specified in the argument x will be used.")
+    }
+    df <- df %>% dplyr::rename(x = !!x)
+  }
+  
+  if(!rlang::quo_is_missing(y)) {
+    if("y" %in% data_colnames) {
+      warning("y is present in the data and specified as an argument.
+The column specified in the argument y will be used.")
+    }
+    df <- df %>% dplyr::rename(y = !!y)
+  }
+  
+  if(!rlang::quo_is_missing(n)) {
+    if("n" %in% data_colnames) {
+      warning("n is present in the data and specified as an argument.
+The column specified in the argument n will be used.")
+    }
+    df <- df %>% dplyr::rename(n = !!n)
+  }
+  
+  if(!rlang::quo_is_missing(b)) {
+    if("b" %in% data_colnames) {
+      warning("b is present in the data and specified as an argument.
+The column specified in the argument b will be used.")
+    }
+    df <- df %>% dplyr::rename(b = !!b)
+  }
+  
+  return(df)
+  
+}
+

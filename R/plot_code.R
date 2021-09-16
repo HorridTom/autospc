@@ -60,37 +60,9 @@ plot_auto_SPC <- function(df,
                           r2_col = "steelblue3"
 ) { 
   
-  data_colnames <- colnames(df)
-
-  # Rename columns to standard names
-  if(!missing(x)) {
-    if("x" %in% data_colnames) {
-      warning("x is present in the data and specified as an argument.
-The column specified in the argument x will be used.")
-    }
-    df <- df %>% dplyr::rename(x = {{ x }})
-  }
-  if(!missing(y)) {
-    if("y" %in% data_colnames) {
-      warning("y is present in the data and specified as an argument.
-The column specified in the argument y will be used.")
-    }
-    df <- df %>% dplyr::rename(y = {{ y }})
-  }
-  if(!missing(n)) {
-    if("n" %in% data_colnames) {
-      warning("n is present in the data and specified as an argument.
-The column specified in the argument n will be used.")
-    }
-    df <- df %>% dplyr::rename(n = {{ n }})
-  }
-  if(!missing(b)) {
-    if("b" %in% data_colnames) {
-      warning("b is present in the data and specified as an argument.
-The column specified in the argument b will be used.")
-    }
-    df <- df %>% dplyr::rename(b = {{ b }})
-  }
+  #rename columns if passed
+  df <- rename_columns(df = df,
+                       x = {{ x }}, y = {{ y }}, n = {{ n }}, b = {{ b }})
   
   #get title from data
   if(is.null(title)){

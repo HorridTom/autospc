@@ -217,7 +217,7 @@ plot_auto_SPC <- function(df,
     write.csv(cht_data, paste0("tables/", gsub(" ","_",title), "_", gsub(" ","_",subtitle,), ".csv"))
     
   }else{
-    #add colums to output title and subtitle 
+    #add columns to output title and subtitle 
     df <- df %>% dplyr::mutate(df, title = title, subtitle = subtitle)
     df
   }
@@ -225,18 +225,42 @@ plot_auto_SPC <- function(df,
 
 
 format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
+  
+  #reshape data
+  # df <- dplyr::select(df, x, y, ucl, lcl, cl, periodType, highlight)
+  # df <- reshape2::melt(df, id = c("x", "periodType", "highlight"))
+  # df <- df %>%
+  #   dplyr::mutate(linetype = dplyr::if_else(variable == "y", "solid", NA_character_),
+  #                 #size = dplyr::if_else(variable == "y", 0.5, as.double(NA))
+  #                 ) %>%
+  #   dplyr::mutate(linetype = dplyr::if_else(variable == "cl", "42", linetype),
+  #                 #size = dplyr::if_else(variable == "cl", 0.75, size)
+  #                 )
+  
+  
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black", "Excluded from limits calculation" = "grey")
+  
   cht + 
-    ggplot2::geom_line(colour = "black", size = 0.5) + 
-    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "display", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "42") +
-    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "84") +
-    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
+    # ggplot2::geom_line(data = df,
+    #                    ggplot2::aes(x, value, linetype = linetype, size = size)) +
+    ggplot2::geom_line(colour = "black", size = 0.5) +
+    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "calculation", cl, NA)),
+                       ggplot2::aes(x,cl), size = 0.75, linetype = "solid") +
+    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "display", cl, NA)),
+                       ggplot2::aes(x,cl), size = 0.75, linetype = "42") +
+    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)),
+                       ggplot2::aes(x,ucl), size = 0.5, linetype = "solid") +
+    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "display", ucl, NA)),
+                       ggplot2::aes(x,ucl), size = 0.5, linetype = "84") +
+    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)),
+                       ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
+    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)),
+                       ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
   
     ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
+    #ggplot2::scale_linetype_manual("Line type", values = c("solid", "dashed"), labels = c("y", "cl")) +
+    #ggplot2::scale_size_manual(values = c(0.5, 0.75), labels = c("0.5","0.75")) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
           panel.grid.minor = ggplot2::element_blank(),

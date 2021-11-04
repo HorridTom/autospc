@@ -121,7 +121,6 @@ create_SPC_auto_limits_table <- function(data,
         print("There are not enough data points to form another period. Calculation complete.")
         break
         }
-      
     }#loop ends
     
     #add a column to show where the breakpoints are

@@ -9,7 +9,10 @@ add_rule_breaks <- function(x) {
     x$rule1 <- (x$y > x$ucl) | (x$y < x$lcl)
     x <- rule_two(x)
     x <- add_highlight(x)
-    x
+    
+    #add column showing whether point is above or below CL
+    x <- x %>%
+      dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0)))
 }
 
 rule_two <- function(df) {

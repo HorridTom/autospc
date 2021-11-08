@@ -45,7 +45,7 @@ create_SPC_auto_limits_table <- function(data,
     
     #set counter to end of first period
     counter <- counter + periodMin + 1
-    
+
     #[3]loop starts
     while(counter < nrow(data)){
       
@@ -73,7 +73,7 @@ create_SPC_auto_limits_table <- function(data,
           
           #[6]set counter to the next rule break position
           counter <- rule2_break_position
-          
+
           #[7]see whether there are enough points after the counter to form new period
           if(enough_data_for_new_period(limits_table, periodMin, counter)){
             
@@ -89,20 +89,20 @@ create_SPC_auto_limits_table <- function(data,
               
               #Set counter to end of calculation period
               counter <- counter + periodMin + 1
-              
+
             }else{
               #[11]
               #check if counter is part way through a rule 2 break already
               #provided there are at least 8 rule 2 breaks following or no further rule breaks have been identified 
               if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength)])){
                 
-                counter = counter + 1
-                
+                counter <- counter + 1
+
               }else{
                 
                 #set counter to the start of the next rule 2 break 
                 counter <- rule2_break_positions[2]
-                
+
               }
               
             }
@@ -122,7 +122,7 @@ create_SPC_auto_limits_table <- function(data,
         break
         }
     }#loop ends
-    
+
     #add a column to show where the breakpoints are
     limits_table <- limits_table %>% 
       dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))

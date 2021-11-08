@@ -181,7 +181,7 @@ rule2_break_start_positions <- function(limits_table, counter){
 identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets = T){
   
   #identify if the triggering rule break is up or down compared to the prev period
-  triggering_rule_break_direction <- limits_table$aboveOrBelowCl[1]
+  triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
   
   if(noRegrets){
     #only looks at calculation period for no regrets 
@@ -211,9 +211,9 @@ identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets 
 
   if(next_rule_break_position == Inf){
     #No rule break in opposite direction
-    list(FALSE, NA, limits_table)
+    list(FALSE, NA, limits_table_candidate)
   }else{
-    list(TRUE, next_rule_break_position, limits_table)
+    list(TRUE, next_rule_break_position, limits_table_candidate)
   }
 
 }

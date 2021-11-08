@@ -201,7 +201,7 @@ identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets 
   
   #looks for a rule break in the opposite direction within the candidate period
   limits_table_candidate <- limits_table_candidate %>% 
-    dplyr::mutate(oppositeBreak  = if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction), T, F))
+    dplyr::mutate(oppositeBreak  = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction), T, F))
   
   if(noRegrets){
     next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == T )) + counter - 1

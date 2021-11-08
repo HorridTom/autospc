@@ -180,45 +180,40 @@ rule2_break_start_positions <- function(limits_table, counter){
 #set counter to beginning of candidate limits 
 identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets = T){
   
+  #identify if the triggering rule break is up or down compared to the prev period
+  triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
+  
   if(noRegrets){
     #only looks at calculation period for no regrets 
-    limits_table <- limits_table[counter:(counter + periodMin - 1),]
-    limits_table <- add_rule_breaks(limits_table)
+    limits_table_candidate <- limits_table[counter:(counter + periodMin - 1),]
+    limits_table_candidate <- add_rule_breaks(limits_table_candidate)
   }else{
     #start rule breaks from candidate period as not to include "hang over" rule breaks from prev period
     #but do include "hang over" into following display period
     limits_table_top <- limits_table[1:(counter-1),]
     limits_table_bottom <- add_rule_breaks(limits_table[counter:nrow(limits_table),])
-    limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
+    limits_table_candidate <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
   }
 
   #state whether each point is above or below the centre line
-  limits_table <- limits_table %>% 
+  limits_table_candidate <- limits_table_candidate %>% 
     dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0)))
   
-  #Numerical change in centre line
-  cl_change <- limits_table$cl[counter - 1] - limits_table$cl[counter]
-  #state whether rule break is up (1), down (-1) or no change (0)
-  rule_break_direction <- ifelse(cl_change > 0, -1, 1)
-    
   #looks for a rule break in the opposite direction within the candidate period
-  limits_table <- limits_table %>% 
-    dplyr::mutate(oppositeBreak  = ifelse(rule2 & (aboveOrBelowCl != rule_break_direction), T, F))
+  limits_table_candidate <- limits_table_candidate %>% 
+    dplyr::mutate(oppositeBreak  = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction), T, F))
   
   if(noRegrets){
-    next_rule_break_position <- min(which(limits_table$oppositeBreak == T )) + counter - 1
+    next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == T )) + counter - 1
   }else{
-    next_rule_break_position <- min(which(limits_table$oppositeBreak[counter:(counter + periodMin - 1)] == T )) + counter - 1
+    next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak[counter:(counter + periodMin - 1)] == T )) + counter - 1
   }
-  
+
   if(next_rule_break_position == Inf){
     #No rule break in opposite direction
-    list(FALSE, NA, limits_table)
+    list(FALSE, NA, limits_table_candidate)
   }else{
-    # next_y_change <- limits_table$y[next_rule_break_position - 1] - limits_table$y[next_rule_break_position]
-    # next_rule_break_direction <- ifelse(next_y_change > 0, "DOWN", "UP")
-    list(TRUE, next_rule_break_position, limits_table)
-
+    list(TRUE, next_rule_break_position, limits_table_candidate)
   }
 
 }

@@ -285,3 +285,22 @@ The column specified in the argument b will be used.")
   
 }
 
+
+
+
+get_pp_limits <- function(data){
+  data <- data %>%
+    dplyr::mutate(pbar = cl / 100) %>%
+    dplyr::mutate(zi = (y/100 - pbar)/sqrt(pbar*(1-pbar)/n)) %>%
+    dplyr::mutate(MR = abs(dplyr::lead(zi) - zi)) %>%
+    dplyr::mutate(MR = dplyr::if_else(excluded == FALSE,
+                                      MR,
+                                      as.numeric(NA))) %>%
+    dplyr::group_by(periodType) %>%
+    dplyr::mutate(sigma_z = mean(MR, na.rm = T)/1.128) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(UCL_calc = pbar + 3 * sigma_z * sqrt(pbar * (1 - pbar) / n)) %>%
+    dplyr::mutate(LCL_calc = pbar - 3 * sigma_z * sqrt(pbar * (1 - pbar) / n)) %>%
+    dplyr::ungroup()
+}
+

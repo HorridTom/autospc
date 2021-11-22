@@ -150,13 +150,38 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
 
 
 #function to form display limits (period extension)
-form_display_limits <- function(limits_table, counter){
+form_display_limits <- function(limits_table, counter, chartType = "C'"){
   
-  limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
-  limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]
-  limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
-  limits_table[counter:nrow(limits_table), "periodType"] <- "display"
-  
+  if(chartType == "C" | chartType == "C'"){
+    limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
+    limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]
+    limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
+    limits_table[counter:nrow(limits_table), "periodType"] <- "display"
+    
+  }else{
+    #constant from P' chart calc = (UCL - CL)sqrt(n)
+    constant <- (limits_table[(counter - 1), "ucl"] - limits_table[(counter - 1), "cl"]) * sqrt(limits_table[(counter - 1), "n"])
+    pbar <- limits_table[(counter - 1), "cl"]
+    
+    # constant <- 189.6842
+    # pbar <- 87.68946
+    
+    limits_table <- limits_table %>%
+      dplyr::mutate(constant = as.numeric(constant)) %>%
+      dplyr::mutate(pbar = as.numeric(pbar)) %>%
+      dplyr::mutate(ucl_display = pbar + (constant/sqrt(n)) ) %>%
+      dplyr::mutate(lcl_display = pbar - (constant/sqrt(n)) ) %>%
+      dplyr::mutate(ucl = dplyr::if_else(is.na(ucl),
+                                         ucl_display,
+                                         ucl)) %>%
+      dplyr::mutate(lcl = dplyr::if_else(is.na(lcl),
+                                         lcl_display,
+                                         lcl))
+    
+    limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
+    limits_table[counter:nrow(limits_table), "periodType"] <- "display"
+  }
+
   limits_table
   
 }
@@ -231,7 +256,8 @@ initialise_limits <- function(data, periodMin,
   
   #extend display limits to end 
   limits_table <- form_display_limits(limits_table = limits_table, 
-                                      counter = counter + periodMin + 1)
+                                      counter = counter + periodMin + 1,
+                                      chartType = chartType)
   
   #add rule breaks
   limits_table <- add_rule_breaks(x = limits_table)
@@ -285,22 +311,4 @@ The column specified in the argument b will be used.")
   
 }
 
-
-
-
-get_pp_limits <- function(data){
-  data <- data %>%
-    dplyr::mutate(pbar = cl / 100) %>%
-    dplyr::mutate(zi = (y/100 - pbar)/sqrt(pbar*(1-pbar)/n)) %>%
-    dplyr::mutate(MR = abs(dplyr::lead(zi) - zi)) %>%
-    dplyr::mutate(MR = dplyr::if_else(excluded == FALSE,
-                                      MR,
-                                      as.numeric(NA))) %>%
-    dplyr::group_by(periodType) %>%
-    dplyr::mutate(sigma_z = mean(MR, na.rm = T)/1.128) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(UCL_calc = pbar + 3 * sigma_z * sqrt(pbar * (1 - pbar) / n)) %>%
-    dplyr::mutate(LCL_calc = pbar - 3 * sigma_z * sqrt(pbar * (1 - pbar) / n)) %>%
-    dplyr::ungroup()
-}
 

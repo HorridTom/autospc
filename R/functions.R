@@ -204,6 +204,32 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
 }
 
 
+#function to identify whether no regrets needs to be taken into account
+get_num_opposite_points <- function(candidate_limits_table,
+                                    triggering_rule_break_direction){
+  
+  #if following points into display period are still in that direction until 8 points are reached
+  data <- candidate_limits_table
+  
+  #handles NA value that appears sometimes at the end of the data 
+  if(is.na(data$y[nrow(data)])){
+    data <- data[1:(nrow(data) - 1),]
+  }
+  
+  #if last point/s are in the opposite direction to the triggering rule break direction
+  num_opposite_points <- 0
+  i <- nrow(data)
+  
+  while(data$aboveOrBelowCl[i] != triggering_rule_break_direction){
+    num_opposite_points <- num_opposite_points + 1
+    i <- i - 1
+  }
+  
+  num_opposite_points
+  
+}
+
+
 #function to create initial limits with rule breaks
 initialise_limits <- function(data, periodMin, 
                               counter, chartType,

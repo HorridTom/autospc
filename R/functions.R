@@ -206,7 +206,11 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
   
   next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == T )) + counter - 1
 
-  if(next_rule_break_position == Inf){
+  last_point_in_calc_period <- tail(
+    which(limits_table_candidate$periodType == "calculation"),
+    n = 1L) + counter - 1
+  
+  if(next_rule_break_position > last_point_in_calc_period){
     #No rule break in opposite direction
     list(FALSE, NA, limits_table_candidate)
   }else{

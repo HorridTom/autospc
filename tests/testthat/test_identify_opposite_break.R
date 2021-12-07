@@ -105,6 +105,6 @@ testthat::test_that("Rule 2 break within candidate period in opposite direction 
   test_op_break5 <- plot_auto_SPC(test_op_break5_data, plotChart = F)
   test_op_break5_break_pos <- which(test_op_break5$breakPoint == TRUE)
   
-  testthat::expect_equal(test_op_break5_break_pos, 23)
+  testthat::expect_equal(test_op_break5_break_pos, 22)
   
 })

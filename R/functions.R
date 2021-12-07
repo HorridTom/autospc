@@ -204,28 +204,84 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
 }
 
 
-#function to identify whether no regrets needs to be taken into account
-get_num_opposite_points <- function(candidate_limits_table,
-                                    triggering_rule_break_direction){
+# Function to establish whether the final run in the candidate calculation
+# period prevents the recalculation (for no regrets)
+final_run_of_calc_period_prevents_recalc <- function(
+  candidate_limits_table,
+  triggering_rule_break_direction) {
   
-  #if following points into display period are still in that direction until 8 points are reached
+  # Filter data to exclude everything prior to the last calculation period 
   data <- candidate_limits_table
+  data <- data %>%
+    dplyr::mutate(laggedPeriodType = dplyr::lag(periodType),
+      newPeriod = dplyr::if_else((is.na(laggedPeriodType) |
+                            laggedPeriodType != periodType), TRUE, FALSE),
+      periodCount = cumsum(newPeriod)
+      )
+  period_table <- data %>%
+    dplyr::distinct(periodType, periodCount)
   
+  last_calc_period <- period_table %>%
+    dplyr::filter(periodType == "calculation") %>%
+    dplyr::pull(periodCount) %>%
+    max()
+  
+  data <- data %>%
+    dplyr::filter(periodCount >= last_calc_period)
+
   #handles NA value that appears sometimes at the end of the data 
   if(is.na(data$y[nrow(data)])){
     data <- data[1:(nrow(data) - 1),]
   }
   
-  #if last point/s are in the opposite direction to the triggering rule break direction
-  num_opposite_points <- 0
-  i <- nrow(data)
+  # identify the row number of the last point, in the last calculation period,
+  # that is not on the centre line
+  last_point_in_last_calc_period <- tail(
+    which(data$periodType == "calculation" &
+            data$aboveOrBelowCl != 0),
+    n = 1L)
   
-  while(data$aboveOrBelowCl[i] != triggering_rule_break_direction){
-    num_opposite_points <- num_opposite_points + 1
-    i <- i - 1
+  if(length(last_point_in_last_calc_period) != 1L) {
+    # all the points in the last calculation period are on the centre line
+    return(FALSE)
   }
   
-  num_opposite_points
+  final_direction <- data[last_point_in_last_calc_period,
+                          "aboveOrBelowCl"]
+  
+  if(final_direction == triggering_rule_break_direction) {
+    # the last point in the final calculation period is in the same direction
+    # as the triggering run, and therefore there is no potential for a rule-
+    # breaking run in the opposite direction spanning the end of the last
+    # calculation period
+    return(FALSE)
+  } else {
+    # the last point in the final calculation period is in the opposite
+    # direction to the triggering rule break
+    
+    # is the final run of the final calculation period the final run overall?
+    final_calc_run_is_final_run <- data %>%
+      dplyr::filter(dplyr::row_number() >= last_point_in_last_calc_period,
+                    aboveOrBelowCl != 0) %>%
+      dplyr::pull(aboveOrBelowCl) %>%
+      is_numeric_vector_constant()
+    
+    if(final_calc_run_is_final_run) {
+      # The final run in the final calculation period is also the final run
+      # in the data. There are two cases: either a) it is a rule breaking
+      # run, or b) it is not. In either case, there is *at least* potential for
+      # a rbr in the opposite direction.
+      return(TRUE)
+    } else {
+      # The final run in the final calculation period is not the final run in
+      # the data. There are two cases: either a) it is a rbr, b) it is not.
+      # (a) in this case, identify_opposite_break will identify it and prevent
+      # the recalculation at the triggering rule break.
+      # (b) in this case, there is no reason to prevent the recalculation
+      return(FALSE)
+    }
+    
+  }
   
 }
 
@@ -294,5 +350,12 @@ The column specified in the argument b will be used.")
   
   return(df)
   
+}
+
+
+# helper function to establish whether all elements of a numeric vector are
+# equal
+is_numeric_vector_constant <- function(x) {
+  diff(range(x)) < .Machine$double.eps ^ 0.5
 }
 

@@ -86,12 +86,14 @@ create_SPC_auto_limits_table <- function(data,
             opposite_rule_break <- identify_opposite_break(candidate_limits_table, counter, periodMin,
                                                            triggering_rule_break_direction)[[1]]
             
-            #get number of points at the end of the candidate period that could start a rule break
-            num_opposite_points <- get_num_opposite_points(candidate_limits_table, 
-                                                           triggering_rule_break_direction)
+            #establish whether (for no regrets) the final run in the candidate
+            #calculation period prevents a recalculation
+            final_run_prevents <- final_run_of_calc_period_prevents_recalc(
+              candidate_limits_table,
+              triggering_rule_break_direction)
             
             #recalc if...
-            if(!opposite_rule_break & ((noRegrets == T & num_opposite_points == 0) | noRegrets == F)){
+            if(!opposite_rule_break & ((noRegrets == T & !final_run_prevents) | noRegrets == F)){
               
               #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
               limits_table <- candidate_limits_table

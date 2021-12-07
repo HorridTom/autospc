@@ -194,16 +194,13 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
                                           FALSE),
                   runCount = cumsum(newRun))
 
-  # remove the first run from consideration for opposite rule breaks. If it is
+  #looks for a rule break in the opposite direction within the candidate period
+  # Don't consider the first run as a potential opposite rule break. If it is
   # in the same direction as the triggering run, it can't be an opposite break,
   # and if it is in the opposite direction, it just represents a transition on
   # the way to the new level
-  limits_table_candidate <- limits_table_candidate %>%
-    dplyr::filter(runCount != 1)
-
-  #looks for a rule break in the opposite direction within the candidate period
   limits_table_candidate <- limits_table_candidate %>% 
-    dplyr::mutate(oppositeBreak = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction), 
+    dplyr::mutate(oppositeBreak = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction) & runCount > 1, 
                                                  T, 
                                                  F))
   

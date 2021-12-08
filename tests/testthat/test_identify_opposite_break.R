@@ -75,6 +75,9 @@ test_op_break5_data <- structure(list(x = 1:46, y = c(10.5893889940781, 6.964641
                                                  18.2723273997918, 20.1257230847694, 17.1981870784102, 18.7753797373298
                                                  )), class = "data.frame", row.names = c(NA, -46L))
 
+#opposite rule break commencing after the end of the candidate calculation period
+test_op_break6_data <- readRDS("testdata/test_oppositeRuleBreak_later.rds")
+
 testthat::test_that("Rule 2 break within candidate period in opposite direction identified correctly",{
   
   #should not recalc due to break in op direction
@@ -107,4 +110,16 @@ testthat::test_that("Rule 2 break within candidate period in opposite direction 
   
   testthat::expect_equal(test_op_break5_break_pos, 22)
   
+})
+
+
+testthat::test_that("Opposite rule break after candidate calc period doesn't prevent recalculation",{
+  #should recalc
+  test_op_break6 <- plot_auto_SPC(test_op_break6_data,
+                                  noRegrets = TRUE,
+                                  plotChart = FALSE)
+  
+  test_op_break6_break_pos <- which(test_op_break6$breakPoint == TRUE)
+  
+  testthat::expect_equal(test_op_break6_break_pos, 31L)
 })

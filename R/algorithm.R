@@ -73,6 +73,7 @@ create_SPC_auto_limits_table <- function(data,
           
           #[6]set counter to the next rule break position
           counter <- rule2_break_position
+          triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
 
           #[7]see whether there are enough points after the counter to form new period
           if(enough_data_for_new_period(limits_table, periodMin, counter)){
@@ -82,7 +83,17 @@ create_SPC_auto_limits_table <- function(data,
                                                         chartType, maxNoOfExclusions)
             
             #[9]check whether there is a rule break in the opposite direction within calc period
-            if(!identify_opposite_break(candidate_limits_table, counter, periodMin, noRegrets)[[1]]){
+            opposite_rule_break <- identify_opposite_break(candidate_limits_table, counter, periodMin,
+                                                           triggering_rule_break_direction)[[1]]
+            
+            #establish whether (for no regrets) the final run in the candidate
+            #calculation period prevents a recalculation
+            final_run_prevents <- final_run_of_calc_period_prevents_recalc(
+              candidate_limits_table,
+              triggering_rule_break_direction)
+            
+            #recalc if...
+            if(!opposite_rule_break & ((noRegrets == T & !final_run_prevents) | noRegrets == F)){
               
               #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
               limits_table <- candidate_limits_table

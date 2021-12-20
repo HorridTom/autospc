@@ -163,23 +163,29 @@ form_display_limits <- function(limits_table, counter, chartType = "C'"){
     constant <- (limits_table[(counter - 1), "ucl"] - limits_table[(counter - 1), "cl"]) * sqrt(limits_table[(counter - 1), "n"])
     pbar <- limits_table[(counter - 1), "cl"]
     
-    # constant <- 189.6842
-    # pbar <- 87.68946
+    limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
+    limits_table[counter:nrow(limits_table), "periodType"] <- "display"
     
-    limits_table <- limits_table %>%
+    #splits limits table to just the section that we want
+    limits_table_top <- limits_table[1:(counter - 1),]
+    limits_table_bottom <- limits_table[counter:nrow(limits_table),]
+    
+    limits_table_bottom <- limits_table_bottom %>%
       dplyr::mutate(constant = as.numeric(constant)) %>%
       dplyr::mutate(pbar = as.numeric(pbar)) %>%
       dplyr::mutate(ucl_display = pbar + (constant/sqrt(n)) ) %>%
       dplyr::mutate(lcl_display = pbar - (constant/sqrt(n)) ) %>%
-      dplyr::mutate(ucl = dplyr::if_else(is.na(ucl),
+      dplyr::mutate(ucl = dplyr::if_else(periodType == "display",
                                          ucl_display,
                                          ucl)) %>%
-      dplyr::mutate(lcl = dplyr::if_else(is.na(lcl),
+      dplyr::mutate(lcl = dplyr::if_else(periodType == "display",
                                          lcl_display,
-                                         lcl))
+                                         lcl)) %>%
+      dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl))
     
-    limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
-    limits_table[counter:nrow(limits_table), "periodType"] <- "display"
+    limits_table <- bind_rows(limits_table_top, limits_table_bottom)
+    
+    
   }
 
   limits_table

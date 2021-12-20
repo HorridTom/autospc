@@ -160,8 +160,8 @@ plot_auto_SPC <- function(df,
     p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
       ggplot2::ggtitle(title, 
                        subtitle = subtitle) +
-      ggplot2::labs(x = "Day", 
-                    y = ytitle,
+      ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title), 
+                    y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
                     caption = paste0(caption),
                     size = 10) +
       ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),

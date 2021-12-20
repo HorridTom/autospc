@@ -53,6 +53,7 @@ plot_auto_SPC <- function(df,
                           override_x_title = NULL,
                           override_y_title = NULL,
                           override_y_lim = NULL,
+                          includeAnnotations = T,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
                           x_break = NULL,
@@ -167,15 +168,18 @@ plot_auto_SPC <- function(df,
       ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                   breaks = scales::breaks_pretty(),
                                   labels = scales::number_format(accuracy = 1, 
-                                                                 big.mark = ",")) +
-      ggplot2::annotate("text", 
-                        x = start_x, 
-                        y = ucl_start + ucl_start/annotation_dist_fact, 
-                        label = cl_start) +
-      ggplot2::annotate("text", 
-                        x = df$x[breakPoints] + 2, 
-                        y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, 
-                        label = round(df$cl[breakPoints])) 
+                                                                 big.mark = ",")) 
+    if(includeAnnotations == T){
+      p <- p +
+        ggplot2::annotate("text", 
+                          x = start_x, 
+                          y = ucl_start + ucl_start/annotation_dist_fact, 
+                          label = cl_start) +
+        ggplot2::annotate("text", 
+                          x = df$x[breakPoints] + 2, 
+                          y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, 
+                          label = round(df$cl[breakPoints]))
+    }
     
     #formats x axis depending on x type
     if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){

@@ -23,6 +23,7 @@ plot_auto_SPC(
   override_x_title = NULL,
   override_y_title = NULL,
   override_y_lim = NULL,
+  includeAnnotations = T,
   override_annotation_dist = 10,
   override_annotation_dist_P = 25,
   x_break = NULL,

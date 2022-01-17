@@ -38,12 +38,12 @@ plot_auto_SPC <- function(df,
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
-                          highlightExclusions = T,
+                          highlightExclusions = TRUE,
                           title = NULL,
                           subtitle = NULL,
-                          plotChart = T,
-                          writeTable = F,
-                          noRegrets = T,
+                          plotChart = TRUE,
+                          writeTable = FALSE,
+                          noRegrets = TRUE,
                           x,
                           y,
                           n,
@@ -53,6 +53,7 @@ plot_auto_SPC <- function(df,
                           override_x_title = NULL,
                           override_y_title = NULL,
                           override_y_lim = NULL,
+                          includeAnnotations = TRUE,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
                           x_break = NULL,
@@ -100,7 +101,7 @@ plot_auto_SPC <- function(df,
     #dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 
     #(i.e. so there isn't a gap between calculation and display limits)
-    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) #%>%
+    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), FALSE, TRUE)) #%>%
     #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
     
     
@@ -116,7 +117,7 @@ plot_auto_SPC <- function(df,
   
   if(highlightExclusions){
     #show exclusions on chart
-    df <- df %>% dplyr::mutate(highlight = ifelse(excluded == T & !is.na(excluded), 
+    df <- df %>% dplyr::mutate(highlight = ifelse(excluded == TRUE & !is.na(excluded), 
                                            "Excluded from limits calculation", 
                                            highlight))
   }
@@ -137,8 +138,8 @@ plot_auto_SPC <- function(df,
   ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage within 4hrs")
   
   #start and end dates
-  start_x <- min(df$x, na.rm = T)
-  end_x <- max(df$x, na.rm = T)
+  start_x <- min(df$x, na.rm = TRUE)
+  end_x <- max(df$x, na.rm = TRUE)
   
   #get y limit
   if(!is.null(override_y_lim)){
@@ -150,32 +151,35 @@ plot_auto_SPC <- function(df,
   ucl_start <- round(df$ucl[1])
   cl_end <- round(df$cl[(nrow(df)-1)])
   
-  if(plotChart == T){
+  if(plotChart == TRUE){
     
     annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'", 
                                    override_annotation_dist, 
                                    override_annotation_dist_P)
-    caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
+    caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
 
     p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
       ggplot2::ggtitle(title, 
                        subtitle = subtitle) +
-      ggplot2::labs(x = "Day", 
-                    y = ytitle,
+      ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title), 
+                    y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
                     caption = paste0(caption),
                     size = 10) +
       ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                   breaks = scales::breaks_pretty(),
                                   labels = scales::number_format(accuracy = 1, 
-                                                                 big.mark = ",")) +
-      ggplot2::annotate("text", 
-                        x = start_x, 
-                        y = ucl_start + ucl_start/annotation_dist_fact, 
-                        label = cl_start) +
-      ggplot2::annotate("text", 
-                        x = df$x[breakPoints] + 2, 
-                        y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, 
-                        label = round(df$cl[breakPoints])) 
+                                                                 big.mark = ",")) 
+    if(includeAnnotations == TRUE){
+      p <- p +
+        ggplot2::annotate("text", 
+                          x = start_x, 
+                          y = ucl_start + ucl_start/annotation_dist_fact, 
+                          label = cl_start) +
+        ggplot2::annotate("text", 
+                          x = df$x[breakPoints] + 2, 
+                          y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, 
+                          label = round(df$cl[breakPoints]))
+    }
     
     #formats x axis depending on x type
     if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
@@ -210,7 +214,7 @@ plot_auto_SPC <- function(df,
     
     p
 
-  }else if(writeTable == T){
+  }else if(writeTable == TRUE){
     
     title <- gsub(":", "_",title)
     subtitle <- gsub(":","_", subtitle)

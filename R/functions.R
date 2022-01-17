@@ -233,10 +233,10 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
   # the way to the new level
   limits_table_candidate <- limits_table_candidate %>% 
     dplyr::mutate(oppositeBreak = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction) & runCount > 1, 
-                                                 T, 
-                                                 F))
+                                                 TRUE, 
+                                                 FALSE))
   
-  next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == T )) + counter - 1
+  next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == TRUE )) + counter - 1
 
   last_point_in_calc_period <- tail(
     which(limits_table_candidate$periodType == "calculation"),

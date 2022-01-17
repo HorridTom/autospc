@@ -208,46 +208,129 @@ rule2_break_start_positions <- function(limits_table, counter){
 
 
 #function to identify whether there has been a rule break in the opposite direction in calc period
-#returns TRUE for rule break in opposite direction within candidate calc period 
+#returns TRUE for rule break in opposite direction within candidate calc period including hang over into display
 #set counter to beginning of candidate limits 
-identify_opposite_break <- function(limits_table, counter, periodMin, noRegrets = T){
+identify_opposite_break <- function(limits_table, counter, periodMin, 
+                                    triggering_rule_break_direction){
   
-  #identify if the triggering rule break is up or down compared to the prev period
-  triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
-  
-  if(noRegrets){
-    #only looks at calculation period for no regrets 
-    limits_table_candidate <- limits_table[counter:(counter + periodMin - 1),]
-    limits_table_candidate <- add_rule_breaks(limits_table_candidate)
-  }else{
-    #start rule breaks from candidate period as not to include "hang over" rule breaks from prev period
-    #but do include "hang over" into following display period
-    limits_table_top <- limits_table[1:(counter-1),]
-    limits_table_bottom <- add_rule_breaks(limits_table[counter:nrow(limits_table),])
-    limits_table_candidate <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
-  }
+  #start rule breaks from candidate period as not to include "hang over" rule breaks from prev period
+  #but do include "hang over" into following display period
+  limits_table_candidate <- limits_table[counter:nrow(limits_table),]
+  limits_table_candidate <- add_rule_breaks(limits_table_candidate)
 
-  #state whether each point is above or below the centre line
-  limits_table_candidate <- limits_table_candidate %>% 
-    dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0)))
-  
+  limits_table_candidate <- limits_table_candidate %>%
+    dplyr::mutate(laggedAOBC = dplyr::lag(aboveOrBelowCl),
+                  newRun = dplyr::if_else((is.na(laggedAOBC) | (aboveOrBelowCl != 0 &
+                                            aboveOrBelowCl != laggedAOBC)),
+                                          TRUE,
+                                          FALSE),
+                  runCount = cumsum(newRun))
+
   #looks for a rule break in the opposite direction within the candidate period
+  # Don't consider the first run as a potential opposite rule break. If it is
+  # in the same direction as the triggering run, it can't be an opposite break,
+  # and if it is in the opposite direction, it just represents a transition on
+  # the way to the new level
   limits_table_candidate <- limits_table_candidate %>% 
-    dplyr::mutate(oppositeBreak  = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction), T, F))
+    dplyr::mutate(oppositeBreak = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction) & runCount > 1, 
+                                                 T, 
+                                                 F))
   
-  if(noRegrets){
-    next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == T )) + counter - 1
-  }else{
-    next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak[counter:(counter + periodMin - 1)] == T )) + counter - 1
-  }
+  next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == T )) + counter - 1
 
-  if(next_rule_break_position == Inf){
+  last_point_in_calc_period <- tail(
+    which(limits_table_candidate$periodType == "calculation"),
+    n = 1L) + counter - 1
+  
+  if(next_rule_break_position > last_point_in_calc_period){
     #No rule break in opposite direction
     list(FALSE, NA, limits_table_candidate)
   }else{
     list(TRUE, next_rule_break_position, limits_table_candidate)
   }
 
+}
+
+
+# Function to establish whether the final run in the candidate calculation
+# period prevents the recalculation (for no regrets)
+final_run_of_calc_period_prevents_recalc <- function(
+  candidate_limits_table,
+  triggering_rule_break_direction) {
+  
+  # Filter data to exclude everything prior to the last calculation period 
+  data <- candidate_limits_table
+  data <- data %>%
+    dplyr::mutate(laggedPeriodType = dplyr::lag(periodType),
+      newPeriod = dplyr::if_else((is.na(laggedPeriodType) |
+                            laggedPeriodType != periodType), TRUE, FALSE),
+      periodCount = cumsum(newPeriod)
+      )
+  period_table <- data %>%
+    dplyr::distinct(periodType, periodCount)
+  
+  last_calc_period <- period_table %>%
+    dplyr::filter(periodType == "calculation") %>%
+    dplyr::pull(periodCount) %>%
+    max()
+  
+  data <- data %>%
+    dplyr::filter(periodCount >= last_calc_period)
+
+  #handles NA value that appears sometimes at the end of the data 
+  if(is.na(data$y[nrow(data)])){
+    data <- data[1:(nrow(data) - 1),]
+  }
+  
+  # identify the row number of the last point, in the last calculation period,
+  # that is not on the centre line
+  last_point_in_last_calc_period <- tail(
+    which(data$periodType == "calculation" &
+            data$aboveOrBelowCl != 0),
+    n = 1L)
+  
+  if(length(last_point_in_last_calc_period) != 1L) {
+    # all the points in the last calculation period are on the centre line
+    return(FALSE)
+  }
+  
+  final_direction <- data[last_point_in_last_calc_period,
+                          "aboveOrBelowCl"]
+  
+  if(final_direction == triggering_rule_break_direction) {
+    # the last point in the final calculation period is in the same direction
+    # as the triggering run, and therefore there is no potential for a rule-
+    # breaking run in the opposite direction spanning the end of the last
+    # calculation period
+    return(FALSE)
+  } else {
+    # the last point in the final calculation period is in the opposite
+    # direction to the triggering rule break
+    
+    # is the final run of the final calculation period the final run overall?
+    final_calc_run_is_final_run <- data %>%
+      dplyr::filter(dplyr::row_number() >= last_point_in_last_calc_period,
+                    aboveOrBelowCl != 0) %>%
+      dplyr::pull(aboveOrBelowCl) %>%
+      is_numeric_vector_constant()
+    
+    if(final_calc_run_is_final_run) {
+      # The final run in the final calculation period is also the final run
+      # in the data. There are two cases: either a) it is a rule breaking
+      # run, or b) it is not. In either case, there is *at least* potential for
+      # a rbr in the opposite direction.
+      return(TRUE)
+    } else {
+      # The final run in the final calculation period is not the final run in
+      # the data. There are two cases: either a) it is a rbr, b) it is not.
+      # (a) in this case, identify_opposite_break will identify it and prevent
+      # the recalculation at the triggering rule break.
+      # (b) in this case, there is no reason to prevent the recalculation
+      return(FALSE)
+    }
+    
+  }
+  
 }
 
 
@@ -319,3 +402,8 @@ The column specified in the argument b will be used.")
 }
 
 
+# helper function to establish whether all elements of a numeric vector are
+# equal
+is_numeric_vector_constant <- function(x) {
+  diff(range(x)) < .Machine$double.eps ^ 0.5
+}

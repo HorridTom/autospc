@@ -16,6 +16,10 @@ plot_auto_SPC(
   plotChart = T,
   writeTable = F,
   noRegrets = T,
+  x,
+  y,
+  n,
+  b,
   override_x_title = NULL,
   override_y_title = NULL,
   override_y_lim = NULL,
@@ -50,6 +54,18 @@ limit calculations}
 
 \item{noRegrets}{Boolean signifying which version of the algorithm should be used.
 Defines whether limits can change as more data is added or not.}
+
+\item{x}{column to use as subgroups on the horizontal axis of the chart
+(passed using tidyselect)}
+
+\item{y}{column to use as count (vertical axis) for C and C' charts (passed
+using tidyselect)}
+
+\item{n}{column to use as denominator for P and P' charts (passed using
+tidyselect)}
+
+\item{b}{column to use as numerator for P and P' charts (passed using
+tidyselect)}
 
 \item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)

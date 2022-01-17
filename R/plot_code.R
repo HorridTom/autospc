@@ -38,12 +38,12 @@ plot_auto_SPC <- function(df,
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
-                          highlightExclusions = T,
+                          highlightExclusions = TRUE,
                           title = NULL,
                           subtitle = NULL,
-                          plotChart = T,
-                          writeTable = F,
-                          noRegrets = T,
+                          plotChart = TRUE,
+                          writeTable = FALSE,
+                          noRegrets = TRUE,
                           x,
                           y,
                           n,
@@ -53,7 +53,7 @@ plot_auto_SPC <- function(df,
                           override_x_title = NULL,
                           override_y_title = NULL,
                           override_y_lim = NULL,
-                          includeAnnotations = T,
+                          includeAnnotations = TRUE,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
                           x_break = NULL,
@@ -101,7 +101,7 @@ plot_auto_SPC <- function(df,
     #dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 
     #(i.e. so there isn't a gap between calculation and display limits)
-    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), F, T)) #%>%
+    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), FALSE, TRUE)) #%>%
     #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
     
     
@@ -117,7 +117,7 @@ plot_auto_SPC <- function(df,
   
   if(highlightExclusions){
     #show exclusions on chart
-    df <- df %>% dplyr::mutate(highlight = ifelse(excluded == T & !is.na(excluded), 
+    df <- df %>% dplyr::mutate(highlight = ifelse(excluded == TRUE & !is.na(excluded), 
                                            "Excluded from limits calculation", 
                                            highlight))
   }
@@ -138,8 +138,8 @@ plot_auto_SPC <- function(df,
   ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage within 4hrs")
   
   #start and end dates
-  start_x <- min(df$x, na.rm = T)
-  end_x <- max(df$x, na.rm = T)
+  start_x <- min(df$x, na.rm = TRUE)
+  end_x <- max(df$x, na.rm = TRUE)
   
   #get y limit
   if(!is.null(override_y_lim)){
@@ -151,7 +151,7 @@ plot_auto_SPC <- function(df,
   ucl_start <- round(df$ucl[1])
   cl_end <- round(df$cl[(nrow(df)-1)])
   
-  if(plotChart == T){
+  if(plotChart == TRUE){
     
     annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'", 
                                    override_annotation_dist, 
@@ -169,7 +169,7 @@ plot_auto_SPC <- function(df,
                                   breaks = scales::breaks_pretty(),
                                   labels = scales::number_format(accuracy = 1, 
                                                                  big.mark = ",")) 
-    if(includeAnnotations == T){
+    if(includeAnnotations == TRUE){
       p <- p +
         ggplot2::annotate("text", 
                           x = start_x, 
@@ -214,7 +214,7 @@ plot_auto_SPC <- function(df,
     
     p
 
-  }else if(writeTable == T){
+  }else if(writeTable == TRUE){
     
     title <- gsub(":", "_",title)
     subtitle <- gsub(":","_", subtitle)

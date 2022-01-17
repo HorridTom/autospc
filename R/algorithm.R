@@ -25,7 +25,7 @@ create_SPC_auto_limits_table <- function(data,
                           periodMin = 21,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
-                          noRegrets = T,
+                          noRegrets = TRUE,
                           ...
 ) {
 
@@ -93,7 +93,7 @@ create_SPC_auto_limits_table <- function(data,
               triggering_rule_break_direction)
             
             #recalc if...
-            if(!opposite_rule_break & ((noRegrets == T & !final_run_prevents) | noRegrets == F)){
+            if(!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)){
               
               #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
               limits_table <- candidate_limits_table
@@ -136,7 +136,7 @@ create_SPC_auto_limits_table <- function(data,
 
     #add a column to show where the breakpoints are
     limits_table <- limits_table %>% 
-      dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), F, T))
+      dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE))
     
     limits_table
     

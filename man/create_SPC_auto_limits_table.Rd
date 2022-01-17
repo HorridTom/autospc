@@ -10,7 +10,7 @@ create_SPC_auto_limits_table(
   periodMin = 21,
   runRuleLength = 8,
   maxNoOfExclusions = 3,
-  noRegrets = T,
+  noRegrets = TRUE,
   ...
 )
 }

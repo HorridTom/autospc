@@ -6,13 +6,13 @@
 # ucl : the upper control limit
 
 add_rule_breaks <- function(x) {
-    x$rule1 <- (x$y > x$ucl) | (x$y < x$lcl)
-    x <- rule_two(x)
-    x <- add_highlight(x)
-    
-    #add column showing whether point is above or below CL
+
     x <- x %>%
+      dplyr::mutate(rule1 = (y > ucl) | (y < lcl)) %>%
+      rule_two() %>%
+      add_highlight() %>%
       dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0)))
+
 }
 
 rule_two <- function(df) {
@@ -28,8 +28,11 @@ rule_two <- function(df) {
 }
 
 add_highlight <- function(df) {
-  df$highlight <- ifelse(df$rule2, "Rule 2", "None")
-  df$highlight <- ifelse(df$rule1, "Rule 1", df$highlight)
-  df[is.na(df$highlight),'highlight'] <- "None"
-  df
+
+  df <- df %>%
+    dplyr::mutate(highlight = dplyr::case_when(rule2 ~ "Rule 2",
+                                                rule1 ~ "Rule 1",
+                                                TRUE ~ "None"))
+  
 }
+

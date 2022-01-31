@@ -135,9 +135,9 @@ create_SPC_auto_limits_table <- function(data,
     }#loop ends
 
     #add a column to show where the breakpoints are
-    limits_table <- limits_table %>% 
+    limits_table <- limits_table %>%
       dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE))
-    
+
     limits_table
     
   }else{

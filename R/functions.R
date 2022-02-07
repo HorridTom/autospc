@@ -78,7 +78,8 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
     #only selects n if P chart
     if(chartType == "P" | chartType == "P'"){
       limits_table <- limits_table %>%
-        dplyr::select(x, y, n, b, ucl, lcl, cl, periodType, excluded, highlight, breakPoint)
+        dplyr::select(x, y, n, b, ucl, lcl, cl, periodType, excluded, contains("highlight"), 
+                      contains("breakPoint"))
     }else{
       limits_table <- limits_table %>%
         dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, contains("highlight"), 

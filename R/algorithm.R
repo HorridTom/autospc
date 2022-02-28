@@ -41,7 +41,7 @@ create_SPC_auto_limits_table <- function(data,
   if(enough_data_for_new_period(data, periodMin, counter)){
     
     #[2]
-    limits_table <- initialise_limits(data, periodMin, counter, chartType, maxNoOfExclusions)
+    limits_table <- form_calculation_and_display_limits(data, periodMin, counter, chartType, maxNoOfExclusions)
     
     #set counter to end of first period
     counter <- counter + periodMin + 1
@@ -79,7 +79,7 @@ create_SPC_auto_limits_table <- function(data,
           if(enough_data_for_new_period(limits_table, periodMin, counter)){
             
             #[8]
-            candidate_limits_table <- initialise_limits(data = limits_table, periodMin, counter,
+            candidate_limits_table <- form_calculation_and_display_limits(data = limits_table, periodMin, counter,
                                                         chartType, maxNoOfExclusions)
             
             #[9]check whether there is a rule break in the opposite direction within calc period

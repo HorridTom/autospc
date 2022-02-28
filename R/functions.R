@@ -365,11 +365,12 @@ initialise_limits <- function(data, periodMin,
   }else if(length(breakpoints) >= 2){
     
     #find start of previous period
-    penultimate_breakpoint <- which(limits_table$breakPoint)[-2][1]
+    no_of_breakpoints <- length(breakpoints)
+    penultimate_breakpoint <- breakpoints[no_of_breakpoints - 1L]
 
     #split data into sections
-    limits_table_top <- limits_table[1:(penultimate_breakpoint-1),]
-    limits_table_mid <- limits_table[penultimate_breakpoint:(counter-1),]
+    limits_table_top <- limits_table[1:(penultimate_breakpoint - 1),]
+    limits_table_mid <- limits_table[penultimate_breakpoint:(counter - 1),]
     limits_table_bottom <- limits_table[counter:nrow(limits_table),]
     
     #add rule breaks to the penultimate and new periods only

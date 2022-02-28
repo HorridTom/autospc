@@ -151,6 +151,12 @@ plot_auto_SPC <- function(df,
   ucl_start <- round(df$ucl[1])
   cl_end <- round(df$cl[(nrow(df)-1)])
   
+  #get periods into groups for plotting
+  df <- df %>%
+    dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE | is.na(limitChange), dplyr::row_number(), NA_integer_))
+  
+  df$periodStart <- fill_NA(df$periodStart)
+  
   if(plotChart == TRUE){
     
     annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'", 
@@ -232,12 +238,17 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black", "Excluded from limits calculation" = "grey")
   cht + 
     ggplot2::geom_line(colour = "black", size = 0.5) + 
-    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "display", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "42") +
-    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "84") +
-    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
+    # ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "solid") +
+    # ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "display", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "42") +
+    # ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "solid") +
+    # ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "84") +
+    # ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
+    # ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
+    ggplot2::geom_line(data = df, 
+                       ggplot2::aes(x,cl,
+                                    size = periodStart,
+                                    linetype = periodType
+                                    )) +
   
     ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 

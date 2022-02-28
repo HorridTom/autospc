@@ -351,54 +351,76 @@ form_calculation_and_display_limits <- function(data, periodMin,
                                       counter = counter + periodMin + 1,
                                       chartType = chartType)
   
+  #add rule breaks considering where periods are
+  limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 
+                                               counter = counter)
+  
+  
+  limits_table
+}
+
+
+#function to add rule breaks to data with many periods
+#Avoids issues faces with highlighting across periods
+add_rule_breaks_respecting_periods <- function(limits_table,
+                                         counter){
+  
   #add a column to show where the breakpoints are
   limits_table <- limits_table %>% 
     dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE))
   
+  #get breakpoint positions
   breakpoints <- which(limits_table$breakPoint)
   
+  
   if(counter == 0){
+    #for first period
     
     #add rule breaks to all of data
     limits_table <- add_rule_breaks(x = limits_table)
     
+  }else if(length(breakpoints) == 1){
+    #for data with 2 periods
+    
+    #split data into sections
+    limits_table_top <- limits_table[1:(counter-1),]
+    limits_table_bottom <- limits_table[counter:nrow(limits_table),]
+    
+    #add rule breaks to the old and new periods separately 
+    limits_table_top <- add_rule_breaks(x = limits_table_top)
+    limits_table_bottom <- add_rule_breaks(x = limits_table_bottom)
+    
+    #put data back together
+    limits_table <- dplyr::bind_rows(limits_table_top, 
+                                     limits_table_bottom)
+    
   }else if(length(breakpoints) >= 2){
+    #for data with 3 or more periods, 
+    #only re-run rule breaks on most recent 2 periods
     
     #find start of previous period
     no_of_breakpoints <- length(breakpoints)
     penultimate_breakpoint <- breakpoints[no_of_breakpoints - 1L]
-
+    
     #split data into sections
-    limits_table_top <- limits_table[1:(penultimate_breakpoint - 1),]
-    limits_table_mid <- limits_table[penultimate_breakpoint:(counter - 1),]
+    limits_table_top <- limits_table[1:(penultimate_breakpoint - 1L),]
+    limits_table_mid <- limits_table[penultimate_breakpoint:(counter - 1L),]
     limits_table_bottom <- limits_table[counter:nrow(limits_table),]
     
     #add rule breaks to the penultimate and new periods only
     limits_table_mid <- add_rule_breaks(x = limits_table_mid)
     limits_table_bottom <- add_rule_breaks(x = limits_table_bottom)
     
-    #put data bacl together
+    #put data back together
     limits_table <- dplyr::bind_rows(limits_table_top, 
                                      limits_table_mid,
                                      limits_table_bottom)
-    
-  }else{
-    #split data into sections
-    limits_table_top <- limits_table[1:(counter-1),]
-    limits_table_bottom <- limits_table[counter:nrow(limits_table),]
-    
-    #add rule breaks to the new period only
-    limits_table_bottom <- add_rule_breaks(x = limits_table_bottom)
-    
-    #put data bacl together
-    limits_table <- dplyr::bind_rows(limits_table_top, 
-                                     limits_table_bottom)
   }
-  
-
   
   limits_table
 }
+
+
 
 
 #function to rename columns

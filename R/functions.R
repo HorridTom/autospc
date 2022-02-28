@@ -336,10 +336,10 @@ final_run_of_calc_period_prevents_recalc <- function(
 }
 
 
-#function to create initial limits with rule breaks
-initialise_limits <- function(data, periodMin, 
-                              counter, chartType,
-                              maxNoOfExclusions){
+#function to create limits for new calculation and display period with rule breaks
+form_calculation_and_display_limits <- function(data, periodMin, 
+                                             counter, chartType,
+                                             maxNoOfExclusions){
   
   #form calculation limits for first period
   limits_table <- form_calculation_limits(data = data, periodMin = periodMin,

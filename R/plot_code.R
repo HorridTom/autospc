@@ -66,12 +66,12 @@ plot_auto_SPC <- function(df,
                        x = {{ x }}, y = {{ y }}, n = {{ n }}, b = {{ b }})
   
   #get title from data
-  if(is.null(title)){
-    title = df$title[1]
+  if(is.null(title) & "title" %in% colnames(df)){
+    title <- df$title[1]
   }
   
-  if(is.null(subtitle)){
-    subtitle = df$subtitle[1]
+  if(is.null(subtitle) & "subtitle" %in% colnames(df)){
+    subtitle <- df$subtitle[1]
   }
   
   #get type from x variable so that ggplot axes are correct

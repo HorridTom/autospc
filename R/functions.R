@@ -236,19 +236,34 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
                                                  TRUE, 
                                                  FALSE))
   
-  next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == TRUE )) + counter - 1
-
-  last_point_in_calc_period <- tail(
-    which(limits_table_candidate$periodType == "calculation"),
-    n = 1L) + counter - 1
-  
-  if(next_rule_break_position > last_point_in_calc_period){
-    #No rule break in opposite direction
-    list(FALSE, NA, limits_table_candidate)
+  #return list containing: boolean of whether there is an opposite break, 
+  #the next rule break position if applicable,
+  #the candidate table
+  if(all(limits_table_candidate$oppositeBreak == FALSE)){
+    #if there are no further rule breaks
+    output <- list(FALSE, NA, limits_table_candidate)
+    
   }else{
-    list(TRUE, next_rule_break_position, limits_table_candidate)
+    
+    next_rule_break_position <- min(which(limits_table_candidate$oppositeBreak == TRUE )) + counter - 1
+    
+    last_point_in_calc_period <- tail(
+      which(limits_table_candidate$periodType == "calculation"),
+      n = 1L) + counter - 1
+    
+    if(next_rule_break_position > last_point_in_calc_period){
+      #No rule break in opposite direction
+      output <- list(FALSE, NA, limits_table_candidate)
+    }else{
+      output <- list(TRUE, next_rule_break_position, limits_table_candidate)
+    }
   }
 
+  
+  
+  
+
+  output
 }
 
 

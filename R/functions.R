@@ -422,3 +422,19 @@ The column specified in the argument b will be used.")
 is_numeric_vector_constant <- function(x) {
   diff(range(x)) < .Machine$double.eps ^ 0.5
 }
+
+
+#helper function to fill in NA values with previous non-NA value
+#used for line aestetics
+fill_NA <- function(x) {
+  which.na <- c(which(!is.na(x)), length(x) + 1)
+  values <- na.omit(x)
+  
+  if (which.na[1] != 1) {
+    which.na <- c(1, which.na)
+    values <- c(values[1], values)
+  }
+  
+  diffs <- diff(which.na)
+  return(rep(values, times = diffs))
+}

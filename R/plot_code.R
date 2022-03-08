@@ -151,6 +151,17 @@ plot_auto_SPC <- function(df,
   ucl_start <- round(df$ucl[1])
   cl_end <- round(df$cl[(nrow(df)-1)])
   
+  #get periods into groups for plotting
+  df <- df %>%
+    dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE | is.na(limitChange) | breakPoint == TRUE,
+                                               dplyr::row_number(), 
+                                               NA_integer_))
+  
+  df$periodStart <- fill_NA(df$periodStart)
+  
+  df <- df %>% 
+    dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
+  
   if(plotChart == TRUE){
     
     annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'", 
@@ -229,18 +240,42 @@ plot_auto_SPC <- function(df,
 
 
 format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
-  point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black", "Excluded from limits calculation" = "grey")
+  point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, 
+                     "None" = "black", "Excluded from limits calculation" = "grey")
+  
+  #get the line types for calculation and display periods
+  plot_periods <- df$plotPeriod
+  unique_plot_periods <- unique(plot_periods)
+  num_calculation_periods <- length(grep("calculation", unique_plot_periods))
+  num_display_periods <- length(grep("display", unique_plot_periods))
+  
+  first_display_period <- plot_periods[grep("display", plot_periods)[1]]
+  first_calc_period <- plot_periods[1]
+  
+  linetypes <- c(rep("solid", num_calculation_periods),
+                 rep("42", num_display_periods))
+ 
+  
   cht + 
     ggplot2::geom_line(colour = "black", size = 0.5) + 
-    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "calculation", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, cl = ifelse(periodType == "display", cl, NA)), ggplot2::aes(x,cl), size = 0.75, linetype = "42") +
-    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "calculation", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, ucl = ifelse(periodType == "display", ucl, NA)), ggplot2::aes(x,ucl), size = 0.5, linetype = "84") +
-    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "calculation", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "solid") +
-    ggplot2::geom_line(data = dplyr::mutate(df, lcl = ifelse(periodType == "display", lcl, NA)), ggplot2::aes(x,lcl), size = 0.5, linetype = "84") +
-  
+    ggplot2::geom_line(data = df, 
+                       ggplot2::aes(x,cl,
+                                    linetype = plotPeriod),
+                       size = 0.75) +
+    ggplot2::geom_line(data = df, 
+                       ggplot2::aes(x,lcl,
+                                    linetype = plotPeriod),
+                       size = 0.5) +
+    ggplot2::geom_line(data = df, 
+                       ggplot2::aes(x,ucl,
+                                    linetype = plotPeriod),
+                       size = 0.5) +
     ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
+    ggplot2::scale_linetype_manual("Period Type",
+                                   labels = c("Calculation", "Display"),
+                                   values = linetypes,
+                                   breaks = c(first_calc_period, first_display_period)) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
           panel.grid.minor = ggplot2::element_blank(),

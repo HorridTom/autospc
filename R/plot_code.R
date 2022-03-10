@@ -265,17 +265,24 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
     ggplot2::geom_line(data = df, 
                        ggplot2::aes(x,lcl,
                                     linetype = plotPeriod),
-                       size = 0.5) +
+                       size = 0.5,
+                       show.legend = FALSE) +
     ggplot2::geom_line(data = df, 
                        ggplot2::aes(x,ucl,
                                     linetype = plotPeriod),
-                       size = 0.5) +
+                       size = 0.5,
+                       show.legend = FALSE) +
     ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
     ggplot2::scale_linetype_manual("Period Type",
                                    labels = c("Calculation", "Display"),
                                    values = linetypes,
-                                   breaks = c(first_calc_period, first_display_period)) +
+                                   breaks = c(first_calc_period,
+                                              first_display_period),
+                                   guide = ggplot2::guide_legend(
+                                     override.aes = list(linetype = c("solid",
+                                                                      "42")))
+                                   ) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
           panel.grid.minor = ggplot2::element_blank(),

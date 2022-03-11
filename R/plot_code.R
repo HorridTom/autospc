@@ -254,6 +254,9 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   
   linetypes <- c(rep("solid", num_calculation_periods),
                  rep("42", num_display_periods))
+  
+  print(paste(unique_plot_periods, num_calculation_periods, num_display_periods,
+        first_calc_period, first_display_period, linetypes))
  
   
   cht + 

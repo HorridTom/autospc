@@ -252,13 +252,10 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   first_display_period <- plot_periods[grep("display", plot_periods)[1]]
   first_calc_period <- plot_periods[1]
   
-  linetypes <- c(rep("solid", num_calculation_periods),
-                 rep("42", num_display_periods))
-  
-  print(paste(unique_plot_periods, num_calculation_periods, num_display_periods,
-        first_calc_period, first_display_period, linetypes))
+  linetypes <- factor(c(rep("solid", num_calculation_periods),
+                 rep("42", num_display_periods)),
+                 levels = c("solid", "42"))
  
-  
   cht + 
     ggplot2::geom_line(colour = "black", size = 0.5) + 
     ggplot2::geom_line(data = df, 

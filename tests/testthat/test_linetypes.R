@@ -16,15 +16,8 @@ testthat::test_that("Linetypes are formed correctly", {
   rle_layer_4 <- rle(layer_4$linetype)
   
   correct_answer <- structure(
-    list(
-      lengths = structure(
-        c(21L, 29L, 22L, 47L, 22L, 9L),
-        .Names = c(NA, NA, NA, "display22", NA, "")
-      ),
-      values = structure(
-        c("solid","42", "solid", "42", "solid", "42"),
-        .Names = c("calculation1",NA, NA, NA, "display22", NA))
-      ),
+    list(lengths = c(21L, 29L, 22L, 47L, 22L, 9L),
+         values = c(1L, 2L, 1L, 2L, 1L, 2L)),
     class = "rle")   
   
   expect_identical(rle_layer_2, correct_answer)

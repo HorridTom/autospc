@@ -337,23 +337,25 @@ final_run_of_calc_period_prevents_recalc <- function(
 
 
 #function to create limits for new calculation and display period with rule breaks
-form_calculation_and_display_limits <- function(data, periodMin, 
-                                             counter, chartType,
-                                             maxNoOfExclusions){
+form_calculation_and_display_limits <- function(data, 
+                                                periodMin, 
+                                                counter_at_period_start, 
+                                                chartType,
+                                                maxNoOfExclusions){
   
   #form calculation limits for first period
   limits_table <- form_calculation_limits(data = data, periodMin = periodMin,
-                                          counter = counter, chartType = chartType,
+                                          counter = counter_at_period_start, chartType = chartType,
                                           maxNoOfExclusions  = maxNoOfExclusions)
   
   #extend display limits to end 
   limits_table <- form_display_limits(limits_table = limits_table, 
-                                      counter = counter + periodMin + 1,
+                                      counter = counter_at_period_start + periodMin + 1,
                                       chartType = chartType)
   
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 
-                                               counter = counter)
+                                               counter = counter_at_period_start)
   
   
   limits_table

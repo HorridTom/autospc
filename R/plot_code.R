@@ -27,6 +27,8 @@
 #' tidyselect)
 #' @param b column to use as numerator for P and P' charts (passed using
 #' tidyselect)
+#' @param verbosity integer specifying how talkative the algorithm is; the
+#' higher the number the more information is provided, none if 0.
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -58,7 +60,8 @@ plot_auto_SPC <- function(df,
                           override_annotation_dist_P = 25,
                           x_break = NULL,
                           r1_col = "orange",
-                          r2_col = "steelblue3"
+                          r2_col = "steelblue3",
+                          verbosity = 1L
 ) { 
   
   #rename columns if passed
@@ -96,7 +99,8 @@ plot_auto_SPC <- function(df,
   #df <- dplyr::mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, chartType = chartType, 
                                      maxNoOfExclusions  = maxNoOfExclusions,
-                                     noRegrets = noRegrets)
+                                     noRegrets = noRegrets,
+                                     verbosity = verbosity)
   df <- df %>%
     #dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 

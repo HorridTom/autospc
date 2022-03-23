@@ -11,6 +11,7 @@ create_SPC_auto_limits_table(
   runRuleLength = 8,
   maxNoOfExclusions = 3,
   noRegrets = TRUE,
+  verbosity = 1L,
   ...
 )
 }
@@ -30,6 +31,9 @@ limit calculations}
 
 \item{noRegrets}{Boolean signifying which version of the algorithm should be used.
 Defines whether limits can change as more data is added or not.}
+
+\item{verbosity}{integer specifying how talkative the algorithm is; the
+higher the number the more information is provided, none if 0.}
 
 \item{chart_typ}{the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")}
 }

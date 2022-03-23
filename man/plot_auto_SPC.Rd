@@ -31,8 +31,7 @@ plot_auto_SPC(
   r2_col = "steelblue3",
   verbosity = 1L,
   use_caption = TRUE,
-  x_pad_end = NULL,
-  y_max_end = NULL
+  x_pad_end = NULL
 )
 }
 \arguments{
@@ -79,9 +78,6 @@ higher the number the more information is provided, none if 0.}
 
 \item{x_pad_end}{optional integer specifying a minimum end point for the
 x-axis}
-
-\item{y_max_end}{optional maximum for the y axis, larger of this and the
-default maximum will be used}
 
 \item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)

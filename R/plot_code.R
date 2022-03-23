@@ -30,6 +30,8 @@
 #' @param verbosity integer specifying how talkative the algorithm is; the
 #' higher the number the more information is provided, none if 0.
 #' @param use_caption logical controlling whether the caption is displayed
+#' @param x_pad_end optional integer specifying a minimum end point for the
+#' x-axis
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -63,7 +65,8 @@ plot_auto_SPC <- function(df,
                           r1_col = "orange",
                           r2_col = "steelblue3",
                           verbosity = 1L,
-                          use_caption = TRUE
+                          use_caption = TRUE,
+                          x_pad_end = NULL
 ) { 
   
   #rename columns if passed
@@ -145,7 +148,7 @@ plot_auto_SPC <- function(df,
   
   #start and end dates
   start_x <- min(df$x, na.rm = TRUE)
-  end_x <- max(df$x, na.rm = TRUE)
+  end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
   #get y limit
   if(!is.null(override_y_lim)){

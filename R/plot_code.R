@@ -243,45 +243,43 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, 
                      "None" = "black", "Excluded from limits calculation" = "grey")
   
-  #get the line types for calculation and display periods
+  #get exemplar calculation and display periods
   plot_periods <- df$plotPeriod
-  unique_plot_periods <- unique(plot_periods)
-  num_calculation_periods <- length(grep("calculation", unique_plot_periods))
-  num_display_periods <- length(grep("display", unique_plot_periods))
   
   first_display_period <- plot_periods[grep("display", plot_periods)[1]]
   first_calc_period <- plot_periods[1]
   
-  linetypes <- factor(c(rep("solid", num_calculation_periods),
-                 rep("42", num_display_periods)),
-                 levels = c("solid", "42"))
- 
+  suppressWarnings( # to avoid the warning about using alpha for discrete vars
   cht + 
-    ggplot2::geom_line(colour = "black", size = 0.5) + 
+    ggplot2::geom_line(colour = "black",
+                       size = 0.5) + 
     ggplot2::geom_line(data = df, 
                        ggplot2::aes(x,cl,
-                                    linetype = plotPeriod),
+                                    alpha = plotPeriod),
+                       linetype = "solid",
                        size = 0.75) +
     ggplot2::geom_line(data = df, 
                        ggplot2::aes(x,lcl,
-                                    linetype = plotPeriod),
+                                    alpha = plotPeriod),
+                       linetype = "42",
                        size = 0.5,
                        show.legend = FALSE) +
     ggplot2::geom_line(data = df, 
                        ggplot2::aes(x,ucl,
-                                    linetype = plotPeriod),
+                                    alpha = plotPeriod),
+                       linetype = "42",
                        size = 0.5,
                        show.legend = FALSE) +
     ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
-    ggplot2::scale_linetype_manual("Period Type",
+    ggplot2::scale_alpha_discrete("Period Type",
                                    labels = c("Calculation", "Display"),
-                                   values = linetypes,
+                                   range = c(1,0.4),
                                    breaks = c(first_calc_period,
                                               first_display_period),
                                    guide = ggplot2::guide_legend(
-                                     override.aes = list(linetype = c("solid",
-                                                                      "42")))
+                                     override.aes = list(alpha = c(1,
+                                                                      0.4)))
                                    ) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
@@ -293,6 +291,6 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
           plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
           axis.line = ggplot2::element_line(colour = "grey60"),
           plot.caption = ggplot2::element_text(size = 10, hjust = 0.5)) 
-  
+  )
 }
 

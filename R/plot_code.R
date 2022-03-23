@@ -32,8 +32,6 @@
 #' @param use_caption logical controlling whether the caption is displayed
 #' @param x_pad_end optional integer specifying a minimum end point for the
 #' x-axis
-#' @param y_max_end optional maximum for the y axis, larger of this and the
-#' default maximum will be used
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -68,8 +66,7 @@ plot_auto_SPC <- function(df,
                           r2_col = "steelblue3",
                           verbosity = 1L,
                           use_caption = TRUE,
-                          x_pad_end = NULL,
-                          y_max_end = NULL
+                          x_pad_end = NULL
 ) { 
   
   #rename columns if passed
@@ -140,7 +137,7 @@ plot_auto_SPC <- function(df,
   # chart y limit
   ylimlow <- 0
   if(chartType == "C" | chartType == "C'"){
-    ylimhigh <- max(max(df$ucl, df$y) + max(df$ucl)/10 +10, y_max_end)
+    ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
     # ylim_choices <- c(50, 100, 200, 400, 600, 1000, 2000, 8000)
     # ylimhigh <- ylim_choices[which.min(ylim_choices - max(df$y) < 0)]
   }else{

@@ -13,7 +13,8 @@
 #' limit calculations 
 #' @param noRegrets Boolean signifying which version of the algorithm should be used. 
 #' Defines whether limits can change as more data is added or not.
-#'
+#' @param verbosity integer specifying how talkative the algorithm is; the
+#' higher the number the more information is provided, none if 0.
 #'
 #' @return data frame with limits, rule breaks and additional info needed for plotting
 #'
@@ -26,6 +27,7 @@ create_SPC_auto_limits_table <- function(data,
                           runRuleLength = 8,
                           maxNoOfExclusions = 3,
                           noRegrets = TRUE,
+                          verbosity = 1L,
                           ...
 ) {
 
@@ -119,17 +121,23 @@ create_SPC_auto_limits_table <- function(data,
             }
 
           }else{
-            print("There are not enough data points to form another period. Calculation complete.")
+            if(verbosity > 0) {
+              print("There are not enough data points to form another period. Calculation complete.")
+            }
             break
             }
   
         }else{
-          print("There are no further rule breaks. Calculation complete.")
+          if(verbosity > 0) {
+            print("There are no further rule breaks. Calculation complete.")
+          }
           break
           }
 
       }else{        
-        print("There are not enough data points to form another period. Calculation complete.")
+        if(verbosity > 0) {
+          print("There are not enough data points to form another period. Calculation complete.")
+        }
         break
         }
     }#loop ends
@@ -141,7 +149,9 @@ create_SPC_auto_limits_table <- function(data,
     limits_table
     
   }else{
-    print("There are not enough points to form one period.")
+    if(verbosity > 0) {
+      print("There are not enough points to form one period.")
+    }
   }
 
 }

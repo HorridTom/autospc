@@ -28,7 +28,8 @@ plot_auto_SPC(
   override_annotation_dist_P = 25,
   x_break = NULL,
   r1_col = "orange",
-  r2_col = "steelblue3"
+  r2_col = "steelblue3",
+  verbosity = 1L
 )
 }
 \arguments{
@@ -67,6 +68,9 @@ tidyselect)}
 
 \item{b}{column to use as numerator for P and P' charts (passed using
 tidyselect)}
+
+\item{verbosity}{integer specifying how talkative the algorithm is; the
+higher the number the more information is provided, none if 0.}
 
 \item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)

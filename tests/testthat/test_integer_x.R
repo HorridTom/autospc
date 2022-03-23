@@ -1,5 +1,3 @@
-context("Integer x values")
-
 testthat::test_that("plot_auto_SPC does not throw an error with integer x values", {
   # Example data
   df1 <- structure(list(x = 1:50,

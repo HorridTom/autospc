@@ -22,6 +22,7 @@ Imports:
     dplyr (>= 1.0.5),
     ggplot2 (>= 3.3.3),
     lubridate (>= 1.7.10),
+    magrittr,
     qicharts2 (>= 0.7.1),
     rlang (>= 0.4.11),
     scales (>= 1.1.1)

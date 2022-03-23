@@ -32,6 +32,8 @@
 #' @param use_caption logical controlling whether the caption is displayed
 #' @param x_pad_end optional integer specifying a minimum end point for the
 #' x-axis
+#' @param y_max_end optional maximum for the y axis, larger of this and the
+#' default maximum will be used
 #'
 #' @return An SPC ggplot or corresponding data
 #'

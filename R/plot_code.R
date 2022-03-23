@@ -29,6 +29,7 @@
 #' tidyselect)
 #' @param verbosity integer specifying how talkative the algorithm is; the
 #' higher the number the more information is provided, none if 0.
+#' @param use_caption logical controlling whether the caption is displayed
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -61,7 +62,8 @@ plot_auto_SPC <- function(df,
                           x_break = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
-                          verbosity = 1L
+                          verbosity = 1L,
+                          use_caption = TRUE
 ) { 
   
   #rename columns if passed
@@ -171,8 +173,12 @@ plot_auto_SPC <- function(df,
     annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'", 
                                    override_annotation_dist, 
                                    override_annotation_dist_P)
-    caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
-
+    if(use_caption) {
+      caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
+    } else {
+      caption <- NULL
+    }
+      
     p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
       ggplot2::ggtitle(title, 
                        subtitle = subtitle) +

@@ -1,6 +1,6 @@
 Package: autospc
 Title: Automatically Partitioned SPC Charts
-Version: 0.0.0.9003
+Version: 0.0.0.9004
 Authors@R: 
     c(person(given = "Thomas",
            family = "Woodcock",

@@ -1,5 +1,3 @@
-context("Test formation of calculation limits for specified period after counter")
-
 #load in test data
 test_data <- readRDS("testdata/test_data.rds")
 

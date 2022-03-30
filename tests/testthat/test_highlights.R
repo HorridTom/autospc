@@ -1,5 +1,3 @@
-context("Test rule 2 highlights are correct")
-
 #load in test data
 test_data <- readRDS("testdata/test_highlights_data.rds")
 test_data2 <- readRDS("testdata/test_highlights_data2.rds")

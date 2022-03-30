@@ -1,5 +1,3 @@
-context("Test passing different column names")
-
 test_data <- readRDS("testdata/test_data.rds")
 
 testthat::test_that("Renaming columns doesn't change the result",{

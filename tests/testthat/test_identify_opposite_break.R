@@ -1,5 +1,3 @@
-context("Identify whether there is a rule 2 break within the calculation period in the opposite direction")
-
 #dataset with second rule break pulling the mean down from triggering rule break
 test_op_break1_data <- structure(list(x = 1:46, y = c(11.7048146433946, 13.7015899219746, 
                                                       13.8600550563176, 13.0276563697981, 12.0177913157517, 6.90695189817015, 

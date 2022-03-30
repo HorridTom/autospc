@@ -1,5 +1,3 @@
-context("Test formation of display limits following calculation limits")
-
 #load in test data
 test_data <- readRDS("testdata/test_data_display_limits.rds")
 

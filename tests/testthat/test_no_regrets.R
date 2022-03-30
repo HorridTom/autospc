@@ -1,5 +1,3 @@
-context("Test no regrets policy as more data is added")
-
 #data ends at end of second calculation period
 test_data <- structure(list(x = 1:51, 
                             y = c(14.9, 

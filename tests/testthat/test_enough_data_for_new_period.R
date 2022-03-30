@@ -1,5 +1,3 @@
-context("Test if there is enough data to form a new period")
-
 #load in test data
 #test_data <- readRDS("tests/testthat/testdata/test_data.rds")
 test_data <- readRDS("testdata/test_data.rds")

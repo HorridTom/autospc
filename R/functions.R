@@ -143,8 +143,8 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
   }
 
   #check whether there are more than 3 exclusion points (due to points with the same values)
-  if(length(exclusion_points) > 3){
-    exclusion_points <- exclusion_points[1:3]
+  if(length(exclusion_points) > maxNoOfExclusions){
+    exclusion_points <- exclusion_points[1:maxNoOfExclusions]
   }
   
   exclusion_points

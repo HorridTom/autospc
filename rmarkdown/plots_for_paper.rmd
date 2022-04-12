@@ -5,11 +5,65 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+publicly_available_data_Caithness_Hospital <- readRDS("~/autospc/rmarkdown/publicly_available_data_Caithness_Hospital.rds")
 ```
 
-## Caithness General Hospital Naive Approach - Fig 1
+## Caithness General Hospital Naive Approach - Fig 1 NOT WORKING
 
 ```{r plot1}
-plot_auto_SPC(testo, x = Month_Start, y = daily_ave_att, x_break = 28, override_date_format = "%d/%m/%y", use_caption = FALSE, includeAnnotations = FALSE, override_x_title = "Date", override_y_title = "Attendances", title = "Average daily A&E attendances per week", subtitle = "Caithness General Hospital")
+plot_auto_SPC(publicly_available_data_Caithness_Hospital, 
+              x = Month_Start, y = daily_ave_att, 
+              override_x_title = "Week", 
+              override_y_title = "Attendances", 
+              title = "Average daily A&E attendances per week", 
+              subtitle = "Caithness General Hospital", 
+              x_break = 28, 
+              override_date_format = "%d/%m/%y", 
+              use_caption = FALSE, 
+              includeAnnotations = FALSE,
+              periodMin = nrow(publicly_available_data_Caithness_Hospital),
+              manual_override_breakpoints = nrow(publicly_available_data_Caithness_Hospital))
 ```
+
+
+
+## Caithness General Hospital Naive Approach2 - Fig 2
+
+```{r plot2}
+plot_auto_SPC(publicly_available_data_Caithness_Hospital, 
+              x = Month_Start, y = daily_ave_att, 
+              override_x_title = "Week", 
+              override_y_title = "Attendances", 
+              title = "Average daily A&E attendances per week", 
+              subtitle = "Caithness General Hospital", 
+              x_break = 28, 
+              override_date_format = "%d/%m/%y", 
+              use_caption = FALSE, 
+              includeAnnotations = FALSE,
+              periodMin = 21,
+              manual_override_breakpoints = nrow(publicly_available_data_Caithness_Hospital))
+```
+
+* Display period not grey??
+
+## Caithness General Hospital Naive Approach3 - Fig 3
+
+```{r plot3}
+plot_auto_SPC(publicly_available_data_Caithness_Hospital, 
+              x = Month_Start, y = daily_ave_att, 
+              override_x_title = "Week", 
+              override_y_title = "Attendances", 
+              title = "Average daily A&E attendances per week", 
+              subtitle = "Caithness General Hospital", 
+              x_break = 28, 
+              override_date_format = "%d/%m/%y", 
+              use_caption = FALSE, 
+              includeAnnotations = FALSE,
+              periodMin = 21,
+              manual_override_breakpoints = c(34, 49))
+```
+
+* Calculation period too short
+* ALso need example of rule break in opposite direction
+
 

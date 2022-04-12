@@ -62,6 +62,7 @@ plot_auto_SPC <- function(df,
                           includeAnnotations = TRUE,
                           override_annotation_dist = 10,
                           override_annotation_dist_P = 25,
+                          override_date_format = "%Y-%m-%d",
                           x_break = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
@@ -215,7 +216,7 @@ plot_auto_SPC <- function(df,
                                 as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
                                 x_break)
 
-      p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
+      p <- p + ggplot2::scale_x_date(labels = scales::date_format(override_date_format),
                                      breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
                                      limits = c(as.Date(start_x), as.Date(end_x))
                                      )

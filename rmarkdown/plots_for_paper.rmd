@@ -1,0 +1,15 @@
+---
+title: "plots for paper"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Caithness General Hospital Naive Approach - Fig 1
+
+```{r plot1}
+plot_auto_SPC(testo, x = Month_Start, y = daily_ave_att, x_break = 28, override_date_format = "%d/%m/%y", use_caption = FALSE, includeAnnotations = FALSE, override_x_title = "Date", override_y_title = "Attendances", title = "Average daily A&E attendances per week", subtitle = "Caithness General Hospital")
+```
+

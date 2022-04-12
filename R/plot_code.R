@@ -55,6 +55,7 @@ plot_auto_SPC <- function(df,
                           b,
                           
                           #overrides for plot aesthetics not detailed in roxygen skeleton
+                          manual_override_breakpoints = NULL,
                           override_x_title = NULL,
                           override_y_title = NULL,
                           override_y_lim = NULL,
@@ -105,7 +106,8 @@ plot_auto_SPC <- function(df,
   df <- create_SPC_auto_limits_table(df, chartType = chartType, 
                                      maxNoOfExclusions  = maxNoOfExclusions,
                                      noRegrets = noRegrets,
-                                     verbosity = verbosity)
+                                     verbosity = verbosity,
+                                     manual_override_breakpoints = manual_override_breakpoints)
   df <- df %>%
     #dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 

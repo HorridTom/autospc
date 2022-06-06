@@ -241,7 +241,7 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
   #return list containing: boolean of whether there is an opposite break, 
   #the next rule break position if applicable,
   #the candidate table
-  if(all(limits_table_candidate$oppositeBreak == FALSE)){
+  if(all(limits_table_candidate$oppositeBreak == FALSE, na.rm = TRUE)){
     #if there are no further rule breaks
     output <- list(FALSE, NA, limits_table_candidate)
     

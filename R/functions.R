@@ -186,7 +186,7 @@ form_display_limits <- function(limits_table, counter, chartType = "C'"){
       dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl)) %>%
       dplyr::mutate(lcl = dplyr::if_else(lcl <= 0, 0, lcl))
     
-    limits_table <- bind_rows(limits_table_top, limits_table_bottom)
+    limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
     
     
   }

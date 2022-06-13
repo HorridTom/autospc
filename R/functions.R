@@ -26,21 +26,25 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
   #run the calculation of limits excluding extremes for selected section of data
   if(chartType == "C"){
     calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),]
-                                         , chart = 'c', exclude = exclusion_points)
+                                         , chart = 'c', exclude = exclusion_points, 
+                                         return.data = TRUE)
   }else if(chartType == "C'"){
     calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
                                          data = data[counter:(counter + periodMin),]
-                                         , chart = 'up', exclude = exclusion_points)
+                                         , chart = 'up', exclude = exclusion_points, 
+                                         return.data = TRUE)
   }else if(chartType == "P"){
     calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),], 
-                                         chart = 'p', multiply = 100, exclude = exclusion_points)
+                                         chart = 'p', multiply = 100, exclude = exclusion_points, 
+                                         return.data = TRUE)
   }else if(chartType == "P'"){
     calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),], 
-                                         chart = 'pp', multiply = 100, exclude = exclusion_points)
+                                         chart = 'pp', multiply = 100, exclude = exclusion_points, 
+                                         return.data = TRUE)
   }
   
 
-  calculation_period <- calculation_period$data %>%
+  calculation_period <- calculation_period %>%
     dplyr::select(x, y, ucl,lcl, cl) %>%
     dplyr::mutate(periodType = "calculation") %>%
     dplyr::mutate(excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F))
@@ -102,20 +106,24 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
   while(i <= maxNoOfExclusions){
     if(chartType == "C"){
       calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),],
-                                           chart = 'c', exclude = exclusion_points)
+                                           chart = 'c', exclude = exclusion_points, 
+                                           return.data = TRUE)
     }else if(chartType == "C'"){
       calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
                                            data = data[counter:(counter + periodMin),],
-                                           chart = 'up', exclude = exclusion_points)
+                                           chart = 'up', exclude = exclusion_points, 
+                                           return.data = TRUE)
     }else if(chartType == "P"){
       calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
-                                           chart = 'p', multiply = 100, exclude = exclusion_points)
+                                           chart = 'p', multiply = 100, exclude = exclusion_points, 
+                                           return.data = TRUE)
     }else if(chartType == "P'"){
       calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
-                                           chart = 'pp', multiply = 100, exclude = exclusion_points)
+                                           chart = 'pp', multiply = 100, exclude = exclusion_points, 
+                                           return.data = TRUE)
     }
     
-    calculation_period <- calculation_period$data %>%
+    calculation_period <- calculation_period %>%
       dplyr::select(x,y,ucl,lcl, cl)
     
     calculation_period <- add_rule_breaks(calculation_period)

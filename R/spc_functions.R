@@ -34,7 +34,6 @@ get_c_limits <- function(data){
 get_p_limits <- function(data){
   
   cl <- sum(data$y, na.rm = TRUE) / sum(data$n, na.rm = TRUE)
-  stdev <- sqrt(cl * (1 - cl) / n)
 
   data <- data %>%
     dplyr::mutate(cl = cl) %>%

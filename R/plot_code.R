@@ -246,8 +246,7 @@ plot_auto_SPC <- function(df,
               row.names = FALSE)
     
   }else{
-    #add colums to output title and subtitle 
-    df <- df %>% dplyr::mutate(df, title = title, subtitle = subtitle)
+    
     df
   }
 }

@@ -25,25 +25,25 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
   
   #run the calculation of limits excluding extremes for selected section of data
   if(chartType == "C"){
-    # calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),]
-    #                                      , chart = 'c', exclude = exclusion_points)
-    calculation_period <- get_c_limits(data = data[counter:(counter + periodMin),])
+    calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),]
+                                         , chart = 'c', exclude = exclusion_points)
+    #calculation_period <- get_c_limits(data = data[counter:(counter + periodMin),])
     
   }else if(chartType == "C'"){
-    # calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
-    #                                      data = data[counter:(counter + periodMin),]
-    #                                      , chart = 'up', exclude = exclusion_points)
-    calculation_period <- get_cp_limits(data = data[counter:(counter + periodMin),])
+    calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])),
+                                         data = data[counter:(counter + periodMin),]
+                                         , chart = 'up', exclude = exclusion_points)
+    #calculation_period <- get_cp_limits(data = data[counter:(counter + periodMin),])
     
   }else if(chartType == "P"){
-    # calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),], 
-    #                                      chart = 'p', multiply = 100, exclude = exclusion_points)
-    calculation_period <- get_p_limits(data = data[counter:(counter + periodMin),])
+    calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),],
+                                         chart = 'p', multiply = 100, exclude = exclusion_points)
+    #calculation_period <- get_p_limits(data = data[counter:(counter + periodMin),])
     
   }else if(chartType == "P'"){
-    # calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),], 
-    #                                      chart = 'pp', multiply = 100, exclude = exclusion_points)
-    calculation_period <- get_pp_limits(data = data[counter:(counter + periodMin),], multiply = 100)
+    calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),],
+                                         chart = 'pp', multiply = 100, exclude = exclusion_points)
+    #calculation_period <- get_pp_limits(data = data[counter:(counter + periodMin),], multiply = 100)
   }
   
 
@@ -108,25 +108,25 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
   
   while(i <= maxNoOfExclusions){
     if(chartType == "C"){
-      # calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),],
-      #                                      chart = 'c', exclude = exclusion_points)
-      calculation_period <- get_c_limits(data[counter:(counter + periodMin),])
+      calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),],
+                                           chart = 'c', exclude = exclusion_points)
+      #calculation_period <- get_c_limits(data[counter:(counter + periodMin),])
       
     }else if(chartType == "C'"){
-      # calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])), 
-      #                                      data = data[counter:(counter + periodMin),],
-      #                                      chart = 'up', exclude = exclusion_points)
-      calculation_period <- get_cp_limits(data[counter:(counter + periodMin),])
+      calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])),
+                                           data = data[counter:(counter + periodMin),],
+                                           chart = 'up', exclude = exclusion_points)
+      #calculation_period <- get_cp_limits(data[counter:(counter + periodMin),])
       
     }else if(chartType == "P"){
-      # calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
-      #                                      chart = 'p', multiply = 100, exclude = exclusion_points)
-      calculation_period <- get_p_limits(data[counter:(counter + periodMin),])
+      calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),],
+                                           chart = 'p', multiply = 100, exclude = exclusion_points)
+      #calculation_period <- get_p_limits(data[counter:(counter + periodMin),])
       
     }else if(chartType == "P'"){
-      # calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),], 
-      #                                      chart = 'pp', multiply = 100, exclude = exclusion_points)
-      calculation_period <- get_pp_limits(data[counter:(counter + periodMin),])
+      calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),],
+                                           chart = 'pp', multiply = 100, exclude = exclusion_points)
+      #calculation_period <- get_pp_limits(data[counter:(counter + periodMin),])
     }
     
     calculation_period <- calculation_period %>%

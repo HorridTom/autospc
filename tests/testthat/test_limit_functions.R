@@ -15,7 +15,7 @@ test_data <- structure(list(x = 1:21,
                        class = "data.frame", 
                        row.names = c(NA, -21L))
 
-testthat::test_that("C chart limits the same as live qicharts2 v.0.7.2",{
+test_that("C chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_c_limits(test_data)
   results <- results %>%
@@ -25,12 +25,12 @@ testthat::test_that("C chart limits the same as live qicharts2 v.0.7.2",{
   correct_answers <- correct_answers %>%
     dplyr::select(cl, ucl, lcl)
 
-  testthat::expect_equal(results, correct_answers)
+  expect_equal(results, correct_answers)
   
 })
 
 
-testthat::test_that("P chart limits the same as live qicharts2 v.0.7.2",{
+test_that("P chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_p_limits(test_data)
   results <- results %>%
@@ -40,12 +40,12 @@ testthat::test_that("P chart limits the same as live qicharts2 v.0.7.2",{
   correct_answers <- correct_answers %>%
     dplyr::select(cl, ucl, lcl)
   
-  testthat::expect_equal(results, correct_answers)
+  expect_equal(results, correct_answers)
   
 })
 
 
-testthat::test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
+test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_cp_limits(test_data)
   results <- results %>%
@@ -55,12 +55,12 @@ testthat::test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
   correct_answers <- correct_answers %>%
     dplyr::select(cl, ucl, lcl)
   
-  testthat::expect_equal(results, correct_answers)
+  expect_equal(results, correct_answers)
   
 })
 
 
-testthat::test_that("P prime chart limits the same as live qicharts2 v.0.7.2",{
+test_that("P prime chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_pp_limits(test_data, multiply = 100)
   results <- results %>%
@@ -70,7 +70,7 @@ testthat::test_that("P prime chart limits the same as live qicharts2 v.0.7.2",{
   correct_answers <- correct_answers %>%
     dplyr::select(cl, ucl, lcl)
   
-  testthat::expect_equal(results, correct_answers)
+  expect_equal(results, correct_answers)
   
 })
 

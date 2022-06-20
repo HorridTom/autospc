@@ -242,11 +242,11 @@ plot_auto_SPC <- function(df,
     
     title <- gsub(":", "_",title)
     subtitle <- gsub(":","_", subtitle)
-    write.csv(cht_data, paste0("tables/", gsub(" ","_",title), "_", gsub(" ","_",subtitle,), ".csv"))
+    write.csv(df, paste0("tables/", gsub(" ","_",title), "_", gsub(" ","_",subtitle,), ".csv"),
+              row.names = FALSE)
     
   }else{
-    #add colums to output title and subtitle 
-    df <- df %>% dplyr::mutate(df, title = title, subtitle = subtitle)
+    
     df
   }
 }

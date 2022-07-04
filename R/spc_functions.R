@@ -1,9 +1,16 @@
 
 #get c chart limits
 #Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_c_limits <- function(data){
+get_c_limits <- function(data, exclusion_points = NULL){
   
-  cl <- mean(data$y, na.rm = TRUE)
+  if(!is.null(exclusion_points)){
+    #exclude exclusion points from calculations
+    data_excl <- data[-exclusion_points,]
+  }else{
+    data_excl <- data
+  }
+  
+  cl <- mean(data_excl$y, na.rm = TRUE)
   stdev <- sqrt(cl)
   
   cl <- cl
@@ -17,12 +24,19 @@ get_c_limits <- function(data){
 
 #get p chart limits
 #Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_p_limits <- function(data){
+get_p_limits <- function(data, exclusion_points = NULL){
   
-  cl <- sum(data$y, na.rm = TRUE) / sum(data$n, na.rm = TRUE)
+  if(!is.null(exclusion_points)){
+    #exclude exclusion points from calculations
+    data_excl <- data[-exclusion_points,]
+  }else{
+    data_excl <- data
+  }
+  
+  cl <- sum(data_excl$y, na.rm = TRUE) / sum(data_excl$n, na.rm = TRUE)
   
   cl <- cl
-  stdev <- sqrt(cl * (1 - cl) / data$n)
+  stdev <- sqrt(cl * (1 - cl) / data_excl$n)
   ucl <- cl + 3 * stdev
   lcl <- cl - 3 * stdev
 
@@ -34,14 +48,21 @@ get_p_limits <- function(data){
 #get C prime limits
 #this is the same as U prime with n = 1
 #Input data with x, y columns. Returns cl, ucl and lcl as named list.
-get_cp_limits <- function(data){
+get_cp_limits <- function(data, exclusion_points = NULL){
+  
+  if(!is.null(exclusion_points)){
+    #exclude exclusion points from calculations
+    data_excl <- data[-exclusion_points,]
+  }else{
+    data_excl <- data
+  }
 
-  cl <- mean(data$y, na.rm = TRUE)
+  cl <- mean(data_excl$y, na.rm = TRUE)
   
   n <- 1
   cl <- cl
   stdev <- sqrt(cl / n)
-  z_i <- (data$y - cl) / stdev
+  z_i <- (data_excl$y - cl) / stdev
 
   mr  <- abs(diff(z_i))
   amr <- mean(mr, na.rm = TRUE)
@@ -67,12 +88,19 @@ get_cp_limits <- function(data){
 
 #get P prime limits
 #Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_pp_limits <- function(data, multiply = 1){
+get_pp_limits <- function(data, exclusion_points = NULL, multiply = 1){
   
-  cl <- sum(data$y, na.rm = TRUE) / sum(data$n, na.rm = TRUE) 
+  if(!is.null(exclusion_points)){
+    #exclude exclusion points from calculations
+    data_excl <- data[-exclusion_points,]
+  }else{
+    data_excl <- data
+  }
   
-  y_new <- data$y / data$n
-  stdev <- sqrt(cl * (1 - cl) / data$n)
+  cl <- sum(data_excl$y, na.rm = TRUE) / sum(data_excl$n, na.rm = TRUE) 
+  
+  y_new <- data_excl$y / data_excl$n
+  stdev <- sqrt(cl * (1 - cl) / data_excl$n)
   z_i <- (y_new - cl) / stdev
 
   mr  <- abs(diff(z_i))

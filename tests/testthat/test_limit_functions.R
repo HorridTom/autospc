@@ -18,29 +18,27 @@ test_data <- structure(list(x = 1:21,
 test_that("C chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_c_limits(test_data)
-  results <- results %>%
-    dplyr::select(cl, ucl, lcl)
   
   correct_answers <- qicharts2::qic(x, y, data = test_data, chart = 'c', return.data = TRUE)
-  correct_answers <- correct_answers %>%
-    dplyr::select(cl, ucl, lcl)
 
-  expect_equal(results, correct_answers)
+  expect_equal(results$cl, correct_answers$cl)
+  expect_equal(results$lcl, correct_answers$lcl)
+  expect_equal(results$ucl, correct_answers$ucl)
   
 })
 
 
 test_that("P chart limits the same as live qicharts2 v.0.7.2",{
   
+  #list
   results <- get_p_limits(test_data)
-  results <- results %>%
-    dplyr::select(cl, ucl, lcl)
-  
+
+  #data frame
   correct_answers <- qicharts2::qic(x, y, n, data = test_data, chart = 'p', return.data = TRUE)
-  correct_answers <- correct_answers %>%
-    dplyr::select(cl, ucl, lcl)
   
-  expect_equal(results, correct_answers)
+  expect_equal(results$cl, correct_answers$cl)
+  expect_equal(results$lcl, correct_answers$lcl)
+  expect_equal(results$ucl, correct_answers$ucl)
   
 })
 
@@ -48,14 +46,12 @@ test_that("P chart limits the same as live qicharts2 v.0.7.2",{
 test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_cp_limits(test_data)
-  results <- results %>%
-    dplyr::select(cl, ucl, lcl)
   
   correct_answers <- qicharts2::qic(x, y, n = rep(1, nrow(test_data)), data = test_data, chart = 'up', return.data = TRUE)
-  correct_answers <- correct_answers %>%
-    dplyr::select(cl, ucl, lcl)
   
-  expect_equal(results, correct_answers)
+  expect_equal(results$cl, correct_answers$cl)
+  expect_equal(results$lcl, correct_answers$lcl)
+  expect_equal(results$ucl, correct_answers$ucl)
   
 })
 
@@ -63,14 +59,12 @@ test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
 test_that("P prime chart limits the same as live qicharts2 v.0.7.2",{
   
   results <- get_pp_limits(test_data, multiply = 100)
-  results <- results %>%
-    dplyr::select(cl, ucl, lcl)
   
   correct_answers <- qicharts2::qic(x, y, n, data = test_data, chart = 'pp', multiply = 100, return.data = TRUE)
-  correct_answers <- correct_answers %>%
-    dplyr::select(cl, ucl, lcl)
   
-  expect_equal(results, correct_answers)
+  expect_equal(results$cl, correct_answers$cl)
+  expect_equal(results$lcl, correct_answers$lcl)
+  expect_equal(results$ucl, correct_answers$ucl)
   
 })
 

@@ -1,64 +1,49 @@
-#get centre line
-get_cl <- function(y, 
-                   cl_method = "mean"){
-  
-  if(cl_method == "mean"){
-    cl  <- mean(y, na.rm = TRUE)
-  }else if(cl_method == "median"){
-    cl  <- stats::median(y, na.rm = TRUE)
-  }else{
-    print("Please enter either 'mean' or 'median' in the 'method' argument.")
-  }
-  
-  cl
-}
 
 #get c chart limits
+#Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
 get_c_limits <- function(data){
   
-  cl <- get_cl(data$y, "mean")
+  cl <- mean(data$y, na.rm = TRUE)
   stdev <- sqrt(cl)
   
-  data <- data %>%
-    dplyr::mutate(cl = cl) %>%
-    dplyr::mutate(ucl = cl + 3 * stdev) %>%
-    dplyr::mutate(lcl = cl - 3 * stdev)
+  cl <- cl
+  ucl <- cl + 3 * stdev
+  lcl <- cl - 3 * stdev
   
-  data$lcl[data$lcl < 0 & is.finite(data$lcl)] <- 0
+  lcl[lcl < 0 & is.finite(lcl)] <- 0
   
-  data
+  list(cl = rep(cl, nrow(data)), ucl = rep(ucl, nrow(data)), lcl = rep(lcl, nrow(data)))
 }
 
 #get p chart limits
-# need multiply = 100, 
+#Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
 get_p_limits <- function(data){
   
   cl <- sum(data$y, na.rm = TRUE) / sum(data$n, na.rm = TRUE)
-
-  data <- data %>%
-    dplyr::mutate(cl = cl) %>%
-    dplyr::mutate(stdev = sqrt(cl * (1 - cl) / n)) %>%
-    dplyr::mutate(ucl = cl + 3 * stdev) %>%
-    dplyr::mutate(lcl = cl - 3 * stdev)
   
-  data$lcl[data$lcl < 0 & is.finite(data$lcl)] <- 0
+  cl <- cl
+  stdev <- sqrt(cl * (1 - cl) / data$n)
+  ucl <- cl + 3 * stdev
+  lcl <- cl - 3 * stdev
 
-  data
+  lcl[lcl < 0 & is.finite(lcl)] <- 0
+
+  list(cl = rep(cl, nrow(data)), ucl = ucl, lcl = lcl)
 }
 
 #get C prime limits
 #this is the same as U prime with n = 1
+#Input data with x, y columns. Returns cl, ucl and lcl as named list.
 get_cp_limits <- function(data){
 
-  cl <- get_cl(data$y, "mean")
-
-  data <- data %>%
-    dplyr::mutate(n = 1) %>%
-    dplyr::mutate(cl = cl) %>%
-    dplyr::mutate(stdev = sqrt(cl / n)) %>%
-    dplyr::mutate(z_i = (y - cl) / stdev) 
+  cl <- mean(data$y, na.rm = TRUE)
   
-  mr  <- abs(diff(data$z_i))
+  n <- 1
+  cl <- cl
+  stdev <- sqrt(cl / n)
+  z_i <- (data$y - cl) / stdev
+
+  mr  <- abs(diff(z_i))
   amr <- mean(mr, na.rm = TRUE)
   
   # Upper limit for moving ranges
@@ -70,29 +55,27 @@ get_cp_limits <- function(data){
   
   sigma_z <- amr / 1.128
   
-  data <- data %>%
-    dplyr::mutate(stdev = stdev * sigma_z) %>%
-    dplyr::mutate(ucl = cl + 3 * stdev) %>%
-    dplyr::mutate(lcl = cl - 3 * stdev)
+  stdev <- stdev * sigma_z
+  ucl <- cl + 3 * stdev
+  lcl <- cl - 3 * stdev
   
-  data$lcl[data$lcl < 0 & is.finite(data$lcl)] <- 0
+  lcl[lcl < 0 & is.finite(lcl)] <- 0
 
-  data
+  list(cl = rep(cl, nrow(data)), ucl = rep(ucl, nrow(data)), lcl = rep(lcl, nrow(data)))
 }
 
 
 #get P prime limits
-get_pp_limits <- function(data, multiply = NULL){
+#Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
+get_pp_limits <- function(data, multiply = 1){
   
   cl <- sum(data$y, na.rm = TRUE) / sum(data$n, na.rm = TRUE) 
   
-  data <- data %>%
-    dplyr::mutate(cl = cl) %>%
-    dplyr::mutate(y_new = y / n) %>%
-    dplyr::mutate(stdev = sqrt(cl * (1 - cl) / n)) %>%
-    dplyr::mutate(z_i = (y_new - cl) / stdev) 
-  
-  mr  <- abs(diff(data$z_i))
+  y_new <- data$y / data$n
+  stdev <- sqrt(cl * (1 - cl) / data$n)
+  z_i <- (y_new - cl) / stdev
+
+  mr  <- abs(diff(z_i))
   amr <- mean(mr, na.rm = TRUE)
 
   # Upper limit for moving ranges
@@ -104,20 +87,13 @@ get_pp_limits <- function(data, multiply = NULL){
 
   sigma_z <- amr / 1.128
   
-  data <- data %>%
-    dplyr::mutate(stdev = stdev * sigma_z) %>%
-    dplyr::mutate(ucl = cl + 3 * stdev) %>%
-    dplyr::mutate(lcl = cl - 3 * stdev)
-
-
-  data$lcl[data$lcl < 0 & is.finite(data$lcl)] <- 0
+  stdev <- stdev * sigma_z
   
-  if(!is.null(multiply)){
-    data <- data %>%
-      dplyr::mutate(cl = cl * multiply,
-                    ucl = ucl * multiply,
-                    lcl = lcl * multiply)
-  }
+  cl <- cl * multiply
+  ucl <- cl + 3 * stdev * multiply
+  lcl <- cl - 3 * stdev * multiply
 
-  data
+  lcl[lcl < 0 & is.finite(lcl)] <- 0
+
+  list(cl = rep(cl, nrow(data)), ucl = ucl, lcl = lcl)
 }

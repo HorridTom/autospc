@@ -1,7 +1,15 @@
-
 #get c chart limits
 #Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
 get_c_limits <- function(data, exclusion_points = NULL){
+  
+  #send error messages if data is not in the right format
+  if(length(data) == 0){
+    stop("The input data has zero observations.")
+  }
+  
+  if(!exists(data$x) | !exists(data$y)){
+    stop("The data does not contain the necessary columns, x and y.")
+  }
   
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations

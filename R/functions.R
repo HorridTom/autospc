@@ -26,25 +26,17 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
   
   #run the calculation of limits excluding extremes for selected section of data
   if(chartType == "C"){
-    # calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),]
-    #                                      , chart = 'c', exclude = exclusion_points, return.data = TRUE)
-    limits_list <- get_c_limits(data = calculation_period, exclusion_points = exclusion_points)
+    limits_list <- get_c_limits(y = calculation_period$y, exclusion_points = exclusion_points)
     
   }else if(chartType == "C'"){
-    # calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])),
-    #                                      data = data[counter:(counter + periodMin),]
-    #                                      , chart = 'up', exclude = exclusion_points, return.data = TRUE)
-    limits_list <- get_cp_limits(data = calculation_period, exclusion_points = exclusion_points)
+    limits_list <- get_cp_limits(y = calculation_period$y, exclusion_points = exclusion_points)
     
   }else if(chartType == "P"){
-    # calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),],
-    #                                      chart = 'p', multiply = 100, exclude = exclusion_points, return.data = TRUE)
-    limits_list <- get_p_limits(data = calculation_period, exclusion_points = exclusion_points)
+    limits_list <- get_p_limits(y = calculation_period$y, n = calculation_period$n, exclusion_points = exclusion_points)
     
   }else if(chartType == "P'"){
-    # calculation_period <- qicharts2::qic(x, y = b, n = n, data = data[counter:(counter + periodMin),],
-    #                                      chart = 'pp', multiply = 100, exclude = exclusion_points, return.data = TRUE)
-    limits_list <- get_pp_limits(data = calculation_period, exclusion_points = exclusion_points, multiply = 100)
+    limits_list <- get_pp_limits(y = calculation_period$y, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
+    
   }
   
   calculation_period$cl <- limits_list$cl
@@ -115,25 +107,16 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
     calculation_period <- data[counter:(counter + periodMin),]
     
     if(chartType == "C"){
-      # calculation_period <- qicharts2::qic(x, y, data = data[counter:(counter + periodMin),],
-      #                                      chart = 'c', exclude = exclusion_points, return.data = TRUE)
-      limits_list <- get_c_limits(data = calculation_period, exclusion_points = exclusion_points)
+      limits_list <- get_c_limits(y = calculation_period$y, exclusion_points = exclusion_points)
       
     }else if(chartType == "C'"){
-      # calculation_period <- qicharts2::qic(x, y, n = rep(1, nrow(data[counter:(counter + periodMin),])),
-      #                                      data = data[counter:(counter + periodMin),],
-      #                                      chart = 'up', exclude = exclusion_points, return.data = TRUE)
-      limits_list <- get_cp_limits(data = calculation_period, exclusion_points = exclusion_points)
+      limits_list <- get_cp_limits(y = calculation_period$y, exclusion_points = exclusion_points)
       
     }else if(chartType == "P"){
-      # calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),],
-      #                                      chart = 'p', multiply = 100, exclude = exclusion_points, return.data = TRUE)
-      limits_list <- get_p_limits(data = calculation_period, exclusion_points = exclusion_points)
+      limits_list <- get_p_limits(y = calculation_period$y, n = calculation_period$n, exclusion_points = exclusion_points)
       
     }else if(chartType == "P'"){
-      # calculation_period <- qicharts2::qic(x, y = b, n, data = data[counter:(counter + periodMin),],
-      #                                      chart = 'pp', multiply = 100, exclude = exclusion_points, return.data = TRUE)
-      limits_list <- get_pp_limits(data = calculation_period, exclusion_points = exclusion_points, multiply = 100)
+      limits_list <- get_pp_limits(y = calculation_period$y, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
     }
     
     calculation_period$cl <- limits_list$cl

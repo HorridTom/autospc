@@ -17,7 +17,7 @@ test_data <- structure(list(x = 1:21,
 
 test_that("C chart limits the same as live qicharts2 v.0.7.2",{
   
-  results <- get_c_limits(test_data)
+  results <- get_c_limits(y = test_data$y)
   
   correct_answers <- qicharts2::qic(x, y, data = test_data, chart = 'c', return.data = TRUE)
 
@@ -31,7 +31,7 @@ test_that("C chart limits the same as live qicharts2 v.0.7.2",{
 test_that("P chart limits the same as live qicharts2 v.0.7.2",{
   
   #list
-  results <- get_p_limits(test_data)
+  results <- get_p_limits(y = test_data$y, n = test_data$n)
 
   #data frame
   correct_answers <- qicharts2::qic(x, y, n, data = test_data, chart = 'p', return.data = TRUE)
@@ -45,7 +45,7 @@ test_that("P chart limits the same as live qicharts2 v.0.7.2",{
 
 test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
   
-  results <- get_cp_limits(test_data)
+  results <- get_cp_limits(y = test_data$y, n = test_data$n)
   
   correct_answers <- qicharts2::qic(x, y, n = rep(1, nrow(test_data)), data = test_data, chart = 'up', return.data = TRUE)
   
@@ -58,7 +58,7 @@ test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
 
 test_that("P prime chart limits the same as live qicharts2 v.0.7.2",{
   
-  results <- get_pp_limits(test_data, multiply = 100)
+  results <- get_pp_limits(y = test_data$y, n = test_data$n, multiply = 100)
   
   correct_answers <- qicharts2::qic(x, y, n, data = test_data, chart = 'pp', multiply = 100, return.data = TRUE)
   

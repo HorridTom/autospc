@@ -1,24 +1,21 @@
 #get c chart limits
-#Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_c_limits <- function(data, exclusion_points = NULL){
+#Input y data as vector. Returns cl, ucl and lcl as named list.
+get_c_limits <- function(y, 
+                         exclusion_points = NULL){
   
   #send error messages if data is not in the right format
-  if(length(data) == 0){
+  if(length(y) == 0){
     stop("The input data has zero observations.")
   }
-  
-  if(!exists(data$x) | !exists(data$y)){
-    stop("The data does not contain the necessary columns, x and y.")
-  }
-  
+
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations
-    data_excl <- data[-exclusion_points,]
+    y_excl <- y[-exclusion_points]
   }else{
-    data_excl <- data
+    y_excl <- y
   }
   
-  cl <- mean(data_excl$y, na.rm = TRUE)
+  cl <- mean(y_excl, na.rm = TRUE)
   stdev <- sqrt(cl)
   
   cl <- cl
@@ -27,50 +24,78 @@ get_c_limits <- function(data, exclusion_points = NULL){
   
   lcl[lcl < 0 & is.finite(lcl)] <- 0
   
-  list(cl = rep(cl, nrow(data)), ucl = rep(ucl, nrow(data)), lcl = rep(lcl, nrow(data)))
+  list(cl = rep(cl, length(y)), ucl = rep(ucl, length(y)), lcl = rep(lcl, length(y)))
 }
 
 #get p chart limits
-#Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_p_limits <- function(data, exclusion_points = NULL){
+#Input y and n data as vectors. Returns cl, ucl and lcl as named list.
+get_p_limits <- function(y, 
+                         n,
+                         exclusion_points = NULL,
+                         multiply = 1){
+  
+  #send error messages if data is not in the right format
+  if(length(y) == 0){
+    stop("The input data has zero observations.")
+  }
+  
+  if(length(y) != length(n)){
+    stop("The input y vector is not the same length as the input n vector.")
+  }
+  
   
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations
-    data_excl <- data[-exclusion_points,]
+    y_excl <- y[-exclusion_points]
+    n_excl <- n[-exclusion_points]
   }else{
-    data_excl <- data
+    y_excl <- y
+    n_excl <- n
   }
   
-  cl <- sum(data_excl$y, na.rm = TRUE) / sum(data_excl$n, na.rm = TRUE)
+  cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE)
   
-  cl <- cl
-  stdev <- sqrt(cl * (1 - cl) / data_excl$n)
-  ucl <- cl + 3 * stdev
-  lcl <- cl - 3 * stdev
+  stdev <- sqrt(cl * (1 - cl) / n_excl)
+  cl <- cl * multiply
+  ucl <- cl + 3 * stdev * multiply
+  lcl <- cl - 3 * stdev * multiply
 
   lcl[lcl < 0 & is.finite(lcl)] <- 0
 
-  list(cl = rep(cl, nrow(data)), ucl = ucl, lcl = lcl)
+  list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
 }
 
 #get C prime limits
 #this is the same as U prime with n = 1
-#Input data with x, y columns. Returns cl, ucl and lcl as named list.
-get_cp_limits <- function(data, exclusion_points = NULL){
+#Input y and n data as vectors. Returns cl, ucl and lcl as named list.
+get_cp_limits <- function(y,
+                          n,
+                          exclusion_points = NULL){
+  
+  #send error messages if data is not in the right format
+  if(length(y) == 0){
+    stop("The input data has zero observations.")
+  }
+  
+  if(length(y) != length(n)){
+    stop("The input y vector is not the same length as the input n vector.")
+  }
   
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations
-    data_excl <- data[-exclusion_points,]
+    y_excl <- y[-exclusion_points]
+    n_excl <- n[-exclusion_points]
   }else{
-    data_excl <- data
+    y_excl <- y
+    n_excl <- n
   }
 
-  cl <- mean(data_excl$y, na.rm = TRUE)
+  cl <- mean(y_excl, na.rm = TRUE)
   
-  n <- 1
+  n_excl <- 1 #######
   cl <- cl
-  stdev <- sqrt(cl / n)
-  z_i <- (data_excl$y - cl) / stdev
+  stdev <- sqrt(cl / n_excl)
+  z_i <- (y_excl - cl) / stdev
 
   mr  <- abs(diff(z_i))
   amr <- mean(mr, na.rm = TRUE)
@@ -90,25 +115,39 @@ get_cp_limits <- function(data, exclusion_points = NULL){
   
   lcl[lcl < 0 & is.finite(lcl)] <- 0
 
-  list(cl = rep(cl, nrow(data)), ucl = rep(ucl, nrow(data)), lcl = rep(lcl, nrow(data)))
+  list(cl = rep(cl, length(y)), ucl = rep(ucl, length(y)), lcl = rep(lcl, length(y)))
 }
 
 
 #get P prime limits
 #Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_pp_limits <- function(data, exclusion_points = NULL, multiply = 1){
+get_pp_limits <- function(y, 
+                          n,
+                          exclusion_points = NULL, 
+                          multiply = 1){
+  
+  #send error messages if data is not in the right format
+  if(length(y) == 0){
+    stop("The input data has zero observations.")
+  }
+  
+  if(length(y) != length(n)){
+    stop("The input y vector is not the same length as the input n vector.")
+  }
   
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations
-    data_excl <- data[-exclusion_points,]
+    y_excl <- y[-exclusion_points]
+    n_excl <- n[-exclusion_points]
   }else{
-    data_excl <- data
+    y_excl <- y
+    n_excl <- n
   }
   
-  cl <- sum(data_excl$y, na.rm = TRUE) / sum(data_excl$n, na.rm = TRUE) 
+  cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE) 
   
-  y_new <- data_excl$y / data_excl$n
-  stdev <- sqrt(cl * (1 - cl) / data_excl$n)
+  y_new <- y_excl / n_excl
+  stdev <- sqrt(cl * (1 - cl) / n_excl)
   z_i <- (y_new - cl) / stdev
 
   mr  <- abs(diff(z_i))
@@ -131,5 +170,5 @@ get_pp_limits <- function(data, exclusion_points = NULL, multiply = 1){
 
   lcl[lcl < 0 & is.finite(lcl)] <- 0
 
-  list(cl = rep(cl, nrow(data)), ucl = ucl, lcl = lcl)
+  list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
 }

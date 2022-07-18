@@ -1,11 +1,16 @@
 #get c chart limits
 #Input y data as vector. Returns cl, ucl and lcl as named list.
 get_c_limits <- function(y, 
-                         exclusion_points = NULL){
+                         exclusion_points = NULL,
+                         na.rm = TRUE){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
+  }
+  
+  if(na.rm == FALSE & any(is.na(y))){
+    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
 
   if(!is.null(exclusion_points)){
@@ -32,7 +37,8 @@ get_c_limits <- function(y,
 get_p_limits <- function(y, 
                          n,
                          exclusion_points = NULL,
-                         multiply = 1){
+                         multiply = 1,
+                         na.rm = TRUE){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
@@ -43,6 +49,9 @@ get_p_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
+  if(na.rm == FALSE & any(is.na(y)) & any(is.na(y))){
+    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
+  }
   
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations
@@ -69,25 +78,23 @@ get_p_limits <- function(y,
 #this is the same as U prime with n = 1
 #Input y and n data as vectors. Returns cl, ucl and lcl as named list.
 get_cp_limits <- function(y,
-                          n,
-                          exclusion_points = NULL){
+                          exclusion_points = NULL,
+                          na.rm = TRUE){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
   }
   
-  if(length(y) != length(n)){
-    stop("The input y vector is not the same length as the input n vector.")
+  if(na.rm == FALSE & any(is.na(y))){
+    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
-  
+
   if(!is.null(exclusion_points)){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
-    n_excl <- n[-exclusion_points]
   }else{
     y_excl <- y
-    n_excl <- n
   }
 
   cl <- mean(y_excl, na.rm = TRUE)
@@ -124,7 +131,8 @@ get_cp_limits <- function(y,
 get_pp_limits <- function(y, 
                           n,
                           exclusion_points = NULL, 
-                          multiply = 1){
+                          multiply = 1, 
+                          na.rm = TRUE){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
@@ -133,6 +141,10 @@ get_pp_limits <- function(y,
   
   if(length(y) != length(n)){
     stop("The input y vector is not the same length as the input n vector.")
+  }
+  
+  if(na.rm == FALSE & any(is.na(y)) & any(is.na(n))){
+    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
   
   if(!is.null(exclusion_points)){

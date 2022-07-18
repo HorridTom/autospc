@@ -45,7 +45,7 @@ test_that("P chart limits the same as live qicharts2 v.0.7.2",{
 
 test_that("C prime chart limits the same as live qicharts2 v.0.7.2",{
   
-  results <- get_cp_limits(y = test_data$y, n = test_data$n)
+  results <- get_cp_limits(y = test_data$y)
   
   correct_answers <- qicharts2::qic(x, y, n = rep(1, nrow(test_data)), data = test_data, chart = 'up', return.data = TRUE)
   

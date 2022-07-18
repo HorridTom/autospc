@@ -9,6 +9,10 @@ get_c_limits <- function(y,
     stop("The input data has zero observations.")
   }
   
+  if(class(y) != "numeric"){
+    stop("The input data is not numeric.")
+  }
+  
   if(na.rm == FALSE & any(is.na(y))){
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
@@ -49,7 +53,11 @@ get_p_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
-  if(na.rm == FALSE & any(is.na(y)) & any(is.na(y))){
+  if(class(y) != "numeric" | class(n) != "numeric"){
+    stop("The input data is not numeric.")
+  }
+  
+  if(na.rm == FALSE & (any(is.na(y)) | any(is.na(y)) )){
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
   
@@ -84,6 +92,10 @@ get_cp_limits <- function(y,
   #send error messages if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
+  }
+  
+  if(class(y) != "numeric"){
+    stop("The input data is not numeric.")
   }
   
   if(na.rm == FALSE & any(is.na(y))){
@@ -143,7 +155,11 @@ get_pp_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
-  if(na.rm == FALSE & any(is.na(y)) & any(is.na(n))){
+  if(class(y) != "numeric" | class(n) != "numeric"){
+    stop("The input data is not numeric.")
+  }
+  
+  if(na.rm == FALSE & (any(is.na(y)) | any(is.na(n)) )){
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
   

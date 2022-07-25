@@ -122,21 +122,21 @@ create_SPC_auto_limits_table <- function(data,
 
           }else{
             if(verbosity > 0) {
-              print("There are not enough data points to form another period. Calculation complete.")
+              #print("There are not enough data points to form another period. Calculation complete.")
             }
             break
             }
   
         }else{
           if(verbosity > 0) {
-            print("There are no further rule breaks. Calculation complete.")
+            #print("There are no further rule breaks. Calculation complete.")
           }
           break
           }
 
       }else{        
         if(verbosity > 0) {
-          print("There are not enough data points to form another period. Calculation complete.")
+          #print("There are not enough data points to form another period. Calculation complete.")
         }
         break
         }
@@ -150,7 +150,7 @@ create_SPC_auto_limits_table <- function(data,
     
   }else{
     if(verbosity > 0) {
-      print("There are not enough points to form one period.")
+      #print("There are not enough points to form one period.")
     }
   }
 

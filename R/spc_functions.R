@@ -72,7 +72,7 @@ get_p_limits <- function(y,
   
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE)
   
-  stdev <- sqrt(cl * (1 - cl) / n_excl)
+  stdev <- sqrt(cl * (1 - cl) / n)
   cl <- cl * multiply
   ucl <- cl + 3 * stdev * multiply
   lcl <- cl - 3 * stdev * multiply
@@ -190,6 +190,8 @@ get_pp_limits <- function(y,
 
   sigma_z <- amr / 1.128
   
+  #recalc stdev with excluded data
+  stdev <- sqrt(cl * (1 - cl) / n)
   stdev <- stdev * sigma_z
   
   cl <- cl * multiply

@@ -38,7 +38,7 @@ test_that("C prime chart process works end to end",{
 
 test_that("P chart process works end to end",{
   
-  results <- plot_auto_SPC(test_data, b = y, chartType = "P", plotChart = FALSE)
+  results <- plot_auto_SPC(test_data, chartType = "P", plotChart = FALSE)
   
   expect_equal(results, correct_answer_P)
   
@@ -46,7 +46,7 @@ test_that("P chart process works end to end",{
 
 test_that("P prime chart process works end to end",{
   
-  results <- plot_auto_SPC(test_data, b = y, chartType = "P'", plotChart = FALSE)
+  results <- plot_auto_SPC(test_data, chartType = "P'", plotChart = FALSE)
   
   expect_equal(results, correct_answer_PP)
   

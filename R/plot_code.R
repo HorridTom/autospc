@@ -3,7 +3,7 @@
 #'
 #' @param data For a C or C' chart: a data frame with columns x, y, title (optional) 
 #' and subtitle (optional)
-#' For a P or P' chart: a data frame with columns x, n (total), b (number of breaches), 
+#' For a P or P' chart: a data frame with columns x, n (total), y (numerator), 
 #' title (optional), subtitle (optional) 
 #' @param chartType the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")
 #' @param periodMin the minimum number of points per period.
@@ -22,10 +22,9 @@
 #' @param x column to use as subgroups on the horizontal axis of the chart
 #' (passed using tidyselect)
 #' @param y column to use as count (vertical axis) for C and C' charts (passed
-#' using tidyselect)
+#' using tidyselect). Otherwise, for P and P' charts this column is the numerator of the 
+#' proportion to be measured of the denominator, n.
 #' @param n column to use as denominator for P and P' charts (passed using
-#' tidyselect)
-#' @param b column to use as numerator for P and P' charts (passed using
 #' tidyselect)
 #' @param verbosity integer specifying how talkative the algorithm is; the
 #' higher the number the more information is provided, none if 0.
@@ -52,7 +51,6 @@ plot_auto_SPC <- function(df,
                           x,
                           y,
                           n,
-                          b,
                           
                           #overrides for plot aesthetics not detailed in roxygen skeleton
                           override_x_title = NULL,
@@ -71,7 +69,7 @@ plot_auto_SPC <- function(df,
   
   #rename columns if passed
   df <- rename_columns(df = df,
-                       x = {{ x }}, y = {{ y }}, n = {{ n }}, b = {{ b }})
+                       x = {{ x }}, y = {{ y }}, n = {{ n }})
   
   #get title from data
   if(is.null(title) & "title" %in% colnames(df)){
@@ -93,10 +91,10 @@ plot_auto_SPC <- function(df,
   if(is.null(chartType)){
     if(all(c("x", "y") %in% colnames(df))){
       chartType <- "C'"
-    }else if(all(c("x", "n", "b") %in% colnames(df))){
+    }else if(all(c("x", "n", "y") %in% colnames(df))){
       chartType <- "P'"
     }else{
-      print("The data you have input is not in the correct format. For C charts, data must contain at least columns 'x' and 'y'. For P charts data must contain at least 'x', 'n' and 'b' columns.")
+      print("The data you have input is not in the correct format. For C charts, data must contain at least columns 'x' and 'y'. For P charts data must contain at least 'x', 'n' and 'y' columns.")
     }
   }
 

@@ -33,7 +33,9 @@ create_SPC_auto_limits_table <- function(data,
 
   #add y column of percentages for P and P' charts. This is to avoid issues with joins later 
   if(chartType == "P" | chartType == "P'"){
-    data <- data %>% dplyr::mutate(y = b * 100 / n)
+    data <- data %>% 
+      dplyr::mutate(y_numerator = y) %>%
+      dplyr::mutate(y = y * 100 / n)
   }
   
   #set counter to zero

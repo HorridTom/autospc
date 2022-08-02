@@ -64,7 +64,8 @@ plot_auto_SPC <- function(df,
                           r2_col = "steelblue3",
                           verbosity = 1L,
                           use_caption = TRUE,
-                          x_pad_end = NULL
+                          x_pad_end = NULL,
+                          noRecals = FALSE
 ) { 
   
   #rename columns if passed
@@ -105,7 +106,8 @@ plot_auto_SPC <- function(df,
                                      runRuleLength = runRuleLength,
                                      maxNoOfExclusions  = maxNoOfExclusions,
                                      noRegrets = noRegrets,
-                                     verbosity = verbosity)
+                                     verbosity = verbosity,
+                                     noRecals = noRecals)
   df <- df %>%
     #dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 

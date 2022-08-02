@@ -28,6 +28,7 @@ create_SPC_auto_limits_table <- function(data,
                           maxNoOfExclusions = 3,
                           noRegrets = TRUE,
                           verbosity = 1L,
+                          noRecals = FALSE,
                           ...
 ) {
 
@@ -50,99 +51,101 @@ create_SPC_auto_limits_table <- function(data,
     #set counter to end of first period
     counter <- counter + periodMin + 1
 
-    #[3]loop starts
-    while(counter < nrow(data)){
-      
-      #[4]see whether there are enough points after the counter to form new period
-      if(enough_data_for_new_period(limits_table, periodMin, counter)){
+    if(!noRecals){#[3]loop starts
+      while(counter < nrow(data)){
         
-        #check if counter is part way through a rule 2 break already, provided there are at least 8 rule 2 break points following
-        #if so, set next rule break position to next point 
-        if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
+        #[4]see whether there are enough points after the counter to form new period
+        if(enough_data_for_new_period(limits_table, periodMin, counter)){
           
-          rule2_break_positions <- NA
-          rule2_break_position <- counter
-          
-        }else{
-          
-          #scan for start of next rule 2 break
-          rule2_break_positions <- rule2_break_start_positions(limits_table = limits_table, counter = counter)
-          rule2_break_position <- rule2_break_positions[1]
-          
-        }
-        
-        #[5]see if there are any further rule 2 breaks
-        if(!is.na(rule2_break_position) & rule2_break_position < nrow(data)){
-          
-          
-          #[6]set counter to the next rule break position
-          counter <- rule2_break_position
-          triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
-
-          #[7]see whether there are enough points after the counter to form new period
-          if(enough_data_for_new_period(limits_table, periodMin, counter)){
+          #check if counter is part way through a rule 2 break already, provided there are at least 8 rule 2 break points following
+          #if so, set next rule break position to next point 
+          if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
             
-            #[8]
-            candidate_limits_table <- form_calculation_and_display_limits(data = limits_table, periodMin, counter,
-                                                        chartType, maxNoOfExclusions)
+            rule2_break_positions <- NA
+            rule2_break_position <- counter
             
-            #[9]check whether there is a rule break in the opposite direction within calc period
-            opposite_rule_break <- identify_opposite_break(candidate_limits_table, counter, periodMin,
-                                                           triggering_rule_break_direction)[[1]]
+          }else{
             
-            #establish whether (for no regrets) the final run in the candidate
-            #calculation period prevents a recalculation
-            final_run_prevents <- final_run_of_calc_period_prevents_recalc(
-              candidate_limits_table,
-              triggering_rule_break_direction)
+            #scan for start of next rule 2 break
+            rule2_break_positions <- rule2_break_start_positions(limits_table = limits_table, counter = counter)
+            rule2_break_position <- rule2_break_positions[1]
             
-            #recalc if...
-            if(!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)){
+          }
+          
+          #[5]see if there are any further rule 2 breaks
+          if(!is.na(rule2_break_position) & rule2_break_position < nrow(data)){
+            
+            
+            #[6]set counter to the next rule break position
+            counter <- rule2_break_position
+            triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
+            
+            #[7]see whether there are enough points after the counter to form new period
+            if(enough_data_for_new_period(limits_table, periodMin, counter)){
               
-              #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
-              limits_table <- candidate_limits_table
+              #[8]
+              candidate_limits_table <- form_calculation_and_display_limits(data = limits_table, periodMin, counter,
+                                                                            chartType, maxNoOfExclusions)
               
-              #Set counter to end of calculation period
-              counter <- counter + periodMin + 1
-
-            }else{
-              #[11]
-              #check if counter is part way through a rule 2 break already
-              #provided there are at least 8 rule 2 breaks following or no further rule breaks have been identified 
-              if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength)])){
+              #[9]check whether there is a rule break in the opposite direction within calc period
+              opposite_rule_break <- identify_opposite_break(candidate_limits_table, counter, periodMin,
+                                                             triggering_rule_break_direction)[[1]]
+              
+              #establish whether (for no regrets) the final run in the candidate
+              #calculation period prevents a recalculation
+              final_run_prevents <- final_run_of_calc_period_prevents_recalc(
+                candidate_limits_table,
+                triggering_rule_break_direction)
+              
+              #recalc if...
+              if(!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)){
                 
-                counter <- counter + 1
-
+                #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
+                limits_table <- candidate_limits_table
+                
+                #Set counter to end of calculation period
+                counter <- counter + periodMin + 1
+                
               }else{
+                #[11]
+                #check if counter is part way through a rule 2 break already
+                #provided there are at least 8 rule 2 breaks following or no further rule breaks have been identified 
+                if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength)])){
+                  
+                  counter <- counter + 1
+                  
+                }else{
+                  
+                  #set counter to the start of the next rule 2 break 
+                  counter <- rule2_break_positions[2]
+                  
+                }
                 
-                #set counter to the start of the next rule 2 break 
-                counter <- rule2_break_positions[2]
-
               }
               
+            }else{
+              if(verbosity > 0) {
+                #print("There are not enough data points to form another period. Calculation complete.")
+              }
+              break
             }
-
+            
           }else{
             if(verbosity > 0) {
-              #print("There are not enough data points to form another period. Calculation complete.")
+              #print("There are no further rule breaks. Calculation complete.")
             }
             break
-            }
-  
-        }else{
+          }
+          
+        }else{        
           if(verbosity > 0) {
-            #print("There are no further rule breaks. Calculation complete.")
+            #print("There are not enough data points to form another period. Calculation complete.")
           }
           break
-          }
-
-      }else{        
-        if(verbosity > 0) {
-          #print("There are not enough data points to form another period. Calculation complete.")
         }
-        break
-        }
-    }#loop ends
+      }#loop ends
+      }
+    
 
     #add a column to show where the breakpoints are
     limits_table <- limits_table %>%

@@ -101,6 +101,8 @@ plot_auto_SPC <- function(df,
   #get control limits
   #df <- dplyr::mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, chartType = chartType, 
+                                     periodMin = periodMin,
+                                     runRuleLength = runRuleLength,
                                      maxNoOfExclusions  = maxNoOfExclusions,
                                      noRegrets = noRegrets,
                                      verbosity = verbosity)

@@ -9,7 +9,7 @@ get_c_limits <- function(y,
     stop("The input data has zero observations.")
   }
   
-  if(!(class(y) %in% c("numeric", "integer"))){
+  if(!is.numeric(y)){
     stop("The input data is not numeric.")
   }
   
@@ -53,7 +53,7 @@ get_p_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
-  if(!(class(y) %in% c("numeric", "integer")) | !(class(n) %in% c("numeric", "integer"))){
+  if(!is.numeric(y) | !is.numeric(n)){
     stop("The input data is not numeric.")
   }
   
@@ -94,7 +94,7 @@ get_cp_limits <- function(y,
     stop("The input data has zero observations.")
   }
   
-  if(!(class(y) %in% c("numeric", "integer"))){
+  if(!is.numeric(y)){
     stop("The input data is not numeric.")
   }
   
@@ -155,7 +155,7 @@ get_pp_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
-  if(!(class(y) %in% c("numeric", "integer")) | !(class(n) %in% c("numeric", "integer"))){
+  if(!is.numeric(y) | !is.numeric(n)){
     stop("The input data is not numeric.")
   }
   

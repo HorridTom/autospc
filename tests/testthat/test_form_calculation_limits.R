@@ -1,7 +1,7 @@
 #load in test data
 test_data <- readRDS("testdata/test_data.rds")
 
-testthat::test_that("Calculation period is formed correctly",{
+test_that("Calculation period is formed correctly",{
   
   result_counter_zero <- form_calculation_limits(test_data, counter = 0, periodMin = 21)
   result_counter_zero_ucl <- result_counter_zero$ucl[1:21]
@@ -13,13 +13,13 @@ testthat::test_that("Calculation period is formed correctly",{
   result_counter_100_cl <- result_counter_100$cl[100:120]
   result_counter_100_lcl <- result_counter_100$lcl[100:120]
   
-  correct_answer_counter_zero_ucl <- rep(93.6978506306795, 21)
-  correct_answer_counter_zero_cl <- rep(68.8119585108865, 21)
-  correct_answer_counter_zero_lcl <- rep(43.9260663910934, 21)
+  correct_answer_counter_zero_ucl <- rep(93.24504, 21)
+  correct_answer_counter_zero_cl <- rep(68.428571, 21)
+  correct_answer_counter_zero_lcl <- rep(43.612102, 21)
 
-  correct_answer_counter_100_ucl <- rep(58.89114, 21)
-  correct_answer_counter_100_cl <- rep(39.9333, 21)
-  correct_answer_counter_100_lcl <- rep(20.97546, 21)
+  correct_answer_counter_100_ucl <- rep(58.230826, 21)
+  correct_answer_counter_100_cl <- rep(39.40000, 21)
+  correct_answer_counter_100_lcl <- rep(20.569174, 21)
   
   correct_answer_counter_100_ucl
   correct_answer_counter_100_cl

@@ -9,7 +9,7 @@ get_c_limits <- function(y,
     stop("The input data has zero observations.")
   }
   
-  if(class(y) != "numeric"){
+  if(!is.numeric(y)){
     stop("The input data is not numeric.")
   }
   
@@ -53,7 +53,7 @@ get_p_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
-  if(class(y) != "numeric" | class(n) != "numeric"){
+  if(!is.numeric(y) | !is.numeric(n)){
     stop("The input data is not numeric.")
   }
   
@@ -72,7 +72,7 @@ get_p_limits <- function(y,
   
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE)
   
-  stdev <- sqrt(cl * (1 - cl) / n_excl)
+  stdev <- sqrt(cl * (1 - cl) / n)
   cl <- cl * multiply
   ucl <- cl + 3 * stdev * multiply
   lcl <- cl - 3 * stdev * multiply
@@ -94,7 +94,7 @@ get_cp_limits <- function(y,
     stop("The input data has zero observations.")
   }
   
-  if(class(y) != "numeric"){
+  if(!is.numeric(y)){
     stop("The input data is not numeric.")
   }
   
@@ -155,7 +155,7 @@ get_pp_limits <- function(y,
     stop("The input y vector is not the same length as the input n vector.")
   }
   
-  if(class(y) != "numeric" | class(n) != "numeric"){
+  if(!is.numeric(y) | !is.numeric(n)){
     stop("The input data is not numeric.")
   }
   
@@ -190,6 +190,8 @@ get_pp_limits <- function(y,
 
   sigma_z <- amr / 1.128
   
+  #recalc stdev with excluded data
+  stdev <- sqrt(cl * (1 - cl) / n)
   stdev <- stdev * sigma_z
   
   cl <- cl * multiply

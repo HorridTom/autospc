@@ -12,6 +12,7 @@ create_SPC_auto_limits_table(
   maxNoOfExclusions = 3,
   noRegrets = TRUE,
   verbosity = 1L,
+  noRecals = FALSE,
   ...
 )
 }

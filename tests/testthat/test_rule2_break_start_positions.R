@@ -1,7 +1,7 @@
 #load in test data
 test_data <- readRDS("testdata/test_data_rule2_break.rds")
 
-testthat::test_that("Start of subsequent rule 2 breaks identified correctly",{
+test_that("Start of subsequent rule 2 breaks identified correctly",{
   
   results <- rule2_break_start_positions(test_data, counter = 22)
   

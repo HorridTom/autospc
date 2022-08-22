@@ -1,6 +1,6 @@
 test_data <- readRDS("testdata/test_data.rds")
 
-testthat::test_that("Renaming columns doesn't change the result",{
+test_that("Renaming columns doesn't change the result",{
   
   test_data1 <- test_data %>%
     dplyr::select(x, y)

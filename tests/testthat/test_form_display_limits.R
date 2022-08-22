@@ -1,7 +1,7 @@
 #load in test data
 test_data <- readRDS("testdata/test_data_display_limits.rds")
 
-testthat::test_that("Display period is formed correctly",{
+test_that("Display period is formed correctly for C chart",{
   
   result <- form_display_limits(test_data, counter = 22)
   result_ucl <- result$ucl[22:nrow(test_data)]

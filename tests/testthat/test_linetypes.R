@@ -1,7 +1,7 @@
 #load in test data
 test_data <- readRDS("testdata/test_data.rds")
 
-testthat::test_that("Linetypes are formed correctly", {
+test_that("Linetypes are formed correctly", {
   
   test_plt <- plot_auto_SPC(df = test_data)
   

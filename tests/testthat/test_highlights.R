@@ -2,7 +2,7 @@
 test_data <- readRDS("testdata/test_highlights_data.rds")
 test_data2 <- readRDS("testdata/test_highlights_data2.rds")
 
-testthat::test_that("Test rule 2 highlights don't go across periods",{
+test_that("Test rule 2 highlights don't go across periods",{
   
   results_data <- plot_auto_SPC(test_data, plotChart = FALSE)
   results <- results_data$highlight
@@ -24,7 +24,7 @@ testthat::test_that("Test rule 2 highlights don't go across periods",{
 })
 
 
-testthat::test_that("Test rule 2 highlights don't happen incorrectly at the end of periods",{
+test_that("Test rule 2 highlights don't happen incorrectly at the end of periods",{
   
   results_data <- plot_auto_SPC(test_data2, plotChart = FALSE)
   results <- results_data$highlight

@@ -19,7 +19,6 @@ plot_auto_SPC(
   x,
   y,
   n,
-  b,
   override_x_title = NULL,
   override_y_title = NULL,
   override_y_lim = NULL,
@@ -31,7 +30,8 @@ plot_auto_SPC(
   r2_col = "steelblue3",
   verbosity = 1L,
   use_caption = TRUE,
-  x_pad_end = NULL
+  x_pad_end = NULL,
+  noRecals = FALSE
 )
 }
 \arguments{
@@ -63,12 +63,10 @@ Defines whether limits can change as more data is added or not.}
 (passed using tidyselect)}
 
 \item{y}{column to use as count (vertical axis) for C and C' charts (passed
-using tidyselect)}
+using tidyselect). Otherwise, for P and P' charts this column is the numerator of the
+proportion to be measured of the denominator, n.}
 
 \item{n}{column to use as denominator for P and P' charts (passed using
-tidyselect)}
-
-\item{b}{column to use as numerator for P and P' charts (passed using
 tidyselect)}
 
 \item{verbosity}{integer specifying how talkative the algorithm is; the
@@ -81,7 +79,7 @@ x-axis}
 
 \item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)
-For a P or P' chart: a data frame with columns x, n (total), b (number of breaches),
+For a P or P' chart: a data frame with columns x, n (total), y (numerator),
 title (optional), subtitle (optional)}
 }
 \value{

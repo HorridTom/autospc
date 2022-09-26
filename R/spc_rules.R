@@ -10,8 +10,9 @@ add_rule_breaks <- function(x) {
     x <- x %>%
       dplyr::mutate(rule1 = (y > ucl) | (y < lcl)) %>%
       rule_two() %>%
-      add_highlight() %>%
-      dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0)))
+      dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0))) %>%
+      dplyr::mutate(rule2 = dplyr::if_else(rule2 & aboveOrBelowCl == 0, FALSE, rule2)) %>%
+      add_highlight()
 
 }
 

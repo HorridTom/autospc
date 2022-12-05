@@ -379,10 +379,12 @@ form_calculation_and_display_limits <- function(data,
                                           maxNoOfExclusions  = maxNoOfExclusions,
                                           rule2Tolerance = rule2Tolerance)
   
-  #extend display limits to end 
-  limits_table <- form_display_limits(limits_table = limits_table, 
-                                      counter = counter_at_period_start + periodMin + 1,
-                                      chartType = chartType)
+  if(counter_at_period_start + periodMin + 1 < nrow(data)){
+    #extend display limits to end 
+    limits_table <- form_display_limits(limits_table = limits_table, 
+                                        counter = counter_at_period_start + periodMin + 1,
+                                        chartType = chartType)
+  }
   
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 

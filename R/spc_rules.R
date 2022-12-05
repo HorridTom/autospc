@@ -9,17 +9,18 @@ add_rule_breaks <- function(x, rule2Tolerance) {
 
     x <- x %>%
       dplyr::mutate(rule1 = (y > ucl) | (y < lcl)) %>%
-      rule_two(rule2Tolerance = rule2Tolerance) %>%
-      dplyr::mutate(aboveOrBelowCl = ifelse(y > cl, 1, ifelse(y < cl, -1, 0))) %>%
+      dplyr::mutate(aboveOrBelowCl = dplyr::case_when(isTRUE(all.equal(y, cl, tolerance = rule2Tolerance)) ~ 0,
+                                                      y > cl ~ 1,
+                                                      y < cl ~ -1)) %>%
+      rule_two() %>%
       dplyr::mutate(rule2 = dplyr::if_else(rule2 & aboveOrBelowCl == 0, FALSE, rule2)) %>%
       add_highlight()
 
 }
 
-rule_two <- function(df, rule2Tolerance) {
+rule_two <- function(df) {
 
-  runs <- rle(ifelse(isTRUE(all.equal(df$y, df$cl, tolerance = rule2Tolerance)),0,
-                     ifelse(df$y > df$cl, 1,-1)))
+  runs <- rle(unlist(df$aboveOrBelowCl))
   rulebreakingruns <- runs$lengths >= 8
   runs$values <- rulebreakingruns
   partofrun <- inverse.rle(runs)

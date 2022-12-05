@@ -251,7 +251,8 @@ plot_auto_SPC <- function(df,
     
   }else{
     
-    df
+    df <- df %>%
+      dplyr::filter(!is.na(x))
   }
 }
 
@@ -289,15 +290,15 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
                        show.legend = FALSE) +
     ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
     ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
-    # ggplot2::scale_alpha_discrete("Period Type",
-    #                                labels = c("Calculation", "Display"),
-    #                                range = c(1,0.4),
-    #                                breaks = c(first_calc_period,
-    #                                           first_display_period),
-    #                                guide = ggplot2::guide_legend(
-    #                                  override.aes = list(alpha = c(1,
-    #                                                                   0.4)))
-    #                                ) +
+    ggplot2::scale_alpha_discrete("Period Type",
+                                   labels = c("Calculation", "Display"),
+                                   range = c(1,0.4),
+                                   breaks = c(first_calc_period,
+                                              first_display_period),
+                                   guide = ggplot2::guide_legend(
+                                     override.aes = list(alpha = c(1,
+                                                                      0.4)))
+                                   ) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
           panel.grid.minor = ggplot2::element_blank(),

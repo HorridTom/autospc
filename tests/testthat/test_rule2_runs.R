@@ -9,9 +9,9 @@ test_data <- structure(list(x = 1:40, y = c(49.4550391796525, 50.9836438579084,
                                             50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50)), class = "data.frame", row.names = c(NA, 
                                                                                                                                       -40L))
 
-test_that("Runs on the centre line do not show as rule 2 breaks",{
+test_that("Runs on the centre line do not show as rule 2 breaks with tolerance",{
   
-  result <- plot_auto_SPC(test_data, plotChart = FALSE)
+  result <- plot_auto_SPC(test_data, plotChart = FALSE, rule2Tolerance = 0.1)
   result <- result$rule2
   
   correct_answer <- rep(FALSE, 40)

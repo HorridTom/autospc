@@ -14,7 +14,8 @@ add_rule_breaks <- function(x, rule2Tolerance) {
                                                       y < cl ~ -1)) %>%
       rule_two() %>%
       dplyr::mutate(rule2 = dplyr::if_else(rule2 & aboveOrBelowCl == 0, FALSE, rule2)) %>%
-      add_highlight()
+      add_highlight() %>%
+      dplyr::relocate(aboveOrBelowCl, .after = rule2)
 
 }
 

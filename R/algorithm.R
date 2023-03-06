@@ -162,6 +162,8 @@ create_SPC_auto_limits_table <- function(data,
   }else{
     if(verbosity > 0) {
       #print("There are not enough points to form one period.")
+      warning("The input data has fewer than the minimun number of points needed to calculate one period. Timeseries data without limits has been displayed.")
+      data
     }
   }
 

@@ -70,6 +70,10 @@ get_p_limits <- function(y,
     n_excl <- n
   }
   
+  #if there are missing y or n values then set both to NA
+  n_excl[which(is.na(y_excl))] <- NA
+  y_excl[which(is.na(n_excl))] <- NA
+  
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE)
   
   stdev <- sqrt(cl * (1 - cl) / n)
@@ -171,6 +175,10 @@ get_pp_limits <- function(y,
     y_excl <- y
     n_excl <- n
   }
+  
+  #if there are missing y or n values then set both to NA
+  n_excl[which(is.na(y_excl))] <- NA
+  y_excl[which(is.na(n_excl))] <- NA
   
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE) 
   

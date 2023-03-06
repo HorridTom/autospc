@@ -3,12 +3,12 @@ test_data <- readRDS("testdata/test_data.rds")
 
 test_that("Calculation period is formed correctly",{
   
-  result_counter_zero <- form_calculation_limits(test_data, counter = 0, periodMin = 21)
+  result_counter_zero <- form_calculation_limits(test_data, counter = 0, periodMin = 21, rule2Tolerance = 0)
   result_counter_zero_ucl <- result_counter_zero$ucl[1:21]
   result_counter_zero_cl <- result_counter_zero$cl[1:21]
   result_counter_zero_lcl <- result_counter_zero$lcl[1:21]
   
-  result_counter_100 <- form_calculation_limits(result_counter_zero, counter = 100, periodMin = 21)
+  result_counter_100 <- form_calculation_limits(result_counter_zero, counter = 100, periodMin = 21, rule2Tolerance = 0)
   result_counter_100_ucl <- result_counter_100$ucl[100:120]
   result_counter_100_cl <- result_counter_100$cl[100:120]
   result_counter_100_lcl <- result_counter_100$lcl[100:120]

@@ -48,6 +48,7 @@ plot_auto_SPC <- function(df,
                           plotChart = TRUE,
                           writeTable = FALSE,
                           noRegrets = TRUE,
+                          rule2Tolerance = 0,
                           x,
                           y,
                           n,
@@ -107,7 +108,8 @@ plot_auto_SPC <- function(df,
                                      maxNoOfExclusions  = maxNoOfExclusions,
                                      noRegrets = noRegrets,
                                      verbosity = verbosity,
-                                     noRecals = noRecals)
+                                     noRecals = noRecals,
+                                     rule2Tolerance = rule2Tolerance)
   df <- df %>%
     #dplyr::mutate(x = as.Date(x)) %>%
     #overlap the limit types to make the plot aesthetics work 
@@ -249,7 +251,8 @@ plot_auto_SPC <- function(df,
     
   }else{
     
-    df
+    df <- df %>%
+      dplyr::filter(!is.na(x))
   }
 }
 

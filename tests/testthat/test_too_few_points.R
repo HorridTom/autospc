@@ -5,8 +5,8 @@ test_data <- data.frame(x = 1:10,
 
 test_that("Charts with fewer points than min period error handle",{
   
-  result_C <- plot_auto_SPC(test_data, plotChart = FALSE, chartType = "C'")
-  result_P <- plot_auto_SPC(test_data, plotChart = FALSE, chartType = "P'")
+  result_C <- plot_auto_SPC(test_data, plotChart = FALSE, chartType = "C", periodMin = 21)
+  result_P <- plot_auto_SPC(test_data, plotChart = FALSE, chartType = "P", periodMin = 21)
 
   testthat::expect_equal(ncol(result_C), 3)
   testthat::expect_equal(ncol(result_P), 4)

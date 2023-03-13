@@ -67,7 +67,7 @@ plot_auto_SPC <- function(df,
                           use_caption = TRUE,
                           x_pad_end = NULL,
                           noRecals = FALSE,
-                          displayLimits = TRUE
+                          showLimits = TRUE
 ) { 
   
   #rename columns if passed
@@ -136,7 +136,7 @@ plot_auto_SPC <- function(df,
   
  
   #if limits are to be displayed on chart
-  if(displayLimits == TRUE & nrow(df) >= periodMin){
+  if(showLimits == TRUE & nrow(df) >= periodMin){
     
     df <- df %>%
       #dplyr::mutate(x = as.Date(x)) %>%

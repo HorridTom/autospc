@@ -158,8 +158,7 @@ create_SPC_auto_limits_table <- function(data,
     limits_table <- limits_table %>%
       dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE)) %>%
       dplyr::mutate(ucl = dplyr::if_else(is.na(y), as.numeric(NA), ucl)) %>%
-      dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) %>%
-      dplyr::mutate(cl = dplyr::if_else(is.na(y), as.numeric(NA), cl))
+      dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
 
     limits_table
     

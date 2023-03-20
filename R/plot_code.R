@@ -110,7 +110,8 @@ plot_auto_SPC <- function(df,
                                      noRegrets = noRegrets,
                                      verbosity = verbosity,
                                      noRecals = noRecals,
-                                     rule2Tolerance = rule2Tolerance)
+                                     rule2Tolerance = rule2Tolerance,
+                                     showLimits = showLimits)
   
   # chart y limit
   ylimlow <- 0

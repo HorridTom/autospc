@@ -38,7 +38,8 @@ create_SPC_auto_limits_table <- function(data,
   if(chartType == "P" | chartType == "P'"){
     data <- data %>% 
       dplyr::mutate(y_numerator = y) %>%
-      dplyr::mutate(y = y * 100 / n)
+      dplyr::mutate(y = y * 100 / n) %>%
+      dplyr::mutate(y = dplyr::if_else(is.nan(y) | is.infinite(y), as.numeric(NA), y))
   }
   
   #set counter to zero
@@ -156,7 +157,9 @@ create_SPC_auto_limits_table <- function(data,
 
     #add a column to show where the breakpoints are
     limits_table <- limits_table %>%
-      dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE))
+      dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE)) %>%
+      dplyr::mutate(ucl = dplyr::if_else(is.na(y), as.numeric(NA), ucl)) %>%
+      dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
 
     limits_table
     

@@ -66,7 +66,8 @@ plot_auto_SPC <- function(df,
                           verbosity = 1L,
                           use_caption = TRUE,
                           x_pad_end = NULL,
-                          noRecals = FALSE
+                          noRecals = FALSE,
+                          showLimits = TRUE
 ) { 
   
   #rename columns if passed
@@ -109,151 +110,194 @@ plot_auto_SPC <- function(df,
                                      noRegrets = noRegrets,
                                      verbosity = verbosity,
                                      noRecals = noRecals,
-                                     rule2Tolerance = rule2Tolerance)
-  df <- df %>%
-    #dplyr::mutate(x = as.Date(x)) %>%
-    #overlap the limit types to make the plot aesthetics work 
-    #(i.e. so there isn't a gap between calculation and display limits)
-    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), FALSE, TRUE)) #%>%
-    #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType)) 
-    
-    
-  #re-convert x column back to date if necessary
-  if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
-    df <- df %>%
-      dplyr::mutate(x = as.Date(x))
-  }
-  
-  
-  #store break points as vector
-  breakPoints <- which(df$breakPoint)
-  
-  if(highlightExclusions){
-    #show exclusions on chart
-    df <- df %>% dplyr::mutate(highlight = ifelse(excluded == TRUE & !is.na(excluded), 
-                                           "Excluded from limits calculation", 
-                                           highlight))
-  }
-  
-  #create initial plot object without formatting 
-  pct <- ggplot2::ggplot(df, ggplot2::aes(x,y))
+                                     rule2Tolerance = rule2Tolerance,
+                                     showLimits = showLimits)
   
   # chart y limit
   ylimlow <- 0
-  if(chartType == "C" | chartType == "C'"){
+  
+  if(nrow(df) < periodMin){
+    ylimhigh <- max(df$y)
+  }else if(chartType == "C" | chartType == "C'"){
     ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
-    # ylim_choices <- c(50, 100, 200, 400, 600, 1000, 2000, 8000)
-    # ylimhigh <- ylim_choices[which.min(ylim_choices - max(df$y) < 0)]
   }else{
     ylimhigh <- 110
   }
   
-  ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage within 4hrs")
+  #override y limit if specified
+  if(!is.null(override_y_lim)){
+    ylimhigh <- override_y_lim
+  }
+  
+  ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage")
   
   #start and end dates
   start_x <- min(df$x, na.rm = TRUE)
   end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
-  #get y limit
-  if(!is.null(override_y_lim)){
-    ylimhigh <- override_y_lim
-  }
-  
-  #for annotations
-  cl_start <- round(df$cl[1])
-  ucl_start <- round(df$ucl[1])
-  cl_end <- round(df$cl[(nrow(df)-1)])
-  
-  #get periods into groups for plotting
-  df <- df %>%
-    dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE | is.na(limitChange) | breakPoint == TRUE,
-                                               dplyr::row_number(), 
-                                               NA_integer_))
-  
-  df$periodStart <- fill_NA(df$periodStart)
-  
-  df <- df %>% 
-    dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
-  
-  if(plotChart == TRUE){
-    
-    annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'", 
-                                   override_annotation_dist, 
-                                   override_annotation_dist_P)
-    if(use_caption) {
-      caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
-    } else {
-      caption <- NULL
-    }
-      
-    p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
-      ggplot2::ggtitle(title, 
-                       subtitle = subtitle) +
-      ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title), 
-                    y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
-                    caption = paste0(caption),
-                    size = 10) +
-      ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
-                                  breaks = scales::breaks_pretty(),
-                                  labels = scales::number_format(accuracy = 1, 
-                                                                 big.mark = ",")) 
-    if(includeAnnotations == TRUE){
-      p <- p +
-        ggplot2::annotate("text", 
-                          x = start_x, 
-                          y = ucl_start + ucl_start/annotation_dist_fact, 
-                          label = cl_start) +
-        ggplot2::annotate("text", 
-                          x = df$x[breakPoints] + 2, 
-                          y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact, 
-                          label = round(df$cl[breakPoints]))
-    }
-    
-    #formats x axis depending on x type
-    if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
-      
-      #get x axis breaks
-      x_break <- dplyr::if_else(is.null(x_break),
-                                as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
-                                x_break)
-
-      p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
-                                     breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
-                                     limits = c(as.Date(start_x), as.Date(end_x))
-                                     )
-
-    }else if(xType == "integer"){
-      #get x axis breaks
-      x_break <- dplyr::if_else(is.null(x_break),
-                                (end_x - start_x) / 40,
-                                x_break)
-
-      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
-                                           limits = c(start_x, end_x))
-    }else{
-      #get x axis breaks
-      x_break <- dplyr::if_else(is.null(x_break),
-                                (end_x - start_x) / 40,
-                                x_break)
-
-      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
-                                            limits = c(start_x, end_x))
-    }
-    
-    p
-
-  }else if(writeTable == TRUE){
-    
-    title <- gsub(":", "_",title)
-    subtitle <- gsub(":","_", subtitle)
-    write.csv(df, paste0("tables/", gsub(" ","_",title), "_", gsub(" ","_",subtitle,), ".csv"),
-              row.names = FALSE)
-    
-  }else{
+ 
+  #if limits are to be displayed on chart
+  if(showLimits == TRUE & nrow(df) >= periodMin){
     
     df <- df %>%
-      dplyr::filter(!is.na(x))
+      #dplyr::mutate(x = as.Date(x)) %>%
+      #overlap the limit types to make the plot aesthetics work
+      #(i.e. so there isn't a gap between calculation and display limits)
+      dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), FALSE, TRUE)) #%>%
+    #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType))
+    
+    
+    #re-convert x column back to date if necessary
+    if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
+      df <- df %>%
+        dplyr::mutate(x = as.Date(x))
+    }
+    
+    
+    #store break points as vector
+    breakPoints <- which(df$breakPoint)
+    
+    if(highlightExclusions){
+      #show exclusions on chart
+      df <- df %>% dplyr::mutate(highlight = ifelse(excluded == TRUE & !is.na(excluded),
+                                                    "Excluded from limits calculation",
+                                                    highlight))
+    }
+    
+    #create initial plot object without formatting
+    pct <- ggplot2::ggplot(df, ggplot2::aes(x,y))
+    
+    #for annotations
+    cl_start <- round(df$cl[1])
+    ucl_start <- round(df$ucl[1])
+    cl_end <- round(df$cl[(nrow(df)-1)])
+    
+    #get periods into groups for plotting
+    df <- df %>%
+      dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE | is.na(limitChange) | breakPoint == TRUE,
+                                                 dplyr::row_number(),
+                                                 NA_integer_))
+    
+    df$periodStart <- fill_NA(df$periodStart)
+    
+    df <- df %>%
+      dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
+    
+    if(plotChart == TRUE){
+      
+      annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'",
+                                     override_annotation_dist,
+                                     override_annotation_dist_P)
+      if(use_caption) {
+        caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
+      } else {
+        caption <- NULL
+      }
+      
+      p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
+        ggplot2::ggtitle(title,
+                         subtitle = subtitle) +
+        ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title),
+                      y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
+                      caption = paste0(caption),
+                      size = 10) +
+        ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
+                                    breaks = scales::breaks_pretty(),
+                                    labels = scales::number_format(accuracy = 1,
+                                                                   big.mark = ","))
+      if(includeAnnotations == TRUE){
+        p <- p +
+          ggplot2::annotate("text",
+                            x = start_x,
+                            y = ucl_start + ucl_start/annotation_dist_fact,
+                            label = cl_start) +
+          ggplot2::annotate("text",
+                            x = df$x[breakPoints] + 2,
+                            y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact,
+                            label = round(df$cl[breakPoints]))
+      }
+      
+      #formats x axis depending on x type
+      if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
+        
+        #get x axis breaks
+        x_break <- dplyr::if_else(is.null(x_break),
+                                  as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
+                                  x_break)
+        
+        p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
+                                       breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
+                                       limits = c(as.Date(start_x), as.Date(end_x))
+        )
+        
+      }else if(xType == "integer"){
+        #get x axis breaks
+        x_break <- dplyr::if_else(is.null(x_break),
+                                  (end_x - start_x) / 40,
+                                  x_break)
+        
+        p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
+                                             limits = c(start_x, end_x))
+      }else{
+        #get x axis breaks
+        x_break <- dplyr::if_else(is.null(x_break),
+                                  (end_x - start_x) / 40,
+                                  x_break)
+        
+        p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+                                             limits = c(start_x, end_x))
+      }
+      
+      p
+      
+    }else if(writeTable == TRUE){
+      
+      title <- gsub(":", "_",title)
+      subtitle <- gsub(":","_", subtitle)
+      write.csv(df, paste0("tables/", gsub(" ","_",title), "_", gsub(" ","_",subtitle,), ".csv"),
+                row.names = FALSE)
+      
+    }else{
+      
+      df <- df %>%
+        dplyr::filter(!is.na(x))
+    }
+    
+  }else{ # only plot timeseries without limits
+    
+    if(plotChart == TRUE){
+      ggplot2::ggplot(df, 
+                      ggplot2::aes(x = x, y = y)) +
+        ggplot2::geom_line(colour = "black",
+                           size = 0.5) +
+        ggplot2::geom_point(colour = "black", size = 2) +
+        ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                       panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
+                       panel.grid.minor = ggplot2::element_blank(),
+                       panel.background = ggplot2::element_blank(),
+                       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
+                       axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
+                       plot.title = ggplot2::element_text(size = 20, hjust = 0),
+                       plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
+                       axis.line = ggplot2::element_line(colour = "grey60"),
+                       plot.caption = ggplot2::element_text(size = 10, hjust = 0.5)) +
+        ggplot2::ggtitle(title,
+                         subtitle = subtitle) +
+        ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title),
+                      y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
+                      size = 10) +
+        ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
+                                    breaks = scales::breaks_pretty(),
+                                    labels = scales::number_format(accuracy = 1,
+                                                                   big.mark = ","))
+
+    }else{
+      
+      df
+    }
+    
   }
+  
 }
 
 

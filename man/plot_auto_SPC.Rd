@@ -16,6 +16,7 @@ plot_auto_SPC(
   plotChart = TRUE,
   writeTable = FALSE,
   noRegrets = TRUE,
+  rule2Tolerance = 1.5e-08,
   x,
   y,
   n,
@@ -31,7 +32,8 @@ plot_auto_SPC(
   verbosity = 1L,
   use_caption = TRUE,
   x_pad_end = NULL,
-  noRecals = FALSE
+  noRecals = FALSE,
+  showLimits = TRUE
 )
 }
 \arguments{

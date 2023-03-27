@@ -35,6 +35,9 @@
 #' @return An SPC ggplot or corresponding data
 #'
 #' @importFrom magrittr %>%
+#' @importFrom fpCompare %==%
+#' @importFrom fpCompare %>>%
+#' @importFrom fpCompare %<<%
 #' @export
 #' @examples
 plot_auto_SPC <- function(df,
@@ -48,7 +51,7 @@ plot_auto_SPC <- function(df,
                           plotChart = TRUE,
                           writeTable = FALSE,
                           noRegrets = TRUE,
-                          rule2Tolerance = 0,
+                          rule2Tolerance = 1.5e-8,
                           x,
                           y,
                           n,

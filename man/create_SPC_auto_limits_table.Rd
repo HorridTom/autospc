@@ -6,13 +6,15 @@
 \usage{
 create_SPC_auto_limits_table(
   data,
-  chartType = "C",
-  periodMin = 21,
-  runRuleLength = 8,
-  maxNoOfExclusions = 3,
-  noRegrets = TRUE,
-  verbosity = 1L,
-  noRecals = FALSE,
+  chartType,
+  periodMin,
+  runRuleLength,
+  maxNoOfExclusions,
+  noRegrets,
+  verbosity,
+  noRecals,
+  rule2Tolerance,
+  showLimits,
   ...
 )
 }

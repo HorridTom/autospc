@@ -194,11 +194,19 @@ plot_auto_SPC <- function(df,
         caption <- NULL
       }
       
+      if(is.null(override_x_title)) {
+        override_x_title <- "Day"
+      }
+      
+      if(is.null(override_y_title)) {
+        override_y_title <- ytitle
+      }
+      
       p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
         ggplot2::ggtitle(title,
                          subtitle = subtitle) +
-        ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title),
-                      y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
+        ggplot2::labs(x = override_x_title,
+                      y = override_y_title,
                       caption = paste0(caption),
                       size = 10) +
         ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
@@ -221,9 +229,9 @@ plot_auto_SPC <- function(df,
       if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
         
         #get x axis breaks
-        x_break <- dplyr::if_else(is.null(x_break),
-                                  as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
-                                  x_break)
+        if(is.null(x_break)) {
+          x_break <- as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40
+        }
         
         p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
                                        breaks = seq(as.Date(start_x), as.Date(end_x), x_break),

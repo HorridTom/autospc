@@ -129,7 +129,16 @@ plot_auto_SPC <- function(df,
     ylimhigh <- override_y_lim
   }
   
+  # Ensure axis titles available
   ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage")
+  
+  if(is.null(override_x_title)) {
+    override_x_title <- "Day"
+  }
+  
+  if(is.null(override_y_title)) {
+    override_y_title <- ytitle
+  }
   
   #start and end dates
   start_x <- min(df$x, na.rm = TRUE)
@@ -197,8 +206,8 @@ plot_auto_SPC <- function(df,
       p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
         ggplot2::ggtitle(title,
                          subtitle = subtitle) +
-        ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title),
-                      y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
+        ggplot2::labs(x = override_x_title,
+                      y = override_y_title,
                       caption = paste0(caption),
                       size = 10) +
         ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
@@ -221,9 +230,9 @@ plot_auto_SPC <- function(df,
       if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
         
         #get x axis breaks
-        x_break <- dplyr::if_else(is.null(x_break),
-                                  as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40,
-                                  x_break)
+        if(is.null(x_break)) {
+          x_break <- as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40
+        }
         
         p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
                                        breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
@@ -232,17 +241,17 @@ plot_auto_SPC <- function(df,
         
       }else if(xType == "integer"){
         #get x axis breaks
-        x_break <- dplyr::if_else(is.null(x_break),
-                                  (end_x - start_x) / 40,
-                                  x_break)
+        if(is.null(x_break)) {
+          x_break <- (end_x - start_x) / 40
+        }
         
         p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
                                              limits = c(start_x, end_x))
       }else{
         #get x axis breaks
-        x_break <- dplyr::if_else(is.null(x_break),
-                                  (end_x - start_x) / 40,
-                                  x_break)
+        if(is.null(x_break)) {
+          x_break <- (end_x - start_x) / 40
+        }
         
         p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
                                              limits = c(start_x, end_x))
@@ -269,7 +278,7 @@ plot_auto_SPC <- function(df,
       ggplot2::ggplot(df, 
                       ggplot2::aes(x = x, y = y)) +
         ggplot2::geom_line(colour = "black",
-                           size = 0.5) +
+                           linewidth = 0.5) +
         ggplot2::geom_point(colour = "black", size = 2) +
         ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                        panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
@@ -283,8 +292,8 @@ plot_auto_SPC <- function(df,
                        plot.caption = ggplot2::element_text(size = 10, hjust = 0.5)) +
         ggplot2::ggtitle(title,
                          subtitle = subtitle) +
-        ggplot2::labs(x = dplyr::if_else(is.null(override_x_title),"Day", override_x_title),
-                      y = dplyr::if_else(is.null(override_y_title), ytitle, override_y_title),
+        ggplot2::labs(x = override_x_title,
+                      y = override_y_title,
                       size = 10) +
         ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                     breaks = scales::breaks_pretty(),

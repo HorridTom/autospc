@@ -1,31 +1,26 @@
 Package: autospc
 Title: Automatically Partitioned SPC Charts
-Version: 0.0.0.9005
-Authors@R: 
-    c(person(given = "Thomas",
-           family = "Woodcock",
-           role = c("aut", "cre"),
-           email = "woodcock.thomas@gmail.com",
+Version: 0.0.0.9006
+Authors@R: c(
+    person("Thomas", "Woodcock", , "woodcock.thomas@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4735-4856")),
-      person(given = "Imogen",
-           family = "O'Connor",
-           role = c("aut"),
-           email = "imogen.connor-helleur@imperial.ac.uk"))
-Description: Creates spc charts with control limits and centre line calculations
-  partitioned into distinct periods.
+    person("Imogen", "O'Connor", , "imogen.connor-helleur@imperial.ac.uk", role = "aut")
+  )
+Description: Creates spc charts with control limits and centre line
+    calculations partitioned into distinct periods.
 License: GPL-3
+Imports: 
+    dplyr (>= 1.1.1),
+    ggplot2 (>= 3.4.2),
+    lubridate (>= 1.9.2),
+    magrittr (>= 2.0.3),
+    qicharts2 (>= 0.7.2),
+    rlang (>= 1.1.0),
+    scales (>= 1.2.1)
+Suggests: 
+    testthat (>= 3.1.7)
+Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
-Imports: 
-    dplyr (>= 1.0.5),
-    ggplot2 (>= 3.3.3),
-    lubridate (>= 1.7.10),
-    magrittr,
-    qicharts2 (>= 0.7.1),
-    rlang (>= 0.4.11),
-    scales (>= 1.1.1)
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+RoxygenNote: 7.2.3

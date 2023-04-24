@@ -228,6 +228,16 @@
       "Repository": "CRAN",
       "Hash": "8106d78941f34855c440ddb946b8f7a5"
     },
+    "fpCompare": {
+      "Package": "fpCompare",
+      "Version": "0.2.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "cc5dcc49a04ad5ad8f7d843c6de124e8"
+    },
     "fs": {
       "Package": "fs",
       "Version": "1.6.1",

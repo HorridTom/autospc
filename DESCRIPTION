@@ -1,6 +1,6 @@
 Package: autospc
 Title: Automatically Partitioned SPC Charts
-Version: 0.0.0.9006
+Version: 0.0.0.9007
 Authors@R: c(
     person("Thomas", "Woodcock", , "woodcock.thomas@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4735-4856")),
@@ -11,6 +11,7 @@ Description: Creates spc charts with control limits and centre line
 License: GPL-3
 Imports: 
     dplyr (>= 1.1.1),
+    fpCompare,
     ggplot2 (>= 3.4.2),
     lubridate (>= 1.9.2),
     magrittr (>= 2.0.3),

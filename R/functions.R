@@ -275,10 +275,6 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
     }
   }
 
-  
-  
-  
-
   output
 }
 

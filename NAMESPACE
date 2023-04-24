@@ -2,4 +2,9 @@
 
 export("%>%")
 export(plot_auto_SPC)
+importFrom(fpCompare,"%<<%")
+importFrom(fpCompare,"%<=%")
+importFrom(fpCompare,"%==%")
+importFrom(fpCompare,"%>=%")
+importFrom(fpCompare,"%>>%")
 importFrom(magrittr,"%>%")

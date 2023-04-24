@@ -18,8 +18,6 @@
 #'
 #' @return data frame with limits, rule breaks and additional info needed for plotting
 #'
-#' @importFrom magrittr %>%
-#'
 #' @examples
 create_SPC_auto_limits_table <- function(data, 
                           chartType,

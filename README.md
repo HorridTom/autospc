@@ -50,6 +50,6 @@ with control limits and other information.
 
 `autospc::plot_auto_SPC(dataframe, plotChart = FALSE)`
 
-`limits_table <- autospc::plot_auto_SPC(dataframe, , x = "month", y = "breaches", plotChart = FALSE)`
+`limits_table <- autospc::plot_auto_SPC(dataframe, x = "month", y = "breaches", plotChart = FALSE)`
 
 This stores the returned data in a variable called `limits_table`

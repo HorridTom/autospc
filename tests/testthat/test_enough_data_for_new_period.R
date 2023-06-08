@@ -4,8 +4,8 @@ test_data <- readRDS("testdata/test_data.rds")
 
 test_that("Determines correctly whether there are enough data point to form a new period",{
   
-  #case when counter is 0
-  result1 <- enough_data_for_new_period(data = test_data, periodMin = 21, counter = 0)
+  #case when counter is 1
+  result1 <- enough_data_for_new_period(data = test_data, periodMin = 21, counter = 1)
   
   #case when counter is much less than nrow(data)
   result2 <- enough_data_for_new_period(data = test_data, periodMin = 21, counter = 54)

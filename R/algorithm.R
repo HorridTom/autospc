@@ -65,7 +65,7 @@ create_SPC_auto_limits_table <- function(data,
           
           #check if counter is part way through a rule 2 break already, provided there are at least 8 rule 2 break points following
           #if so, set next rule break position to next point 
-          if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
+          if(all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
             
             rule2_break_positions <- NA
             rule2_break_position <- counter
@@ -116,7 +116,7 @@ create_SPC_auto_limits_table <- function(data,
                 #[11]
                 #check if counter is part way through a rule 2 break already
                 #provided there are at least 8 rule 2 breaks following or no further rule breaks have been identified 
-                if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength)])){
+                if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
                   
                   counter <- counter + 1
                   

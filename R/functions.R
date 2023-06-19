@@ -1,7 +1,7 @@
 #function to determine whether there are enough data points left to form a new period
 enough_data_for_new_period <- function(data, periodMin, counter){
    
-  if((nrow(data) - counter) >= periodMin){
+  if((nrow(data) - counter + 1) >= periodMin){
     TRUE
   }else{
     FALSE
@@ -22,7 +22,7 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
   
   exclusion_points <- find_extremes(data, chartType, counter, periodMin, maxNoOfExclusions, rule2Tolerance)
   
-  calculation_period <- data[counter:(counter + periodMin),]
+  calculation_period <- data[counter:(counter + periodMin - 1),]
   
   #run the calculation of limits excluding extremes for selected section of data
   if(chartType == "C"){
@@ -50,7 +50,7 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
 
 
   #first period does not already have the additional columns
-  if(counter == 0){
+  if(counter == 1){
     
     #joins limits to the existing data
     limits_table <- data %>%
@@ -104,7 +104,7 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
   
   while(i <= maxNoOfExclusions){
     
-    calculation_period <- data[counter:(counter + periodMin),]
+    calculation_period <- data[counter:(counter + periodMin - 1),]
     
     if(chartType == "C"){
       limits_list <- get_c_limits(y = calculation_period$y, exclusion_points = exclusion_points)
@@ -378,7 +378,7 @@ form_calculation_and_display_limits <- function(data,
   
   #extend display limits to end 
   limits_table <- form_display_limits(limits_table = limits_table, 
-                                      counter = counter_at_period_start + periodMin + 1,
+                                      counter = counter_at_period_start + periodMin,
                                       chartType = chartType)
   
   #add rule breaks considering where periods are
@@ -405,7 +405,7 @@ add_rule_breaks_respecting_periods <- function(limits_table,
   breakpoints <- which(limits_table$breakPoint)
   
   
-  if(counter == 0){
+  if(counter == 1){
     #for first period
     
     #add rule breaks to all of data

@@ -40,8 +40,8 @@ create_SPC_auto_limits_table <- function(data,
       dplyr::mutate(y = dplyr::if_else(is.nan(y) | is.infinite(y), as.numeric(NA), y))
   }
   
-  #set counter to zero
-  counter <- 0
+  #set counter to one
+  counter <- 1
   
   #[1] see whether there are enough data points to form one period
   if(enough_data_for_new_period(data, periodMin, counter)){
@@ -49,13 +49,13 @@ create_SPC_auto_limits_table <- function(data,
     #[2]
     limits_table <- form_calculation_and_display_limits(data = data, 
                                                         periodMin = periodMin, 
-                                                        counter = counter, 
+                                                        counter_at_period_start = counter, 
                                                         chartType = chartType, 
                                                         maxNoOfExclusions  = maxNoOfExclusions, 
                                                         rule2Tolerance = rule2Tolerance)
     
-    #set counter to end of first period
-    counter <- counter + periodMin + 1
+    #set counter to first point after end of first period
+    counter <- counter + periodMin
 
     if(!noRecals){#[3]loop starts
       while(counter < nrow(data)){
@@ -65,7 +65,7 @@ create_SPC_auto_limits_table <- function(data,
           
           #check if counter is part way through a rule 2 break already, provided there are at least 8 rule 2 break points following
           #if so, set next rule break position to next point 
-          if(all(limits_table$rule2[counter:(counter + runRuleLength)])){
+          if(all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
             
             rule2_break_positions <- NA
             rule2_break_position <- counter
@@ -109,14 +109,14 @@ create_SPC_auto_limits_table <- function(data,
                 #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
                 limits_table <- candidate_limits_table
                 
-                #Set counter to end of calculation period
-                counter <- counter + periodMin + 1
+                #Set counter to first point after end of new calculation period
+                counter <- counter + periodMin
                 
               }else{
                 #[11]
                 #check if counter is part way through a rule 2 break already
                 #provided there are at least 8 rule 2 breaks following or no further rule breaks have been identified 
-                if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength)])){
+                if(is.na(rule2_break_positions[2]) | all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
                   
                   counter <- counter + 1
                   

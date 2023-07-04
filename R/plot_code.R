@@ -310,7 +310,18 @@ plot_auto_SPC <- function(df,
   
 }
 
-
+#function format SPC charts 
+#' format_SPC
+#'
+#' @param cht The output plot from running autospc::plot_auto_spc
+#' @param df the input data frame to the autospc::plot_auto_spc function
+#' @param r1_col the colour for rule 1 break points
+#' @param r2_col the colour for rule 2 break points
+#'
+#' @return A formatted SPC ggplot 
+#'
+#' @export
+#' @examples
 format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, 
                      "None" = "black", "Excluded from limits calculation" = "grey")

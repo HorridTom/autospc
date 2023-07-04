@@ -15,6 +15,7 @@ create_SPC_auto_limits_table(
   noRecals,
   rule2Tolerance,
   showLimits,
+  development_recalc_at_every_break,
   ...
 )
 }

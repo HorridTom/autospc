@@ -66,7 +66,8 @@ plot_auto_SPC <- function(df,
                           use_caption = TRUE,
                           x_pad_end = NULL,
                           noRecals = FALSE,
-                          showLimits = TRUE
+                          showLimits = TRUE,
+                          development_recalc_at_every_break = F
 ) { 
   
   #rename columns if passed
@@ -110,7 +111,8 @@ plot_auto_SPC <- function(df,
                                      verbosity = verbosity,
                                      noRecals = noRecals,
                                      rule2Tolerance = rule2Tolerance,
-                                     showLimits = showLimits)
+                                     showLimits = showLimits,
+                                     development_recalc_at_every_break = development_recalc_at_every_break)
   
   # chart y limit
   ylimlow <- 0

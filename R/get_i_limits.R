@@ -3,7 +3,9 @@
 
 get_i_limits <- function(y, 
                          na.rm = TRUE,
-                         recursive_mr_screen =  FALSE){
+                         recursive_mr_screen =  FALSE,
+                         exclusion_points = NULL){
+  
   #sends error messages if data is not in the correct format
   if(length(y) == 0){
     stop("The input data has zero observations.")
@@ -16,9 +18,17 @@ get_i_limits <- function(y,
   if(na.rm == FALSE & any(is.na(y))){
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
+  
+  #exclude exclusion points from calculations
+  if(!is.null(exclusion_points)){
+    y_excl <- y[-exclusion_points]
+  }else{
+    y_excl <- y
+  }
+  
   # calculations of limits for i charts
-  mean_i <- mean(y, na.rm = TRUE)
-  mr <- abs(diff(y))
+  mean_i <- mean(y_excl, na.rm = TRUE)
+  mr <- abs(diff(y_excl))
   mean_mr <- mean(mr, na.rm = TRUE)
   ucl_mr <- 3.267 * mean_mr
   sigma <- mean_mr/1.128 

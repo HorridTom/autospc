@@ -2,7 +2,6 @@
 mr_data <- readRDS("testdata/test_mr_data.rds")
 
 #test that mr control limits match the recalculated mr control limits
-#tolerance = 0.01
 library(testthat)
 test_that("mR limits match the recalculated mR limits",{
   results <- get_mr_limits(y = mr_data$y)

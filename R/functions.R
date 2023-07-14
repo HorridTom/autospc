@@ -37,6 +37,12 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
   }else if(chartType == "P'"){
     limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
     
+  }else if(chartType == "I"){
+    limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points)
+    
+  }else if(chartType == "MR"){
+    limits_list <- get_mr_limits(y = calculation_period$y, exclusion_points = exclusion_points)  
+    
   }
   
   calculation_period$cl <- limits_list$cl
@@ -117,6 +123,13 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
       
     }else if(chartType == "P'"){
       limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
+    
+    }else if(chartType == "I"){
+      limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points)
+      
+    }else if(chartType == "MR"){
+      limits_list <- get_mr_limits(y = calculation_period$y, exclusion_points = exclusion_points)  
+      
     }
     
     calculation_period$cl <- limits_list$cl

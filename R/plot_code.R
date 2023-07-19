@@ -91,6 +91,13 @@ plot_auto_SPC <- function(df,
   
   #decide whether the chart is C or P depending on data format if not specified 
   if(is.null(chartType)){
+    
+    lifecycle::deprecate_warn(
+      when = "0.0.0.9008",
+      what = I("chartType  = NULL"),
+      details = I("Please explicitly pass the desired chart type")
+    )
+    
     if(all(c("x", "y") %in% colnames(df))){
       chartType <- "C'"
     }else if(all(c("x", "n", "y") %in% colnames(df))){

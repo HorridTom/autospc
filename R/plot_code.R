@@ -1,11 +1,11 @@
 #function to plot automated SPC charts
 #' plot_auto_SPC
 #'
-#' @param data For a C or C' chart: a data frame with columns x, y, title (optional) 
+#' @param data For an I, MR, C or C' chart: a data frame with columns x, y, title (optional) 
 #' and subtitle (optional)
 #' For a P or P' chart: a data frame with columns x, n (total), y (numerator), 
 #' title (optional), subtitle (optional) 
-#' @param chartType the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")
+#' @param chartType the type of chart you wish to plot (e.g. "I", "MR", "C", "C'", "P", "P'")
 #' @param periodMin the minimum number of points per period.
 #' @param runRuleLength the number of points above or below the centre line needed
 #' for a rule 2 break

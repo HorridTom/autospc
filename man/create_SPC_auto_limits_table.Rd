@@ -19,7 +19,7 @@ create_SPC_auto_limits_table(
 )
 }
 \arguments{
-\item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
+\item{data}{For an XMR, C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)
 For a P or P' chart: a data frame with columns x, n (total), b (number of breaches),
 title (optional), subtitle (optional)}
@@ -38,7 +38,7 @@ Defines whether limits can change as more data is added or not.}
 \item{verbosity}{integer specifying how talkative the algorithm is; the
 higher the number the more information is provided, none if 0.}
 
-\item{chart_typ}{the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")}
+\item{chart_typ}{the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")}
 }
 \value{
 data frame with limits, rule breaks and additional info needed for plotting

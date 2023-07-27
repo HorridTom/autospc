@@ -1,11 +1,11 @@
 #function to plot automated SPC charts
 #' plot_auto_SPC
 #'
-#' @param data For an I, MR, C or C' chart: a data frame with columns x, y, title (optional) 
+#' @param data For an XMR, C or C' chart: a data frame with columns x, y, title (optional) 
 #' and subtitle (optional)
 #' For a P or P' chart: a data frame with columns x, n (total), y (numerator), 
 #' title (optional), subtitle (optional) 
-#' @param chartType the type of chart you wish to plot (e.g. "I", "MR", "C", "C'", "P", "P'")
+#' @param chartType the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")
 #' @param periodMin the minimum number of points per period.
 #' @param runRuleLength the number of points above or below the centre line needed
 #' for a rule 2 break
@@ -126,6 +126,8 @@ plot_auto_SPC <- function(df,
     ylimhigh <- max(df$y)
   }else if(chartType == "C" | chartType == "C'"){
     ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
+  }else if (chartType == "XMR"){
+    ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
   }else{
     ylimhigh <- 110
   }
@@ -136,7 +138,12 @@ plot_auto_SPC <- function(df,
   }
   
   # Ensure axis titles available
-  ytitle <- ifelse(chartType == "C" | chartType == "C'", "Number", "Percentage")
+  ytitle <- switch(chartType,
+                   C = "Number",
+                   `C'` = "Number",
+                   P = "Percentage",
+                   `P'` = "Percentage",
+                   XMR = "X")
   
   if(is.null(override_x_title)) {
     override_x_title <- "Day"
@@ -200,7 +207,7 @@ plot_auto_SPC <- function(df,
     
     if(plotChart == TRUE){
       
-      annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'",
+      annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'" | chartType == "XMR",
                                      override_annotation_dist,
                                      override_annotation_dist_P)
       if(use_caption) {

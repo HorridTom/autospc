@@ -37,7 +37,7 @@ plot_auto_SPC(
 )
 }
 \arguments{
-\item{chartType}{the type of chart you wish to plot (e.g. "C", "C'", "P", "P'")}
+\item{chartType}{the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")}
 
 \item{periodMin}{the minimum number of points per period.}
 
@@ -79,7 +79,7 @@ higher the number the more information is provided, none if 0.}
 \item{x_pad_end}{optional integer specifying a minimum end point for the
 x-axis}
 
-\item{data}{For a C or C' chart: a data frame with columns x, y, title (optional)
+\item{data}{For an XMR, C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)
 For a P or P' chart: a data frame with columns x, n (total), y (numerator),
 title (optional), subtitle (optional)}

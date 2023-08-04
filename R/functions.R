@@ -37,7 +37,7 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
   }else if(chartType == "P'"){
     limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
     
-  }else if(chartType == "I"){
+  }else if(chartType == "XMR"){
     limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points)
     
   }else if(chartType == "MR"){
@@ -124,7 +124,7 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
     }else if(chartType == "P'"){
       limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
     
-    }else if(chartType == "I"){
+    }else if(chartType == "XMR"){
       limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points)
       
     }else if(chartType == "MR"){
@@ -180,7 +180,7 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
 #function to form display limits (period extension)
 form_display_limits <- function(limits_table, counter, chartType = "C'"){
   
-  if(chartType == "C" | chartType == "C'"){
+  if(chartType == "C" | chartType == "C'" | chartType == "XMR"){
     limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
     limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]
     limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]

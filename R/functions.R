@@ -180,6 +180,11 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
 #function to form display limits (period extension)
 form_display_limits <- function(limits_table, counter, chartType = "C'"){
   
+  if(counter > nrow(limits_table)) {
+    # No display limits needed - no data beyond calculation period
+    return(limits_table)
+  }
+  
   if(chartType == "C" | chartType == "C'" | chartType == "XMR"){
     limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
     limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]

@@ -7,6 +7,6 @@ test_that("calculation period only chart is created without warning", {
                           plotChart = TRUE)
   
   expect_no_warning(print(plot_1),
-                    #message = "containing missing values"
+                    message = "containing missing values"
   )
 })

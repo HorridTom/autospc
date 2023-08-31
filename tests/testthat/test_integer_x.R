@@ -1,4 +1,4 @@
-testthat::test_that("plot_auto_SPC does not throw an error with integer x values", {
+test_that("plot_auto_SPC does not throw an error with integer x values", {
   # Example data
   df1 <- structure(list(x = 1:50,
                         y = c(49, 70, 44, 43, 75, 60, 47, 65, 
@@ -10,6 +10,6 @@ testthat::test_that("plot_auto_SPC does not throw an error with integer x values
     dplyr::mutate(y = as.integer(y))
   # Expect no error when calling plot_auto_SPC with this data
   expect_error(
-    plot_auto_SPC(df1, title = "my title", subtitle = "my subtitle"),
+    plot_auto_SPC(df1, chartType = "C'", title = "my title", subtitle = "my subtitle"),
     NA)
 })

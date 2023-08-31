@@ -28,11 +28,11 @@ test_data5 <- dplyr::add_row(test_data3, x = 54, y = 27)
 
 test_that("No regrets = TRUE",{
   
-  output_no_regrets <- autospc::plot_auto_SPC(test_data, noRegrets = T, plotChart = F)
-  output_no_regrets2 <- autospc::plot_auto_SPC(test_data2, noRegrets = T, plotChart = F)
-  output_no_regrets3 <- autospc::plot_auto_SPC(test_data3, noRegrets = T, plotChart = F)
-  output_no_regrets4 <- autospc::plot_auto_SPC(test_data4, noRegrets = T, plotChart = F)
-  output_no_regrets5 <- autospc::plot_auto_SPC(test_data5, noRegrets = T, plotChart = F)
+  output_no_regrets <- autospc::plot_auto_SPC(test_data, noRegrets = T, chartType = "C'", plotChart = F)
+  output_no_regrets2 <- autospc::plot_auto_SPC(test_data2, noRegrets = T, chartType = "C'", plotChart = F)
+  output_no_regrets3 <- autospc::plot_auto_SPC(test_data3, noRegrets = T, chartType = "C'", plotChart = F)
+  output_no_regrets4 <- autospc::plot_auto_SPC(test_data4, noRegrets = T, chartType = "C'", plotChart = F)
+  output_no_regrets5 <- autospc::plot_auto_SPC(test_data5, noRegrets = T, chartType = "C'", plotChart = F)
 
   #expect no breakpoint (no recalculation)
   testthat::expect_equal(sum(output_no_regrets$breakPoint, na.rm = T), 0)
@@ -46,11 +46,11 @@ test_that("No regrets = TRUE",{
 
 test_that("No regrets = FALSE",{
 
-  output_regrets <- autospc::plot_auto_SPC(test_data, noRegrets = F, plotChart = F)
-  output_regrets2 <- autospc::plot_auto_SPC(test_data2, noRegrets = F, plotChart = F)
-  output_regrets3 <- autospc::plot_auto_SPC(test_data3, noRegrets = F, plotChart = F)
-  output_regrets4 <- autospc::plot_auto_SPC(test_data4, noRegrets = F, plotChart = F)
-  output_regrets5 <- autospc::plot_auto_SPC(test_data5, noRegrets = F, plotChart = F)
+  output_regrets <- autospc::plot_auto_SPC(test_data, noRegrets = F, chartType = "C'", plotChart = F)
+  output_regrets2 <- autospc::plot_auto_SPC(test_data2, noRegrets = F, chartType = "C'", plotChart = F)
+  output_regrets3 <- autospc::plot_auto_SPC(test_data3, noRegrets = F, chartType = "C'", plotChart = F)
+  output_regrets4 <- autospc::plot_auto_SPC(test_data4, noRegrets = F, chartType = "C'", plotChart = F)
+  output_regrets5 <- autospc::plot_auto_SPC(test_data5, noRegrets = F, chartType = "C'", plotChart = F)
   
   #expect no breakpoint (no recalculation)
   testthat::expect_equal(sum(output_regrets$breakPoint, na.rm = T), 1)

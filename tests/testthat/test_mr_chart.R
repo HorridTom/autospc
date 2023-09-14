@@ -10,3 +10,9 @@ test_that("mR limits match the recalculated mR limits",{
   expect_equal(results$cl, correct_answers$cl)
   expect_equal(results$ucl, correct_answers$ucl)
 })
+
+test_that("mR chart created without error",{
+  expect_no_error(
+    chart <- plot_auto_SPC(df = mr_data, chartType = "MR", plotChart = TRUE)
+  )
+})

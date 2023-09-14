@@ -9,6 +9,7 @@ test_that("mR limits match the recalculated mR limits",{
   correct_answers <- qicharts2::qic(y, data = mr_data, chart = 'mr', return.data = TRUE)
   expect_equal(results$cl, correct_answers$cl)
   expect_equal(results$ucl, correct_answers$ucl)
+  expect_equal(results$lcl, rlang::rep_along(correct_answers$ucl, 0))
 })
 
 test_that("mR chart created without error",{

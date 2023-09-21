@@ -10,6 +10,7 @@ test_that("mR limits match the recalculated mR limits",{
   expect_equal(results$cl, correct_answers$cl)
   expect_equal(results$ucl, correct_answers$ucl)
   expect_equal(results$lcl, rlang::rep_along(correct_answers$ucl, 0))
+  expect_equal(results$mr, correct_answers$y)
 })
 
 test_that("mR chart created without error",{

@@ -18,6 +18,11 @@ get_mr_limits <- function(y,
   
   cl <- mean_mr 
   ucl <- ucl_mr
+  lcl <- 0
   
-  return(list(cl = rep(cl, length(y)), ucl = rep(ucl, length(y))))
+  return(list(cl = rep(cl, length(y)),
+              ucl = rep(ucl, length(y)),
+              lcl = rep(lcl, length(y)),
+              mr = c(NA_real_, mr)
+  ))
 }

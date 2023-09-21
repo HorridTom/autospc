@@ -186,8 +186,14 @@ plot_auto_SPC <- function(df,
                                                     highlight))
     }
     
+    if(chartType == "MR") {
+      mrs <- get_mr_limits(y = df$y)$mr
+      df <- df %>% dplyr::mutate(y = mrs)
+    }
+    
     #create initial plot object without formatting
-    pct <- ggplot2::ggplot(df, ggplot2::aes(x,y))
+    pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
+                           ggplot2::aes(x,y))
     
     #for annotations
     cl_start <- round(df$cl[1])

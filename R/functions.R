@@ -129,7 +129,8 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
       
     }else if(chartType == "MR"){
       limits_list <- get_mr_limits(y = calculation_period$y, exclusion_points = exclusion_points)  
-      
+      calculation_period$y <- get_mr_limits(y = calculation_period$y,
+                                            exclusion_points = NULL)$mr
     }
     
     calculation_period$cl <- limits_list$cl
@@ -185,7 +186,7 @@ form_display_limits <- function(limits_table, counter, chartType = "C'"){
     return(limits_table)
   }
   
-  if(chartType == "C" | chartType == "C'" | chartType == "XMR"){
+  if(chartType == "C" | chartType == "C'" | chartType == "XMR" | chartType == "MR"){
     limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
     limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]
     limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]

@@ -65,6 +65,7 @@ plot_auto_SPC <- function(df,
                           verbosity = 1L,
                           use_caption = TRUE,
                           x_pad_end = NULL,
+                          extend_limits_to = NULL,
                           noRecals = FALSE,
                           showLimits = TRUE,
                           development_recalc_at_every_break = F
@@ -121,6 +122,50 @@ plot_auto_SPC <- function(df,
                                      showLimits = showLimits,
                                      development_recalc_at_every_break = development_recalc_at_every_break)
   
+  #start and end dates
+  if(!is.null(extend_limits_to) && is.null(x_pad_end)) {
+    x_pad_end = extend_limits_to
+  }
+  start_x <- min(df$x, na.rm = TRUE)
+  x_max <- max(df$x, na.rm = TRUE)
+  end_x <- max(x_max, x_pad_end)
+  
+  # Extend display limits
+  if(!is.null(extend_limits_to)) {
+    
+    if(extend_limits_to <= x_max) {
+      stop("Limits can only be extended to a point beyond the end of the data.")
+    }
+    
+    df_ext_first_row <- df %>%
+      filter(row_number() == max(row_number())) %>% 
+      mutate(x = x_max + 1,
+             y = NA_real_,
+             periodType = "display",
+             excluded = NA,
+             breakPoint = FALSE,
+             rule1 = FALSE,
+             rule2 = FALSE,
+             aboveOrBelowCl = 0,
+             highlight = "None")
+    
+    df_ext_last_row <- df %>%
+      filter(row_number() == max(row_number())) %>% 
+      mutate(x = extend_limits_to,
+             y = NA_real_,
+             periodType = "display",
+             excluded = NA,
+             breakPoint = FALSE,
+             rule1 = FALSE,
+             rule2 = FALSE,
+             aboveOrBelowCl = 0,
+             highlight = "None")
+    
+    df <- df %>% 
+      bind_rows(df_ext_first_row,
+                df_ext_last_row)
+  }
+  
   # chart y limit
   ylimlow <- 0
   
@@ -154,10 +199,6 @@ plot_auto_SPC <- function(df,
   if(is.null(override_y_title)) {
     override_y_title <- ytitle
   }
-  
-  #start and end dates
-  start_x <- min(df$x, na.rm = TRUE)
-  end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
  
   #if limits are to be displayed on chart

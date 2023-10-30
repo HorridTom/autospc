@@ -95,6 +95,8 @@
 #' @param x_break Optional numeric specifying spacing of horizontal axis breaks.
 #' @param x_pad_end Optional, specifies a minimum end point for the horizontal
 #' axis.
+#' @param extend_limits_to Optional, specifies a point on the horizontal axis
+#' to extend the final limits out to
 #' @param r1_col Highlight colour for breaks of rule 1 (points outside the
 #' control limits)
 #' @param r2_col Highlight colour for breaks of rule 2 (shifts)
@@ -181,6 +183,7 @@ plot_auto_SPC <- function(df,
                           override_y_lim = NULL,
                           x_break = NULL,
                           x_pad_end = NULL,
+                          extend_limits_to = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
                           includeAnnotations = TRUE,
@@ -298,6 +301,50 @@ plot_auto_SPC <- function(df,
                                      mr_screen_max_loops = mr_screen_max_loops,
                                      recalc_every_shift = recalc_every_shift)
   
+  #start and end dates
+  if(!is.null(extend_limits_to) && is.null(x_pad_end)) {
+    x_pad_end = extend_limits_to
+  }
+  start_x <- min(df$x, na.rm = TRUE)
+  x_max <- max(df$x, na.rm = TRUE)
+  end_x <- max(x_max, x_pad_end)
+  
+  # Extend display limits
+  if(!is.null(extend_limits_to)) {
+    
+    if(extend_limits_to <= x_max) {
+      stop("Limits can only be extended to a point beyond the end of the data.")
+    }
+    
+    df_ext_first_row <- df %>%
+      filter(row_number() == max(row_number())) %>% 
+      mutate(x = x_max + 1,
+             y = NA_real_,
+             periodType = "display",
+             excluded = NA,
+             breakPoint = FALSE,
+             rule1 = FALSE,
+             rule2 = FALSE,
+             aboveOrBelowCl = 0,
+             highlight = "None")
+    
+    df_ext_last_row <- df %>%
+      filter(row_number() == max(row_number())) %>% 
+      mutate(x = extend_limits_to,
+             y = NA_real_,
+             periodType = "display",
+             excluded = NA,
+             breakPoint = FALSE,
+             rule1 = FALSE,
+             rule2 = FALSE,
+             aboveOrBelowCl = 0,
+             highlight = "None")
+    
+    df <- df %>% 
+      bind_rows(df_ext_first_row,
+                df_ext_last_row)
+  }
+  
   # chart y limit
   ylimlow <- 0
   
@@ -338,10 +385,6 @@ plot_auto_SPC <- function(df,
   if(is.null(override_y_title)) {
     override_y_title <- ytitle
   }
-  
-  #start and end dates
-  start_x <- min(df$x, na.rm = TRUE)
-  end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
  
   #if limits are to be displayed on chart

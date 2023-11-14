@@ -106,7 +106,12 @@ plot_auto_SPC <- function(df,
       print("The data you have input is not in the correct format. For C charts, data must contain at least columns 'x' and 'y'. For P charts data must contain at least 'x', 'n' and 'y' columns.")
     }
   }
-
+  
+  if(chartType == "MR") {
+    mrs <- get_mrs(y = df$y)
+    df <- df %>% dplyr::mutate(y = mrs)
+  }
+  
   #get control limits
   #df <- dplyr::mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, chartType = chartType, 
@@ -184,11 +189,6 @@ plot_auto_SPC <- function(df,
       df <- df %>% dplyr::mutate(highlight = ifelse(excluded == TRUE & !is.na(excluded),
                                                     "Excluded from limits calculation",
                                                     highlight))
-    }
-    
-    if(chartType == "MR") {
-      mrs <- get_mr_limits(y = df$y)$mr
-      df <- df %>% dplyr::mutate(y = mrs)
     }
     
     #create initial plot object without formatting

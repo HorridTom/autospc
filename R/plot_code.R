@@ -69,6 +69,8 @@ plot_auto_SPC <- function(df,
                           showLimits = TRUE
 ) { 
   
+  df_original <- df
+  
   #rename columns if passed
   df <- rename_columns(df = df,
                        x = {{ x }}, y = {{ y }}, n = {{ n }})
@@ -148,7 +150,8 @@ plot_auto_SPC <- function(df,
                    `C'` = "Number",
                    P = "Percentage",
                    `P'` = "Percentage",
-                   XMR = "X")
+                   XMR = "X",
+                   MR = "MR")
   
   if(is.null(override_x_title)) {
     override_x_title <- "Day"
@@ -238,11 +241,13 @@ plot_auto_SPC <- function(df,
           ggplot2::annotate("text",
                             x = start_x,
                             y = ucl_start + ucl_start/annotation_dist_fact,
-                            label = cl_start) +
+                            label = cl_start,
+                            na.rm = TRUE) +
           ggplot2::annotate("text",
                             x = df$x[breakPoints] + 2,
                             y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact,
-                            label = round(df$cl[breakPoints]))
+                            label = round(df$cl[breakPoints]),
+                            na.rm = TRUE)
       }
       
       #formats x axis depending on x type
@@ -276,7 +281,33 @@ plot_auto_SPC <- function(df,
                                              limits = c(start_x, end_x))
       }
       
-      p
+      if(chartType == "XMR") {
+        mc <- match.call()
+        mc[["chartType"]] <- "MR"
+        mc[["df"]] <- rlang::expr(df_original)
+        
+        p_mr <- eval(mc)
+        
+        p <- p + 
+          ggplot2::labs(caption = NULL,
+                        x = NULL) + 
+          ggplot2::theme(axis.text.x = ggplot2::element_blank(), 
+                         axis.ticks.x = ggplot2::element_blank())
+        
+        p_mr <- p_mr + 
+          ggplot2::labs(caption = caption)
+        
+        p <- ggpubr::ggarrange(p, p_mr,
+                               ncol = 1,
+                               nrow = 2,
+                               legend = "right",
+                               common.legend = TRUE,
+                               align = "v")
+      }
+      
+      suppressWarnings(
+        return(p) # Chart output
+      )
       
     }else if(writeTable == TRUE){
       
@@ -321,7 +352,7 @@ plot_auto_SPC <- function(df,
 
     }else{
       
-      df
+      return(df) # Table output
     }
     
   }
@@ -342,25 +373,30 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   suppressWarnings( # to avoid the warning about using alpha for discrete vars
     cht + 
       ggplot2::geom_line(colour = "black",
-                         size = 0.5) + 
+                         size = 0.5,
+                         na.rm = TRUE) + 
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,cl,
                                       alpha = plotPeriod),
                          linetype = "solid",
-                         size = 0.75) +
+                         size = 0.75,
+                         na.rm = TRUE) +
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,lcl,
                                       alpha = plotPeriod),
                          linetype = "42",
                          size = 0.5,
-                         show.legend = FALSE) +
+                         show.legend = FALSE,
+                         na.rm = TRUE) +
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,ucl,
                                       alpha = plotPeriod),
                          linetype = "42",
                          size = 0.5,
-                         show.legend = FALSE) +
-      ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
+                         show.legend = FALSE,
+                         na.rm = TRUE) +
+      ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2,
+                          na.rm = TRUE) +
       ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
       ggplot2::scale_alpha_discrete("Period Type",
                                     labels = if(!is.na(first_display_period)) {

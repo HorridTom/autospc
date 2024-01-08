@@ -133,7 +133,7 @@ plot_auto_SPC <- function(df,
     ylimhigh <- max(df$y)
   }else if(chartType == "C" | chartType == "C'"){
     ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
-  }else if (chartType == "XMR"){
+  }else if (chartType == "XMR" | chartType == "MR"){
     ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
   }else{
     ylimhigh <- 110

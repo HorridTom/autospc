@@ -52,7 +52,8 @@ create_SPC_auto_limits_table <- function(data,
                                                         counter_at_period_start = counter, 
                                                         chartType = chartType, 
                                                         maxNoOfExclusions  = maxNoOfExclusions, 
-                                                        rule2Tolerance = rule2Tolerance)
+                                                        rule2Tolerance = rule2Tolerance,
+                                                        runRuleLength = runRuleLength)
     
     #set counter to first point after end of first period
     counter <- counter + periodMin
@@ -90,12 +91,21 @@ create_SPC_auto_limits_table <- function(data,
             if(enough_data_for_new_period(limits_table, periodMin, counter)){
               
               #[8]
-              candidate_limits_table <- form_calculation_and_display_limits(data = limits_table, periodMin, counter,
-                                                                            chartType, maxNoOfExclusions, rule2Tolerance = rule2Tolerance)
+              candidate_limits_table <- form_calculation_and_display_limits(data = limits_table,
+                                                                            periodMin,
+                                                                            counter,
+                                                                            chartType,
+                                                                            maxNoOfExclusions,
+                                                                            rule2Tolerance = rule2Tolerance,
+                                                                            runRuleLength = runRuleLength)
               
               #[9]check whether there is a rule break in the opposite direction within calc period
-              opposite_rule_break <- identify_opposite_break(candidate_limits_table, counter, periodMin,
-                                                             triggering_rule_break_direction, rule2Tolerance = rule2Tolerance)[[1]]
+              opposite_rule_break <- identify_opposite_break(candidate_limits_table,
+                                                             counter,
+                                                             periodMin,
+                                                             triggering_rule_break_direction,
+                                                             rule2Tolerance = rule2Tolerance,
+                                                             runRuleLength = runRuleLength)[[1]]
               
               #establish whether (for no regrets) the final run in the candidate
               #calculation period prevents a recalculation

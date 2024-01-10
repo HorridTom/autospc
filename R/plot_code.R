@@ -284,6 +284,8 @@ plot_auto_SPC <- function(df,
       if(chartType == "XMR") {
         mc <- match.call()
         mc[["chartType"]] <- "MR"
+        if("title" %in% names(mc)) {mc[["title"]] <- NULL}
+        if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
         mc[["df"]] <- rlang::expr(df_original)
         
         p_mr <- eval(mc)

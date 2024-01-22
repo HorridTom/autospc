@@ -214,6 +214,16 @@ plot_auto_SPC <- function(df,
     df <- df %>%
       dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
     
+    if(chartType == "XMR") {
+      mc <- match.call()
+      mc[["chartType"]] <- "MR"
+      if("title" %in% names(mc)) {mc[["title"]] <- NULL}
+      if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
+      mc[["df"]] <- rlang::expr(df_original)
+      
+      p_mr <- eval(mc)
+    }
+    
     if(plotChart == TRUE){
       
       annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'" | chartType == "XMR",
@@ -282,14 +292,6 @@ plot_auto_SPC <- function(df,
       }
       
       if(chartType == "XMR") {
-        mc <- match.call()
-        mc[["chartType"]] <- "MR"
-        if("title" %in% names(mc)) {mc[["title"]] <- NULL}
-        if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
-        mc[["df"]] <- rlang::expr(df_original)
-        
-        p_mr <- eval(mc)
-        
         p <- p + 
           ggplot2::labs(caption = NULL,
                         x = NULL) + 
@@ -319,6 +321,21 @@ plot_auto_SPC <- function(df,
                 row.names = FALSE)
       
     }else{
+      
+      if(chartType == "XMR") {
+        
+        df <- df %>%
+          dplyr::left_join(p_mr %>%
+                             dplyr::select(x,
+                                           mr = y,
+                                           amr = cl,
+                                           url = ucl,
+                                           lrl = lcl),
+                           by = c("x" = "x")) %>% 
+          dplyr::select(x, y, cl, ucl, lcl,
+                        mr, amr, url, lrl,
+                        dplyr::everything())
+      }
       
       df <- df %>%
         dplyr::filter(!is.na(x))

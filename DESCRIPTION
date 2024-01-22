@@ -13,6 +13,7 @@ Imports:
     dplyr (>= 1.1.1),
     fpCompare,
     ggplot2 (>= 3.4.2),
+    ggpubr (>= 0.6.0),
     lifecycle (>= 1.0.3),
     lubridate (>= 1.9.2),
     magrittr (>= 2.0.3),

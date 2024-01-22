@@ -5,24 +5,26 @@
 # lcl : the lower control limit
 # ucl : the upper control limit
 
-add_rule_breaks <- function(x, rule2Tolerance) {
+add_rule_breaks <- function(x,
+                            rule2Tolerance,
+                            runRuleLength) {
 
     x <- x %>%
       dplyr::mutate(rule1 = (y > ucl) | (y < lcl)) %>%
       dplyr::mutate(aboveOrBelowCl = dplyr::case_when(abs(y - cl) %<=% rule2Tolerance ~ 0L,
                                                       (y - cl) %>>% rule2Tolerance ~ 1L,
                                                       (y - cl) %<<% -rule2Tolerance ~ -1L)) %>%
-      rule_two() %>%
+      rule_two(runRuleLength = runRuleLength) %>%
       dplyr::mutate(rule2 = dplyr::if_else(rule2 & aboveOrBelowCl == 0L, FALSE, rule2)) %>%
       add_highlight() %>%
       dplyr::relocate(aboveOrBelowCl, .after = rule2)
 
 }
 
-rule_two <- function(df) {
+rule_two <- function(df, runRuleLength) {
 
   runs <- rle(unlist(df$aboveOrBelowCl))
-  rulebreakingruns <- runs$lengths >= 8
+  rulebreakingruns <- runs$lengths >= runRuleLength
   runs$values <- rulebreakingruns
   partofrun <- inverse.rle(runs)
   df$rule2 <- partofrun

@@ -33,7 +33,8 @@ plot_auto_SPC(
   use_caption = TRUE,
   x_pad_end = NULL,
   noRecals = FALSE,
-  showLimits = TRUE
+  showLimits = TRUE,
+  development_recalc_at_every_break = F
 )
 }
 \arguments{

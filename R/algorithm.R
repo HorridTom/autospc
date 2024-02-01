@@ -29,6 +29,7 @@ create_SPC_auto_limits_table <- function(data,
                           noRecals,
                           rule2Tolerance,
                           showLimits,
+                          development_recalc_at_every_break,
                           ...
 ) {
 
@@ -104,7 +105,8 @@ create_SPC_auto_limits_table <- function(data,
                 triggering_rule_break_direction)
               
               #recalc if...
-              if(!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)){
+              #no opposite rule break and no regrets principle is satisfied OR if the development argument is set to TRUE
+              if((!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)) | development_recalc_at_every_break == TRUE){
                 
                 #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
                 limits_table <- candidate_limits_table

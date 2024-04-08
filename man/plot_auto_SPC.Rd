@@ -33,7 +33,8 @@ plot_auto_SPC(
   use_caption = TRUE,
   x_pad_end = NULL,
   noRecals = FALSE,
-  showLimits = TRUE
+  showLimits = TRUE,
+  showMR = TRUE
 )
 }
 \arguments{
@@ -78,6 +79,9 @@ higher the number the more information is provided, none if 0.}
 
 \item{x_pad_end}{optional integer specifying a minimum end point for the
 x-axis}
+
+\item{showMR}{logical controlling whether the moving range chart is included
+in XMR chart}
 
 \item{data}{For an XMR, C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)

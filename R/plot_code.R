@@ -31,6 +31,8 @@
 #' @param use_caption logical controlling whether the caption is displayed
 #' @param x_pad_end optional integer specifying a minimum end point for the
 #' x-axis
+#' @param showMR logical controlling whether the moving range chart is included
+#' in XMR chart
 #'
 #' @return An SPC ggplot or corresponding data
 #'

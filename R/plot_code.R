@@ -31,6 +31,8 @@
 #' @param use_caption logical controlling whether the caption is displayed
 #' @param x_pad_end optional integer specifying a minimum end point for the
 #' x-axis
+#' @param showMR logical controlling whether the moving range chart is included
+#' in XMR chart
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -66,7 +68,8 @@ plot_auto_SPC <- function(df,
                           use_caption = TRUE,
                           x_pad_end = NULL,
                           noRecals = FALSE,
-                          showLimits = TRUE
+                          showLimits = TRUE,
+                          showMR = TRUE
 ) { 
   
   df_original <- df
@@ -214,7 +217,7 @@ plot_auto_SPC <- function(df,
     df <- df %>%
       dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
     
-    if(chartType == "XMR") {
+    if((chartType == "XMR") & showMR) {
       mc <- match.call()
       mc[["chartType"]] <- "MR"
       if("title" %in% names(mc)) {mc[["title"]] <- NULL}
@@ -291,7 +294,7 @@ plot_auto_SPC <- function(df,
                                              limits = c(start_x, end_x))
       }
       
-      if(chartType == "XMR") {
+      if((chartType == "XMR") & showMR) {
         p <- p + 
           ggplot2::labs(caption = NULL,
                         x = NULL) + 

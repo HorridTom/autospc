@@ -10,7 +10,13 @@ enough_data_for_new_period <- function(data, periodMin, counter){
 
 #function to form calculation limits for a period
 #data has columns x and y
-form_calculation_limits <- function(data, counter, periodMin, chartType = "C", maxNoOfExclusions = 3, rule2Tolerance){
+form_calculation_limits <- function(data,
+                                    counter,
+                                    periodMin,
+                                    chartType = "C",
+                                    maxNoOfExclusions = 3,
+                                    rule2Tolerance,
+                                    runRuleLength){
   
   #force columns into the correct type
   if("y" %in% colnames(data)){
@@ -20,7 +26,13 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
     data$n <- as.double(data$n)
   }
   
-  exclusion_points <- find_extremes(data, chartType, counter, periodMin, maxNoOfExclusions, rule2Tolerance)
+  exclusion_points <- find_extremes(data,
+                                    chartType,
+                                    counter,
+                                    periodMin,
+                                    maxNoOfExclusions,
+                                    rule2Tolerance,
+                                    runRuleLength = runRuleLength)
   
   calculation_period <- data[counter:(counter + periodMin - 1),]
   
@@ -41,7 +53,7 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
     limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points)
     
   }else if(chartType == "MR"){
-    limits_list <- get_mr_limits(y = calculation_period$y, exclusion_points = exclusion_points)  
+    limits_list <- get_mr_limits(mr = calculation_period$y, exclusion_points = exclusion_points)  
     
   }
   
@@ -101,7 +113,13 @@ form_calculation_limits <- function(data, counter, periodMin, chartType = "C", m
 
 
 #function to find most extreme points outside of control limits and return their positions
-find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions, rule2Tolerance){
+find_extremes <- function(data,
+                          chartType,
+                          counter,
+                          periodMin,
+                          maxNoOfExclusions,
+                          rule2Tolerance,
+                          runRuleLength){
   
   #initialise variables
   i <- 1
@@ -128,8 +146,9 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
       limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points)
       
     }else if(chartType == "MR"){
-      limits_list <- get_mr_limits(y = calculation_period$y, exclusion_points = exclusion_points)  
-      
+      limits_list <- get_mr_limits(mr = calculation_period$y, exclusion_points = exclusion_points)  
+      calculation_period$y <- get_mr_limits(mr = calculation_period$y,
+                                            exclusion_points = NULL)$mr
     }
     
     calculation_period$cl <- limits_list$cl
@@ -139,7 +158,9 @@ find_extremes <- function(data, chartType, counter, periodMin, maxNoOfExclusions
     calculation_period <- calculation_period %>%
       dplyr::select(x,y,ucl,lcl, cl)
     
-    calculation_period <- add_rule_breaks(calculation_period, rule2Tolerance = rule2Tolerance)
+    calculation_period <- add_rule_breaks(calculation_period,
+                                          rule2Tolerance = rule2Tolerance,
+                                          runRuleLength = runRuleLength)
     calculation_period <- calculation_period %>% 
       dplyr::mutate(aboveCl = ifelse(y > cl, TRUE,ifelse(y < cl, FALSE, NA))) %>%
       dplyr::mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
@@ -185,7 +206,7 @@ form_display_limits <- function(limits_table, counter, chartType = "C'"){
     return(limits_table)
   }
   
-  if(chartType == "C" | chartType == "C'" | chartType == "XMR"){
+  if(chartType == "C" | chartType == "C'" | chartType == "XMR" | chartType == "MR"){
     limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
     limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]
     limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
@@ -245,12 +266,15 @@ rule2_break_start_positions <- function(limits_table, counter){
 #set counter to beginning of candidate limits 
 identify_opposite_break <- function(limits_table, counter, periodMin, 
                                     triggering_rule_break_direction,
-                                    rule2Tolerance){
+                                    rule2Tolerance,
+                                    runRuleLength){
   
   #start rule breaks from candidate period as not to include "hang over" rule breaks from prev period
   #but do include "hang over" into following display period
   limits_table_candidate <- limits_table[counter:nrow(limits_table),]
-  limits_table_candidate <- add_rule_breaks(limits_table_candidate, rule2Tolerance = rule2Tolerance)
+  limits_table_candidate <- add_rule_breaks(limits_table_candidate,
+                                            rule2Tolerance = rule2Tolerance,
+                                            runRuleLength = runRuleLength)
 
   limits_table_candidate <- limits_table_candidate %>%
     dplyr::mutate(laggedAOBC = dplyr::lag(aboveOrBelowCl),
@@ -385,13 +409,15 @@ form_calculation_and_display_limits <- function(data,
                                                 counter_at_period_start, 
                                                 chartType,
                                                 maxNoOfExclusions,
-                                                rule2Tolerance){
+                                                rule2Tolerance,
+                                                runRuleLength){
   
   #form calculation limits for first period
   limits_table <- form_calculation_limits(data = data, periodMin = periodMin,
                                           counter = counter_at_period_start, chartType = chartType,
                                           maxNoOfExclusions  = maxNoOfExclusions,
-                                          rule2Tolerance = rule2Tolerance)
+                                          rule2Tolerance = rule2Tolerance,
+                                          runRuleLength = runRuleLength)
   
   
   #extend display limits to end 
@@ -402,7 +428,8 @@ form_calculation_and_display_limits <- function(data,
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 
                                                counter = counter_at_period_start,
-                                               rule2Tolerance = rule2Tolerance)
+                                               rule2Tolerance = rule2Tolerance,
+                                               runRuleLength = runRuleLength)
   
   
   limits_table
@@ -413,7 +440,8 @@ form_calculation_and_display_limits <- function(data,
 #Avoids issues faces with highlighting across periods
 add_rule_breaks_respecting_periods <- function(limits_table,
                                          counter,
-                                         rule2Tolerance){
+                                         rule2Tolerance,
+                                         runRuleLength){
   
   #add a column to show where the breakpoints are
   limits_table <- limits_table %>% 
@@ -427,7 +455,9 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     #for first period
     
     #add rule breaks to all of data
-    limits_table <- add_rule_breaks(x = limits_table, rule2Tolerance = rule2Tolerance)
+    limits_table <- add_rule_breaks(x = limits_table,
+                                    rule2Tolerance = rule2Tolerance,
+                                    runRuleLength = runRuleLength)
     
   }else if(length(breakpoints) == 1){
     #for data with 2 periods
@@ -437,8 +467,12 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     limits_table_bottom <- limits_table[counter:nrow(limits_table),]
     
     #add rule breaks to the old and new periods separately 
-    limits_table_top <- add_rule_breaks(x = limits_table_top, rule2Tolerance = rule2Tolerance)
-    limits_table_bottom <- add_rule_breaks(x = limits_table_bottom, rule2Tolerance = rule2Tolerance)
+    limits_table_top <- add_rule_breaks(x = limits_table_top,
+                                        rule2Tolerance = rule2Tolerance,
+                                        runRuleLength = runRuleLength)
+    limits_table_bottom <- add_rule_breaks(x = limits_table_bottom,
+                                           rule2Tolerance = rule2Tolerance,
+                                           runRuleLength = runRuleLength)
     
     #put data back together
     limits_table <- dplyr::bind_rows(limits_table_top, 
@@ -458,8 +492,12 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     limits_table_bottom <- limits_table[counter:nrow(limits_table),]
     
     #add rule breaks to the penultimate and new periods only
-    limits_table_mid <- add_rule_breaks(x = limits_table_mid, rule2Tolerance = rule2Tolerance)
-    limits_table_bottom <- add_rule_breaks(x = limits_table_bottom, rule2Tolerance = rule2Tolerance)
+    limits_table_mid <- add_rule_breaks(x = limits_table_mid,
+                                        rule2Tolerance = rule2Tolerance,
+                                        runRuleLength = runRuleLength)
+    limits_table_bottom <- add_rule_breaks(x = limits_table_bottom,
+                                           rule2Tolerance = rule2Tolerance,
+                                           runRuleLength = runRuleLength)
     
     #put data back together
     limits_table <- dplyr::bind_rows(limits_table_top, 

@@ -137,7 +137,7 @@ plot_auto_SPC <- function(df,
   }else if(chartType == "C" | chartType == "C'"){
     ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
   }else if (chartType == "XMR" | chartType == "MR"){
-    ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
+    ylimhigh <- max(df$ucl, df$y)*1.1
   }else{
     ylimhigh <- 110
   }
@@ -247,8 +247,8 @@ plot_auto_SPC <- function(df,
                       size = 10) +
         ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                     breaks = scales::breaks_pretty(),
-                                    labels = scales::number_format(accuracy = 1,
-                                                                   big.mark = ","))
+                                    labels = scales::label_number(big.mark = ","))
+      
       if(includeAnnotations == TRUE){
         p <- p +
           ggplot2::annotate("text",

@@ -13,6 +13,10 @@
 #' limit calculations 
 #' @param noRegrets Boolean signifying which version of the algorithm should be used. 
 #' Defines whether limits can change as more data is added or not.
+#' @param overhangingReversions Boolean determining whether rule breaks in the
+#' opposite direction to a rule break triggering a candidate recalculation
+#' prevent recalculation even if they overhang the end of the candidate
+#' calculation period. Set to FALSE only with noRegrets = FALSE.
 #' @param verbosity integer specifying how talkative the algorithm is; the
 #' higher the number the more information is provided, none if 0.
 #'
@@ -29,8 +33,17 @@ create_SPC_auto_limits_table <- function(data,
                           noRecals,
                           rule2Tolerance,
                           showLimits,
+                          overhangingReversions,
                           ...
 ) {
+  
+  if(noRegrets & !overhangingReversions) {
+    warning(paste0("Setting noRegrets = TRUE and overhangingReversions = ",
+                   "FALSE does not make sense, since noRegrets requires ",
+                   "consideration of overhanging reversions. Changing ",
+                   "overhangingReversions to TRUE."))
+    overhangingReversions <- TRUE
+  }
 
   #add y column of percentages for P and P' charts. This is to avoid issues with joins later 
   if(chartType == "P" | chartType == "P'"){
@@ -105,7 +118,8 @@ create_SPC_auto_limits_table <- function(data,
                                                              periodMin,
                                                              triggering_rule_break_direction,
                                                              rule2Tolerance = rule2Tolerance,
-                                                             runRuleLength = runRuleLength)[[1]]
+                                                             runRuleLength = runRuleLength,
+                                                             overhangingReversions = overhangingReversions)[[1]]
               
               #establish whether (for no regrets) the final run in the candidate
               #calculation period prevents a recalculation

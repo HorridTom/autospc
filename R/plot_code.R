@@ -19,6 +19,10 @@
 #' (useful for doing lots of charts at a time) 
 #' @param noRegrets Boolean signifying which version of the algorithm should be used. 
 #' Defines whether limits can change as more data is added or not.
+#' @param overhangingReversions Boolean determining whether rule breaks in the
+#' opposite direction to a rule break triggering a candidate recalculation
+#' prevent recalculation even if they overhang the end of the candidate
+#' calculation period. Set to FALSE only with noRegrets = FALSE.
 #' @param x column to use as subgroups on the horizontal axis of the chart
 #' (passed using tidyselect)
 #' @param y column to use as count (vertical axis) for C and C' charts (passed
@@ -49,6 +53,7 @@ plot_auto_SPC <- function(df,
                           plotChart = TRUE,
                           writeTable = FALSE,
                           noRegrets = TRUE,
+                          overhangingReversions = TRUE,
                           rule2Tolerance = 0,
                           x,
                           y,
@@ -127,7 +132,8 @@ plot_auto_SPC <- function(df,
                                      verbosity = verbosity,
                                      noRecals = noRecals,
                                      rule2Tolerance = rule2Tolerance,
-                                     showLimits = showLimits)
+                                     showLimits = showLimits,
+                                     overhangingReversions = overhangingReversions)
   
   # chart y limit
   ylimlow <- 0

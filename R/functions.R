@@ -264,14 +264,27 @@ rule2_break_start_positions <- function(limits_table, counter){
 #function to identify whether there has been a rule break in the opposite direction in calc period
 #returns TRUE for rule break in opposite direction within candidate calc period including hang over into display
 #set counter to beginning of candidate limits 
-identify_opposite_break <- function(limits_table, counter, periodMin, 
+identify_opposite_break <- function(limits_table,
+                                    counter,
+                                    periodMin, 
                                     triggering_rule_break_direction,
                                     rule2Tolerance,
-                                    runRuleLength){
+                                    runRuleLength,
+                                    overhangingReversions = TRUE){
   
-  #start rule breaks from candidate period as not to include "hang over" rule breaks from prev period
-  #but do include "hang over" into following display period
-  limits_table_candidate <- limits_table[counter:nrow(limits_table),]
+  # start rule breaks from candidate period as not to include "hang over" rule
+  # breaks from prev period
+  # overhangingReversions controls whether to include "hang over" into following
+  # display period
+  
+  candidate_start <- counter
+  if(overhangingReversions) {
+    candidate_end <- nrow(limits_table)
+  } else {
+    candidate_end <- counter + periodMin - 1L
+  }
+  
+  limits_table_candidate <- limits_table[candidate_start:candidate_end,]
   limits_table_candidate <- add_rule_breaks(limits_table_candidate,
                                             rule2Tolerance = rule2Tolerance,
                                             runRuleLength = runRuleLength)
@@ -293,6 +306,16 @@ identify_opposite_break <- function(limits_table, counter, periodMin,
     dplyr::mutate(oppositeBreak = dplyr::if_else(rule2 & (aboveOrBelowCl != triggering_rule_break_direction) & runCount > 1, 
                                                  TRUE, 
                                                  FALSE))
+  
+  if(!overhangingReversions & nrow(limits_table) > candidate_end) {
+    
+    limits_table_tail <- limits_table[(candidate_end + 1L):nrow(limits_table),]
+    limits_table_tail <- limits_table_tail %>% 
+      dplyr::mutate(oppositeBreak = FALSE)
+    
+    limits_table_candidate <- limits_table_candidate %>%
+      dplyr::bind_rows(limits_table_tail)
+  }
   
   #return list containing: boolean of whether there is an opposite break, 
   #the next rule break position if applicable,

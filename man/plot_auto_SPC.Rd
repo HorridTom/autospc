@@ -16,6 +16,7 @@ plot_auto_SPC(
   plotChart = TRUE,
   writeTable = FALSE,
   noRegrets = TRUE,
+  overhangingReversions = TRUE,
   rule2Tolerance = 0,
   x,
   y,
@@ -61,6 +62,11 @@ limit calculations}
 
 \item{noRegrets}{Boolean signifying which version of the algorithm should be used.
 Defines whether limits can change as more data is added or not.}
+
+\item{overhangingReversions}{Boolean determining whether rule breaks in the
+opposite direction to a rule break triggering a candidate recalculation
+prevent recalculation even if they overhang the end of the candidate
+calculation period. Set to FALSE only with noRegrets = FALSE.}
 
 \item{x}{column to use as subgroups on the horizontal axis of the chart
 (passed using tidyselect)}

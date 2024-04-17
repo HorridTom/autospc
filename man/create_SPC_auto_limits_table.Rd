@@ -15,6 +15,7 @@ create_SPC_auto_limits_table(
   noRecals,
   rule2Tolerance,
   showLimits,
+  overhangingReversions,
   ...
 )
 }
@@ -37,6 +38,11 @@ Defines whether limits can change as more data is added or not.}
 
 \item{verbosity}{integer specifying how talkative the algorithm is; the
 higher the number the more information is provided, none if 0.}
+
+\item{overhangingReversions}{Boolean determining whether rule breaks in the
+opposite direction to a rule break triggering a candidate recalculation
+prevent recalculation even if they overhang the end of the candidate
+calculation period. Set to FALSE only with noRegrets = FALSE.}
 
 \item{chart_typ}{the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")}
 }

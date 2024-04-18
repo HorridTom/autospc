@@ -23,6 +23,15 @@
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
 #' calculation period. Set to FALSE only with noRegrets = FALSE.
+#' @param floatingMedian Whether to add a floating median line to the chart,
+#' calculated based on the final floatingMedian_n data points on the chart:
+#' "no" - do not display a floating median,
+#' "yes" - display a floating median,
+#' "auto" - display a floating median if and only if there is at least one point
+#' that is part of a shift rule break in the final floatingMedian_n data points
+#' on the chart.
+#' @param floatingMedian_n the number of points to use for calculation of the
+#' floating median, if present
 #' @param x column to use as subgroups on the horizontal axis of the chart
 #' (passed using tidyselect)
 #' @param y column to use as count (vertical axis) for C and C' charts (passed
@@ -55,6 +64,8 @@ plot_auto_SPC <- function(df,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
                           rule2Tolerance = 0,
+                          floatingMedian = "no",
+                          floatingMedian_n = 12L,
                           x,
                           y,
                           n,
@@ -203,6 +214,25 @@ plot_auto_SPC <- function(df,
                                                     highlight))
     }
     
+    
+    addFloatingMedian <- switch(EXPR = floatingMedian,
+                                yes = TRUE,
+                                auto = any(df %>%
+                                             dplyr::slice_tail(n = floatingMedian_n) %>% 
+                                             dplyr::pull(rule2)),
+                                FALSE)
+    
+    if(addFloatingMedian) {
+      df <- df %>%
+        dplyr::mutate(median =
+                        dplyr::if_else(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L,
+                                       median(df %>%
+                                                dplyr::filter(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L) %>%
+                                                dplyr::pull(y)),
+                                       NA))
+      
+    }
+    
     #create initial plot object without formatting
     pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
                            ggplot2::aes(x,y))
@@ -254,6 +284,30 @@ plot_auto_SPC <- function(df,
         ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                     breaks = scales::breaks_pretty(),
                                     labels = scales::label_number(big.mark = ","))
+      
+      if(addFloatingMedian) {
+        p <- p +
+          ggplot2::geom_line(data = df, 
+                             ggplot2::aes(x, median),
+                             linetype = "75551555",
+                             colour = "gray50",
+                             size = 0.5,
+                             show.legend = TRUE,
+                             na.rm = TRUE) +
+          ggplot2::annotate("text",
+                            x = df %>%
+                              dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
+                              dplyr::pull(x),
+                            y = df %>%
+                              dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
+                              dplyr::pull(median)*0.95,
+                            label = "Median",
+                            size = 3,
+                            colour = "gray50",
+                            na.rm = TRUE)
+      }
+      
+      
       
       if(includeAnnotations == TRUE){
         p <- p +

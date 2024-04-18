@@ -18,6 +18,8 @@ plot_auto_SPC(
   noRegrets = TRUE,
   overhangingReversions = TRUE,
   rule2Tolerance = 0,
+  floatingMedian = "no",
+  floatingMedian_n = 12L,
   x,
   y,
   n,
@@ -67,6 +69,17 @@ Defines whether limits can change as more data is added or not.}
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
 calculation period. Set to FALSE only with noRegrets = FALSE.}
+
+\item{floatingMedian}{Whether to add a floating median line to the chart,
+calculated based on the final floatingMedian_n data points on the chart:
+"no" - do not display a floating median,
+"yes" - display a floating median,
+"auto" - display a floating median if and only if there is at least one point
+that is part of a shift rule break in the final floatingMedian_n data points
+on the chart.}
+
+\item{floatingMedian_n}{the number of points to use for calculation of the
+floating median, if present}
 
 \item{x}{column to use as subgroups on the horizontal axis of the chart
 (passed using tidyselect)}

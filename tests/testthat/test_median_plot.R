@@ -18,7 +18,7 @@ test_that("the number of medians calculated match the number of data points used
 
   chart_result_data <- chart_result$data 
 
-  # Filter the median for the the last n points i.e. test_median_n points 
+  # Extract all median values from the result data  
   result_median <- chart_result_data %>% 
     dplyr::filter(!is.na(median)) %>% 
     dplyr::pull(median)
@@ -41,7 +41,7 @@ test_that("only one median is being calculated",{
   
   chart_result_data <- chart_result$data 
   
-  # Filter the median for the the last n points i.e. test_median_n points 
+  # Extract all median values from the result data  
   result_median <- chart_result_data %>% 
     dplyr::filter(!is.na(median)) %>% 
     dplyr::pull(median)
@@ -121,7 +121,7 @@ test_that("the median is plotted after a shift rule 2 break when floatingMedian 
 })
 
 test_that("Median is not plotted when floatingMedian is set to auto and there is not a shift rule 2 break in the last floatingMedian_n rows", {
-  # Load test dataset whose floatingMedian_n does not contain a shift rule 2 break 
+  # Load test dataset whose last 12 points does not contain a shift rule 2 break 
   test_medianNoRule2 <- readRDS("testdata/test_medianNoRule2Breaks.rds")
   
   #set the n points for the median

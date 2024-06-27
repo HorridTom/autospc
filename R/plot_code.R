@@ -291,7 +291,7 @@ plot_auto_SPC <- function(df,
                              ggplot2::aes(x, median),
                              linetype = "75551555",
                              colour = "gray50",
-                             size = 0.5,
+                             linewidth = 0.5,
                              show.legend = TRUE,
                              na.rm = TRUE) +
           ggplot2::annotate("text",
@@ -455,26 +455,26 @@ format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
   suppressWarnings( # to avoid the warning about using alpha for discrete vars
     cht + 
       ggplot2::geom_line(colour = "black",
-                         size = 0.5,
+                         linewidth = 0.5,
                          na.rm = TRUE) + 
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,cl,
                                       alpha = plotPeriod),
                          linetype = "solid",
-                         size = 0.75,
+                         linewidth = 0.75,
                          na.rm = TRUE) +
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,lcl,
                                       alpha = plotPeriod),
                          linetype = "42",
-                         size = 0.5,
+                         linewidth = 0.5,
                          show.legend = FALSE,
                          na.rm = TRUE) +
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,ucl,
                                       alpha = plotPeriod),
                          linetype = "42",
-                         size = 0.5,
+                         linewidth = 0.5,
                          show.legend = FALSE,
                          na.rm = TRUE) +
       ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2,

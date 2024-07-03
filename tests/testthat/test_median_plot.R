@@ -104,7 +104,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Calculates the correct median from the data
   correct_median_auto <- auto_median_result_data %>%
-    dplyr::slice((n() - test_median_n + 1):n()) %>%
+    dplyr::slice((n() - test_median_n + 1L):n()) %>%
     dplyr::summarise(med = median(y, na.rm = TRUE)) %>%
     dplyr::pull(med)
   

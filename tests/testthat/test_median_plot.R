@@ -1,7 +1,3 @@
-library(testthat)
-library(dplyr)
-library(autospc)
-
 # Load test data
 test_median_data <- readRDS("testdata/test_median_data.rds")
 
@@ -41,7 +37,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Calculates the correct median from the data
   correct_median <- chart_result_data %>%
-    dplyr::slice((n() - test_median_n + 1):n()) %>%
+    dplyr::slice((dplyr::n() - test_median_n + 1):dplyr::n()) %>%
     dplyr::summarise(med = median(y, na.rm = TRUE)) %>%
     dplyr::pull(med)
   
@@ -104,7 +100,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Calculates the correct median from the data
   correct_median_auto <- auto_median_result_data %>%
-    dplyr::slice((n() - test_median_n + 1L):n()) %>%
+    dplyr::slice((dplyr::n() - test_median_n + 1L):dplyr::n()) %>%
     dplyr::summarise(med = median(y, na.rm = TRUE)) %>%
     dplyr::pull(med)
   

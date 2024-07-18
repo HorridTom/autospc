@@ -312,13 +312,15 @@ plot_auto_SPC <- function(df,
       if(includeAnnotations == TRUE){
         p <- p +
           ggplot2::annotate("text",
+                            colour = "red",
                             x = start_x,
-                            y = ucl_start + ucl_start/annotation_dist_fact,
+                            y = df$cl[1],
                             label = cl_start,
                             na.rm = TRUE) +
           ggplot2::annotate("text",
-                            x = df$x[breakPoints] + 2,
-                            y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact,
+                            colour = "red",
+                            x = df$x[breakPoints] - 0.75,
+                            y = df$cl[breakPoints],
                             label = round(df$cl[breakPoints]),
                             na.rm = TRUE)
       }

@@ -182,7 +182,7 @@ plot_auto_SPC <- function(df,
   }
   
   #start and end dates
-  start_x <- min(df$x, na.rm = TRUE)
+  start_x <- min(df$x-1, na.rm = TRUE)
   end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
  

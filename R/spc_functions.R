@@ -216,7 +216,7 @@ get_pp_limits <- function(y,
 
 get_i_limits <- function(y, 
                          na.rm = TRUE,
-                         mr_screen_max_loops = Inf,
+                         mr_screen_max_loops = 1,
                          exclusion_points = NULL){
   
   #sends error messages if data is not in the correct format

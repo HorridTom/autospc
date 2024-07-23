@@ -216,7 +216,7 @@ get_pp_limits <- function(y,
 
 get_i_limits <- function(y, 
                          na.rm = TRUE,
-                         recursive_mr_screen = "once",
+                         mr_screen_max_loops = Inf,
                          exclusion_points = NULL){
   
   #sends error messages if data is not in the correct format
@@ -249,18 +249,10 @@ get_i_limits <- function(y,
   lcl_i <- mean_i - (3 * sigma)
   
   #removes moving ranges that are above the ucl_mr and recalculates the mean_mr, ucl_i and lcl_i  
-  max_loops <- if(recursive_mr_screen == "recursive"){
-    Inf
-  }else if(recursive_mr_screen == "once"){
-    1L
-  }else{
-    0L
-  }
-  
   i <- 0L
   
   #calculate limits in cases where there are mRs above the upper range limit
-  while(any(mr > ucl_mr) & (i < max_loops)){
+  while(any(mr > ucl_mr) & (i < mr_screen_max_loops)){
     mr <- mr[mr < ucl_mr] #removes any mR values above the ucl
     mean_mr <- mean(mr, na.rm = TRUE)
     ucl_mr <- 3.267 * mean_mr

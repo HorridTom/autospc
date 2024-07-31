@@ -6,7 +6,7 @@
 #' For a P or P' chart: a data frame with columns x, n (total), y (numerator), 
 #' title (optional), subtitle (optional) 
 #' @param chartType the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")
-#' @param periodMin the minimum number of points per period.
+#' @param periodMin the minimum number of points per period. 
 #' @param runRuleLength the number of points above or below the centre line needed
 #' for a rule 2 break
 #' @param maxNoOfExclusions the maximum number of extreme points to exclude from 
@@ -47,10 +47,38 @@
 #' @param showMR logical controlling whether the moving range chart is included
 #' in XMR chart
 #'
-#' @return An SPC ggplot or corresponding data
+#' @return An SPC ggplot or corresponding data 
 #'
 #' @export
-#' @examples
+#' @examples 
+#' # Using default arguments on a C chart
+#' plot_auto_SPC(
+#'   East_Sussex_Data, 
+#'   chartType = "C", 
+#'   x = Month_Start, 
+#'   y = Perf_All
+#')
+#' # Using a lower threshold for runs each side of the centre line 
+#' # on an XMR chart
+#' plot_auto_SPC(
+#'   East_Sussex_Data, 
+#'   chartType = "XMR", 
+#'   x = Month_Start, 
+#'   y = Att_All, 
+#'   runRuleLength = 6
+#' )
+#'    
+#' #Using titles and subtitles but not captions
+#' plot_auto_SPC(
+#'   East_Sussex_Data, 
+#'   chartType = "C'", 
+#'   x = Month_Start, 
+#'   y = Att_All, 
+#'   title = "Monthly Attendance in East Sussex",
+#'   subtitle = "C' Shewhart Chart",
+#'   use_caption = FALSE
+#')
+ 
 plot_auto_SPC <- function(df,
                           chartType = NULL,
                           periodMin = 21,

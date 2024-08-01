@@ -1,4 +1,4 @@
-## code to prepare `example_dataset` dataset goes here
+
 # This function uses nhsAEscraper to find a dataset based on real NHS data
 # devtools::install_github("HorridTom/nhsAEscraper")
 
@@ -15,6 +15,7 @@ get_example_dataset <- function() {
     Att_Typ1_Br, Att_Typ2_Br, Att_Typ3_Br, 
     Perf_Typ1, 
     E_Adm_Typ1, E_Adm_Typ2, E_Adm_Typ34, 
+    E_Adm_Not_ED, E_Adm_All,
     SourceFile, hashSourceFileContents))
   #Changing format of date to allow autoSPC to run
   example_dataset$Month_Start <- as.Date(example_dataset$Month_Start) 

@@ -114,31 +114,20 @@ An SPC ggplot or corresponding data
 plot_auto_SPC
 }
 \examples{
-# Using default arguments on a C chart
+# Using a C chart to track changes in monthly attendance
 plot_auto_SPC(
   example_dataset, 
   chartType = "C", 
   x = Month_Start, 
-  y = Perf_All
-)
-# Using a lower threshold for runs each side of the centre line 
-# on an XMR chart
-plot_auto_SPC(
-  example_dataset, 
-  chartType = "XMR", 
-  x = Month_Start, 
-  y = Att_All, 
-  runRuleLength = 6
+  y = Att_All
 )
    
-#Using titles and subtitles but not captions
+#Using a P chart to track changes in percentage of admission within 4 hours
 plot_auto_SPC(
   example_dataset, 
-  chartType = "C'", 
+  chartType = "P", 
   x = Month_Start, 
-  y = Att_All, 
-  title = "Monthly Attendance in East Sussex",
-  subtitle = "C' Shewhart Chart",
-  use_caption = FALSE
+  y = Perf_All, 
+  
 )
 }

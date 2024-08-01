@@ -116,7 +116,7 @@ plot_auto_SPC
 \examples{
 # Using default arguments on a C chart
 plot_auto_SPC(
-  East_Sussex_Data, 
+  example_dataset, 
   chartType = "C", 
   x = Month_Start, 
   y = Perf_All
@@ -124,7 +124,7 @@ plot_auto_SPC(
 # Using a lower threshold for runs each side of the centre line 
 # on an XMR chart
 plot_auto_SPC(
-  East_Sussex_Data, 
+  example_dataset, 
   chartType = "XMR", 
   x = Month_Start, 
   y = Att_All, 
@@ -133,7 +133,7 @@ plot_auto_SPC(
    
 #Using titles and subtitles but not captions
 plot_auto_SPC(
-  East_Sussex_Data, 
+  example_dataset, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All, 

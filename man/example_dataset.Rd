@@ -9,10 +9,11 @@ A data frame with 109 rows and 9 columns
 \describe{
 \item{Month_Start}{Start date for that month of data}
 \item{Att_All}{Total attendance to A&E}
-\item{Att_All_Br}{Total attendances to A&E that were < 4 hours}
-\item{Perf_All}{Percentage of attendances within 4 hours}
-\item{E_Adm_All_ED}{Total emergency admissions via A&E}
-\item{E_Adm_4hBr_D}{Total spending > 4 hours from decision to admit to admission}
+\item{Within_4h}{Total attendances to A&E that were < 4 hours}
+\item{Over_4h}{Total attendances to A&E that were > 4 hours}
+\item{Percent_in_4h}{Percentage of attendances within 4 hours}
+\item{E_Adm_ViaAE}{Total emergency admissions via A&E}
+\item{E_Adm_Over_4h}{Total spending > 4 hours from decision to admit to admission}
 }
 }
 \source{

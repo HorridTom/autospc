@@ -114,20 +114,29 @@ An SPC ggplot or corresponding data
 plot_auto_SPC
 }
 \examples{
-# Using a C chart to track changes in monthly attendance
+# Using a C' chart to track changes in the count of monthly attendance 
 plot_auto_SPC(
   example_dataset, 
-  chartType = "C", 
+  chartType = "C'", 
   x = Month_Start, 
   y = Att_All
 )
    
-#Using a P chart to track changes in percentage of admission within 4 hours
+#Using a P' chart to track changes in the percentage admitted within 4 hours
 plot_auto_SPC(
   example_dataset, 
-  chartType = "P", 
+  chartType = "P'", 
   x = Month_Start, 
-  y = Perf_All, 
-  
+  y = Within_4h, 
+  n = Att_All
+)
+
+#using a runRuleLength of 7 when tracking monthly attendance
+plot_auto_SPC(
+  example_dataset, 
+  chartType = "C'", 
+  x = Month_Start, 
+  y = Att_All,
+  runRuleLength = 7
 )
 }

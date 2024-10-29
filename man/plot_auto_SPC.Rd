@@ -116,7 +116,7 @@ plot_auto_SPC
 \examples{
 # Using a C' chart to track changes in the count of monthly attendance 
 plot_auto_SPC(
-  example_dataset, 
+  ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All
@@ -124,7 +124,7 @@ plot_auto_SPC(
    
 #Using a P' chart to track changes in the percentage admitted within 4 hours
 plot_auto_SPC(
-  example_dataset, 
+  ed_attendances_monthly, 
   chartType = "P'", 
   x = Month_Start, 
   y = Within_4h, 
@@ -133,7 +133,7 @@ plot_auto_SPC(
 
 #using a runRuleLength of 7 when tracking monthly attendance
 plot_auto_SPC(
-  example_dataset, 
+  ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All,

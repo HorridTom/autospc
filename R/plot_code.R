@@ -6,7 +6,7 @@
 #' For a P or P' chart: a data frame with columns x, n (total), y (numerator), 
 #' title (optional), subtitle (optional) 
 #' @param chartType the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")
-#' @param periodMin the minimum number of points per period.
+#' @param periodMin the minimum number of points per period. 
 #' @param runRuleLength the number of points above or below the centre line needed
 #' for a rule 2 break
 #' @param maxNoOfExclusions the maximum number of extreme points to exclude from 
@@ -47,10 +47,36 @@
 #' @param showMR logical controlling whether the moving range chart is included
 #' in XMR chart
 #'
-#' @return An SPC ggplot or corresponding data
+#' @return An SPC ggplot or corresponding data 
 #'
 #' @export
-#' @examples
+#' @examples 
+#' # Using a C' chart to track changes in the count of monthly attendance 
+#' plot_auto_SPC(
+#'   ed_attendances_monthly, 
+#'   chartType = "C'", 
+#'   x = Month_Start, 
+#'   y = Att_All
+#')
+#'    
+#' #Using a P' chart to track changes in the percentage admitted within 4 hours
+#' plot_auto_SPC(
+#'   ed_attendances_monthly, 
+#'   chartType = "P'", 
+#'   x = Month_Start, 
+#'   y = Within_4h, 
+#'   n = Att_All
+#')
+#'
+#' #using a runRuleLength of 7 when tracking monthly attendance
+#' plot_auto_SPC(
+#'   ed_attendances_monthly, 
+#'   chartType = "C'", 
+#'   x = Month_Start, 
+#'   y = Att_All,
+#'   runRuleLength = 7
+#')
+ 
 plot_auto_SPC <- function(df,
                           chartType = NULL,
                           periodMin = 21,

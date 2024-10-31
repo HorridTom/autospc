@@ -46,6 +46,10 @@
 #' x-axis
 #' @param showMR logical controlling whether the moving range chart is included
 #' in XMR chart
+#' @param mr_screen_max_loops integer or Inf specifying maximum number of times
+#' to recursively ignore mr values above the upper range limit when calculating
+#' xmr limits. Note this does not affect the calculation of the upper range
+#' limit on the mr chart.
 #'
 #' @return An SPC ggplot or corresponding data
 #'
@@ -85,7 +89,8 @@ plot_auto_SPC <- function(df,
                           x_pad_end = NULL,
                           noRecals = FALSE,
                           showLimits = TRUE,
-                          showMR = TRUE
+                          showMR = TRUE,
+                          mr_screen_max_loops = 1L
 ) { 
   
   df_original <- df
@@ -144,7 +149,8 @@ plot_auto_SPC <- function(df,
                                      noRecals = noRecals,
                                      rule2Tolerance = rule2Tolerance,
                                      showLimits = showLimits,
-                                     overhangingReversions = overhangingReversions)
+                                     overhangingReversions = overhangingReversions,
+                                     mr_screen_max_loops = mr_screen_max_loops)
   
   # chart y limit
   ylimlow <- 0

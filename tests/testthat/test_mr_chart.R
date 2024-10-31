@@ -5,7 +5,8 @@ mr_data <- readRDS("testdata/test_mr_data.rds")
 library(testthat)
 test_that("mR limits match the recalculated mR limits",{
   mrs = get_mrs(y = mr_data$y)
-  results <- get_mr_limits(mr = mrs)
+  results <- get_mr_limits(mr = mrs,
+                           mr_screen_max_loops = 0)
   
   correct_answers <- qicharts2::qic(y, data = mr_data, chart = 'mr', return.data = TRUE)
   expect_equal(results$cl, correct_answers$cl)

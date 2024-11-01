@@ -233,14 +233,16 @@ plot_auto_SPC <- function(df,
       
     }
     
+    # add label column
+    df <- df %>% 
+      dplyr::mutate(cl_label = dplyr::if_else(breakPoint |
+                                                dplyr::row_number() == 1L,
+                                              as.character(round(cl)),
+                                              ""))
+    
     #create initial plot object without formatting
     pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
                            ggplot2::aes(x,y))
-    
-    #for annotations
-    cl_start <- round(df$cl[1])
-    ucl_start <- round(df$ucl[1])
-    cl_end <- round(df$cl[(nrow(df)-1)])
     
     #get periods into groups for plotting
     df <- df %>%
@@ -310,17 +312,12 @@ plot_auto_SPC <- function(df,
       
       
       if(includeAnnotations == TRUE){
-        p <- p +
-          ggplot2::annotate("text",
-                            x = start_x,
-                            y = ucl_start + ucl_start/annotation_dist_fact,
-                            label = cl_start,
-                            na.rm = TRUE) +
-          ggplot2::annotate("text",
-                            x = df$x[breakPoints] + 2,
-                            y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact,
-                            label = round(df$cl[breakPoints]),
-                            na.rm = TRUE)
+        p <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
+                                                       y = cl,
+                                                       label = cl_label),
+                                          position = ggpp::position_nudge_to(y = max(df$ucl, na.rm = TRUE)*1.1)) # TODO: work out how to configure this optimally. https://www.r4photobiology.info/galleries/nudge-and-repel.html
+                                                                                  # TODO: tidy up all the annotation machinery
+                                                                                  # TODO: apply this to labelling of floating median?
       }
       
       #formats x axis depending on x type

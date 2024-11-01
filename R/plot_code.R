@@ -182,7 +182,7 @@ plot_auto_SPC <- function(df,
   }
   
   #start and end dates
-  start_x <- min(df$x-1, na.rm = TRUE)
+  start_x <- min(df$x, na.rm = TRUE)
   end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
  
@@ -312,15 +312,13 @@ plot_auto_SPC <- function(df,
       if(includeAnnotations == TRUE){
         p <- p +
           ggplot2::annotate("text",
-                            colour = "red",
                             x = start_x,
-                            y = df$cl[1],
+                            y = ucl_start + ucl_start/annotation_dist_fact,
                             label = cl_start,
                             na.rm = TRUE) +
           ggplot2::annotate("text",
-                            colour = "red",
-                            x = df$x[breakPoints] - 0.75,
-                            y = df$cl[breakPoints],
+                            x = df$x[breakPoints] + 2,
+                            y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact,
                             label = round(df$cl[breakPoints]),
                             na.rm = TRUE)
       }

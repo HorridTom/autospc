@@ -150,11 +150,17 @@ plot_auto_SPC <- function(df,
   ylimlow <- 0
   
   if(nrow(df) < periodMin){
-    ylimhigh <- max(df$y)
+    ylimhigh <- max(df$y,
+                    na.rm = TRUE)
   }else if(chartType == "C" | chartType == "C'"){
-    ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
+    ylimhigh <- max(df$ucl,
+                    df$y,
+                    na.rm = TRUE) + max(df$ucl,
+                                        na.rm = TRUE)/10 + 10
   }else if (chartType == "XMR" | chartType == "MR"){
-    ylimhigh <- max(df$ucl, df$y)*1.1
+    ylimhigh <- max(df$ucl,
+                    df$y,
+                    na.rm = TRUE)*1.1
   }else{
     ylimhigh <- 110
   }
@@ -234,10 +240,21 @@ plot_auto_SPC <- function(df,
     }
     
     # add label column
+    
+    label_accuracy <- as.numeric(switch(chartType,
+                     C = 1,
+                     `C'` = 1,
+                     P = 0.01,
+                     `P'` = 0.01,
+                     XMR = 10^(ceiling(log10(ylimhigh)) - 4),
+                     MR = 10^(ceiling(log10(ylimhigh)) - 4)))
+    
     df <- df %>% 
       dplyr::mutate(cl_label = dplyr::if_else(breakPoint |
                                                 dplyr::row_number() == 1L,
-                                              as.character(round(cl)),
+                                              scales::number(cl,
+                                                     big.mark = ",",
+                                                     accuracy = label_accuracy),
                                               ""))
     
     #create initial plot object without formatting
@@ -315,7 +332,23 @@ plot_auto_SPC <- function(df,
         p <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
                                                        y = cl,
                                                        label = cl_label),
-                                          position = ggpp::position_nudge_to(y = max(df$ucl, na.rm = TRUE)*1.1)) # TODO: work out how to configure this optimally. https://www.r4photobiology.info/galleries/nudge-and-repel.html
+                                          #position = ggpp::position_nudge_to(y = max(df$ucl, na.rm = TRUE)*1.1),
+                                          color = "grey25",
+                                          size = 3,
+                                          segment.color = "grey25",
+                                          segment.linetype = 1L,
+                                          force             = 0,
+                                          nudge_y           = 3000,
+                                          nudge_x           = -150,
+                                          direction         = "x",
+                                          hjust             = 0,
+                                          segment.size      = 0.75,
+                                          segment.curvature = 0.6,
+                                          #segment.angle = 45,
+                                          segment.ncp = 4,
+                                          segment.inflect = FALSE,
+                                          segment.square = FALSE,
+                                          arrow = grid::arrow(length = grid::unit(0.015, "npc"))) # TODO: work out how to configure this optimally. https://www.r4photobiology.info/galleries/nudge-and-repel.html
                                                                                   # TODO: tidy up all the annotation machinery
                                                                                   # TODO: apply this to labelling of floating median?
       }

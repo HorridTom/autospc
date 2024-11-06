@@ -239,23 +239,48 @@ plot_auto_SPC <- function(df,
       
     }
     
-    # add label column
+    # add label information
+    upper_annotation_level <- max(df$ucl, na.rm = TRUE)*1.1
     
-    label_accuracy <- as.numeric(switch(chartType,
+    lower_annotation_level <- ifelse(chartType == "MR",
+                                     max(df$ucl, na.rm = TRUE)*1.1,
+                                     min(df$lcl, na.rm = TRUE)*0.9)
+    
+    label_accuracy <- switch(chartType,
                      C = 1,
                      `C'` = 1,
-                     P = 0.01,
-                     `P'` = 0.01,
+                     P = 0.1,
+                     `P'` = 0.1,
                      XMR = 10^(ceiling(log10(ylimhigh)) - 4),
-                     MR = 10^(ceiling(log10(ylimhigh)) - 4)))
+                     MR = 10^(ceiling(log10(ylimhigh)) - 4))
     
     df <- df %>% 
-      dplyr::mutate(cl_label = dplyr::if_else(breakPoint |
-                                                dplyr::row_number() == 1L,
-                                              scales::number(cl,
-                                                     big.mark = ",",
-                                                     accuracy = label_accuracy),
-                                              ""))
+      dplyr::mutate(cl_label = dplyr::if_else(
+        breakPoint |
+          dplyr::row_number() == (1L + (chartType == "MR")),
+        dplyr::if_else(rep(chartType == "P" | chartType == "P'",
+                           nrow(df)),
+                       scales::number(cl,
+                                      accuracy = label_accuracy,
+                                      suffix = "%"),
+                       scales::number(cl,
+                                      big.mark = ",",
+                                      accuracy = label_accuracy)),
+        ""),
+        cl_change = sign(cl - dplyr::lag(cl)),
+        annotation_level = dplyr::case_when(
+          dplyr::row_number() == (1L + (chartType == "MR")) ~ upper_annotation_level,
+          breakPoint == FALSE ~ 0,
+          cl_change == 1 ~ upper_annotation_level,
+          cl_change == -1 ~ lower_annotation_level
+        ),
+        annotation_curvature = dplyr::case_when(
+          dplyr::row_number() == (1L + (chartType == "MR")) ~ 0.6,
+          breakPoint == FALSE ~ 0,
+          cl_change == 1 ~ 0.6,
+          cl_change == -1 ~ -0.6
+        )
+      )
     
     #create initial plot object without formatting
     pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
@@ -332,19 +357,19 @@ plot_auto_SPC <- function(df,
         p <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
                                                        y = cl,
                                                        label = cl_label),
-                                          #position = ggpp::position_nudge_to(y = max(df$ucl, na.rm = TRUE)*1.1),
+                                          position = ggpp::position_nudge_to(y = df %>%
+                                                                               dplyr::filter(!is.na(y)) %>%
+                                                                               dplyr::pull(annotation_level)),
                                           color = "grey25",
                                           size = 3,
                                           segment.color = "grey25",
                                           segment.linetype = 1L,
                                           force             = 0,
-                                          nudge_y           = 3000,
-                                          nudge_x           = -150,
-                                          direction         = "x",
                                           hjust             = 0,
                                           segment.size      = 0.75,
-                                          segment.curvature = 0.6,
-                                          #segment.angle = 45,
+                                          segment.curvature = df %>%
+                                            dplyr::filter(!is.na(y)) %>%
+                                            dplyr::pull(annotation_curvature),
                                           segment.ncp = 4,
                                           segment.inflect = FALSE,
                                           segment.square = FALSE,

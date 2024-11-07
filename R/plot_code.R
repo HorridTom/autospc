@@ -244,7 +244,7 @@ plot_auto_SPC <- function(df,
     
     lower_annotation_level <- ifelse(chartType == "MR",
                                      max(df$ucl, na.rm = TRUE)*1.1,
-                                     min(df$lcl, na.rm = TRUE)*0.9)
+                                     min(df$lcl, na.rm = TRUE)*0.80)
     
     label_accuracy <- switch(chartType,
                      C = 1,
@@ -275,7 +275,7 @@ plot_auto_SPC <- function(df,
           cl_change == -1 ~ lower_annotation_level
         ),
         annotation_curvature = dplyr::case_when(
-          dplyr::row_number() == (1L + (chartType == "MR")) ~ 0.6,
+          dplyr::row_number() == (1L + (chartType == "MR")) ~ 0.3,
           breakPoint == FALSE ~ 0,
           cl_change == 1 ~ 0.6,
           cl_change == -1 ~ -0.6
@@ -373,7 +373,7 @@ plot_auto_SPC <- function(df,
                                           segment.ncp = 4,
                                           segment.inflect = FALSE,
                                           segment.square = FALSE,
-                                          arrow = grid::arrow(length = grid::unit(0.015, "npc"))) # TODO: work out how to configure this optimally. https://www.r4photobiology.info/galleries/nudge-and-repel.html
+                                          arrow = grid::arrow(length = grid::unit(0.03, "npc"))) # TODO: work out how to configure this optimally. https://www.r4photobiology.info/galleries/nudge-and-repel.html
                                                                                   # TODO: tidy up all the annotation machinery
                                                                                   # TODO: apply this to labelling of floating median?
       }

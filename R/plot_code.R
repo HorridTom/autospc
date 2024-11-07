@@ -75,8 +75,9 @@ plot_auto_SPC <- function(df,
                           override_y_title = NULL,
                           override_y_lim = NULL,
                           includeAnnotations = TRUE,
-                          override_annotation_dist = 10,
-                          override_annotation_dist_P = 25,
+                          upper_annotation_sf = 1.1,
+                          lower_annotation_sf = 0.8,
+                          annotation_arrow_curve = 0.3,
                           x_break = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
@@ -239,48 +240,13 @@ plot_auto_SPC <- function(df,
       
     }
     
-    # add label information
-    upper_annotation_level <- max(df$ucl, na.rm = TRUE)*1.1
-    
-    lower_annotation_level <- ifelse(chartType == "MR",
-                                     max(df$ucl, na.rm = TRUE)*1.1,
-                                     min(df$lcl, na.rm = TRUE)*0.80)
-    
-    label_accuracy <- switch(chartType,
-                     C = 1,
-                     `C'` = 1,
-                     P = 0.1,
-                     `P'` = 0.1,
-                     XMR = 10^(ceiling(log10(ylimhigh)) - 4),
-                     MR = 10^(ceiling(log10(ylimhigh)) - 4))
-    
-    df <- df %>% 
-      dplyr::mutate(cl_label = dplyr::if_else(
-        breakPoint |
-          dplyr::row_number() == (1L + (chartType == "MR")),
-        dplyr::if_else(rep(chartType == "P" | chartType == "P'",
-                           nrow(df)),
-                       scales::number(cl,
-                                      accuracy = label_accuracy,
-                                      suffix = "%"),
-                       scales::number(cl,
-                                      big.mark = ",",
-                                      accuracy = label_accuracy)),
-        ""),
-        cl_change = sign(cl - dplyr::lag(cl)),
-        annotation_level = dplyr::case_when(
-          dplyr::row_number() == (1L + (chartType == "MR")) ~ upper_annotation_level,
-          breakPoint == FALSE ~ 0,
-          cl_change == 1 ~ upper_annotation_level,
-          cl_change == -1 ~ lower_annotation_level
-        ),
-        annotation_curvature = dplyr::case_when(
-          dplyr::row_number() == (1L + (chartType == "MR")) ~ 0.3,
-          breakPoint == FALSE ~ 0,
-          cl_change == 1 ~ 0.6,
-          cl_change == -1 ~ -0.6
-        )
-      )
+    # add annotation information
+    df <- add_annotation_data(df = df,
+                              chartType = chartType,
+                              ylimhigh = ylimhigh,
+                              upper_annotation_sf = upper_annotation_sf,
+                              lower_annotation_sf = lower_annotation_sf,
+                              annotation_arrow_curve = annotation_arrow_curve)
     
     #create initial plot object without formatting
     pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
@@ -309,9 +275,6 @@ plot_auto_SPC <- function(df,
     
     if(plotChart == TRUE){
       
-      annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'" | chartType == "XMR",
-                                     override_annotation_dist,
-                                     override_annotation_dist_P)
       if(use_caption) {
         caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
       } else {
@@ -360,9 +323,10 @@ plot_auto_SPC <- function(df,
                                           position = ggpp::position_nudge_to(y = df %>%
                                                                                dplyr::filter(!is.na(y)) %>%
                                                                                dplyr::pull(annotation_level)),
-                                          color = "grey25",
+                                          color = "grey40",
                                           size = 3,
-                                          segment.color = "grey25",
+                                          fontface = "bold",
+                                          segment.color = "grey40",
                                           segment.linetype = 1L,
                                           force             = 0,
                                           hjust             = 0,
@@ -373,8 +337,7 @@ plot_auto_SPC <- function(df,
                                           segment.ncp = 4,
                                           segment.inflect = FALSE,
                                           segment.square = FALSE,
-                                          arrow = grid::arrow(length = grid::unit(0.03, "npc"))) # TODO: work out how to configure this optimally. https://www.r4photobiology.info/galleries/nudge-and-repel.html
-                                                                                  # TODO: tidy up all the annotation machinery
+                                          arrow = grid::arrow(length = grid::unit(0.015, "npc")))
                                                                                   # TODO: apply this to labelling of floating median?
       }
       

@@ -2,15 +2,24 @@
 add_annotation_data <- function(df,
                                 chartType,
                                 ylimhigh,
+                                align_labels = FALSE,
                                 upper_annotation_sf,
                                 lower_annotation_sf,
                                 annotation_arrow_curve) {
   
-  upper_annotation_level <- max(df$ucl, na.rm = TRUE)*upper_annotation_sf
+  if(align_labels) {
+    upper_level <- max(df$ucl, na.rm = TRUE)*upper_annotation_sf
+    lower_level <- min(df$lcl, na.rm = TRUE)*lower_annotation_sf
+  } else {
+    upper_level <- df$ucl*upper_annotation_sf
+    lower_level <- df$lcl*lower_annotation_sf
+  }
+  
+  upper_annotation_level <- upper_level
   
   lower_annotation_level <- ifelse(chartType == "MR",
-                                   max(df$ucl, na.rm = TRUE)*upper_annotation_sf,
-                                   min(df$lcl, na.rm = TRUE)*lower_annotation_sf)
+                                   upper_level,
+                                   lower_level)
   
   label_accuracy <- switch(chartType,
                            C = 1,
@@ -50,4 +59,51 @@ add_annotation_data <- function(df,
   
   return(df)
   
+}
+
+
+add_annotations_to_plot <- function(p,
+                                    df,
+                                    annotation_arrows,
+                                    annotation_curvature) {
+  
+  if(annotation_arrows) {
+    
+    p_annotated <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
+                                                             y = cl,
+                                                             label = cl_label),
+                                                position = ggpp::position_nudge_to(y = df %>%
+                                                                                     dplyr::filter(!is.na(y)) %>%
+                                                                                     dplyr::pull(annotation_level)),
+                                                color = "grey40",
+                                                size = 3,
+                                                fontface = "bold",
+                                                segment.color = "grey40",
+                                                segment.linetype = 1L,
+                                                force             = 0,
+                                                hjust             = 0,
+                                                segment.size      = 0.75,
+                                                segment.curvature = df %>%
+                                                  dplyr::filter(!is.na(y)) %>%
+                                                  dplyr::pull(annotation_curvature),
+                                                segment.ncp = 4,
+                                                segment.inflect = FALSE,
+                                                segment.square = FALSE,
+                                                arrow = grid::arrow(length = grid::unit(0.015, "npc")))
+  } else {
+    p_annotated <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
+                                                             y = cl,
+                                                             label = cl_label),
+                                                position = ggpp::position_nudge_to(y = df %>%
+                                                                                     dplyr::filter(!is.na(y)) %>%
+                                                                                     dplyr::pull(annotation_level)),
+                                                color = "grey40",
+                                                size = 3,
+                                                fontface = "bold",
+                                                force             = 0,
+                                                hjust             = 0,
+                                                min.segment.length = Inf)
+  }
+  
+  return(p_annotated)
 }

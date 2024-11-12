@@ -75,8 +75,10 @@ plot_auto_SPC <- function(df,
                           override_y_title = NULL,
                           override_y_lim = NULL,
                           includeAnnotations = TRUE,
+                          align_labels = FALSE,
                           upper_annotation_sf = 1.1,
                           lower_annotation_sf = 0.8,
+                          annotation_arrows = FALSE,
                           annotation_arrow_curve = 0.3,
                           x_break = NULL,
                           r1_col = "orange",
@@ -244,6 +246,7 @@ plot_auto_SPC <- function(df,
     df <- add_annotation_data(df = df,
                               chartType = chartType,
                               ylimhigh = ylimhigh,
+                              align_labels = align_labels,
                               upper_annotation_sf = upper_annotation_sf,
                               lower_annotation_sf = lower_annotation_sf,
                               annotation_arrow_curve = annotation_arrow_curve)
@@ -317,28 +320,11 @@ plot_auto_SPC <- function(df,
       
       
       if(includeAnnotations == TRUE){
-        p <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
-                                                       y = cl,
-                                                       label = cl_label),
-                                          position = ggpp::position_nudge_to(y = df %>%
-                                                                               dplyr::filter(!is.na(y)) %>%
-                                                                               dplyr::pull(annotation_level)),
-                                          color = "grey40",
-                                          size = 3,
-                                          fontface = "bold",
-                                          segment.color = "grey40",
-                                          segment.linetype = 1L,
-                                          force             = 0,
-                                          hjust             = 0,
-                                          segment.size      = 0.75,
-                                          segment.curvature = df %>%
-                                            dplyr::filter(!is.na(y)) %>%
-                                            dplyr::pull(annotation_curvature),
-                                          segment.ncp = 4,
-                                          segment.inflect = FALSE,
-                                          segment.square = FALSE,
-                                          arrow = grid::arrow(length = grid::unit(0.015, "npc")))
-                                                                                  # TODO: apply this to labelling of floating median?
+        
+        p <- add_annotations_to_plot(p = p,
+                                     df = df,
+                                     annotation_arrows = annotation_arrows,
+                                     annotation_curvature = annotation_curvature)
       }
       
       #formats x axis depending on x type

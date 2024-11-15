@@ -77,10 +77,12 @@ plot_auto_SPC <- function(df,
                           includeAnnotations = TRUE,
                           align_labels = FALSE,
                           flip_labels = FALSE,
-                          upper_annotation_sf = 1.1,
-                          lower_annotation_sf = 0.8,
+                          upper_annotation_sf = NULL,
+                          lower_annotation_sf = NULL,
                           annotation_arrows = FALSE,
                           annotation_arrow_curve = 0.3,
+                          override_annotation_dist = NULL,
+                          override_annotation_dist_P = NULL,
                           x_break = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
@@ -135,6 +137,48 @@ plot_auto_SPC <- function(df,
   if(chartType == "MR") {
     mrs <- get_mrs(y = df$y)
     df <- df %>% dplyr::mutate(y = mrs)
+  }
+  
+  # Check annotation arguments
+  if(!is.null(override_annotation_dist) |
+     !is.null(override_annotation_dist_P)) {
+    
+    lifecycle::deprecate_warn(
+      when = "0.0.0.9010",
+      what = I(paste0("plot_auto_SPC(override_annotation_dist,",
+                      "override_annotation_dist_P)")),
+      details = I(paste0("Please use `plot_auto_SPC(upper_annotation_sf, ",
+                         "lower_annotation_sf)` instead. ",
+                         "Note that equivalent new arguments can be obtained ",
+                         "from the old by transforming as follows: 1+1/x. ",
+                         "For example, override_annotation_dist = 10 is ",
+                         "equivalent to upper_annotation_sf = 1.1."))
+    )
+    
+    if(!is.null(override_annotation_dist_P) & startsWith(chartType, "P")) {
+      oad <- override_annotation_dist_P
+    } else {
+      oad <- override_annotation_dist
+    }
+    
+    if(is.null(upper_annotation_sf)) {
+      upper_annotation_sf <- 1 + 1/oad
+    }
+    
+    if(is.null(lower_annotation_sf)) {
+      lower_annotation_sf <- 1 - 1/oad
+    }
+    
+  }
+  
+  if(is.null(upper_annotation_sf)) {
+    upper_annotation_sf <- ifelse(startsWith(chartType, "P"),
+                                  1.04,
+                                  1.1)
+  }
+  
+  if(is.null(lower_annotation_sf)) {
+    lower_annotation_sf <- 2 - upper_annotation_sf
   }
   
   #get control limits

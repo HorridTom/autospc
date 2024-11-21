@@ -1,55 +1,104 @@
 # autospc
+
+## Overview
+
+autospc provides a rigorous and consistent means of re-establishing limits on
+Shewhart charts (also known as control charts), using the
+_Stable Shift Algorithm_.
+
+The main function is `plot_auto_SPC()`, which plots Shewhart charts of various
+types appropriate for different types of data, with limits established using the
+algorithm.
+
 ## Installation
-Make sure you have the `devtools` package installed.
+
+autospc can be installed using the [devtools](https://cran.r-project.org/web/packages/devtools/index.html) package.
+
+Install devtools if you have not already done so
 
 `install.packages("devtools")`
 
-Then you can install the `autospc` package.
+Then you can install autospc
 
 `devtools::install_github("HorridTom/autospc")`
 
 This may then give you the option to install other packages that `autospc` is 
 dependent on.
 
-## Input data format
+Once installed, you can load autospc as usual with
+
+`library(autospc)`
+
+## Usage
+
+The example dataset `ed_attendances_monthly`, provided with autospc, is typical
+of the time series data that the Stable Shift Algorithm is designed for. The
+example code below uses this dataset, and can be executed once autospc is
+loaded.
+
 For a **C, C' or XmR** chart the data must have the following columns:
 
-* Your x-axis variable which should be a date, POSIXct, numeric or integer type. The name of this
-column can be specified in the `x` argument of the `plot_auto_SPC`.
+* Your x-axis variable: date, POSIXct, numeric or integer type. The name of this
+column can be specified in the `x` argument of `plot_auto_SPC()`.
 
-* Your y-axis variable which should be a numeric or integer type. The name of this
-column can be specified in the `y` argument of the `plot_auto_SPC` function, e.g. 
-`plot_auto_spc(data, x = "x_column_name", y = "y_column_name", chartType = "C")`
+* Your y-axis variable : numeric or integer type. The name of this column can be
+specified in the `y` argument of the `plot_auto_SPC()` function.
+
+For example:
+
+```
+plot_auto_SPC(ed_attendances_monthly,
+                chartType = "C'",
+                x = Month_Start,
+                y = Att_All)
+```
 
 For a **P or P'** chart the data must have the following columns:
 
-* Your x-axis variable which should be a date, POSIXct, numeric or integer type. The name of this
-column can be specified in the `x` argument of the `plot_auto_SPC` function.
+* Your x-axis variable: date, POSIXct, numeric or integer type. The name of this
+column can be specified in the `x` argument of `plot_auto_SPC()`.
 
-* The total count data or denominator (e.g. number of ED attendances) which should be a numeric or integer type. The name of this column can be specified in the `n` argument of the `plot_auto_SPC` function.
+* The denominator or total count (e.g. number of ED attendances): numeric or
+integer type. The name of this column can be specified in the `n` argument of
+`plot_auto_SPC()`.
 
-* The numerator (e.g. number of 4hr breaches) which should be a numeric or integer type. The name of this
-column can be specified in the `y` argument of the `plot_auto_SPC` function, e.g. 
-`plot_auto_spc(data, x = "x_column_name", n = "denominator_column_name", y = "numerator_column_name", chartType = "P'")`
+* The numerator (e.g. number of ED attendances less than 4 hours in duration): 
+numeric or integer type. The name of this column can be specified in the `y`
+argument of `plot_auto_SPC()`.
 
+For example:
 
-## Running the charts
-Run the following code on a `dataframe` that fits the above format with the columns "month", "breaches" and "attendances".
+```
+plot_auto_SPC(ed_attendances_monthly,
+                chartType = "P'",
+                x = Month_Start,
+                y = Within_4h,
+                n = Att_All)
+```
 
-`autospc::plot_auto_SPC(dataframe, x = "month", y = "breaches", chartType = "C")`
+The parameters of the Stable Shift Algorithm, and the appearance of the chart,
+can be configured through various arguments. Use `?autospc::plot_auto_SPC` to
+find out more.
 
-The type of chart to be plotted should be specified using the `chartType` argument. E.g.
-`autospc::plot_auto_SPC(dataframe, x = "month", y = "breaches", n = "attendances", chartType = "P")`
+### Analysis output as a table
 
-There are various arguments that can be specified in this function call to change
-the appearance of the chart. Use `??autospc::plot_auto_spc` to find out more.
+In addition to the default plot output, analysis results can be obtained in
+table format using `plotChart = FALSE`, as follows:
 
-## Getting the data table
-Run the following code on a `dataframe` in the above format to return the data 
-with control limits and other information.
+```
+limits_table <- plot_auto_SPC(ed_attendances_monthly,
+                              chartType = "P'",
+                              x = Month_Start,
+                              y = Within_4h,
+                              n = Att_All,
+                              plotChart = FALSE)
+                              
+head(limits_table,
+      n = 5L)
+```
 
-`autospc::plot_auto_SPC(dataframe,chartType = "C", plotChart = FALSE)`
+## Getting help
 
-`limits_table <- autospc::plot_auto_SPC(dataframe, x = "month", y = "breaches", chartType = "C", plotChart = FALSE)`
-
-This stores the returned data in a variable called `limits_table`
+If you encounter a clear bug, please file an issue with a [minimal reproducible
+example](https://forum.posit.co/t/faq-how-to-do-a-minimal-reproducible-example-reprex-for-beginners/23061)
+on [GitHub](https://github.com/HorridTom/autospc/issues).

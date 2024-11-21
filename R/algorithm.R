@@ -34,6 +34,7 @@ create_SPC_auto_limits_table <- function(data,
                           rule2Tolerance,
                           showLimits,
                           overhangingReversions,
+                          mr_screen_max_loops,
                           ...
 ) {
   
@@ -66,7 +67,8 @@ create_SPC_auto_limits_table <- function(data,
                                                         chartType = chartType, 
                                                         maxNoOfExclusions  = maxNoOfExclusions, 
                                                         rule2Tolerance = rule2Tolerance,
-                                                        runRuleLength = runRuleLength)
+                                                        runRuleLength = runRuleLength,
+                                                        mr_screen_max_loops = mr_screen_max_loops)
     
     #set counter to first point after end of first period
     counter <- counter + periodMin
@@ -110,7 +112,8 @@ create_SPC_auto_limits_table <- function(data,
                                                                             chartType,
                                                                             maxNoOfExclusions,
                                                                             rule2Tolerance = rule2Tolerance,
-                                                                            runRuleLength = runRuleLength)
+                                                                            runRuleLength = runRuleLength,
+                                                                            mr_screen_max_loops = mr_screen_max_loops)
               
               #[9]check whether there is a rule break in the opposite direction within calc period
               opposite_rule_break <- identify_opposite_break(candidate_limits_table,

@@ -91,7 +91,8 @@ get_p_limits <- function(y,
 #Input y and n data as vectors. Returns cl, ucl and lcl as named list.
 get_cp_limits <- function(y,
                           exclusion_points = NULL,
-                          na.rm = TRUE){
+                          na.rm = TRUE,
+                          mr_screen_max_loops = 1){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
@@ -121,16 +122,10 @@ get_cp_limits <- function(y,
   z_i <- (y_excl - cl) / stdev
 
   mr  <- abs(diff(z_i))
-  amr <- mean(mr, na.rm = TRUE)
+  mr_lims <- mr_lims_calc(mr = mr,
+                          mr_screen_max_loops = mr_screen_max_loops)
   
-  # Upper limit for moving ranges
-  ulmr <- 3.267 * amr
-  
-  # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
-  mr  <- mr[mr < ulmr]
-  amr <- mean(mr, na.rm = TRUE)
-  
-  sigma_z <- amr / 1.128
+  sigma_z <- mr_lims$mean_mr / 1.128
   
   stdev <- stdev * sigma_z
   ucl <- cl + 3 * stdev
@@ -148,7 +143,8 @@ get_pp_limits <- function(y,
                           n,
                           exclusion_points = NULL, 
                           multiply = 1, 
-                          na.rm = TRUE){
+                          na.rm = TRUE,
+                          mr_screen_max_loops = 1){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
@@ -167,7 +163,7 @@ get_pp_limits <- function(y,
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
   
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & !(length(exclusion_points) == 0L)){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
     n_excl <- n[-exclusion_points]
@@ -179,22 +175,19 @@ get_pp_limits <- function(y,
   #if there are missing y or n values then set both to NA
   n_excl[which(is.na(y_excl))] <- NA
   y_excl[which(is.na(n_excl))] <- NA
-  
+
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE) 
   
   y_new <- y_excl / n_excl
   stdev <- sqrt(cl * (1 - cl) / n_excl)
   z_i <- (y_new - cl) / stdev
 
+  
   mr  <- abs(diff(z_i))
-  amr <- mean(mr, na.rm = TRUE)
-
-  # Upper limit for moving ranges
-  ulmr <- 3.267 * amr
-
-  # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
-  mr  <- mr[mr < ulmr]
-  amr <- mean(mr, na.rm = TRUE)
+  mr_lims <- mr_lims_calc(mr = mr,
+                          mr_screen_max_loops = mr_screen_max_loops)
+  amr <- mr_lims$mean_mr
+  ulmr <- mr_lims$ucl_mr
 
   sigma_z <- amr / 1.128
   
@@ -216,7 +209,7 @@ get_pp_limits <- function(y,
 
 get_i_limits <- function(y, 
                          na.rm = TRUE,
-                         recursive_mr_screen =  FALSE,
+                         mr_screen_max_loops = 1,
                          exclusion_points = NULL){
   
   #sends error messages if data is not in the correct format
@@ -240,33 +233,14 @@ get_i_limits <- function(y,
   }
   
   # calculations of limits for i charts
-  mean_i <- mean(y_excl, na.rm = TRUE)
   mr <- abs(diff(y_excl))
-  mean_mr <- mean(mr, na.rm = TRUE)
-  ucl_mr <- 3.267 * mean_mr
-  sigma <- mean_mr/1.128 
+  mr_lims <- mr_lims_calc(mr = mr,
+                          mr_screen_max_loops = mr_screen_max_loops)
+  
+  mean_i <- mean(y_excl, na.rm = TRUE)
+  sigma <- mr_lims$mean_mr/1.128 
   ucl_i <- mean_i + (3 * sigma)
   lcl_i <- mean_i - (3 * sigma)
-  
-  #removes moving ranges that are above the ucl_mr and recalculates the mean_mr, ucl_i and lcl_i  
-  max_loops <- if(recursive_mr_screen){
-    Inf
-  }else{
-    1L
-  }
-  
-  i <- 0L
-  
-  #calculate limits in cases where there are mRs above the upper range limit
-  while(any(mr > ucl_mr) & (i < max_loops)){
-    mr <- mr[mr < ucl_mr]
-    mean_mr <- mean(mr, na.rm = TRUE)
-    ucl_mr <- 3.267 * mean_mr
-    sigma <- mean_mr/1.128 
-    ucl_i <- mean_i + (3 * sigma)
-    lcl_i <- mean_i - (3 * sigma)
-    i <- i+1L
-  }
   
   #lists the results
   return(list(cl = rep(mean_i, length(y)), ucl = rep(ucl_i, length(y)), lcl = rep(lcl_i, length(y))))
@@ -292,7 +266,7 @@ get_mrs <- function(y,
 # Get moving range limits 
 get_mr_limits <- function(mr,
                           na.rm = TRUE,
-                          recursive_mr_screen = FALSE,
+                          mr_screen_max_loops = 0,
                           exclusion_points = NULL) {
   
   #exclude exclusion points from calculations
@@ -302,11 +276,11 @@ get_mr_limits <- function(mr,
     mr_excl <- mr
   }
   
-  mean_mr <- mean(mr_excl, na.rm = TRUE)
-  ucl_mr <- 3.267 * mean_mr 
+  mr_lims <- mr_lims_calc(mr = mr_excl,
+                          mr_screen_max_loops = mr_screen_max_loops)
   
-  cl <- mean_mr 
-  ucl <- ucl_mr
+  cl <- mr_lims$mean_mr 
+  ucl <- mr_lims$ucl_mr
   lcl <- 0
   
   return(list(cl = rep(cl, length(mr)),
@@ -315,3 +289,30 @@ get_mr_limits <- function(mr,
               mr = mr
   ))
 }
+
+mr_lims_calc <- function(mr,
+                         mr_screen_max_loops) {
+  
+  # calculations of limits for i charts
+  mean_mr <- mean(mr,
+                  na.rm = TRUE)
+  ucl_mr <- 3.267 * mean_mr
+  
+  #removes moving ranges that are above the ucl_mr and
+  # recalculates the mean_mr
+  i <- 0L
+  
+  while(any(mr > ucl_mr, na.rm = TRUE) & (i < mr_screen_max_loops)){
+    
+    mr <- mr[mr < ucl_mr] # removes any mR values above the ucl
+    mean_mr <- mean(mr, na.rm = TRUE)
+    ucl_mr <- 3.267 * mean_mr
+    
+    i <- i+1L
+  }
+  
+  return(list(mean_mr = mean_mr,
+              ucl_mr = ucl_mr))
+}
+
+

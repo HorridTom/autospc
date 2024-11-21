@@ -16,6 +16,7 @@ create_SPC_auto_limits_table(
   rule2Tolerance,
   showLimits,
   overhangingReversions,
+  mr_screen_max_loops,
   ...
 )
 }

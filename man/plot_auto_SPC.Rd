@@ -44,7 +44,8 @@ plot_auto_SPC(
   x_pad_end = NULL,
   noRecals = FALSE,
   showLimits = TRUE,
-  showMR = TRUE
+  showMR = TRUE,
+  mr_screen_max_loops = 1L
 )
 }
 \arguments{
@@ -109,6 +110,11 @@ x-axis}
 \item{showMR}{logical controlling whether the moving range chart is included
 in XMR chart}
 
+\item{mr_screen_max_loops}{integer or Inf specifying maximum number of times
+to recursively ignore mr values above the upper range limit when calculating
+xmr limits. Note this does not affect the calculation of the upper range
+limit on the mr chart.}
+
 \item{data}{For an XMR, C or C' chart: a data frame with columns x, y, title (optional)
 and subtitle (optional)
 For a P or P' chart: a data frame with columns x, n (total), y (numerator),
@@ -119,4 +125,31 @@ An SPC ggplot or corresponding data
 }
 \description{
 plot_auto_SPC
+}
+\examples{
+# Using a C' chart to track changes in the count of monthly attendance 
+plot_auto_SPC(
+  ed_attendances_monthly, 
+  chartType = "C'", 
+  x = Month_Start, 
+  y = Att_All
+)
+   
+#Using a P' chart to track changes in the percentage admitted within 4 hours
+plot_auto_SPC(
+  ed_attendances_monthly, 
+  chartType = "P'", 
+  x = Month_Start, 
+  y = Within_4h, 
+  n = Att_All
+)
+
+#using a runRuleLength of 7 when tracking monthly attendance
+plot_auto_SPC(
+  ed_attendances_monthly, 
+  chartType = "C'", 
+  x = Month_Start, 
+  y = Att_All,
+  runRuleLength = 7
+)
 }

@@ -52,7 +52,8 @@ add_annotation_data <- function(df,
         dplyr::row_number() == (1L + (chartType == "MR")) ~ annotation_arrow_curve,
         breakPoint == FALSE ~ 0,
         cl_change == 1 ~ annotation_arrow_curve,
-        cl_change == -1 ~ -annotation_arrow_curve
+        cl_change == -1 & flip_labels ~ -annotation_arrow_curve,
+        cl_change == -1 & !flip_labels ~ annotation_arrow_curve
       )
     ) %>%
     dplyr::select(
@@ -70,6 +71,7 @@ add_annotation_data <- function(df,
 
 add_annotations_to_plot <- function(p,
                                     df,
+                                    annotation_size,
                                     annotation_arrows,
                                     annotation_curvature) {
   
@@ -82,7 +84,7 @@ add_annotations_to_plot <- function(p,
                                                                                      dplyr::filter(!is.na(y)) %>%
                                                                                      dplyr::pull(annotation_level)),
                                                 color = "grey40",
-                                                size = 3,
+                                                size = annotation_size,
                                                 fontface = "bold",
                                                 segment.color = "grey40",
                                                 segment.linetype = 1L,
@@ -104,7 +106,7 @@ add_annotations_to_plot <- function(p,
                                                                                      dplyr::filter(!is.na(y)) %>%
                                                                                      dplyr::pull(annotation_level)),
                                                 color = "grey40",
-                                                size = 3,
+                                                size = annotation_size,
                                                 fontface = "bold",
                                                 force             = 0,
                                                 hjust             = 0,

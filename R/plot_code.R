@@ -75,6 +75,7 @@ plot_auto_SPC <- function(df,
                           override_y_title = NULL,
                           override_y_lim = NULL,
                           includeAnnotations = TRUE,
+                          annotation_size = 3,
                           align_labels = FALSE,
                           flip_labels = FALSE,
                           upper_annotation_sf = NULL,
@@ -369,6 +370,7 @@ plot_auto_SPC <- function(df,
         
         p <- add_annotations_to_plot(p = p,
                                      df = df,
+                                     annotation_size = annotation_size,
                                      annotation_arrows = annotation_arrows,
                                      annotation_curvature = annotation_curvature)
       }

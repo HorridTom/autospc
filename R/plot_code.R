@@ -105,8 +105,15 @@ plot_auto_SPC <- function(df,
                           override_y_title = NULL,
                           override_y_lim = NULL,
                           includeAnnotations = TRUE,
-                          override_annotation_dist = 10,
-                          override_annotation_dist_P = 25,
+                          annotation_size = 3,
+                          align_labels = FALSE,
+                          flip_labels = FALSE,
+                          upper_annotation_sf = NULL,
+                          lower_annotation_sf = NULL,
+                          annotation_arrows = FALSE,
+                          annotation_arrow_curve = 0.3,
+                          override_annotation_dist = NULL,
+                          override_annotation_dist_P = NULL,
                           x_break = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
@@ -164,6 +171,48 @@ plot_auto_SPC <- function(df,
     df <- df %>% dplyr::mutate(y = mrs)
   }
   
+  # Check annotation arguments
+  if(!is.null(override_annotation_dist) |
+     !is.null(override_annotation_dist_P)) {
+    
+    lifecycle::deprecate_warn(
+      when = "0.0.0.9010",
+      what = I(paste0("plot_auto_SPC(override_annotation_dist,",
+                      "override_annotation_dist_P)")),
+      details = I(paste0("Please use `plot_auto_SPC(upper_annotation_sf, ",
+                         "lower_annotation_sf)` instead. ",
+                         "Note that equivalent new arguments can be obtained ",
+                         "from the old by transforming as follows: 1+1/x. ",
+                         "For example, override_annotation_dist = 10 is ",
+                         "equivalent to upper_annotation_sf = 1.1."))
+    )
+    
+    if(!is.null(override_annotation_dist_P) & startsWith(chartType, "P")) {
+      oad <- override_annotation_dist_P
+    } else {
+      oad <- override_annotation_dist
+    }
+    
+    if(is.null(upper_annotation_sf)) {
+      upper_annotation_sf <- 1 + 1/oad
+    }
+    
+    if(is.null(lower_annotation_sf)) {
+      lower_annotation_sf <- 1 - 1/oad
+    }
+    
+  }
+  
+  if(is.null(upper_annotation_sf)) {
+    upper_annotation_sf <- ifelse(startsWith(chartType, "P"),
+                                  1.04,
+                                  1.1)
+  }
+  
+  if(is.null(lower_annotation_sf)) {
+    lower_annotation_sf <- 2 - upper_annotation_sf
+  }
+  
   #get control limits
   #df <- dplyr::mutate(df, x = as.Date(x))
   df <- create_SPC_auto_limits_table(df, chartType = chartType, 
@@ -182,11 +231,17 @@ plot_auto_SPC <- function(df,
   ylimlow <- 0
   
   if(nrow(df) < periodMin){
-    ylimhigh <- max(df$y)
+    ylimhigh <- max(df$y,
+                    na.rm = TRUE)
   }else if(chartType == "C" | chartType == "C'"){
-    ylimhigh <- max(df$ucl, df$y) + max(df$ucl)/10 +10
+    ylimhigh <- max(df$ucl,
+                    df$y,
+                    na.rm = TRUE) + max(df$ucl,
+                                        na.rm = TRUE)/10 + 10
   }else if (chartType == "XMR" | chartType == "MR"){
-    ylimhigh <- max(df$ucl, df$y)*1.1
+    ylimhigh <- max(df$ucl,
+                    df$y,
+                    na.rm = TRUE)*1.1
   }else{
     ylimhigh <- 110
   }
@@ -265,14 +320,19 @@ plot_auto_SPC <- function(df,
       
     }
     
+    # add annotation information
+    df <- add_annotation_data(df = df,
+                              chartType = chartType,
+                              ylimhigh = ylimhigh,
+                              align_labels = align_labels,
+                              flip_labels = flip_labels,
+                              upper_annotation_sf = upper_annotation_sf,
+                              lower_annotation_sf = lower_annotation_sf,
+                              annotation_arrow_curve = annotation_arrow_curve)
+    
     #create initial plot object without formatting
     pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
                            ggplot2::aes(x,y))
-    
-    #for annotations
-    cl_start <- round(df$cl[1])
-    ucl_start <- round(df$ucl[1])
-    cl_end <- round(df$cl[(nrow(df)-1)])
     
     #get periods into groups for plotting
     df <- df %>%
@@ -297,9 +357,6 @@ plot_auto_SPC <- function(df,
     
     if(plotChart == TRUE){
       
-      annotation_dist_fact <- ifelse(chartType == "C" | chartType == "C'" | chartType == "XMR",
-                                     override_annotation_dist,
-                                     override_annotation_dist_P)
       if(use_caption) {
         caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
       } else {
@@ -342,17 +399,12 @@ plot_auto_SPC <- function(df,
       
       
       if(includeAnnotations == TRUE){
-        p <- p +
-          ggplot2::annotate("text",
-                            x = start_x,
-                            y = ucl_start + ucl_start/annotation_dist_fact,
-                            label = cl_start,
-                            na.rm = TRUE) +
-          ggplot2::annotate("text",
-                            x = df$x[breakPoints] + 2,
-                            y = df$ucl[breakPoints] + ucl_start/annotation_dist_fact,
-                            label = round(df$cl[breakPoints]),
-                            na.rm = TRUE)
+        
+        p <- add_annotations_to_plot(p = p,
+                                     df = df,
+                                     annotation_size = annotation_size,
+                                     annotation_arrows = annotation_arrows,
+                                     annotation_curvature = annotation_curvature)
       }
       
       #formats x axis depending on x type

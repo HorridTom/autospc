@@ -27,6 +27,7 @@ plot_auto_SPC(
   override_y_title = NULL,
   override_y_lim = NULL,
   includeAnnotations = TRUE,
+  annotation_size = 3,
   align_labels = FALSE,
   flip_labels = FALSE,
   upper_annotation_sf = NULL,

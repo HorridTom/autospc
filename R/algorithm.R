@@ -1,26 +1,12 @@
-#function interface for automated SPC function
-#' create_SPC_auto_limits_table
+#' Automatically recalculate SPC control limits
+#' 
+#' `create_SPC_auto_limits_table` applies the Stable Shift Algorithm to automate
+#' recalculation of control limits.
 #'
-#' @param data For an XMR, C or C' chart: a data frame with columns x, y, title (optional) 
-#' and subtitle (optional)
-#' For a P or P' chart: a data frame with columns x, n (total), b (number of breaches), 
-#' title (optional), subtitle (optional) 
-#' @param chart_typ the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")
-#' @param periodMin the minimum number of points per period.
-#' @param runRuleLength the number of points above or below the centre line needed
-#' for a rule 2 break
-#' @param maxNoOfExclusions the maximum number of extreme points to exclude from 
-#' limit calculations 
-#' @param noRegrets Boolean signifying which version of the algorithm should be used. 
-#' Defines whether limits can change as more data is added or not.
-#' @param overhangingReversions Boolean determining whether rule breaks in the
-#' opposite direction to a rule break triggering a candidate recalculation
-#' prevent recalculation even if they overhang the end of the candidate
-#' calculation period. Set to FALSE only with noRegrets = FALSE.
-#' @param verbosity integer specifying how talkative the algorithm is; the
-#' higher the number the more information is provided, none if 0.
+#' @inheritParams plot_auto_SPC
 #'
-#' @return data frame with limits, rule breaks and additional info needed for plotting
+#' @return data frame with limits, rule breaks and additional info needed for
+#' plotting
 #'
 #' @examples
 create_SPC_auto_limits_table <- function(data, 

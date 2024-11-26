@@ -2,7 +2,7 @@
 % Please edit documentation in R/algorithm.R
 \name{create_SPC_auto_limits_table}
 \alias{create_SPC_auto_limits_table}
-\title{create_SPC_auto_limits_table}
+\title{Automatically recalculate SPC control limits}
 \usage{
 create_SPC_auto_limits_table(
   data,
@@ -21,35 +21,55 @@ create_SPC_auto_limits_table(
 )
 }
 \arguments{
-\item{data}{For an XMR, C or C' chart: a data frame with columns x, y, title (optional)
-and subtitle (optional)
-For a P or P' chart: a data frame with columns x, n (total), b (number of breaches),
-title (optional), subtitle (optional)}
+\item{chartType}{The type of chart you wish to plot. Available options are:
+"XMR", "MR", "C", "C'", "P", "P'".
+\subsection{Algorithm Parameters}{
+}}
 
-\item{periodMin}{the minimum number of points per period.}
+\item{periodMin}{The minimum number of points (subgroups) per period,
+i.e. the minimum number of points required to form control limits.}
 
-\item{runRuleLength}{the number of points above or below the centre line needed
-for a rule 2 break}
+\item{runRuleLength}{The minimum number of consecutive points above or below
+the centre line constituting a shift (or "rule 2") break.}
 
-\item{maxNoOfExclusions}{the maximum number of extreme points to exclude from
-limit calculations}
+\item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
+limit calculations.}
 
-\item{noRegrets}{Boolean signifying which version of the algorithm should be used.
-Defines whether limits can change as more data is added or not.}
+\item{noRegrets}{Boolean signifying which version of the algorithm should be
+used. Defines whether limits can change as more data is added or not.}
 
-\item{verbosity}{integer specifying how talkative the algorithm is; the
-higher the number the more information is provided, none if 0.}
+\item{verbosity}{Integer specifying how talkative the algorithm is; the
+higher the number the more information is provided, none if 0.
+\subsection{Chart Appearance}{
+}}
+
+\item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
+extend limits calculated from the first periodMin points.}
+
+\item{rule2Tolerance}{Minimum difference between a point's vertical position
+and the centre line to count as "on the centre line" for the purposes of
+shift rule breaks}
+
+\item{showLimits}{Boolean controlling whether or not to display centre line
+and control limits}
 
 \item{overhangingReversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.}
+calculation period. Set to FALSE only with noRegrets = FALSE.
+\subsection{SPC Parameters}{
+}}
 
-\item{chart_typ}{the type of chart you wish to plot (e.g. "XMR", "C", "C'", "P", "P'")}
+\item{mr_screen_max_loops}{Integer or Inf specifying maximum number of times
+to recursively ignore mr values above the upper range limit when calculating
+xmr limits. Note this does not affect the calculation of the upper range
+limit on the mr chart.}
 }
 \value{
-data frame with limits, rule breaks and additional info needed for plotting
+data frame with limits, rule breaks and additional info needed for
+plotting
 }
 \description{
-create_SPC_auto_limits_table
+\code{create_SPC_auto_limits_table} applies the Stable Shift Algorithm to automate
+recalculation of control limits.
 }

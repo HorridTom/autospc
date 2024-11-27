@@ -16,11 +16,22 @@ create_SPC_auto_limits_table(
   rule2Tolerance,
   showLimits,
   overhangingReversions,
-  mr_screen_max_loops,
-  ...
+  mr_screen_max_loops
 )
 }
 \arguments{
+\item{data}{A data frame. For an XMR, C or C' chart, must have columns:
+\itemize{
+\item x, the subgrouping variable, to be plotted on the horizontal axis;
+\item y, the variable of interest to be plotted on the vertical axis;
+} \cr
+For a P or P' chart, must have columns:
+\itemize{
+\item x, the subgrouping variable, to be plotted on the horizontal axis;
+\item n, the total count or denominator;
+\item y, the count meeting criteria, or numerator;
+}}
+
 \item{chartType}{The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
@@ -72,4 +83,29 @@ plotting
 \description{
 \code{create_SPC_auto_limits_table} applies the Stable Shift Algorithm to automate
 recalculation of control limits.
+}
+\examples{
+# Calculate limts for a C' chart for count of monthly attendances
+
+df <- ed_attendances_monthly \%>\%
+        dplyr::rename(x = Month_Start,
+                      y = Att_All)
+
+limits_table <- create_SPC_auto_limits_table(
+  df,
+  chartType = "C'",
+  periodMin = 21,
+  runRuleLength = 8,
+  maxNoOfExclusions = 3,
+  noRegrets = TRUE,
+  verbosity = 1L,
+  noRecals = FALSE,
+  rule2Tolerance = 0,
+  showLimits = TRUE,
+  overhangingReversions = TRUE,
+  mr_screen_max_loops = 1L
+)
+
+head(limits_table)
+
 }

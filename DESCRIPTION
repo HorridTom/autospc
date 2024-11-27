@@ -17,7 +17,6 @@ Imports:
     ggpubr (>= 0.6.0),
     ggrepel,
     lifecycle (>= 1.0.3),
-    lubridate (>= 1.9.2),
     magrittr (>= 2.0.3),
     qicharts2 (>= 0.7.2),
     rlang (>= 1.1.0),

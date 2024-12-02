@@ -418,7 +418,7 @@ plot_auto_SPC <- function(df,
       p_mr <- eval(mc)
     }
     
-    if(plotChart == TRUE){
+    if(plotChart){
       
       if(use_caption) {
         caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
@@ -524,6 +524,7 @@ plot_auto_SPC <- function(df,
       )
       
     }else if(writeTable == TRUE){
+      # (!plotChart)
       
       title <- gsub(":", "_",title)
       subtitle <- gsub(":","_", subtitle)
@@ -531,8 +532,9 @@ plot_auto_SPC <- function(df,
                 row.names = FALSE)
       
     }else{
+      # (!plotChart)
       
-      if(chartType == "XMR") {
+      if(chartType == "XMR" & showMR) {
         
         df <- df %>%
           dplyr::left_join(p_mr %>%

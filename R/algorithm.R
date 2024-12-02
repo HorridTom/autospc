@@ -77,6 +77,10 @@ create_SPC_auto_limits_table <- function(data,
   
   #set counter to one
   counter <- 1
+  if(verbosity > 0) {
+    message("*********************************************")
+    message(paste0("Counter: ", counter))
+  }
   
   #[1] see whether there are enough data points to form one period
   if(enough_data_for_new_period(data, periodMin, counter)){
@@ -96,6 +100,11 @@ create_SPC_auto_limits_table <- function(data,
 
     if(!noRecals){#[3]loop starts
       while(counter < nrow(data)){
+        
+        if(verbosity > 0) {
+          message("\n---------------------------------------------")
+          message(paste0("Counter: ", counter))
+        }
         
         #[4]see whether there are enough points after the counter to form new period
         if(enough_data_for_new_period(limits_table, periodMin, counter)){
@@ -117,7 +126,10 @@ create_SPC_auto_limits_table <- function(data,
           
           #[5]see if there are any further rule 2 breaks
           if(!is.na(rule2_break_position) & rule2_break_position < nrow(data)){
-            
+            if(verbosity > 0) {
+              message(paste0("Candidate period starting at: ",
+                           rule2_break_position))
+            }
             
             #[6]set counter to the next rule break position
             counter <- rule2_break_position
@@ -154,6 +166,8 @@ create_SPC_auto_limits_table <- function(data,
               #recalc if...
               if(!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)){
                 
+                message(paste0("Candidate period confirmed"))
+                
                 #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
                 limits_table <- candidate_limits_table
                 
@@ -161,6 +175,12 @@ create_SPC_auto_limits_table <- function(data,
                 counter <- counter + periodMin
                 
               }else{
+                
+                message(paste0("Candidate period rejected.\nOpposite rule break: ",
+                             opposite_rule_break,
+                             "\nFinal run prevents: ",
+                             final_run_prevents))
+                
                 #[11]
                 #check if counter is part way through a rule 2 break already
                 #provided there are at least 8 rule 2 breaks following or no further rule breaks have been identified 
@@ -179,21 +199,24 @@ create_SPC_auto_limits_table <- function(data,
               
             }else{
               if(verbosity > 0) {
-                #print("There are not enough data points to form another period. Calculation complete.")
+                message("There are not enough data points to form another period. Calculation complete.")
+                message("*********************************************\n")
               }
               break
             }
             
           }else{
             if(verbosity > 0) {
-              #print("There are no further rule breaks. Calculation complete.")
+              message("There are no further rule breaks. Calculation complete.")
+              message("*********************************************\n")
             }
             break
           }
           
         }else{        
           if(verbosity > 0) {
-            #print("There are not enough data points to form another period. Calculation complete.")
+            message("There are not enough data points to form another period. Calculation complete.")
+            message("*********************************************\n")
           }
           break
         }
@@ -211,8 +234,8 @@ create_SPC_auto_limits_table <- function(data,
     
   }else{
     if(verbosity > 0) {
-      #print("There are not enough points to form one period.")
-      
+      message("There are not enough points to form one period.")
+      message("*********************************************\n")
       if(showLimits == TRUE){
         warning("The input data has fewer than the minimum number of points needed to calculate one period. Timeseries data without limits has been displayed.")
       }

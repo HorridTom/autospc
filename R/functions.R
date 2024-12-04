@@ -480,7 +480,7 @@ add_rule_breaks_respecting_periods <- function(limits_table,
   breakpoints <- which(limits_table$breakPoint)
   
   
-  if(counter == 1){
+  if(counter == 1 | length(breakpoints) == 0L) {
     #for first period
     
     #add rule breaks to all of data

@@ -44,6 +44,8 @@
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
 #' calculation period. Set to FALSE only with noRegrets = FALSE.
+#' @param recalc_every_shift Boolean determining whether to ignore the stable
+#' shift algorithm and simply establish a new period at each shift rule break.
 #' 
 #' ## SPC Parameters
 #' @param maxNoOfExclusions The maximum number of extreme points to exclude from 
@@ -153,6 +155,7 @@ plot_auto_SPC <- function(df,
                           noRecals = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
+                          recalc_every_shift = FALSE,
                           ## SPC Parameters
                           maxNoOfExclusions = 3,
                           highlightExclusions = TRUE,
@@ -288,7 +291,8 @@ plot_auto_SPC <- function(df,
                                      rule2Tolerance = rule2Tolerance,
                                      showLimits = showLimits,
                                      overhangingReversions = overhangingReversions,
-                                     mr_screen_max_loops = mr_screen_max_loops)
+                                     mr_screen_max_loops = mr_screen_max_loops,
+                                     recalc_every_shift = recalc_every_shift)
   
   # chart y limit
   ylimlow <- 0

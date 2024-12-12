@@ -56,7 +56,8 @@ create_SPC_auto_limits_table <- function(data,
                           rule2Tolerance,
                           showLimits,
                           overhangingReversions,
-                          mr_screen_max_loops
+                          mr_screen_max_loops,
+                          recalc_every_shift
 ) {
   
   if(noRegrets & !overhangingReversions) {
@@ -152,7 +153,10 @@ create_SPC_auto_limits_table <- function(data,
                 triggering_rule_break_direction)
               
               #recalc if...
-              if(!opposite_rule_break & ((noRegrets == TRUE & !final_run_prevents) | noRegrets == FALSE)){
+              if((!opposite_rule_break & 
+                 ((noRegrets == TRUE & !final_run_prevents) |
+                  noRegrets == FALSE)) |
+                 recalc_every_shift){
                 
                 #[10]No opposite rule break in candidate calculation period - candidate limits become real limits
                 limits_table <- candidate_limits_table

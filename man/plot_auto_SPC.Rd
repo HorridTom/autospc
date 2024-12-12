@@ -15,6 +15,7 @@ plot_auto_SPC(
   noRecals = FALSE,
   noRegrets = TRUE,
   overhangingReversions = TRUE,
+  recalc_every_shift = FALSE,
   maxNoOfExclusions = 3,
   highlightExclusions = TRUE,
   mr_screen_max_loops = 1L,
@@ -97,7 +98,10 @@ used. Defines whether limits can change as more data is added or not.}
 \item{overhangingReversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.
+calculation period. Set to FALSE only with noRegrets = FALSE.}
+
+\item{recalc_every_shift}{Boolean determining whether to ignore the stable
+shift algorithm and simply establish a new period at each shift rule break.
 \subsection{SPC Parameters}{
 }}
 

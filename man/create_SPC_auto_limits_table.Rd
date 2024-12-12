@@ -16,7 +16,8 @@ create_SPC_auto_limits_table(
   rule2Tolerance,
   showLimits,
   overhangingReversions,
-  mr_screen_max_loops
+  mr_screen_max_loops,
+  recalc_every_shift
 )
 }
 \arguments{
@@ -67,14 +68,17 @@ and control limits}
 \item{overhangingReversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.
-\subsection{SPC Parameters}{
-}}
+calculation period. Set to FALSE only with noRegrets = FALSE.}
 
 \item{mr_screen_max_loops}{Integer or Inf specifying maximum number of times
 to recursively ignore mr values above the upper range limit when calculating
 xmr limits. Note this does not affect the calculation of the upper range
 limit on the mr chart.}
+
+\item{recalc_every_shift}{Boolean determining whether to ignore the stable
+shift algorithm and simply establish a new period at each shift rule break.
+\subsection{SPC Parameters}{
+}}
 }
 \value{
 data frame with limits, rule breaks and additional info needed for

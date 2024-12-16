@@ -291,7 +291,22 @@ plot_auto_SPC <- function(df,
                                      mr_screen_max_loops = mr_screen_max_loops)
   
   # chart y limit
-  ylimlow <- 0
+  if(nrow(df) < periodMin) {
+    ylimlow <- min(df$y,
+                   na.rm = TRUE)
+  } else if(chartType != "XMR") {
+    ylimlow <- 0
+  } else {
+    ylimlow <- min(df$lcl,
+                   df$y,
+                   na.rm = TRUE)
+    yll_sgn <- sign(ylimlow)
+    if(yll_sgn != -1) {
+      ylimlow <- ylimlow * 0.9
+    } else {
+      ylimlow <- ylimlow * 1.1
+    }
+  }
   
   if(nrow(df) < periodMin){
     ylimhigh <- max(df$y,

@@ -101,12 +101,14 @@ form_calculation_limits <- function(data,
     #only selects n if P chart
     if(chartType == "P" | chartType == "P'"){
       limits_table <- limits_table %>%
-        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, contains("highlight"), 
-                      contains("breakPoint"))
+        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, 
+                      contains("breakPoint"), contains("rule"),
+                      contains("aboveOrBelow"), contains("highlight"))
     }else{
       limits_table <- limits_table %>%
-        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, contains("highlight"), 
-                      contains("breakPoint"))
+        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, 
+                      contains("breakPoint"), contains("rule"),
+                      contains("aboveOrBelow"), contains("highlight"))
     }
   }
   

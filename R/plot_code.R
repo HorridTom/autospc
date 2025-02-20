@@ -40,14 +40,14 @@
 #' extend limits calculated from the first periodMin points.
 #' @param noPeriodMin Boolean - if TRUE, ignore periodMin for recalculations and
 #' recalculate at every shift rule break
+#' @param recalc_every_shift Boolean determining whether to ignore the stable
+#' shift algorithm and simply establish a new period at each shift rule break.
 #' @param noRegrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhangingReversions Boolean determining whether rule breaks in the
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
 #' calculation period. Set to FALSE only with noRegrets = FALSE.
-#' @param recalc_every_shift Boolean determining whether to ignore the stable
-#' shift algorithm and simply establish a new period at each shift rule break.
 #' 
 #' ## SPC Parameters
 #' @param maxNoOfExclusions The maximum number of extreme points to exclude from 
@@ -156,9 +156,9 @@ plot_auto_SPC <- function(df,
                           runRuleLength = 8,
                           noRecals = FALSE,
                           noPeriodMin = FALSE,
+                          recalc_every_shift = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
-                          recalc_every_shift = FALSE,
                           ## SPC Parameters
                           maxNoOfExclusions = 3,
                           highlightExclusions = TRUE,

@@ -11,13 +11,14 @@ create_SPC_auto_limits_table(
   runRuleLength,
   maxNoOfExclusions,
   noRegrets,
+  noPeriodMin,
+  recalc_every_shift,
   verbosity,
   noRecals,
   rule2Tolerance,
   showLimits,
   overhangingReversions,
-  mr_screen_max_loops,
-  recalc_every_shift
+  mr_screen_max_loops
 )
 }
 \arguments{
@@ -50,6 +51,12 @@ limit calculations.}
 \item{noRegrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}
 
+\item{noPeriodMin}{Boolean - if TRUE, ignore periodMin for recalculations and
+recalculate at every shift rule break}
+
+\item{recalc_every_shift}{Boolean determining whether to ignore the stable
+shift algorithm and simply establish a new period at each shift rule break.}
+
 \item{verbosity}{Integer specifying how talkative the algorithm is; the
 higher the number the more information is provided, none if 0.
 \subsection{Chart Appearance}{
@@ -68,17 +75,14 @@ and control limits}
 \item{overhangingReversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.}
+calculation period. Set to FALSE only with noRegrets = FALSE.
+\subsection{SPC Parameters}{
+}}
 
 \item{mr_screen_max_loops}{Integer or Inf specifying maximum number of times
 to recursively ignore mr values above the upper range limit when calculating
 xmr limits. Note this does not affect the calculation of the upper range
 limit on the mr chart.}
-
-\item{recalc_every_shift}{Boolean determining whether to ignore the stable
-shift algorithm and simply establish a new period at each shift rule break.
-\subsection{SPC Parameters}{
-}}
 }
 \value{
 data frame with limits, rule breaks and additional info needed for

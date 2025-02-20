@@ -52,13 +52,13 @@ create_SPC_auto_limits_table <- function(data,
                           maxNoOfExclusions,
                           noRegrets,
                           noPeriodMin,
+                          recalc_every_shift,
                           verbosity,
                           noRecals,
                           rule2Tolerance,
                           showLimits,
                           overhangingReversions,
-                          mr_screen_max_loops,
-                          recalc_every_shift
+                          mr_screen_max_loops
 ) {
   
   if(noRegrets & !overhangingReversions) {

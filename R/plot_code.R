@@ -320,32 +320,32 @@ plot_auto_SPC <- function(df,
     }
     
     df_ext_first_row <- df %>%
-      filter(row_number() == max(row_number())) %>% 
-      mutate(x = x_max + 1,
-             y = NA_real_,
-             periodType = "display",
-             excluded = NA,
-             breakPoint = FALSE,
-             rule1 = FALSE,
-             rule2 = FALSE,
-             aboveOrBelowCl = 0,
-             highlight = "None")
+      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
+      dplyr::mutate(x = x_max + 1,
+                    y = NA_real_,
+                    periodType = "display",
+                    excluded = NA,
+                    breakPoint = FALSE,
+                    rule1 = FALSE,
+                    rule2 = FALSE,
+                    aboveOrBelowCl = 0,
+                    highlight = "None")
     
     df_ext_last_row <- df %>%
-      filter(row_number() == max(row_number())) %>% 
-      mutate(x = extend_limits_to,
-             y = NA_real_,
-             periodType = "display",
-             excluded = NA,
-             breakPoint = FALSE,
-             rule1 = FALSE,
-             rule2 = FALSE,
-             aboveOrBelowCl = 0,
-             highlight = "None")
+      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
+      dplyr::mutate(x = extend_limits_to,
+                    y = NA_real_,
+                    periodType = "display",
+                    excluded = NA,
+                    breakPoint = FALSE,
+                    rule1 = FALSE,
+                    rule2 = FALSE,
+                    aboveOrBelowCl = 0,
+                    highlight = "None")
     
     df <- df %>% 
-      bind_rows(df_ext_first_row,
-                df_ext_last_row)
+      dplyr::bind_rows(df_ext_first_row,
+                       df_ext_last_row)
   }
   
   # chart y limit

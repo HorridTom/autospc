@@ -21,3 +21,35 @@ test_that("Determines correctly whether there are enough data point to form a ne
   testthat::expect_equal(results, correct_answers)
   
 })
+
+
+test_that("Correctly established enough data point to form a new period with baseline",{
+  
+  # case when baseline = NULL
+  result1 <- enough_data_for_new_period(data = test_data,
+                                        periodMin = 21,
+                                        counter = 1)
+  
+  # case when baseline = periodMin
+  result2 <- enough_data_for_new_period(data = test_data,
+                                        periodMin = 21,
+                                        baseline = 21,
+                                        counter = 1)
+  
+  # case when baseline > length of data
+  
+  bl <- nrow(test_data) + 1
+  
+  result3 <- enough_data_for_new_period(data = test_data,
+                                        periodMin = 21,
+                                        baseline = bl,
+                                        counter = 1)
+  
+  
+  results <- c(result1, result2, result3)
+  
+  correct_answers <- c(TRUE, TRUE, FALSE)
+  
+  testthat::expect_equal(results, correct_answers)
+  
+})

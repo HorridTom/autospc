@@ -18,13 +18,24 @@ test_that("comparator approaches calculate correctly",{
   
   p2 <- plot_auto_SPC(test_comparator_approaches_data,
                       chartType = "XMR",
+                      periodMin = 21L,
                       noPeriodMin = FALSE,
+                      recalc_every_shift = TRUE,
+                      showMR = FALSE,
+                      plotChart = FALSE)
+  
+  p2b <- plot_auto_SPC(test_comparator_approaches_data,
+                      chartType = "XMR",
+                      periodMin = 21L,
+                      noPeriodMin = FALSE,
+                      baseline = 42L,
                       recalc_every_shift = TRUE,
                       showMR = FALSE,
                       plotChart = FALSE)
   
   p3 <- plot_auto_SPC(test_comparator_approaches_data,
                       chartType = "XMR",
+                      periodMin = 21L,
                       noRegrets = FALSE,
                       overhangingReversions = FALSE,
                       showMR = FALSE,
@@ -32,12 +43,14 @@ test_that("comparator approaches calculate correctly",{
   
   p4 <- plot_auto_SPC(test_comparator_approaches_data,
                       chartType = "XMR",
+                      periodMin = 21L,
                       noRegrets = TRUE,
                       showMR = FALSE,
                       plotChart = FALSE)
   
   breakpoints <- lapply(list(p1,
                              p2,
+                             p2b,
                              p3,
                              p4),
                         get_breakpoints)
@@ -47,8 +60,10 @@ test_that("comparator approaches calculate correctly",{
   expect_equal(breakpoints[[2]],
                c(22L, 43L, 64L))
   expect_equal(breakpoints[[3]],
-               c(22L, 43L))
+               c(43L, 64L))
   expect_equal(breakpoints[[4]],
+               c(22L, 43L))
+  expect_equal(breakpoints[[5]],
                c(22L))
   
 })

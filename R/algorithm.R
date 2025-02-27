@@ -48,6 +48,7 @@
 create_SPC_auto_limits_table <- function(data, 
                           chartType,
                           periodMin,
+                          baseline,
                           runRuleLength,
                           maxNoOfExclusions,
                           noRegrets,
@@ -81,7 +82,8 @@ create_SPC_auto_limits_table <- function(data,
   counter <- 1
   
   #[1] see whether there are enough data points to form one period
-  if(enough_data_for_new_period(data, periodMin, counter)){
+  if(enough_data_for_new_period(data, periodMin, counter,
+                                baseline = baseline)){
     
     #[2]
     limits_table <- form_calculation_and_display_limits(data = data, 
@@ -91,10 +93,18 @@ create_SPC_auto_limits_table <- function(data,
                                                         maxNoOfExclusions  = maxNoOfExclusions, 
                                                         rule2Tolerance = rule2Tolerance,
                                                         runRuleLength = runRuleLength,
-                                                        mr_screen_max_loops = mr_screen_max_loops)
+                                                        mr_screen_max_loops = mr_screen_max_loops,
+                                                        baseline = baseline)
     
     #set counter to first point after end of first period
-    counter <- counter + periodMin
+    if(counter == 1 & !is.null(baseline)) {
+      first_period_length <- max(baseline,
+                         periodMin)
+    } else {
+      first_period_length <- periodMin
+    }
+    
+    counter <- counter + first_period_length
 
     if(!noRecals){#[3]loop starts
       while(counter < nrow(data)){

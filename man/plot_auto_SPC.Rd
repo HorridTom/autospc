@@ -11,6 +11,7 @@ plot_auto_SPC(
   n,
   chartType = NULL,
   periodMin = 21,
+  baseline = NULL,
   runRuleLength = 8,
   noRecals = FALSE,
   noPeriodMin = FALSE,
@@ -87,6 +88,11 @@ denominator for P and P' charts.}
 
 \item{periodMin}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
+
+\item{baseline}{The number of points (subgroups) in the first calculation
+period. Overrides periodMin, for the first period only. If NULL (default),
+the first period is treated the same as the rest, i.e. it comprises periodMin
+points.}
 
 \item{runRuleLength}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}

@@ -79,7 +79,8 @@ create_SPC_auto_limits_table <- function(data,
   counter <- 1
   
   #[1] see whether there are enough data points to form one period
-  if(enough_data_for_new_period(data, periodMin, counter)){
+  if(enough_data_for_new_period(data, periodMin, counter,
+                                chartType = chartType)){
     
     #[2]
     limits_table <- form_calculation_and_display_limits(data = data, 
@@ -98,7 +99,8 @@ create_SPC_auto_limits_table <- function(data,
       while(counter < nrow(data)){
         
         #[4]see whether there are enough points after the counter to form new period
-        if(enough_data_for_new_period(limits_table, periodMin, counter)){
+        if(enough_data_for_new_period(limits_table, periodMin, counter,
+                                      chartType = chartType)){
           
           #check if counter is part way through a rule 2 break already, provided there are at least 8 rule 2 break points following
           #if so, set next rule break position to next point 
@@ -124,7 +126,8 @@ create_SPC_auto_limits_table <- function(data,
             triggering_rule_break_direction <- limits_table$aboveOrBelowCl[counter]
             
             #[7]see whether there are enough points after the counter to form new period
-            if(enough_data_for_new_period(limits_table, periodMin, counter)){
+            if(enough_data_for_new_period(limits_table, periodMin, counter,
+                                          chartType = chartType)){
               
               #[8]
               candidate_limits_table <- form_calculation_and_display_limits(data = limits_table,

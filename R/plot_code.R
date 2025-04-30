@@ -290,8 +290,16 @@ plot_auto_SPC <- function(df,
                                      overhangingReversions = overhangingReversions,
                                      mr_screen_max_loops = mr_screen_max_loops)
   
+  num_non_missing_y <- df %>%
+    dplyr::filter(!is.na(y)) %>%
+    nrow()
+  
+  if(chartType == "MR") {
+    num_non_missing_y <- num_non_missing_y + 1L
+  }
+  
   # chart y limit
-  if(nrow(df) < periodMin) {
+  if(num_non_missing_y < periodMin) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
   } else if(chartType != "XMR") {
@@ -308,7 +316,7 @@ plot_auto_SPC <- function(df,
     }
   }
   
-  if(nrow(df) < periodMin){
+  if(num_non_missing_y < periodMin){
     ylimhigh <- max(df$y,
                     na.rm = TRUE)
   }else if(chartType == "C" | chartType == "C'"){
@@ -352,7 +360,7 @@ plot_auto_SPC <- function(df,
   
  
   #if limits are to be displayed on chart
-  if(showLimits == TRUE & nrow(df) >= periodMin){
+  if(showLimits == TRUE & num_non_missing_y >= periodMin){
     
     df <- df %>%
       #dplyr::mutate(x = as.Date(x)) %>%

@@ -97,6 +97,8 @@
 #' @param override_y_lim Optional numeric specifying upper limit of the
 #' vertical axis.
 #' @param x_break Optional numeric specifying spacing of horizontal axis breaks.
+#' @param x_date_format Optional string format for date labels on horizontal
+#' axis. Passed to scales::date_format.
 #' @param x_pad_end Optional, specifies a minimum end point for the horizontal
 #' axis.
 #' @param extend_limits_to Optional, specifies a point on the horizontal axis
@@ -187,6 +189,7 @@ plot_auto_SPC <- function(df,
                           override_y_title = NULL,
                           override_y_lim = NULL,
                           x_break = NULL,
+                          x_date_format = "%Y-%m-%d",
                           x_pad_end = NULL,
                           extend_limits_to = NULL,
                           r1_col = "orange",
@@ -352,7 +355,22 @@ plot_auto_SPC <- function(df,
   }
   
   # chart y limit
-  ylimlow <- 0
+  if(nrow(df) < periodMin) {
+    ylimlow <- min(df$y,
+                   na.rm = TRUE)
+  } else if(chartType != "XMR") {
+    ylimlow <- 0
+  } else {
+    ylimlow <- min(df$lcl,
+                   df$y,
+                   na.rm = TRUE)
+    yll_sgn <- sign(ylimlow)
+    if(yll_sgn != -1) {
+      ylimlow <- ylimlow * 0.9
+    } else {
+      ylimlow <- ylimlow * 1.1
+    }
+  }
   
   if(nrow(df) < periodMin){
     ylimhigh <- max(df$y,
@@ -535,7 +553,7 @@ plot_auto_SPC <- function(df,
           x_break <- as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40
         }
         
-        p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
+        p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
                                        breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
                                        limits = c(as.Date(start_x), as.Date(end_x))
         )

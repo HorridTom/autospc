@@ -89,6 +89,8 @@
 #' @param override_y_lim Optional numeric specifying upper limit of the
 #' vertical axis.
 #' @param x_break Optional numeric specifying spacing of horizontal axis breaks.
+#' @param x_date_format Optional string format for date labels on horizontal
+#' axis. Passed to scales::date_format.
 #' @param x_pad_end Optional, specifies a minimum end point for the horizontal
 #' axis.
 #' @param r1_col Highlight colour for breaks of rule 1 (points outside the
@@ -174,6 +176,7 @@ plot_auto_SPC <- function(df,
                           override_y_title = NULL,
                           override_y_lim = NULL,
                           x_break = NULL,
+                          x_date_format = "%Y-%m-%d",
                           x_pad_end = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
@@ -493,7 +496,7 @@ plot_auto_SPC <- function(df,
           x_break <- as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40
         }
         
-        p <- p + ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d"),
+        p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
                                        breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
                                        limits = c(as.Date(start_x), as.Date(end_x))
         )

@@ -33,6 +33,7 @@ plot_auto_SPC(
   override_y_title = NULL,
   override_y_lim = NULL,
   x_break = NULL,
+  x_date_format = "\%Y-\%m-\%d",
   x_pad_end = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
@@ -161,6 +162,9 @@ higher the number the more information is provided, none if 0.
 vertical axis.}
 
 \item{x_break}{Optional numeric specifying spacing of horizontal axis breaks.}
+
+\item{x_date_format}{Optional string format for date labels on horizontal
+axis. Passed to scales::date_format.}
 
 \item{x_pad_end}{Optional, specifies a minimum end point for the horizontal
 axis.}

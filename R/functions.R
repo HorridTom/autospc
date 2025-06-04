@@ -1,11 +1,18 @@
 #function to determine whether there are enough data points left to form a new period
-enough_data_for_new_period <- function(data, periodMin, counter){
-   
-  if((nrow(data) - counter + 1) >= periodMin){
-    TRUE
-  }else{
-    FALSE
+enough_data_for_new_period <- function(data, periodMin, counter, chartType){
+  
+  num_remaining_non_missing_data_points <- data %>%
+    dplyr::filter(dplyr::row_number() >= counter) %>%
+    dplyr::filter(!is.na(y)) %>%
+    nrow()
+  
+  if(chartType == "MR") {
+    num_remaining_non_missing_data_points <-
+      num_remaining_non_missing_data_points + 1L
   }
+   
+  return(num_remaining_non_missing_data_points >= periodMin)
+  
 }
 
 #function to form calculation limits for a period

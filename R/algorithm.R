@@ -201,9 +201,8 @@ create_SPC_auto_limits_table <- function(data,
       }
     
 
-    #add a column to show where the breakpoints are
+    #update NAs in limit columns
     limits_table <- limits_table %>%
-      dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE)) %>%
       dplyr::mutate(ucl = dplyr::if_else(is.na(y), as.numeric(NA), ucl)) %>%
       dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
 

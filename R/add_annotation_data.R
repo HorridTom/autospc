@@ -46,6 +46,7 @@ add_annotation_data <- function(df,
         dplyr::row_number() == (1L + (chartType == "MR")) ~ upper_annotation_level,
         breakPoint == FALSE ~ 0,
         cl_change == 1 ~ upper_annotation_level,
+        cl_change == 0 ~ upper_annotation_level,
         cl_change == -1 ~ lower_annotation_level
       ),
       annotation_curvature = dplyr::case_when(

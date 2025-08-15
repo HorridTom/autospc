@@ -86,6 +86,15 @@ form_calculation_limits <- function(data,
         dplyr::select(x, y, ucl, lcl, cl, periodType, excluded)
     }
     
+    # Add the breakPoint column to keep track of break points as they are
+    # added. For compatibility with (at least)
+    # add_rule_breaks_respecting_periods, the first point is not classed as a 
+    # break point.
+    limits_table <- limits_table %>%
+      dplyr::mutate(breakPoint = dplyr::if_else(dplyr::row_number() == counter,
+                                                NA,
+                                                FALSE))
+    
   }else{
     
     #joins limits to the existing data, overwriting display limits 
@@ -97,6 +106,10 @@ form_calculation_limits <- function(data,
       dplyr::mutate(cl = dplyr::if_else(is.na(cl.y), cl.x, cl.y)) %>%
       dplyr::mutate(periodType = dplyr::if_else(is.na(periodType.y), periodType.x, periodType.y)) %>%
       dplyr::mutate(excluded = dplyr::if_else(is.na(excluded.y), excluded.x, excluded.y)) 
+    
+    limits_table <- limits_table %>% 
+      dplyr::mutate(breakPoint = (breakPoint |
+                                     dplyr::row_number() == counter))
     
     #only selects n if P chart
     if(chartType == "P" | chartType == "P'"){
@@ -468,15 +481,13 @@ form_calculation_and_display_limits <- function(data,
 
 
 #function to add rule breaks to data with many periods
-#Avoids issues faces with highlighting across periods
+#Avoids issues with highlighting across periods. NB this function counts
+#actual break points, not period starts, hence it relies on the breakPoint
+#column not being TRUE on the first row.
 add_rule_breaks_respecting_periods <- function(limits_table,
                                          counter,
                                          rule2Tolerance,
                                          runRuleLength){
-  
-  #add a column to show where the breakpoints are
-  limits_table <- limits_table %>% 
-    dplyr::mutate(breakPoint = ifelse(cl == dplyr::lag(cl), FALSE, TRUE))
   
   #get breakpoint positions
   breakpoints <- which(limits_table$breakPoint)

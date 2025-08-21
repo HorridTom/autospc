@@ -18,7 +18,6 @@ Imports:
     ggrepel,
     lifecycle (>= 1.0.3),
     magrittr (>= 2.0.3),
-    qicharts2 (>= 0.7.2),
     rlang (>= 1.1.0),
     scales (>= 1.2.1)
 Suggests: 

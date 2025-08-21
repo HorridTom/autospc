@@ -2,13 +2,18 @@ library(testthat)
 
 # load in test data
 test_data <- readRDS("testdata/test_individual_data.rds")
+# Correct answer created using:
+# test_individual_answer <- qicharts2::qic(x, y, data = test_data, chart = 'i',
+#                                           return.data = TRUE)
+# qicharts2 v.0.7.2
+test_individual_answer <- readRDS("testdata/test_individual_answer.rds")
 
 # test that the i chart limits is the same as qicharts2 results 
 test_that("I chart limits the same as live qicharts2 v.0.7.2",{
   results <- get_i_limits(y = test_data$y,
                           mr_screen_max_loops = 1)
   
-  correct_answers <- qicharts2::qic(x, y, data = test_data, chart = 'i', return.data = TRUE)
+  correct_answers <- test_individual_answer
   
   expect_equal(results$cl, correct_answers$cl)
   expect_equal(results$lcl, correct_answers$lcl)
@@ -19,12 +24,17 @@ test_that("I chart limits the same as live qicharts2 v.0.7.2",{
 # test that moving range limits that are above ucl_mr are removed when
 # mr_screen_max_loops = 1
 extreme_mr_data <- readRDS("testdata/test_mr_data.rds")
+# Correct answer created using:
+# test_mr_answer <- qicharts2::qic(x, y, data = extreme_mr_data, chart = 'i',
+#                                   return.data = TRUE)
+# qicharts2 v.0.7.2
+test_mr_answer <- readRDS("testdata/test_mr_answer.rds")
 
 test_that("I chart limits the same as live qicharts2 v.0.7.2",{
   results <- get_i_limits(y = extreme_mr_data$y,
                           mr_screen_max_loops = 1)
   
-  correct_answers <- qicharts2::qic(x, y, data = extreme_mr_data, chart = 'i', return.data = TRUE)
+  correct_answers <- test_mr_answer
   
   expect_equal(results$cl, correct_answers$cl)
   expect_equal(results$lcl, correct_answers$lcl)

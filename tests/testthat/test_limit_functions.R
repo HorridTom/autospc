@@ -14,7 +14,7 @@ test_data <- structure(list(x = 1:21,
 test_c_limit_answer <- readRDS(file.path("testdata",
                                          "test_c_limit_answer.rds"))
 
-test_that("C chart limits the same as live qicharts2 v.0.7.2",{
+test_that("C chart limits the same as qicharts2 v.0.7.2",{
   
   results <- get_c_limits(y = test_data$y)
   

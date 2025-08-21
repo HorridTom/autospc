@@ -4,18 +4,25 @@ library(testthat)
 mr_data <- readRDS("testdata/test_mr_data.rds")
 extreme_mr_data <- readRDS("testdata/test_mr_data.rds")
 
-#test that mr control limits match those from qicharts2
+# Correct answer created using:
+# test_mr_limit_answer <- qicharts2::qic(y, data = mr_data, chart = 'mr',
+#                                         return.data = TRUE)
+# qicharts2 v.0.7.2
+test_mr_limit_answer <- readRDS(file.path("testdata",
+                                         "test_mr_limit_answer.rds"))
+
+# test that mr control limits match those from qicharts2 v.0.7.2
 # when mr_screen_max_loops = 0
-test_that("mR limits match the recalculated mR limits",{
+test_that("mR chart limits the same as qicharts2 v.0.7.2",{
+  
   mrs = get_mrs(y = mr_data$y)
   results <- get_mr_limits(mr = mrs,
                            mr_screen_max_loops = 0)
   
-  correct_answers <- qicharts2::qic(y, data = mr_data, chart = 'mr', return.data = TRUE)
-  expect_equal(results$cl, correct_answers$cl)
-  expect_equal(results$ucl, correct_answers$ucl)
-  expect_equal(results$lcl, rlang::rep_along(correct_answers$ucl, 0))
-  expect_equal(results$mr, correct_answers$y)
+  expect_equal(results$cl, test_mr_limit_answer$cl)
+  expect_equal(results$ucl, test_mr_limit_answer$ucl)
+  expect_equal(results$lcl, rlang::rep_along(test_mr_limit_answer$ucl, 0))
+  expect_equal(results$mr, test_mr_limit_answer$y)
 })
 
 test_that("mR chart created without error",{

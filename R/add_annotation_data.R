@@ -98,7 +98,8 @@ add_annotations_to_plot <- function(p,
                                                 segment.ncp = 4,
                                                 segment.inflect = FALSE,
                                                 segment.square = FALSE,
-                                                arrow = grid::arrow(length = grid::unit(0.015, "npc")))
+                                                arrow = grid::arrow(length = grid::unit(0.015, "npc")),
+                                                na.rm = TRUE)
   } else {
     p_annotated <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
                                                              y = cl,
@@ -111,7 +112,8 @@ add_annotations_to_plot <- function(p,
                                                 fontface = "bold",
                                                 force             = 0,
                                                 hjust             = 0,
-                                                min.segment.length = Inf)
+                                                min.segment.length = Inf,
+                                                na.rm = TRUE)
   }
   
   return(p_annotated)

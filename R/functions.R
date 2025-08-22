@@ -635,3 +635,63 @@ fill_NA <- function(x) {
   diffs <- diff(which.na)
   return(rep(values, times = diffs))
 }
+
+
+# Check whether a floating median is required, and add a column to df providing
+# its values if so
+floating_median_column <- function(df,
+                                       floatingMedian,
+                                       floatingMedian_n) {
+  
+  addFloatingMedian <- switch(EXPR = floatingMedian,
+                              yes = TRUE,
+                              auto = any(df %>%
+                                           dplyr::slice_tail(n = floatingMedian_n) %>% 
+                                           dplyr::pull(rule2)),
+                              FALSE)
+  
+  if(addFloatingMedian) {
+    df <- df %>%
+      dplyr::mutate(median =
+                      dplyr::if_else(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L,
+                                     median(df %>%
+                                              dplyr::filter(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L) %>%
+                                              dplyr::pull(y)),
+                                     NA))
+    
+  }
+  
+  return(df)
+  
+}
+
+
+# Add floating median line to the plot p
+add_floating_median <- function(df,
+                                p,
+                                floatingMedian_n) {
+  
+  p <- p +
+    ggplot2::geom_line(data = df, 
+                       ggplot2::aes(x, median),
+                       linetype = "75551555",
+                       colour = "gray50",
+                       linewidth = 0.5,
+                       show.legend = TRUE,
+                       na.rm = TRUE) +
+    ggplot2::annotate("text",
+                      x = df %>%
+                        dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
+                        dplyr::pull(x),
+                      y = df %>%
+                        dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
+                        dplyr::pull(median)*0.95,
+                      label = "Median",
+                      size = 3,
+                      colour = "gray50",
+                      na.rm = TRUE)
+  
+  return(p)
+  
+}
+

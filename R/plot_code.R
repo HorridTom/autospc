@@ -390,24 +390,10 @@ plot_auto_SPC <- function(df,
                                                     highlight))
     }
     
-    
-    addFloatingMedian <- switch(EXPR = floatingMedian,
-                                yes = TRUE,
-                                auto = any(df %>%
-                                             dplyr::slice_tail(n = floatingMedian_n) %>% 
-                                             dplyr::pull(rule2)),
-                                FALSE)
-    
-    if(addFloatingMedian) {
-      df <- df %>%
-        dplyr::mutate(median =
-                        dplyr::if_else(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L,
-                                       median(df %>%
-                                                dplyr::filter(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L) %>%
-                                                dplyr::pull(y)),
-                                       NA))
-      
-    }
+    # add floating median column if needed
+    df <- floating_median_column(df = df,
+                                 floatingMedian = floatingMedian,
+                                 floatingMedian_n = floatingMedian_n)
     
     # add annotation information
     df <- add_annotation_data(df = df,
@@ -463,29 +449,11 @@ plot_auto_SPC <- function(df,
                                     breaks = scales::breaks_pretty(),
                                     labels = scales::label_number(big.mark = ","))
       
-      if(addFloatingMedian) {
-        p <- p +
-          ggplot2::geom_line(data = df, 
-                             ggplot2::aes(x, median),
-                             linetype = "75551555",
-                             colour = "gray50",
-                             linewidth = 0.5,
-                             show.legend = TRUE,
-                             na.rm = TRUE) +
-          ggplot2::annotate("text",
-                            x = df %>%
-                              dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
-                              dplyr::pull(x),
-                            y = df %>%
-                              dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
-                              dplyr::pull(median)*0.95,
-                            label = "Median",
-                            size = 3,
-                            colour = "gray50",
-                            na.rm = TRUE)
+      if("median" %in% colnames(df)) {
+        p <- add_floating_median(p = p,
+                                 df = df,
+                                 floatingMedian_n = floatingMedian_n)
       }
-      
-      
       
       if(includeAnnotations == TRUE){
         

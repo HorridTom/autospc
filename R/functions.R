@@ -643,20 +643,30 @@ floating_median_column <- function(df,
                                        floatingMedian,
                                        floatingMedian_n) {
   
+  median_from_x <- df %>%
+    dplyr::mutate(non_missing_y = !is.na(y)) %>%
+    dplyr::arrange(dplyr::desc(x)) %>%
+    dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing_y)) %>%
+    dplyr::filter(cumulative_num_non_missing == floatingMedian_n) %>%
+    dplyr::pull(x) %>%
+    max()
+  
   addFloatingMedian <- switch(EXPR = floatingMedian,
                               yes = TRUE,
                               auto = any(df %>%
-                                           dplyr::slice_tail(n = floatingMedian_n) %>% 
+                                           dplyr::filter(x >= median_from_x) %>% 
                                            dplyr::pull(rule2)),
                               FALSE)
   
   if(addFloatingMedian) {
+    
     df <- df %>%
       dplyr::mutate(median =
-                      dplyr::if_else(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L,
+                      dplyr::if_else(x >= median_from_x,
                                      median(df %>%
-                                              dplyr::filter(dplyr::row_number() >= nrow(df) - floatingMedian_n + 1L) %>%
-                                              dplyr::pull(y)),
+                                              dplyr::filter(x >= median_from_x) %>%
+                                              dplyr::pull(y),
+                                            na.rm = TRUE),
                                      NA))
     
   }

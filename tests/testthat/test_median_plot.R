@@ -151,12 +151,13 @@ test_that("NAs do not prevent median from being plotted",{
   # Test that a median column is generated 
   expect_true("median" %in% names(chart_result_data))
   
-  # Test it has the correct value
+  # Test it is not NA and has the correct value
   result_median <- chart_result_data %>% 
     dplyr::filter(!is.na(median)) %>% 
     dplyr::summarise(medi = median(median)) %>%
     dplyr::pull(medi)
   
+  expect_false(is.na(result_median))
   expect_equal(result_median, 9.5)
 })
 

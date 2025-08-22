@@ -127,3 +127,37 @@ test_that("Median is not plotted when floatingMedian is set to auto and there is
   # Test that the median is not calculated nor plotted when there is not a shift rule 2 break in last 12L points 
   expect_false("median" %in% names(chart_result_data))
 })
+
+
+test_that("NAs do not prevent median from being plotted",{
+  # Set the n points for the median 
+  test_median_n <- 12L 
+  
+  # Introduce NA withing last floatingMedian_n points
+  test_median_data_na <- test_median_data %>% 
+    dplyr::mutate(y = dplyr::if_else(dplyr::row_number() == 124L,
+                                     NA_integer_,
+                                     y))
+  
+  # Create and store XmR chart 
+  chart_result <- autospc::plot_auto_SPC(df = test_median_data_na,
+                                         chartType = 'XMR',
+                                         floatingMedian = "yes",
+                                         floatingMedian_n = test_median_n,
+                                         showMR = FALSE)
+  # Store XmR chart data  
+  chart_result_data <- chart_result$data
+  
+  # Test that a median column is generated 
+  expect_true("median" %in% names(chart_result_data))
+  
+  # Test it is not NA and has the correct value
+  result_median <- chart_result_data %>% 
+    dplyr::filter(!is.na(median)) %>% 
+    dplyr::summarise(medi = median(median)) %>%
+    dplyr::pull(medi)
+  
+  expect_false(is.na(result_median))
+  expect_equal(result_median, 9.5)
+})
+

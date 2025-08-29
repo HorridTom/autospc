@@ -312,42 +312,6 @@ plot_auto_SPC <- function(df,
   x_max <- max(df$x, na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
   
-  # Extend display limits
-  if(!is.null(extend_limits_to)) {
-    
-    if(extend_limits_to <= x_max) {
-      stop("Limits can only be extended to a point beyond the end of the data.")
-    }
-    
-    df_ext_first_row <- df %>%
-      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
-      dplyr::mutate(x = x_max + 1,
-                    y = NA_real_,
-                    periodType = "display",
-                    excluded = NA,
-                    breakPoint = FALSE,
-                    rule1 = FALSE,
-                    rule2 = FALSE,
-                    aboveOrBelowCl = 0,
-                    highlight = "None")
-    
-    df_ext_last_row <- df %>%
-      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
-      dplyr::mutate(x = extend_limits_to,
-                    y = NA_real_,
-                    periodType = "display",
-                    excluded = NA,
-                    breakPoint = FALSE,
-                    rule1 = FALSE,
-                    rule2 = FALSE,
-                    aboveOrBelowCl = 0,
-                    highlight = "None")
-    
-    df <- df %>% 
-      dplyr::bind_rows(df_ext_first_row,
-                       df_ext_last_row)
-  }
-  
   # chart y limit
   if(num_non_missing_y < periodMin) {
     ylimlow <- min(df$y,
@@ -462,6 +426,11 @@ plot_auto_SPC <- function(df,
     
     df <- df %>%
       dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
+    
+    # Extend display limits
+    df <- extend_limits(df = df,
+                        extend_limits_to = extend_limits_to,
+                        x_max = x_max)
     
     if((chartType == "XMR") & showMR) {
       mc <- match.call()

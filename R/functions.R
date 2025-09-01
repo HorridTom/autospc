@@ -707,6 +707,7 @@ add_floating_median <- function(df,
 
 
 extend_limits <- function(df,
+                          chartType,
                           extend_limits_to,
                           x_max) {
   
@@ -716,24 +717,70 @@ extend_limits <- function(df,
       stop("Limits can only be extended to a point beyond the end of the data.")
     }
     
-    last_period <- df %>%
-      dplyr::filter(dplyr::row_number() == nrow(df)) %>%
+    last_calc_period <- df %>%
+      dplyr::filter(periodType == "calculation") %>%
+      dplyr::slice_tail(n = 1L) %>%
       dplyr::pull(plotPeriod)
     
-    mean_limits <- df %>%
-      dplyr::filter(plotPeriod == last_period) %>%
-      dplyr::select(cl, lcl, ucl) %>%
-      dplyr::summarise(dplyr::across(dplyr::everything(),
-                                     ~ mean(.x,
-                                            na.rm = TRUE)))
+    # For extension, chart types whose limits may vary within a period due to
+    # varying denominators use limit values derived from the mean denominator 
+    # for the final period. Other chart types use the (constant) limits from the 
+    # final period.
+    switch(chartType,
+           P = {
+             ext_calc_data <- df %>%
+               dplyr::filter(plotPeriod == last_calc_period) %>%
+               dplyr::mutate(y = (y/100)*n,
+                             n = dplyr::if_else(is.na(n),
+                                                NA_real_,
+                                                mean(n,
+                                                     na.rm = TRUE)))
+             
+             exclusion_points <- ext_calc_data %>%
+               dplyr::pull(excluded) %>%
+               which()
+             
+             ext_limits <- get_p_limits(y = ext_calc_data$y,
+                                        n = ext_calc_data$n,
+                                        exclusion_points = exclusion_points,
+                                        multiply = 100) %>%
+               lapply("[[", 1L)
+             
+           },
+           `P'` = {
+             ext_calc_data <- df %>%
+               dplyr::filter(plotPeriod == last_calc_period) %>%
+               dplyr::mutate(y = (y/100)*n)
+             
+             exclusion_points <- ext_calc_data %>%
+               dplyr::pull(excluded) %>%
+               which()
+             
+             ext_limits <- get_pp_limits(y = ext_calc_data$y,
+                                         n = ext_calc_data$n,
+                                         exclusion_points = exclusion_points,
+                                         multiply = 100,
+                                         use_nbar_for_stdev = TRUE) %>% 
+               lapply("[[", 1L)
+           },
+           {
+             ext_limits <- df %>% 
+               dplyr::filter(plotPeriod == last_calc_period) %>% 
+               dplyr::select(cl, lcl, ucl) %>% 
+               dplyr::summarise(dplyr::across(dplyr::everything(),
+                                              ~ mean(.x,
+                                                     na.rm = TRUE))) %>%
+               as.list()
+           }
+    )
     
     df_ext_first_row <- df %>%
       dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
       dplyr::mutate(x = x_max + 1,
                     y = NA_real_,
-                    cl = mean_limits$cl,
-                    lcl = mean_limits$lcl,
-                    ucl = mean_limits$ucl,
+                    cl = ext_limits$cl,
+                    lcl = ext_limits$lcl,
+                    ucl = ext_limits$ucl,
                     periodType = "display",
                     excluded = NA,
                     breakPoint = FALSE,
@@ -746,9 +793,9 @@ extend_limits <- function(df,
       dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
       dplyr::mutate(x = extend_limits_to,
                     y = NA_real_,
-                    cl = mean_limits$cl,
-                    lcl = mean_limits$lcl,
-                    ucl = mean_limits$ucl,
+                    cl = ext_limits$cl,
+                    lcl = ext_limits$lcl,
+                    ucl = ext_limits$ucl,
                     periodType = "display",
                     excluded = NA,
                     breakPoint = FALSE,

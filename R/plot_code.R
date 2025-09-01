@@ -429,6 +429,7 @@ plot_auto_SPC <- function(df,
     
     # Extend display limits
     df <- extend_limits(df = df,
+                        chartType = chartType,
                         extend_limits_to = extend_limits_to,
                         x_max = x_max)
     

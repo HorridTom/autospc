@@ -17,7 +17,7 @@ get_c_limits <- function(y,
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
 
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
   }else{
@@ -61,7 +61,7 @@ get_p_limits <- function(y,
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
   
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
     n_excl <- n[-exclusion_points]
@@ -107,7 +107,7 @@ get_cp_limits <- function(y,
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
 
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
   }else{
@@ -144,7 +144,8 @@ get_pp_limits <- function(y,
                           exclusion_points = NULL, 
                           multiply = 1, 
                           na.rm = TRUE,
-                          mr_screen_max_loops = 1){
+                          mr_screen_max_loops = 1,
+                          use_nbar_for_stdev = FALSE){
   
   #send error messages if data is not in the right format
   if(length(y) == 0){
@@ -163,7 +164,7 @@ get_pp_limits <- function(y,
     stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
   }
   
-  if(!is.null(exclusion_points) & !(length(exclusion_points) == 0L)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
     n_excl <- n[-exclusion_points]
@@ -179,6 +180,12 @@ get_pp_limits <- function(y,
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE) 
   
   y_new <- y_excl / n_excl
+  
+  if(use_nbar_for_stdev) {
+    n_excl <- mean(n_excl,
+                   na.rm = TRUE)
+  }
+  
   stdev <- sqrt(cl * (1 - cl) / n_excl)
   z_i <- (y_new - cl) / stdev
 
@@ -192,6 +199,10 @@ get_pp_limits <- function(y,
   sigma_z <- amr / 1.128
   
   #recalc stdev with excluded data
+  if(use_nbar_for_stdev) {
+    n <- mean(n,
+              na.rm = TRUE)
+  }
   stdev <- sqrt(cl * (1 - cl) / n)
   stdev <- stdev * sigma_z
   
@@ -226,7 +237,7 @@ get_i_limits <- function(y,
   }
   
   #exclude exclusion points from calculations
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     y_excl <- y[-exclusion_points]
   }else{
     y_excl <- y
@@ -250,7 +261,7 @@ get_i_limits <- function(y,
 get_mrs <- function(y,
                     exclusion_points = NULL) {
   #exclude exclusion points from calculations
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     y_excl <- y[-exclusion_points]
   }else{
     y_excl <- y
@@ -270,7 +281,7 @@ get_mr_limits <- function(mr,
                           exclusion_points = NULL) {
   
   #exclude exclusion points from calculations
-  if(!is.null(exclusion_points)){
+  if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     mr_excl <- mr[-exclusion_points]
   }else{
     mr_excl <- mr

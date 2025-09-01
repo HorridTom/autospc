@@ -35,6 +35,7 @@ plot_auto_SPC(
   x_break = NULL,
   x_date_format = "\%Y-\%m-\%d",
   x_pad_end = NULL,
+  extend_limits_to = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
   includeAnnotations = TRUE,
@@ -168,6 +169,9 @@ axis. Passed to scales::date_format.}
 
 \item{x_pad_end}{Optional, specifies a minimum end point for the horizontal
 axis.}
+
+\item{extend_limits_to}{Optional, specifies a point on the horizontal axis
+to extend the final limits out to}
 
 \item{r1_col}{Highlight colour for breaks of rule 1 (points outside the
 control limits)}

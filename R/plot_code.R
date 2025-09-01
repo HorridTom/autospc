@@ -93,6 +93,8 @@
 #' axis. Passed to scales::date_format.
 #' @param x_pad_end Optional, specifies a minimum end point for the horizontal
 #' axis.
+#' @param extend_limits_to Optional, specifies a point on the horizontal axis
+#' to extend the final limits out to
 #' @param r1_col Highlight colour for breaks of rule 1 (points outside the
 #' control limits)
 #' @param r2_col Highlight colour for breaks of rule 2 (shifts)
@@ -178,6 +180,7 @@ plot_auto_SPC <- function(df,
                           x_break = NULL,
                           x_date_format = "%Y-%m-%d",
                           x_pad_end = NULL,
+                          extend_limits_to = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
                           includeAnnotations = TRUE,
@@ -301,6 +304,14 @@ plot_auto_SPC <- function(df,
     num_non_missing_y <- num_non_missing_y + 1L
   }
   
+  #start and end dates
+  if(!is.null(extend_limits_to) && is.null(x_pad_end)) {
+    x_pad_end = extend_limits_to
+  }
+  start_x <- min(df$x, na.rm = TRUE)
+  x_max <- max(df$x, na.rm = TRUE)
+  end_x <- max(x_max, x_pad_end)
+  
   # chart y limit
   if(num_non_missing_y < periodMin) {
     ylimlow <- min(df$y,
@@ -356,10 +367,6 @@ plot_auto_SPC <- function(df,
   if(is.null(override_y_title)) {
     override_y_title <- ytitle
   }
-  
-  #start and end dates
-  start_x <- min(df$x, na.rm = TRUE)
-  end_x <- max(max(df$x, na.rm = TRUE), x_pad_end)
   
  
   #if limits are to be displayed on chart
@@ -419,6 +426,12 @@ plot_auto_SPC <- function(df,
     
     df <- df %>%
       dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
+    
+    # Extend display limits
+    df <- extend_limits(df = df,
+                        chartType = chartType,
+                        extend_limits_to = extend_limits_to,
+                        x_max = x_max)
     
     if((chartType == "XMR") & showMR) {
       mc <- match.call()

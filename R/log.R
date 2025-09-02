@@ -12,26 +12,23 @@ record_log_entry <- function(df,
     dplyr::filter(dplyr::row_number() == counter) %>%
     dplyr::pull(log)
   
-  updated_log_entry <- paste_narm(existing_log_entry,
-                                  as.character(step),
-                                  collapse = ";")
+  if(is.na(existing_log_entry)) {
+    updated_log_entry <- as.character(step)
+  } else {
+    updated_log_entry <- paste(existing_log_entry,
+                               as.character(step),
+                               sep = ";")
+  }
   
   df <- df %>%
     #dplyr::rowwise() %>%
     dplyr::mutate(log = dplyr::if_else(dplyr::row_number() == counter,
                                        updated_log_entry,
                                        log)) #%>%
-    #dplyr::ungroup()
+  #dplyr::ungroup()
   
   
   return(df)
   
 }
 
-
-paste_narm <- function(v,
-                       ...) {
-  v <- v[!is.na(v)]
-  return(paste(v,
-               ...))
-}

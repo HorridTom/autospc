@@ -81,18 +81,20 @@ create_SPC_auto_limits_table <- function(data,
   #set counter to one
   counter <- 1
   
-  #[1] Check whether there are enough data points to form one period
+  # [1] Counter initialised
   data <- record_log_entry(df = data,
                            counter = counter,
                            step = 1)
-  
+  # Check whether there are enough data points to form one period
   if(!enough_data_for_new_period(data = data,
                                  periodMin = periodMin,
                                  counter = counter,
                                  chartType = chartType)){
-    if(verbosity > 0) {
-      #print("There are not enough points to form one period.")
-    }  
+    
+    data <- record_log_entry(df = data,
+                             counter = counter,
+                             step = "2b")
+    
     if(showLimits == TRUE){
       warning(paste0("The input data has fewer than the minimum number of",
                      "points needed to calculate one period. Timeseries data",
@@ -103,7 +105,7 @@ create_SPC_auto_limits_table <- function(data,
     
   } else {
     
-    #[2] There are enough data points to form one period
+    # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
       data = data, 
       periodMin = periodMin, 
@@ -116,7 +118,7 @@ create_SPC_auto_limits_table <- function(data,
     
     limits_table <- record_log_entry(df = limits_table,
                                      counter = counter,
-                                     step = 2)
+                                     step = "2a")
     
     # Set counter to first point after end of first period
     counter <- counter + periodMin
@@ -130,17 +132,14 @@ create_SPC_auto_limits_table <- function(data,
       while(counter < nrow(data)){
         
         # [4] Check whether enough points after the counter to form new period
-        limits_table <- record_log_entry(df = limits_table,
-                                         counter = counter,
-                                         step = 4)
-        
         if(!enough_data_for_new_period(data = limits_table,
                                        periodMin = periodMin,
                                        counter = counter,
                                        chartType = chartType)) {        
-          if(verbosity > 0) {
-            #print("There are not enough data points to form another period. Calculation complete.")
-          }
+          
+          limits_table <- record_log_entry(df = limits_table,
+                                           counter = counter,
+                                           step = "4b")
           
           break
           
@@ -148,9 +147,11 @@ create_SPC_auto_limits_table <- function(data,
           
           # There are sufficient data points remaining after the counter to form
           # a new period if indicated.
+          limits_table <- record_log_entry(df = limits_table,
+                                           counter = counter,
+                                           step = "4a")
           
-          # Advance the counter to the next point that could form the start of a
-          # new period:
+          # Identify the next rule break to consider as a triggering rule break:
           # Check whether counter is part way through a rule 2 break already,
           # with at least [runRuleLength] rule 2 break points following.
           if(all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
@@ -170,15 +171,11 @@ create_SPC_auto_limits_table <- function(data,
           }
           
           # [5] Check whether there are any further rule 2 breaks
-          limits_table <- record_log_entry(df = limits_table,
-                                           counter = counter,
-                                           step = 5)
-          
           if(is.na(rule2_break_position) | rule2_break_position >= nrow(data)){
-            # If not, then there can be no more additional periods
-            if(verbosity > 0) {
-              #print("There are no further rule breaks. Calculation complete.")
-            }
+            # [5b] If not, then there can be no more additional periods
+            limits_table <- record_log_entry(df = limits_table,
+                                             counter = counter,
+                                             step = "5b")
             
             break
             
@@ -186,37 +183,36 @@ create_SPC_auto_limits_table <- function(data,
             # If so, then consider the next rule break as the start of a
             # potential new period
             
-            # [6] Set counter to the next rule break position and record the
+            # [5a] Set counter to the next rule break position and record the
             # direction of the rule break
             limits_table <- record_log_entry(df = limits_table,
                                              counter = counter,
-                                             step = 6)
+                                             step = "5a")
             
             counter <- rule2_break_position
             triggering_rule_break_direction <-
               limits_table$aboveOrBelowCl[counter]
             
-            # [7] Check whether there are enough points after the counter to
+            # [6] Check whether there are enough points after the counter to
             # form a new period
-            limits_table <- record_log_entry(df = limits_table,
-                                             counter = counter,
-                                             step = 7)
             
             if(!enough_data_for_new_period(limits_table, periodMin, counter,
                                            chartType = chartType)){
-              if(verbosity > 0) {
-                #print("There are not enough data points to form another period. Calculation complete.")
-              }
+              
+              limits_table <- record_log_entry(df = limits_table,
+                                               counter = counter,
+                                               step = "6b")
               
               break
               
             } else {
               
-              # [8] Establish candidate limits using the first periodMin points
-              # from the counter as calculation period
+              # [6a] There are sufficient points. Establish candidate limits
+              # using the first periodMin points from the counter as calculation
+              # period
               limits_table <- record_log_entry(df = limits_table,
                                                counter = counter,
-                                               step = 8)
+                                               step = "6a")
               
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
@@ -228,16 +224,8 @@ create_SPC_auto_limits_table <- function(data,
                 runRuleLength = runRuleLength,
                 mr_screen_max_loops = mr_screen_max_loops)
               
-              # [9] Establish whether there is a rule break in the opposite
+              # Establish whether there is a rule break in the opposite
               # direction within this calculation period
-              limits_table <- record_log_entry(
-                df = limits_table,
-                counter = counter,
-                step = 9)
-              candidate_limits_table <- record_log_entry(
-                df = candidate_limits_table,
-                counter = counter,
-                step = 9)
               
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
@@ -262,29 +250,29 @@ create_SPC_auto_limits_table <- function(data,
               if(!opposite_rule_break &
                  ((noRegrets == TRUE & !final_run_prevents) |
                   noRegrets == FALSE)){
-                # [10] If so, re-establish limits at the counter, confirming the
+                # [7a] If so, re-establish limits at the counter, confirming the
                 # candidate limits
                 
                 limits_table <- candidate_limits_table
                 
                 limits_table <- record_log_entry(df = limits_table,
                                                  counter = counter,
-                                                 step = 10)
+                                                 step = "7a")
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
                 counter <- counter + periodMin
                 
               } else {
-                #[11] If not (i.e. there is an opposing rule break, or the final
-                # run prevents re-establishment of limits), limits are not
+                # [7b] If not (i.e. there is an opposing rule break, or the
+                # final run prevents re-establishment of limits), limits are not
                 # re-established, the candidate limits are rejected, and the
                 # algorithm proceeds to the next point that could potentially
                 # be the start of a new period.
                 
                 limits_table <- record_log_entry(df = limits_table,
                                                  counter = counter,
-                                                 step = 11)
+                                                 step = "7b")
                 
                 # Check whether:
                 # 1) no further rule breaks have been identified OR
@@ -302,10 +290,10 @@ create_SPC_auto_limits_table <- function(data,
                   # If not, move counter to the start of the next rule 2 break 
                   counter <- rule2_break_positions[2]
                 }
-              } # end of: [11] candidate limits rejected
-            } # end of: [8], [9] establish candidate limits
-          } # end of [6], [7] there are rule breaks to consider 
-        } # end of: enough points remaing after the counter
+              } # end of: [7b] candidate limits rejected
+            } # end of: [6a] establish candidate limits
+          } # end of [5a], [6] there are rule breaks to consider 
+        } # end of: [4a] enough points remaining after the counter
       } # end of: algorithm loop
     } # end of: [3] !noRecals
     

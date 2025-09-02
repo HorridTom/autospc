@@ -93,10 +93,10 @@ form_calculation_limits <- function(data,
     #only selects n if P chart
     if(chartType == "P" | chartType == "P'"){
       limits_table <- limits_table %>%
-        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded)
+        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, log)
     }else{
       limits_table <- limits_table %>%
-        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded)
+        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, log)
     }
     
     # Add the breakPoint column to keep track of break points as they are
@@ -129,12 +129,14 @@ form_calculation_limits <- function(data,
       limits_table <- limits_table %>%
         dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, 
                       contains("breakPoint"), contains("rule"),
-                      contains("aboveOrBelow"), contains("highlight"))
+                      contains("aboveOrBelow"), contains("highlight"),
+                      log)
     }else{
       limits_table <- limits_table %>%
         dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, 
                       contains("breakPoint"), contains("rule"),
-                      contains("aboveOrBelow"), contains("highlight"))
+                      contains("aboveOrBelow"), contains("highlight"),
+                      log)
     }
   }
   

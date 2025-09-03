@@ -1,11 +1,18 @@
 
 record_log_entry <- function(df,
                              counter,
-                             step){
+                             entry){
   
   if(!("log" %in% colnames(df))){
     df <- df %>%
       dplyr::mutate(log = NA_character_)
+  }
+  
+  counter_overflow <- FALSE
+  if(counter > nrow(df)) {
+    counter_arg <- counter
+    counter <- nrow(df)
+    counter_overflow <- TRUE
   }
   
   existing_log_entry <- df %>%
@@ -13,10 +20,22 @@ record_log_entry <- function(df,
     dplyr::pull(log)
   
   if(is.na(existing_log_entry)) {
-    updated_log_entry <- as.character(step)
+    if(counter_overflow) {
+      entry <- paste0("co@",
+                      counter_arg,
+                      "|",
+                      entry)
+    }
+    updated_log_entry <- as.character(entry)
   } else {
+    if(counter_overflow) {
+      existing_log_entry <- paste0(existing_log_entry,
+                                   "co@",
+                                   counter_arg,
+                                   "|")
+    }
     updated_log_entry <- paste(existing_log_entry,
-                               as.character(step),
+                               as.character(entry),
                                sep = ";")
   }
   
@@ -29,6 +48,189 @@ record_log_entry <- function(df,
   
   
   return(df)
+  
+}
+
+
+interpret_log_entry <- function(entry) {
+  
+  step <- stringr::str_sub(entry,
+                           1L,
+                           2L)
+  
+  branch <- stringr::str_sub(entry,
+                             3L,
+                             4L)
+  
+  entry_data <- stringr::str_sub(entry,
+                                 5L,
+                                 -1L)
+  if(stringr::str_length(entry_data) == 0L) {
+    entry_data <- NA_character_
+  }
+  
+  switch (step,
+          "01" = {
+            eis <- "Counter initialised to 1."
+          },
+          "02" = {
+            if(branch == "00") {
+              eis <- "Sufficient data to proceed."
+            } else if(branch == "10") {
+              eis <- "Insufficient remaining data for further re-establishment of limits."
+            } else {
+              eis <- "Undefined branch at step 02."
+            }
+          },
+          "03" = {
+            eis <- "Main algorithm loop commenced."
+          },
+          "04" = {
+            if(stringr::str_sub(branch,
+                                1L,
+                                1L) == "0") {
+              eis <- "Sufficient data to proceed."
+            } else if(stringr::str_sub(branch,
+                                       1L,
+                                       1L) == "1") {
+              eis <- "Insufficient remaining data for further re-establishment of limits."
+            } else {
+              eis <- "Undefined branch at step 04."
+            }
+            
+            if(!is.na(entry_data)){
+              eis <- paste0(eis,
+                            " The next shift rule break commences at point ",
+                            entry_data,
+                            ".")
+            }
+          },
+          "05" = {
+            if(branch == "00") {
+              eis <- "There is a shift rule break commencing here,"
+              
+              switch(entry_data,
+                     "01" = {
+                       eis <- paste(eis,
+                                    "downwards from the current centre line.")
+                     },
+                     "10" = {
+                       eis <- paste(eis,
+                                    "upwards from the current centre line.")
+                     },
+                     {
+                       eis <- paste(eis,
+                                    "information on its direction is missing.")
+                     })
+              
+            } else if(branch == "10") {
+              eis <- paste("There are no subsequent shift rule breaks.")
+            } else {
+              eis <- "Undefined branch at step 05."
+            }
+          },
+          "06" = {
+            if(branch == "00") {
+              eis <- "Sufficient data to proceed."
+            } else if(branch == "10") {
+              eis <- "Insufficient remaining data for further re-establishment of limits."
+            } else {
+              eis <- "Undefined branch at step 06."
+            }
+            
+            if(!is.na(entry_data)){
+              opp <- as.logical(as.integer(stringr::str_sub(entry_data,
+                                                            1L,
+                                                            1L)))
+              frp <- as.logical(as.integer(stringr::str_sub(entry_data,
+                                                            2L,
+                                                            2L)))
+              opp_str <- if(opp) {
+                paste("There is a shift rule break back towards",
+                      "the prevailing centre line.")
+              } else {
+                paste("There is no shift rule break back towards the",
+                      "prevailing centre line.")
+              }
+              
+              frp_str <- if(frp) {
+                paste("The final run in the candidate calculation period may",
+                      "become a shift rule break back towards the prevailing",
+                      "centre line.")
+              } else {
+                paste("The final run in the candidate calculation period",
+                      "cannot become a shift rule break back towards the",
+                      "prevailing centre line.")
+              }
+              
+              eis <- paste(eis,
+                           opp_str,
+                           frp_str)
+              
+            }
+            
+          },
+          "07" = {
+            if(branch == "00") {
+              eis <- "Candidate limits accepted, limits re-established."
+            } else if(branch == "10") {
+              eis <- paste("Candidate limits rejected, prevailing limits",
+                           "retained.")
+            } else {
+              eis <- "Undefined branch at step 07."
+            }
+          },
+          {interpretation <- "Undefined log entry"}
+  )
+  
+  return(eis)
+  
+}
+
+
+create_log_dataframe <- function(df) {
+  
+  df <- df %>% 
+    dplyr::select(x,
+                  log_entry = log) %>% 
+    tibble::rowid_to_column("counter") %>%
+    dplyr::filter(!is.na(log_entry)) %>%
+    tidyr::separate_longer_delim(log_entry,
+                                 delim = ";") %>%
+    dplyr::rowwise() %>% 
+    dplyr::mutate(interpretation = interpret_log_entry(log_entry))
+  
+  
+  return(df)
+  
+}
+
+
+interpret_log <- function(df) {
+  
+  log_df <- create_log_dataframe(df)
+  
+  log_df <- log_df %>%
+    dplyr::group_by(counter) %>%
+    dplyr::mutate(interpretation = stringr::str_wrap(interpretation,
+                                                     width = 80L)) %>%
+    dplyr::summarise(x = dplyr::first(x),
+                     interpretation = paste(interpretation,
+                                            collapse = "\n- "),
+                     .groups = "drop")
+  
+  log_txt <- log_df %>%
+    dplyr::mutate(log_txt = paste0("Counter at ",
+                                   counter,
+                                   ", ",
+                                   x,
+                                   ":\n",
+                                   interpretation)) %>%
+    dplyr::summarise(log_txt = paste0(log_txt,
+                                      collapse = "\n\n")) %>%
+    dplyr::pull(log_txt)
+    
+    return(log_txt)
   
 }
 

@@ -20,8 +20,8 @@ test_that("Charts with fewer points than min period error handle",{
   result_C <- suppressWarnings(plot_auto_SPC(test_data, plotChart = FALSE, chartType = "C", periodMin = 21))
   result_P <- suppressWarnings(plot_auto_SPC(test_data, plotChart = FALSE, chartType = "P", periodMin = 21))
 
-  testthat::expect_equal(ncol(result_C), 3)
-  testthat::expect_equal(ncol(result_P), 4)
+  testthat::expect_equal(ncol(result_C), 4)
+  testthat::expect_equal(ncol(result_P), 5)
   testthat::expect_warning(plot_auto_SPC(test_data, plotChart = TRUE, chartType = "C"))
   testthat::expect_warning(plot_auto_SPC(test_data, plotChart = TRUE, chartType = "P"))
   
@@ -33,8 +33,8 @@ test_that("Charts with showLimits = FALSE behave as expected",{
   result_P <- plot_auto_SPC(test_data2, plotChart = FALSE, chartType = "P", periodMin = 21, showLimits = FALSE)
   
   #expect full limits table to be returned regardless of showLimits status
-  testthat::expect_equal(ncol(result_C), 12 )
-  testthat::expect_equal(ncol(result_P), 18)
+  testthat::expect_equal(ncol(result_C), 13)
+  testthat::expect_equal(ncol(result_P), 19)
   
   #expect no warning even for data passed in with too few points
   testthat::expect_warning(plot_auto_SPC(test_data, plotChart = TRUE, chartType = "C", showLimits = FALSE), regexp = NA)

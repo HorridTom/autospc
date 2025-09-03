@@ -93,10 +93,12 @@ form_calculation_limits <- function(data,
     #only selects n if P chart
     if(chartType == "P" | chartType == "P'"){
       limits_table <- limits_table %>%
-        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, log)
+        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded,
+                      dplyr::any_of("log"))
     }else{
       limits_table <- limits_table %>%
-        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, log)
+        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded,
+                      dplyr::any_of("log"))
     }
     
     # Add the breakPoint column to keep track of break points as they are
@@ -128,15 +130,19 @@ form_calculation_limits <- function(data,
     if(chartType == "P" | chartType == "P'"){
       limits_table <- limits_table %>%
         dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, 
-                      contains("breakPoint"), contains("rule"),
-                      contains("aboveOrBelow"), contains("highlight"),
-                      log)
+                      dplyr::contains("breakPoint"),
+                      dplyr::contains("rule"),
+                      dplyr::contains("aboveOrBelow"),
+                      dplyr::contains("highlight"),
+                      dplyr::any_of("log"))
     }else{
       limits_table <- limits_table %>%
         dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, 
-                      contains("breakPoint"), contains("rule"),
-                      contains("aboveOrBelow"), contains("highlight"),
-                      log)
+                      dplyr::contains("breakPoint"),
+                      dplyr::contains("rule"),
+                      dplyr::contains("aboveOrBelow"),
+                      dplyr::contains("highlight"),
+                      dplyr::any_of("log"))
     }
   }
   
@@ -812,5 +818,16 @@ extend_limits <- function(df,
   }
   
   return(df)
+}
+
+
+sign_chr <- function(x) {
+  y <- dplyr::case_when(
+    x < 0 ~ "01",
+    x == 0 ~ "00",
+    x > 0 ~ "10"
+  )
+  
+  return(y)
 }
 

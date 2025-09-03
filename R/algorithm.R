@@ -84,7 +84,7 @@ create_SPC_auto_limits_table <- function(data,
   # [1] Counter initialised
   data <- record_log_entry(df = data,
                            counter = counter,
-                           step = 1)
+                           entry = "0100")
   # Check whether there are enough data points to form one period
   if(!enough_data_for_new_period(data = data,
                                  periodMin = periodMin,
@@ -93,7 +93,7 @@ create_SPC_auto_limits_table <- function(data,
     
     data <- record_log_entry(df = data,
                              counter = counter,
-                             step = "2b")
+                             entry = "0210")
     
     if(showLimits == TRUE){
       warning(paste0("The input data has fewer than the minimum number of",
@@ -118,7 +118,7 @@ create_SPC_auto_limits_table <- function(data,
     
     limits_table <- record_log_entry(df = limits_table,
                                      counter = counter,
-                                     step = "2a")
+                                     entry = "0200")
     
     # Set counter to first point after end of first period
     counter <- counter + periodMin
@@ -127,7 +127,7 @@ create_SPC_auto_limits_table <- function(data,
       # [3] Algorithm loop starts - unless user specified no recalculations
       limits_table <- record_log_entry(df = limits_table,
                                        counter = counter,
-                                       step = 3)
+                                       entry = "0300")
       
       while(counter < nrow(data)){
         
@@ -139,7 +139,7 @@ create_SPC_auto_limits_table <- function(data,
           
           limits_table <- record_log_entry(df = limits_table,
                                            counter = counter,
-                                           step = "4b")
+                                           entry = "0410")
           
           break
           
@@ -147,17 +147,21 @@ create_SPC_auto_limits_table <- function(data,
           
           # There are sufficient data points remaining after the counter to form
           # a new period if indicated.
-          limits_table <- record_log_entry(df = limits_table,
-                                           counter = counter,
-                                           step = "4a")
           
           # Identify the next rule break to consider as a triggering rule break:
           # Check whether counter is part way through a rule 2 break already,
           # with at least [runRuleLength] rule 2 break points following.
           if(all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
-            # If so, set next rule break position to next point.   
+            # If so, set next rule break position to the counter. 
             rule2_break_positions <- NA
             rule2_break_position <- counter
+            
+            log_entry <- paste0("0400",
+                                rule2_break_position)
+            
+            limits_table <- record_log_entry(df = limits_table,
+                                             counter = counter,
+                                             entry = log_entry)
             
           } else {
             # If not, i.e. if either the counter is not within a rule 2 break,
@@ -168,6 +172,14 @@ create_SPC_auto_limits_table <- function(data,
               counter = counter)
             
             rule2_break_position <- rule2_break_positions[1]
+            
+            log_entry <- paste0("0401",
+                                rule2_break_position)
+            
+            limits_table <- record_log_entry(df = limits_table,
+                                             counter = counter,
+                                             entry = log_entry)
+            
           }
           
           # [5] Check whether there are any further rule 2 breaks
@@ -175,7 +187,7 @@ create_SPC_auto_limits_table <- function(data,
             # [5b] If not, then there can be no more additional periods
             limits_table <- record_log_entry(df = limits_table,
                                              counter = counter,
-                                             step = "5b")
+                                             entry = "0510")
             
             break
             
@@ -185,13 +197,17 @@ create_SPC_auto_limits_table <- function(data,
             
             # [5a] Set counter to the next rule break position and record the
             # direction of the rule break
-            limits_table <- record_log_entry(df = limits_table,
-                                             counter = counter,
-                                             step = "5a")
-            
             counter <- rule2_break_position
             triggering_rule_break_direction <-
               limits_table$aboveOrBelowCl[counter]
+            
+            log_entry <- paste0("0500",
+                                sign_chr(triggering_rule_break_direction))
+            
+            limits_table <- record_log_entry(df = limits_table,
+                                             counter = counter,
+                                             entry = log_entry)
+            
             
             # [6] Check whether there are enough points after the counter to
             # form a new period
@@ -201,7 +217,7 @@ create_SPC_auto_limits_table <- function(data,
               
               limits_table <- record_log_entry(df = limits_table,
                                                counter = counter,
-                                               step = "6b")
+                                               entry = "0610")
               
               break
               
@@ -210,9 +226,6 @@ create_SPC_auto_limits_table <- function(data,
               # [6a] There are sufficient points. Establish candidate limits
               # using the first periodMin points from the counter as calculation
               # period
-              limits_table <- record_log_entry(df = limits_table,
-                                               counter = counter,
-                                               step = "6a")
               
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
@@ -242,6 +255,18 @@ create_SPC_auto_limits_table <- function(data,
                 candidate_limits_table,
                 triggering_rule_break_direction)
               
+              log_entry <- paste0("0600",
+                                  as.integer(opposite_rule_break),
+                                  as.integer(final_run_prevents))
+              
+              limits_table <- record_log_entry(df = limits_table,
+                                               counter = counter,
+                                               entry = log_entry)
+              candidate_limits_table <- record_log_entry(
+                df = candidate_limits_table,
+                counter = counter,
+                entry = log_entry)
+              
               # Check whether:
               # 1) There is no opposing rule break AND
               # 2) Either:
@@ -257,7 +282,7 @@ create_SPC_auto_limits_table <- function(data,
                 
                 limits_table <- record_log_entry(df = limits_table,
                                                  counter = counter,
-                                                 step = "7a")
+                                                 entry = "0700")
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
@@ -272,7 +297,7 @@ create_SPC_auto_limits_table <- function(data,
                 
                 limits_table <- record_log_entry(df = limits_table,
                                                  counter = counter,
-                                                 step = "7b")
+                                                 entry = "0710")
                 
                 # Check whether:
                 # 1) no further rule breaks have been identified OR

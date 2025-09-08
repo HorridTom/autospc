@@ -87,9 +87,9 @@ interpret_log_entry <- function(entry,
           },
           "02" = {
             if(branch == "00") {
-              eis <- "Sufficient data to proceed."
+              eis <- "Sufficient data to form at least one period."
             } else if(branch == "10") {
-              eis <- "Insufficient remaining data for further re-establishment of limits."
+              eis <- "Insufficient data to form control limits."
             } else {
               eis <- "Undefined branch at step 02."
             }
@@ -105,7 +105,8 @@ interpret_log_entry <- function(entry,
             } else if(stringr::str_sub(branch,
                                        1L,
                                        1L) == "1") {
-              eis <- "Insufficient remaining data for further re-establishment of limits."
+              eis <- paste0("Insufficient remaining data for further",
+                            "re-establishment of limits.")
             } else {
               eis <- "Undefined branch at step 04."
             }
@@ -114,7 +115,8 @@ interpret_log_entry <- function(entry,
                                                      2L,
                                                      2L) == "1"){
               eis <- paste0(eis,
-                            " The next shift rule break commences at point ",
+                            " Moving counter to the next shift rule break,",
+                            " commencing at point ",
                             entry_data,
                             ".")
             }
@@ -145,9 +147,16 @@ interpret_log_entry <- function(entry,
           },
           "06" = {
             if(branch == "00") {
-              eis <- "Sufficient data to proceed."
+              if(verbosity > 1) {
+                eis <- "Sufficient data to proceed."
+              } else {
+                eis <- ""
+              }
+              eis <- paste(eis,
+                            "Forming candidate limits.")
             } else if(branch == "10") {
-              eis <- "Insufficient remaining data for further re-establishment of limits."
+              eis <- paste0("Insufficient remaining data for further",
+                            "re-establishment of limits.")
             } else {
               eis <- "Undefined branch at step 06."
             }
@@ -229,12 +238,14 @@ interpret_log <- function(df,
                                  verbosity = verbosity)
   
   log_df <- log_df %>%
+    dplyr::filter(!(trimws(interpretation) == "")) %>%
     dplyr::group_by(counter) %>%
     dplyr::mutate(interpretation = stringr::str_wrap(interpretation,
-                                                     width = 80L)) %>%
+                                                     width = 60L)) %>%
     dplyr::summarise(x = dplyr::first(x),
                      interpretation = paste(interpretation,
                                             collapse = "\n- "),
+                     interpretation = paste0("- ", interpretation),
                      .groups = "drop")
   
   log_txt <- log_df %>%

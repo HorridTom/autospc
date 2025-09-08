@@ -77,8 +77,12 @@
 #' in XMR chart
 #' @param writeTable Boolean specifying whether to save the data as a CSV 
 #' (useful for doing lots of charts at a time).
-#' @param verbosity Integer specifying how talkative the algorithm is; the
-#' higher the number the more information is provided, none if 0.
+#' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
+#' standard output log; the higher the number the more information is provided,
+#' none if 0.
+#' @param log_file_path if not NULL (the default), path to save log file to.
+#' The file extension provided (.rds or .csv) determines the type of file the
+#' log data is saved to. Full log data is saved, regardless of verbosity.
 #' 
 #' ## Chart Appearance
 #' @param title Optional string specifying chart title. Overrides df$title.
@@ -169,7 +173,8 @@ plot_auto_SPC <- function(df,
                           showLimits = TRUE,
                           showMR = TRUE,
                           writeTable = FALSE,
-                          verbosity = 1L,
+                          verbosity = 0L,
+                          log_file_path = NULL,
                           ## Chart Appearance
                           title = NULL,
                           subtitle = NULL,
@@ -295,6 +300,12 @@ plot_auto_SPC <- function(df,
                                      showLimits = showLimits,
                                      overhangingReversions = overhangingReversions,
                                      mr_screen_max_loops = mr_screen_max_loops)
+  
+  # Output log data
+  log_output(df,
+             verbosity = verbosity,
+             chartType = chartType,
+             log_file_path = log_file_path)
   
   num_non_missing_y <- df %>%
     dplyr::filter(!is.na(y)) %>%

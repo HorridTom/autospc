@@ -1,3 +1,4 @@
+# Functions to populate and interpret algorithm log
 
 record_log_entry <- function(df,
                              counter,
@@ -52,8 +53,18 @@ record_log_entry <- function(df,
 }
 
 
-interpret_log_entry <- function(entry) {
+interpret_log_entry <- function(entry,
+                                verbosity) {
   
+  # Deal with counter overflow marker
+  if(stringr::str_detect(entry, "\\|")) {
+    entry <- stringr::str_sub(
+      stringr::str_extract(entry, "\\|.*$"),
+      2L,
+      -1L)
+  }
+  
+  # Extract components from log entry
   step <- stringr::str_sub(entry,
                            1L,
                            2L)
@@ -69,6 +80,7 @@ interpret_log_entry <- function(entry) {
     entry_data <- NA_character_
   }
   
+  # Form log entry interpretation string based on log entry components
   switch (step,
           "01" = {
             eis <- "Counter initialised to 1."
@@ -98,7 +110,9 @@ interpret_log_entry <- function(entry) {
               eis <- "Undefined branch at step 04."
             }
             
-            if(!is.na(entry_data)){
+            if(!is.na(entry_data) & stringr::str_sub(branch,
+                                                     2L,
+                                                     2L) == "1"){
               eis <- paste0(eis,
                             " The next shift rule break commences at point ",
                             entry_data,
@@ -148,20 +162,20 @@ interpret_log_entry <- function(entry) {
               opp_str <- if(opp) {
                 paste("There is a shift rule break back towards",
                       "the prevailing centre line.")
-              } else {
+              } else if(verbosity > 1){
                 paste("There is no shift rule break back towards the",
                       "prevailing centre line.")
-              }
+              } else {""}
               
               frp_str <- if(frp) {
                 paste("The final run in the candidate calculation period may",
                       "become a shift rule break back towards the prevailing",
                       "centre line.")
-              } else {
+              } else if(verbosity > 1){
                 paste("The final run in the candidate calculation period",
                       "cannot become a shift rule break back towards the",
                       "prevailing centre line.")
-              }
+              } else {""}
               
               eis <- paste(eis,
                            opp_str,
@@ -188,7 +202,8 @@ interpret_log_entry <- function(entry) {
 }
 
 
-create_log_dataframe <- function(df) {
+create_log_dataframe <- function(df,
+                                 verbosity) {
   
   df <- df %>% 
     dplyr::select(x,
@@ -198,7 +213,8 @@ create_log_dataframe <- function(df) {
     tidyr::separate_longer_delim(log_entry,
                                  delim = ";") %>%
     dplyr::rowwise() %>% 
-    dplyr::mutate(interpretation = interpret_log_entry(log_entry))
+    dplyr::mutate(interpretation = interpret_log_entry(log_entry,
+                                                       verbosity = verbosity))
   
   
   return(df)
@@ -206,9 +222,11 @@ create_log_dataframe <- function(df) {
 }
 
 
-interpret_log <- function(df) {
+interpret_log <- function(df,
+                          verbosity) {
   
-  log_df <- create_log_dataframe(df)
+  log_df <- create_log_dataframe(df,
+                                 verbosity = verbosity)
   
   log_df <- log_df %>%
     dplyr::group_by(counter) %>%
@@ -229,8 +247,58 @@ interpret_log <- function(df) {
     dplyr::summarise(log_txt = paste0(log_txt,
                                       collapse = "\n\n")) %>%
     dplyr::pull(log_txt)
+  
+  return(log_txt)
+  
+}
+
+
+log_output <- function(df,
+                       verbosity,
+                       chartType ,
+                       log_file_path) {
+  if(verbosity > 0){
+    log_text <- interpret_log(df,
+                              verbosity = verbosity)
+    cat(paste0("\n",
+               chartType,
+               ":\n\n"))
+    cat(log_text)
+    cat("\n\n")
+  }
+  
+  if(!is.null(log_file_path)) {
+    log_df <- create_log_dataframe(df,
+                                   verbosity = 2L)
+    fext <- tools::file_ext(log_file_path)
     
-    return(log_txt)
+    if(tolower(fext) == "rds") {
+      
+      tryCatch(
+        expr = {
+          saveRDS(log_df,
+                  file = log_file_path)
+        },
+        error = function(cnd){
+          message("Unable to save log file.")
+          print(cnd)
+        }
+      )
+    } else if(tolower(fext) == "csv") {
+      tryCatch(
+        expr = {
+          write.csv(log_df,
+                    file = log_file_path)
+        },
+        error = function(cnd){
+          message("Unable to save log file.")
+          print(cnd)
+        }
+      )
+    } else {
+      warning("Invalid extension in log_file_path. Log file not written.")
+    }
+  }
   
 }
 

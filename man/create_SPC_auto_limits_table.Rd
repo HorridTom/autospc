@@ -49,10 +49,9 @@ limit calculations.}
 \item{noRegrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}
 
-\item{verbosity}{Integer specifying how talkative the algorithm is; the
-higher the number the more information is provided, none if 0.
-\subsection{Chart Appearance}{
-}}
+\item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
+standard output log; the higher the number the more information is provided,
+none if 0.}
 
 \item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first periodMin points.}

@@ -25,7 +25,8 @@ plot_auto_SPC(
   showLimits = TRUE,
   showMR = TRUE,
   writeTable = FALSE,
-  verbosity = 1L,
+  verbosity = 0L,
+  log_file_path = NULL,
   title = NULL,
   subtitle = NULL,
   use_caption = TRUE,
@@ -144,8 +145,13 @@ in XMR chart}
 \item{writeTable}{Boolean specifying whether to save the data as a CSV
 (useful for doing lots of charts at a time).}
 
-\item{verbosity}{Integer specifying how talkative the algorithm is; the
-higher the number the more information is provided, none if 0.
+\item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
+standard output log; the higher the number the more information is provided,
+none if 0.}
+
+\item{log_file_path}{if not NULL (the default), path to save log file to.
+The file extension provided (.rds or .csv) determines the type of file the
+log data is saved to. Full log data is saved, regardless of verbosity.
 \subsection{Chart Appearance}{
 }}
 

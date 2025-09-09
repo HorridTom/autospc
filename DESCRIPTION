@@ -1,6 +1,6 @@
 Package: autospc
 Title: Automatically Partitioned SPC Charts
-Version: 0.0.0.9024
+Version: 0.0.0.9025
 Authors@R: c(
     person("Thomas", "Woodcock", , "woodcock.thomas@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4735-4856")),
@@ -19,7 +19,11 @@ Imports:
     lifecycle (>= 1.0.3),
     magrittr (>= 2.0.3),
     rlang (>= 1.1.0),
-    scales (>= 1.2.1)
+    scales (>= 1.2.1),
+    stringr,
+    tibble,
+    tidyr,
+    tools
 Suggests: 
     testthat (>= 3.1.7)
 Config/testthat/edition: 3

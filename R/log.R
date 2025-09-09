@@ -155,7 +155,7 @@ interpret_log_entry <- function(entry,
               eis <- paste(eis,
                             "Forming candidate limits.")
             } else if(branch == "10") {
-              eis <- paste0("Insufficient remaining data for further",
+              eis <- paste("Insufficient remaining data for further",
                             "re-establishment of limits.")
             } else {
               eis <- "Undefined branch at step 06."

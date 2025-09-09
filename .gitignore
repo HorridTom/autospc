@@ -66,3 +66,4 @@ SPCalgorithm1/datasets/*
 /Visualisation/*.rtf
 /Visualisation/*.xls*
 /Visualisation/Flow_diagram/*
+inst/doc

@@ -10,6 +10,7 @@ Description: Creates spc charts with control limits and centre line
     calculations partitioned into distinct periods.
 License: GPL-3
 Imports: 
+    DiagrammeR,
     dplyr (>= 1.1.1),
     fpCompare,
     ggplot2 (>= 3.4.2),

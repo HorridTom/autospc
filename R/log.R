@@ -105,7 +105,7 @@ interpret_log_entry <- function(entry,
             } else if(stringr::str_sub(branch,
                                        1L,
                                        1L) == "1") {
-              eis <- paste0("Insufficient remaining data for further",
+              eis <- paste("Insufficient remaining data for further",
                             "re-establishment of limits.")
             } else {
               eis <- "Undefined branch at step 04."

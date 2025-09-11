@@ -207,23 +207,27 @@ plot_auto_SPC <- function(df,
                        x = {{ x }}, y = {{ y }}, n = {{ n }})
   
   #get title from data
-  if(is.null(title) & "title" %in% colnames(df)){
+  if(is.null(title) & "title" %in% colnames(df)) {
     title <- df$title[1]
   }
   
-  if(is.null(subtitle) & "subtitle" %in% colnames(df)){
+  if(is.null(subtitle) & "subtitle" %in% colnames(df)) {
     subtitle <- df$subtitle[1]
   }
   
   #get type from x variable so that ggplot axes are correct
   #currently only accepting Date, numeric and integer as acceptable types
   xType <- class(df$x)
-  if(xType != "Date" & all(xType!= c("POSIXct", "POSIXt")) & xType != "numeric" & xType != "integer"){
-    print("Please make sure that your x column is a 'Date', 'numeric' or 'integer' type.")
+  if(xType != "Date" & 
+     all(xType!= c("POSIXct", "POSIXt")) & 
+     xType != "numeric" & 
+     xType != "integer") {
+    print(paste0("Please make sure that your x column is a",
+                 "'Date', 'numeric' or 'integer' type."))
   }
   
   #decide whether the chart is C or P depending on data format if not specified 
-  if(is.null(chartType)){
+  if(is.null(chartType)) {
     
     lifecycle::deprecate_warn(
       when = "0.0.0.9008",
@@ -231,12 +235,15 @@ plot_auto_SPC <- function(df,
       details = I("Please explicitly pass the desired chart type")
     )
     
-    if(all(c("x", "y") %in% colnames(df))){
+    if(all(c("x", "y") %in% colnames(df))) {
       chartType <- "C'"
-    }else if(all(c("x", "n", "y") %in% colnames(df))){
+    } else if(all(c("x", "n", "y") %in% colnames(df))) {
       chartType <- "P'"
-    }else{
-      print("The data you have input is not in the correct format. For C charts, data must contain at least columns 'x' and 'y'. For P charts data must contain at least 'x', 'n' and 'y' columns.")
+    } else {
+      print(paste0("The data you have input is not in the correct format. ",
+                   "For C charts, data must contain at least columns 'x' and ",
+                   "'y'. For P charts data must contain at least 'x', 'n' and ",
+                   "'y' columns."))
     }
   }
   
@@ -287,19 +294,21 @@ plot_auto_SPC <- function(df,
     lower_annotation_sf <- 2 - upper_annotation_sf
   }
   
-  #get control limits
-  #df <- dplyr::mutate(df, x = as.Date(x))
-  df <- create_SPC_auto_limits_table(df, chartType = chartType, 
-                                     periodMin = periodMin,
-                                     runRuleLength = runRuleLength,
-                                     maxNoOfExclusions  = maxNoOfExclusions,
-                                     noRegrets = noRegrets,
-                                     verbosity = verbosity,
-                                     noRecals = noRecals,
-                                     rule2Tolerance = rule2Tolerance,
-                                     showLimits = showLimits,
-                                     overhangingReversions = overhangingReversions,
-                                     mr_screen_max_loops = mr_screen_max_loops)
+  # Get control limits
+  df <- create_SPC_auto_limits_table(
+    df,
+    chartType = chartType, 
+    periodMin = periodMin,
+    runRuleLength = runRuleLength,
+    maxNoOfExclusions  = maxNoOfExclusions,
+    noRegrets = noRegrets,
+    verbosity = verbosity,
+    noRecals = noRecals,
+    rule2Tolerance = rule2Tolerance,
+    showLimits = showLimits,
+    overhangingReversions = overhangingReversions,
+    mr_screen_max_loops = mr_screen_max_loops
+  )
   
   # Output log data
   log_output(df,
@@ -315,7 +324,7 @@ plot_auto_SPC <- function(df,
     num_non_missing_y <- num_non_missing_y + 1L
   }
   
-  #start and end dates
+  # Start and end dates
   if(!is.null(extend_limits_to) && is.null(x_pad_end)) {
     x_pad_end = extend_limits_to
   }
@@ -323,7 +332,7 @@ plot_auto_SPC <- function(df,
   x_max <- max(df$x, na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
   
-  # chart y limit
+  # Chart y limit
   if(num_non_missing_y < periodMin) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
@@ -341,24 +350,24 @@ plot_auto_SPC <- function(df,
     }
   }
   
-  if(num_non_missing_y < periodMin){
+  if(num_non_missing_y < periodMin) {
     ylimhigh <- max(df$y,
                     na.rm = TRUE)
-  }else if(chartType == "C" | chartType == "C'"){
+  } else if(chartType == "C" | chartType == "C'") {
     ylimhigh <- max(df$ucl,
                     df$y,
                     na.rm = TRUE) + max(df$ucl,
                                         na.rm = TRUE)/10 + 10
-  }else if (chartType == "XMR" | chartType == "MR"){
+  } else if (chartType == "XMR" | chartType == "MR") {
     ylimhigh <- max(df$ucl,
                     df$y,
                     na.rm = TRUE)*1.1
-  }else{
+  } else {
     ylimhigh <- 110
   }
   
-  #override y limit if specified
-  if(!is.null(override_y_lim)){
+  #Override y limit if specified
+  if(!is.null(override_y_lim)) {
     ylimhigh <- override_y_lim
   }
   
@@ -379,33 +388,33 @@ plot_auto_SPC <- function(df,
     override_y_title <- ytitle
   }
   
- 
-  #if limits are to be displayed on chart
-  if(showLimits == TRUE & num_non_missing_y >= periodMin){
+  
+  # Check whether limits are to be displayed on chart
+  if(showLimits & num_non_missing_y >= periodMin){
     
     df <- df %>%
-      #dplyr::mutate(x = as.Date(x)) %>%
-      #overlap the limit types to make the plot aesthetics work
-      #(i.e. so there isn't a gap between calculation and display limits)
-      dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType), FALSE, TRUE)) #%>%
-    #mutate(periodType = ifelse(limitChange & periodType == "calculation", lag(periodType), periodType))
+      dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType),
+                                         FALSE,
+                                         TRUE))
     
     
-    #re-convert x column back to date if necessary
-    if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
+    # Convert x column back to date if necessary
+    if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){ 
       df <- df %>%
         dplyr::mutate(x = as.Date(x))
     }
     
     
-    #store break points as vector
+    # Store break points as vector
     breakPoints <- which(df$breakPoint)
     
-    if(highlightExclusions){
-      #show exclusions on chart
-      df <- df %>% dplyr::mutate(highlight = ifelse(excluded == TRUE & !is.na(excluded),
-                                                    "Excluded from limits calculation",
-                                                    highlight))
+    if(highlightExclusions) {
+      # Show exclusions on chart
+      df <- df %>% dplyr::mutate(
+        highlight = ifelse(excluded & !is.na(excluded),
+                           "Excluded from limits calculation",
+                           highlight)
+      )
     }
     
     # add floating median column if needed
@@ -423,15 +432,14 @@ plot_auto_SPC <- function(df,
                               lower_annotation_sf = lower_annotation_sf,
                               annotation_arrow_curve = annotation_arrow_curve)
     
-    #create initial plot object without formatting
-    pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
-                           ggplot2::aes(x,y))
-    
-    #get periods into groups for plotting
+    # Get periods into groups for plotting
     df <- df %>%
-      dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE | is.na(limitChange) | breakPoint == TRUE,
-                                                 dplyr::row_number(),
-                                                 NA_integer_))
+      dplyr::mutate(
+        periodStart = dplyr::if_else(limitChange == TRUE |
+                                       is.na(limitChange) |
+                                       breakPoint == TRUE,
+                                     dplyr::row_number(),
+                                     NA_integer_))
     
     df$periodStart <- fill_NA(df$periodStart)
     
@@ -452,104 +460,59 @@ plot_auto_SPC <- function(df,
       mc[["df"]] <- rlang::expr(df_original)
       
       p_mr <- eval(mc)
+    } else {
+      p_mr <- NA
     }
     
     if(plotChart){
       
-      if(use_caption) {
-        caption <- paste(chartType,"Shewhart Chart.","\n*Shewhart chart rules apply \nRule 1: Any point outside the control limits \nRule 2: Eight or more consecutive points all above, or all below, the centre line")
-      } else {
-        caption <- NULL
-      }
-      
-      p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
-        ggplot2::ggtitle(title,
-                         subtitle = subtitle) +
-        ggplot2::labs(x = override_x_title,
-                      y = override_y_title,
-                      caption = paste0(caption),
-                      size = 10) +
-        ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
-                                    breaks = scales::breaks_pretty(),
-                                    labels = scales::label_number(big.mark = ","))
-      
-      if("median" %in% colnames(df)) {
-        p <- add_floating_median(p = p,
-                                 df = df,
-                                 floatingMedian_n = floatingMedian_n)
-      }
-      
-      if(includeAnnotations == TRUE){
-        
-        p <- add_annotations_to_plot(p = p,
-                                     df = df,
-                                     annotation_size = annotation_size,
-                                     annotation_arrows = annotation_arrows,
-                                     annotation_curvature = annotation_curvature)
-      }
-      
-      #formats x axis depending on x type
-      if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
-        
-        #get x axis breaks
-        if(is.null(x_break)) {
-          x_break <- as.numeric(difftime(as.Date(end_x), as.Date(start_x), units = "days")) / 40
-        }
-        
-        p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
-                                       breaks = seq(as.Date(start_x), as.Date(end_x), x_break),
-                                       limits = c(as.Date(start_x), as.Date(end_x))
-        )
-        
-      }else if(xType == "integer"){
-        #get x axis breaks
-        if(is.null(x_break)) {
-          x_break <- (end_x - start_x) / 40
-        }
-        
-        p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
-                                             limits = c(start_x, end_x))
-      }else{
-        #get x axis breaks
-        if(is.null(x_break)) {
-          x_break <- (end_x - start_x) / 40
-        }
-        
-        p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
-                                             limits = c(start_x, end_x))
-      }
-      
-      if((chartType == "XMR") & showMR) {
-        p <- p + 
-          ggplot2::labs(caption = NULL,
-                        x = NULL) + 
-          ggplot2::theme(axis.text.x = ggplot2::element_blank(), 
-                         axis.ticks.x = ggplot2::element_blank())
-        
-        p_mr <- p_mr + 
-          ggplot2::labs(caption = caption)
-        
-        p <- ggpubr::ggarrange(p, p_mr,
-                               ncol = 1,
-                               nrow = 2,
-                               legend = "right",
-                               common.legend = TRUE,
-                               align = "v")
-      }
+      p <- create_spc_plot(
+        df = df,
+        p_mr = p_mr,
+        chartType = chartType,
+        xType = xType,
+        start_x = start_x,
+        end_x = end_x,
+        x_max = x_max,
+        ylimlow = ylimlow,
+        ylimhigh = ylimhigh,
+        num_non_missing_y = num_non_missing_y,
+        periodMin = periodMin,
+        title = title,
+        subtitle = subtitle,
+        use_caption = use_caption,
+        override_x_title = override_x_title,
+        override_y_title = override_y_title,
+        r1_col = r1_col,
+        r2_col = r2_col,
+        includeAnnotations = includeAnnotations,
+        annotation_size = annotation_size,
+        annotation_arrows = annotation_arrows,
+        annotation_curvature = annotation_arrow_curve,
+        floatingMedian_n = floatingMedian_n,
+        showMR = showMR,
+        x_break = x_break,
+        x_date_format = x_date_format
+      )
       
       suppressWarnings(
         return(p) # Chart output
       )
       
-    }else if(writeTable == TRUE){
+    } else if(writeTable) {
       # (!plotChart)
       
       title <- gsub(":", "_",title)
       subtitle <- gsub(":","_", subtitle)
-      write.csv(df, paste0("tables/", gsub(" ","_",title), "_", gsub(" ","_",subtitle,), ".csv"),
+      write.csv(df,
+                paste0("tables/",
+                       gsub(" ", "_", title),
+                       "_",
+                       gsub(" ", "_", subtitle,),
+                       ".csv"),
                 row.names = FALSE)
       
-    }else{
+    } else {
       # (!plotChart)
       
       if(chartType == "XMR" & showMR) {
@@ -569,120 +532,25 @@ plot_auto_SPC <- function(df,
       
       df <- df %>%
         dplyr::filter(!is.na(x))
+      
+      return(df)
     }
     
-  }else{ # only plot timeseries without limits
-    
-    if(plotChart == TRUE){
-      ggplot2::ggplot(df, 
-                      ggplot2::aes(x = x, y = y)) +
-        ggplot2::geom_line(colour = "black",
-                           linewidth = 0.5) +
-        ggplot2::geom_point(colour = "black", size = 2) +
-        ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                       panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
-                       panel.grid.minor = ggplot2::element_blank(),
-                       panel.background = ggplot2::element_blank(),
-                       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
-                       axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
-                       plot.title = ggplot2::element_text(size = 20, hjust = 0),
-                       plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
-                       axis.line = ggplot2::element_line(colour = "grey60"),
-                       plot.caption = ggplot2::element_text(size = 10, hjust = 0.5)) +
-        ggplot2::ggtitle(title,
-                         subtitle = subtitle) +
-        ggplot2::labs(x = override_x_title,
-                      y = override_y_title,
-                      size = 10) +
-        ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
-                                    breaks = scales::breaks_pretty(),
-                                    labels = scales::number_format(accuracy = 1,
-                                                                   big.mark = ","))
-
-    }else{
+  } else { # Plot only the time series, without limits
+    if(plotChart == TRUE) {
+      p <- create_timeseries_plot(
+        df = df,
+        title = title,
+        subtitle = subtitle,
+        override_x_title = override_x_title,
+        override_y_title = override_y_title,
+        ylimlow = ylimlow,
+        ylimhigh = ylimhigh)
       
+      return(p)
+    } else {
       return(df) # Table output
     }
-    
   }
-  
-}
-
-
-format_SPC <- function(cht, df, r1_col, r2_col, ymin, ymax) {
-  point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, 
-                     "None" = "black", "Excluded from limits calculation" = "grey")
-  
-  #get exemplar calculation and display periods
-  plot_periods <- df$plotPeriod
-  
-  first_display_period <- plot_periods[grep("display", plot_periods)[1]]
-  first_calc_period <- plot_periods[1]
-  
-  suppressWarnings( # to avoid the warning about using alpha for discrete vars
-    cht + 
-      ggplot2::geom_line(colour = "black",
-                         linewidth = 0.5,
-                         na.rm = TRUE) + 
-      ggplot2::geom_line(data = df, 
-                         ggplot2::aes(x,cl,
-                                      alpha = plotPeriod),
-                         linetype = "solid",
-                         linewidth = 0.75,
-                         na.rm = TRUE) +
-      ggplot2::geom_line(data = df, 
-                         ggplot2::aes(x,lcl,
-                                      alpha = plotPeriod),
-                         linetype = "42",
-                         linewidth = 0.5,
-                         show.legend = FALSE,
-                         na.rm = TRUE) +
-      ggplot2::geom_line(data = df, 
-                         ggplot2::aes(x,ucl,
-                                      alpha = plotPeriod),
-                         linetype = "42",
-                         linewidth = 0.5,
-                         show.legend = FALSE,
-                         na.rm = TRUE) +
-      ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2,
-                          na.rm = TRUE) +
-      ggplot2::scale_color_manual("Rule triggered*", values = point_colours) + 
-      ggplot2::scale_alpha_discrete("Period Type",
-                                    labels = if(!is.na(first_display_period)) {
-                                      c("Calculation", "Display")
-                                      } else {
-                                        c("Calculation")
-                                      },
-                                    range = if(!is.na(first_display_period)) {
-                                      c(1, 0.4)
-                                    } else {
-                                      c(1, 1)
-                                    },
-                                    breaks = if(!is.na(first_display_period)) {
-                                      c(first_calc_period,
-                                        first_display_period)
-                                      } else {
-                                        c(first_calc_period)
-                                        },
-                                    guide = ggplot2::guide_legend(
-                                      override.aes = list(alpha = if(!is.na(first_display_period)) {
-                                        c(1, 0.4)
-                                        } else {
-                                          c(1)
-                                          }
-                                      )
-                                    )
-      ) +
-      ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                     panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
-                     panel.grid.minor = ggplot2::element_blank(),
-                     panel.background = ggplot2::element_blank(),
-                     axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
-                     axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
-                     plot.title = ggplot2::element_text(size = 20, hjust = 0),
-                     plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
-                     axis.line = ggplot2::element_line(colour = "grey60"),
-                     plot.caption = ggplot2::element_text(size = 10, hjust = 0.5)) 
-  )
 }
 

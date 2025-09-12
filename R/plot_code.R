@@ -202,97 +202,30 @@ plot_auto_SPC <- function(df,
   
   df_original <- df
   
-  #rename columns if passed
+  # Rename columns if passed
   df <- rename_columns(df = df,
                        x = {{ x }}, y = {{ y }}, n = {{ n }})
   
-  #get title from data
-  if(is.null(title) & "title" %in% colnames(df)) {
-    title <- df$title[1]
-  }
+  # Preprocess inputs
+  preprocessed_vars <- preprocess_inputs(
+    df = df,
+    chartType = chartType,
+    title = title,
+    subtitle = subtitle,
+    upper_annotation_sf = upper_annotation_sf,
+    lower_annotation_sf = lower_annotation_sf,
+    override_annotation_dist = override_annotation_dist,
+    override_annotation_dist_P = override_annotation_dist_P
+  )
   
-  if(is.null(subtitle) & "subtitle" %in% colnames(df)) {
-    subtitle <- df$subtitle[1]
-  }
+  df                  <- preprocessed_vars$df
+  chartType           <- preprocessed_vars$chartType
+  title               <- preprocessed_vars$title
+  subtitle            <- preprocessed_vars$subtitle
+  xType               <- preprocessed_vars$xType
+  upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
+  lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
   
-  #get type from x variable so that ggplot axes are correct
-  #currently only accepting Date, numeric and integer as acceptable types
-  xType <- class(df$x)
-  if(xType != "Date" & 
-     all(xType!= c("POSIXct", "POSIXt")) & 
-     xType != "numeric" & 
-     xType != "integer") {
-    print(paste0("Please make sure that your x column is a",
-                 "'Date', 'numeric' or 'integer' type."))
-  }
-  
-  #decide whether the chart is C or P depending on data format if not specified 
-  if(is.null(chartType)) {
-    
-    lifecycle::deprecate_warn(
-      when = "0.0.0.9008",
-      what = I("chartType  = NULL"),
-      details = I("Please explicitly pass the desired chart type")
-    )
-    
-    if(all(c("x", "y") %in% colnames(df))) {
-      chartType <- "C'"
-    } else if(all(c("x", "n", "y") %in% colnames(df))) {
-      chartType <- "P'"
-    } else {
-      print(paste0("The data you have input is not in the correct format. ",
-                   "For C charts, data must contain at least columns 'x' and ",
-                   "'y'. For P charts data must contain at least 'x', 'n' and ",
-                   "'y' columns."))
-    }
-  }
-  
-  if(chartType == "MR") {
-    mrs <- get_mrs(y = df$y)
-    df <- df %>% dplyr::mutate(y = mrs)
-  }
-  
-  # Check annotation arguments
-  if(!is.null(override_annotation_dist) |
-     !is.null(override_annotation_dist_P)) {
-    
-    lifecycle::deprecate_warn(
-      when = "0.0.0.9010",
-      what = I(paste0("plot_auto_SPC(override_annotation_dist,",
-                      "override_annotation_dist_P)")),
-      details = I(paste0("Please use `plot_auto_SPC(upper_annotation_sf, ",
-                         "lower_annotation_sf)` instead. ",
-                         "Note that equivalent new arguments can be obtained ",
-                         "from the old by transforming as follows: 1+1/x. ",
-                         "For example, override_annotation_dist = 10 is ",
-                         "equivalent to upper_annotation_sf = 1.1."))
-    )
-    
-    if(!is.null(override_annotation_dist_P) & startsWith(chartType, "P")) {
-      oad <- override_annotation_dist_P
-    } else {
-      oad <- override_annotation_dist
-    }
-    
-    if(is.null(upper_annotation_sf)) {
-      upper_annotation_sf <- 1 + 1/oad
-    }
-    
-    if(is.null(lower_annotation_sf)) {
-      lower_annotation_sf <- 1 - 1/oad
-    }
-    
-  }
-  
-  if(is.null(upper_annotation_sf)) {
-    upper_annotation_sf <- ifelse(startsWith(chartType, "P"),
-                                  1.04,
-                                  1.1)
-  }
-  
-  if(is.null(lower_annotation_sf)) {
-    lower_annotation_sf <- 2 - upper_annotation_sf
-  }
   
   # Get control limits
   df <- create_SPC_auto_limits_table(
@@ -316,141 +249,50 @@ plot_auto_SPC <- function(df,
              chartType = chartType,
              log_file_path = log_file_path)
   
-  num_non_missing_y <- df %>%
-    dplyr::filter(!is.na(y)) %>%
-    nrow()
+  # Postprocess data
   
-  if(chartType == "MR") {
-    num_non_missing_y <- num_non_missing_y + 1L
-  }
+  postprocessing_vars <- postprocess(
+    df = df,
+    chartType = chartType,
+    periodMin = periodMin,
+    showLimits = showLimits,
+    override_x_title = override_x_title,
+    override_y_title = override_y_title,
+    override_y_lim = override_y_lim,
+    x_pad_end = x_pad_end,
+    extend_limits_to = extend_limits_to,
+    xType = xType
+  )
   
-  # Start and end dates
-  if(!is.null(extend_limits_to) && is.null(x_pad_end)) {
-    x_pad_end = extend_limits_to
-  }
-  start_x <- min(df$x, na.rm = TRUE)
-  x_max <- max(df$x, na.rm = TRUE)
-  end_x <- max(x_max, x_pad_end)
-  
-  # Chart y limit
-  if(num_non_missing_y < periodMin) {
-    ylimlow <- min(df$y,
-                   na.rm = TRUE)
-  } else if(chartType != "XMR") {
-    ylimlow <- 0
-  } else {
-    ylimlow <- min(df$lcl,
-                   df$y,
-                   na.rm = TRUE)
-    yll_sgn <- sign(ylimlow)
-    if(yll_sgn != -1) {
-      ylimlow <- ylimlow * 0.9
-    } else {
-      ylimlow <- ylimlow * 1.1
-    }
-  }
-  
-  if(num_non_missing_y < periodMin) {
-    ylimhigh <- max(df$y,
-                    na.rm = TRUE)
-  } else if(chartType == "C" | chartType == "C'") {
-    ylimhigh <- max(df$ucl,
-                    df$y,
-                    na.rm = TRUE) + max(df$ucl,
-                                        na.rm = TRUE)/10 + 10
-  } else if (chartType == "XMR" | chartType == "MR") {
-    ylimhigh <- max(df$ucl,
-                    df$y,
-                    na.rm = TRUE)*1.1
-  } else {
-    ylimhigh <- 110
-  }
-  
-  #Override y limit if specified
-  if(!is.null(override_y_lim)) {
-    ylimhigh <- override_y_lim
-  }
-  
-  # Ensure axis titles available
-  ytitle <- switch(chartType,
-                   C = "Number",
-                   `C'` = "Number",
-                   P = "Percentage",
-                   `P'` = "Percentage",
-                   XMR = "X",
-                   MR = "MR")
-  
-  if(is.null(override_x_title)) {
-    override_x_title <- "Day"
-  }
-  
-  if(is.null(override_y_title)) {
-    override_y_title <- ytitle
-  }
+  df                 <- postprocessing_vars$df
+  override_x_title   <- postprocessing_vars$override_x_title
+  override_y_title   <- postprocessing_vars$override_y_title
+  num_non_missing_y  <- postprocessing_vars$num_non_missing_y
+  start_x            <- postprocessing_vars$start_x
+  x_max              <- postprocessing_vars$x_max
+  end_x              <- postprocessing_vars$end_x
+  ylimhigh           <- postprocessing_vars$ylimhigh
+  ylimlow            <- postprocessing_vars$ylimlow
   
   
   # Check whether limits are to be displayed on chart
   if(showLimits & num_non_missing_y >= periodMin){
     
-    df <- df %>%
-      dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType),
-                                         FALSE,
-                                         TRUE))
-    
-    
-    # Convert x column back to date if necessary
-    if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){ 
-      df <- df %>%
-        dplyr::mutate(x = as.Date(x))
-    }
-    
-    
-    # Store break points as vector
-    breakPoints <- which(df$breakPoint)
-    
-    if(highlightExclusions) {
-      # Show exclusions on chart
-      df <- df %>% dplyr::mutate(
-        highlight = ifelse(excluded & !is.na(excluded),
-                           "Excluded from limits calculation",
-                           highlight)
-      )
-    }
-    
-    # add floating median column if needed
-    df <- floating_median_column(df = df,
-                                 floatingMedian = floatingMedian,
-                                 floatingMedian_n = floatingMedian_n)
-    
-    # add annotation information
-    df <- add_annotation_data(df = df,
-                              chartType = chartType,
-                              ylimhigh = ylimhigh,
-                              align_labels = align_labels,
-                              flip_labels = flip_labels,
-                              upper_annotation_sf = upper_annotation_sf,
-                              lower_annotation_sf = lower_annotation_sf,
-                              annotation_arrow_curve = annotation_arrow_curve)
-    
-    # Get periods into groups for plotting
-    df <- df %>%
-      dplyr::mutate(
-        periodStart = dplyr::if_else(limitChange == TRUE |
-                                       is.na(limitChange) |
-                                       breakPoint == TRUE,
-                                     dplyr::row_number(),
-                                     NA_integer_))
-    
-    df$periodStart <- fill_NA(df$periodStart)
-    
-    df <- df %>%
-      dplyr::mutate(plotPeriod = paste0(periodType, periodStart))
-    
-    # Extend display limits
-    df <- extend_limits(df = df,
-                        chartType = chartType,
-                        extend_limits_to = extend_limits_to,
-                        x_max = x_max)
+    df <- postprocess_spc(
+      df = df,
+      chartType = chartType,
+      highlightExclusions = highlightExclusions,
+      floatingMedian = floatingMedian,
+      floatingMedian_n = floatingMedian_n,
+      extend_limits_to = extend_limits_to,
+      align_labels = align_labels,
+      flip_labels = flip_labels,
+      upper_annotation_sf = upper_annotation_sf,
+      lower_annotation_sf = lower_annotation_sf,
+      annotation_arrow_curve = annotation_arrow_curve,
+      ylimhigh = ylimhigh,
+      x_max = x_max
+    )
     
     if((chartType == "XMR") & showMR) {
       mc <- match.call()

@@ -96,9 +96,9 @@ create_SPC_auto_limits_table <- function(data,
                              entry = "0210")
     
     if(showLimits == TRUE){
-      warning(paste0("The input data has fewer than the minimum number of",
-                     "points needed to calculate one period. Timeseries data",
-                     "without limits has been displayed."))
+      warning(paste("The input data has fewer than the minimum number of",
+                    "points needed to calculate one period. Timeseries data",
+                    "without limits has been displayed."))
     }
     
     return(data)

@@ -2,12 +2,12 @@
 preprocess_inputs <- function(
     df,
     chartType,
-    title,
-    subtitle,
-    upper_annotation_sf,
-    lower_annotation_sf,
-    override_annotation_dist,
-    override_annotation_dist_P) {
+    title = NULL,
+    subtitle = NULL,
+    upper_annotation_sf = NULL,
+    lower_annotation_sf = NULL,
+    override_annotation_dist = NULL,
+    override_annotation_dist_P = NULL) {
   
   #get title from data
   if(is.null(title) & "title" %in% colnames(df)) {

@@ -5,10 +5,21 @@
 #' results at
 #' @param ... Arguments passed to [autospc::plot_auto_SPC()]
 #'
-#' @returns faceted plot showing results at different stages as specified by
-#' split_rows
-#' @export
+#' @returns Faceted plot showing results of [autospc::plot_auto_SPC()] at
+#' different stages as specified by split_rows
 #'
+#' @examples
+#' # Show progression of C' chart for count of monthly attendances over time
+#' facet_over_time(
+#'   ed_attendances_monthly,
+#'   split_rows = c(30L, 60L, 90L),
+#'   chartType = "C'",
+#'   x = Month_Start,
+#'   y = Att_All, 
+#'   x_break = 365
+#' )
+#' 
+#' @export  
 facet_over_time <- function(df,
                             split_rows,
                             ...) {
@@ -16,7 +27,29 @@ facet_over_time <- function(df,
   dots_exprs <- rlang::exprs(...)
   dots_exprs$plotChart <- FALSE
   
-  xType <- class(df$x)
+  xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
+  
+  df_rn <- eval(rlang::call2("rename_columns",
+                          df = df,
+                          !!!xyn_exprs))
+  
+  #xType <- class(df_rn$x)
+  
+  
+  preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
+  ppi_args <- dots_exprs[which(names(dots_exprs) %in% preprocess_inputs_args)]
+
+  # Preprocess inputs
+  preprocessed_vars <- eval(rlang::call2("preprocess_inputs",
+                                         df = df_rn,
+                                         !!!ppi_args))
+
+  chartType           <- preprocessed_vars$chartType
+  title               <- preprocessed_vars$title
+  subtitle            <- preprocessed_vars$subtitle
+  xType               <- preprocessed_vars$xType
+  upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
+  lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
   
   split_rows <- sort(split_rows)
   
@@ -29,23 +62,6 @@ facet_over_time <- function(df,
   
   data_splits_list <- create_splits_list(df = df,
                                          split_rows = split_rows)
-  
-  
-  # preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
-  # ppi_args <- dots_exprs[which(names(dots_exprs) %in% preprocess_inputs_args)]
-  # 
-  # # Preprocess inputs
-  # preprocessed_vars <- eval(rlang::call2("preprocess_inputs",
-  #                                        df = df,
-  #                                        !!!ppi_args))
-  # 
-  # df                  <- preprocessed_vars$df
-  # chartType           <- preprocessed_vars$chartType
-  # title               <- preprocessed_vars$title
-  # subtitle            <- preprocessed_vars$subtitle
-  # xType               <- preprocessed_vars$xType
-  # upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
-  # lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
   
   results_splits_list <- lapply(
     data_splits_list,
@@ -61,30 +77,38 @@ facet_over_time <- function(df,
     .id = "stage"
   )
   
-  # postprocess_args <- names(formals(autospc:::postprocess_spc))
-  # pp_args <- dots_exprs[which(names(dots_exprs) %in% postprocess_args)]
-  # 
-  # # Postprocess data
-  # rdproc <- eval(rlang::call2("postprocess_spc",
-  #                         df = results_data,
-  #                         ylimhigh = 1000,
-  #                         x_max = as.Date("2017-01-01"),
-  #                         !!!pp_args))
+  postprocess_args <- names(formals(autospc:::postprocess))
+  pp_args <- dots_exprs[which(names(dots_exprs) %in% postprocess_args)]
+
+  # Postprocess data
+  postprocessing_vars <- eval(rlang::call2("postprocess",
+                          df = results_data,
+                          xType = xType,
+                          !!!pp_args))
+  
+  override_x_title   <- postprocessing_vars$override_x_title
+  override_y_title   <- postprocessing_vars$override_y_title
+  num_non_missing_y  <- postprocessing_vars$num_non_missing_y
+  start_x            <- postprocessing_vars$start_x
+  x_max              <- postprocessing_vars$x_max
+  end_x              <- postprocessing_vars$end_x
+  ylimhigh           <- postprocessing_vars$ylimhigh
+  ylimlow            <- postprocessing_vars$ylimlow
   
   csp_args <- names(formals(autospc:::create_spc_plot))
   c_args <- dots_exprs[which(names(dots_exprs) %in% csp_args)]
   
-  # csp
+  # Create SPC plot
   sp <- eval(rlang::call2("create_spc_plot",
                           df = results_data,
                           split_rows = split_rows,
-                          ylimlow = 0L,
-                          ylimhigh = 17000,
-                          xType = "Date",
-                          x_max = as.Date("2024-05-31"),
-                          start_x = as.Date("2015-05-31"),
-                          end_x = as.Date("2024-05-31"),
-                          num_non_missing_y = 200,
+                          ylimlow = ylimlow,
+                          ylimhigh = ylimhigh,
+                          xType = xType,
+                          x_max = x_max,
+                          start_x = start_x,
+                          end_x = end_x,
+                          num_non_missing_y = num_non_missing_y,
                           !!!c_args))
   
   return(sp)

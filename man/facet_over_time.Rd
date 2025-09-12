@@ -27,9 +27,21 @@ results at}
 \item{...}{Arguments passed to \code{\link[=plot_auto_SPC]{plot_auto_SPC()}}}
 }
 \value{
-faceted plot showing results at different stages as specified by
-split_rows
+Faceted plot showing results of \code{\link[=plot_auto_SPC]{plot_auto_SPC()}} at
+different stages as specified by split_rows
 }
 \description{
 facet_over_time
+}
+\examples{
+# Show progression of C' chart for count of monthly attendances over time
+facet_over_time(
+  ed_attendances_monthly,
+  split_rows = c(30L, 60L, 90L),
+  chartType = "C'",
+  x = Month_Start,
+  y = Att_All, 
+  x_break = 365
+)
+
 }

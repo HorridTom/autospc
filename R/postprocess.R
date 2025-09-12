@@ -4,14 +4,14 @@
 # are to be displayed
 postprocess <- function(
     df,
-    chartType,
-    periodMin,
-    showLimits,
-    override_x_title,
-    override_y_title,
-    override_y_lim,
-    x_pad_end,
-    extend_limits_to,
+    chartType = NULL,
+    periodMin = 21,
+    showLimits = TRUE,
+    override_x_title = NULL,
+    override_y_title = NULL,
+    override_y_lim = NULL,
+    x_pad_end = NULL,
+    extend_limits_to = NULL,
     xType
 ) {
   

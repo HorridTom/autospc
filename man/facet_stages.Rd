@@ -4,7 +4,7 @@
 \alias{facet_stages}
 \title{facet_stages}
 \usage{
-facet_stages(df, split_rows, ...)
+facet_stages(df, split_rows, plotChart = TRUE, ...)
 }
 \arguments{
 \item{df}{A data frame. For an XMR, C or C' chart, must have columns for:
@@ -23,6 +23,10 @@ For a P or P' chart, must have columns for:
 
 \item{split_rows}{A vector of row numbers specifying the stages to display
 results at}
+
+\item{plotChart}{Boolean specifying whether to plot the chart. If not, the
+data is returned with centre line, control limits and other analytic output
+appended as columns.}
 
 \item{...}{Arguments passed to \code{\link[=plot_auto_SPC]{plot_auto_SPC()}}}
 }

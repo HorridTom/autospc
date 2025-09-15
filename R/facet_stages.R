@@ -21,29 +21,45 @@
 #' 
 #' @export  
 facet_stages <- function(df,
-                            split_rows,
-                            ...) {
+                         split_rows,
+                         plotChart = TRUE,
+                         ...) {
   
   dots_exprs <- rlang::exprs(...)
+  
+  if(dots_exprs$chartType == "XMR") {
+    if(!("showMR" %in% names(dots_exprs))) {
+      
+      dots_exprs$showMR <- FALSE
+      
+    } else if (dots_exprs$showMR) {
+      warning(paste("`facet_stages()` does not support `showMR = TRUE`.",
+                    "Setting `showMR` to `FALSE`. To facet an MR chart by",
+                    "stages use `facet_stages()` with `chartType = MR`."))
+      
+      dots_exprs$showMR <- FALSE
+    }
+  }
+  
   dots_exprs$plotChart <- FALSE
   
   xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
   
   df_rn <- eval(rlang::call2("rename_columns",
-                          df = df,
-                          !!!xyn_exprs))
+                             df = df,
+                             !!!xyn_exprs))
   
   #xType <- class(df_rn$x)
   
   
   preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
   ppi_args <- dots_exprs[which(names(dots_exprs) %in% preprocess_inputs_args)]
-
+  
   # Preprocess inputs
   preprocessed_vars <- eval(rlang::call2("preprocess_inputs",
                                          df = df_rn,
                                          !!!ppi_args))
-
+  
   chartType           <- preprocessed_vars$chartType
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
@@ -77,14 +93,18 @@ facet_stages <- function(df,
     .id = "stage"
   )
   
+  if(!plotChart) {
+    return(results_data)
+  }
+  
   postprocess_args <- names(formals(autospc:::postprocess))
   pp_args <- dots_exprs[which(names(dots_exprs) %in% postprocess_args)]
-
+  
   # Postprocess data
   postprocessing_vars <- eval(rlang::call2("postprocess",
-                          df = results_data,
-                          xType = xType,
-                          !!!pp_args))
+                                           df = results_data,
+                                           xType = xType,
+                                           !!!pp_args))
   
   override_x_title   <- postprocessing_vars$override_x_title
   override_y_title   <- postprocessing_vars$override_y_title

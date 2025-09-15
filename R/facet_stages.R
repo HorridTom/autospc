@@ -1,5 +1,5 @@
 
-#' facet_over_time
+#' facet_stages
 #' @inheritParams plot_auto_SPC
 #' @param split_rows A vector of row numbers specifying the stages to display
 #' results at
@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' # Show progression of C' chart for count of monthly attendances over time
-#' facet_over_time(
+#' facet_stages(
 #'   ed_attendances_monthly,
 #'   split_rows = c(30L, 60L, 90L),
 #'   chartType = "C'",
@@ -20,7 +20,7 @@
 #' )
 #' 
 #' @export  
-facet_over_time <- function(df,
+facet_stages <- function(df,
                             split_rows,
                             ...) {
   

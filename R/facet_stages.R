@@ -2,7 +2,7 @@
 #' facet_stages
 #' @inheritParams plot_auto_SPC
 #' @param split_rows A vector of row numbers specifying the stages to display
-#' results at
+#' results at. Names specify facet strip labels.
 #' @param ... Arguments passed to [autospc::plot_auto_SPC()]
 #'
 #' @returns Faceted plot showing results of [autospc::plot_auto_SPC()] at

@@ -22,7 +22,7 @@ For a P or P' chart, must have columns for:
 }}
 
 \item{split_rows}{A vector of row numbers specifying the stages to display
-results at}
+results at. Names specify facet strip labels.}
 
 \item{plotChart}{Boolean specifying whether to plot the chart. If not, the
 data is returned with centre line, control limits and other analytic output

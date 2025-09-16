@@ -44,54 +44,23 @@ A standard approach in SPC analysis for quality improvement goes as follows:
 
 This is exemplified in the following three charts.
 
-```{r 2.1, fig.width=7, fig.height=4.3}
-plot_auto_SPC(
+```{r 2.0, fig.width=7, fig.height=9}
+facet_stages(
   ed_attendances_monthly %>%
-    filter(row_number() <= 24),
+    filter(row_number() <= 32L),
+  split_rows = c("Baseline" = 24L,
+                 "Data added beyond baseline" = 28L,
+                 "Further data added" = 32L),
   x = Month_Start, 
   y = Att_All,
   chartType = "C'",
   periodMin = 24,
-  title = "1. Establish a baseline",
-  use_caption = FALSE,
-  x_break = 91.25,
-  x_date_format = "%Y-%b",
-  x_pad_end = as.Date("2018-04-01"),
-  upper_annotation_sf = 0.825
- )
-```
-```{r 2.2, fig.width=7, fig.height=4.3}
-plot_auto_SPC(
-  ed_attendances_monthly %>%
-    filter(row_number() <= 24),
-  x = Month_Start, 
-  y = Att_All,
-  chartType = "C'",
-  periodMin = 24,
-  title = "2. Extend the baseline limits",
   use_caption = FALSE,
   x_break = 91.25,
   x_date_format = "%Y-%b",
   extend_limits_to = as.Date("2018-04-01"),
   upper_annotation_sf = 0.825
-) 
-```
-
-```{r 2.3, fig.width=7, fig.height=4.3}
-plot_auto_SPC(
-  ed_attendances_monthly %>%
-    filter(row_number() <= 32),
-  x = Month_Start, 
-  y = Att_All,
-  chartType = "C'",
-  periodMin = 24,
-  title = "3. Add data to the chart as time progresses",
-  use_caption = FALSE,
-  x_break = 91.25,
-  x_date_format = "%Y-%b",
-  extend_limits_to = as.Date("2018-04-01"),
-  upper_annotation_sf = 0.825
-) 
+)
 ```
 
 As data is added, the process may shift to a higher or lower level. Indeed, this

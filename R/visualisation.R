@@ -1,6 +1,6 @@
 create_spc_plot <- function(df,
-                            p_mr,
-                            chartType,
+                            p_mr = NA,
+                            chartType = NULL,
                             xType,
                             start_x,
                             end_x,
@@ -8,22 +8,23 @@ create_spc_plot <- function(df,
                             ylimlow,
                             ylimhigh,
                             num_non_missing_y,
-                            periodMin,
-                            title,
-                            subtitle,
-                            use_caption,
-                            override_x_title,
-                            override_y_title,
-                            r1_col,
-                            r2_col,
-                            includeAnnotations,
-                            annotation_size,
-                            annotation_arrows,
-                            annotation_curvature,
-                            floatingMedian_n,
-                            showMR,
-                            x_break,
-                            x_date_format) {
+                            periodMin = 21,
+                            title = NULL,
+                            subtitle = NULL,
+                            use_caption = TRUE,
+                            override_x_title = NULL,
+                            override_y_title = NULL,
+                            r1_col = "orange",
+                            r2_col = "steelblue3",
+                            includeAnnotations = TRUE,
+                            annotation_size = 3,
+                            annotation_arrows = FALSE,
+                            annotation_curvature = 0.3,
+                            floatingMedian_n = 12L,
+                            showMR = TRUE,
+                            x_break = NULL,
+                            x_date_format = "%Y-%m-%d",
+                            split_rows = NULL) {
   
   # Create initial plot object without formatting
   pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
@@ -100,6 +101,13 @@ create_spc_plot <- function(df,
     
     p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
                                          limits = c(start_x, end_x))
+  }
+  
+  if(!is.null(split_rows)) {
+    p <- p +
+      ggplot2::facet_wrap(facets = ggplot2::vars(stage),
+                          ncol = 1L)
+    
   }
   
   if((chartType == "XMR") & showMR) {

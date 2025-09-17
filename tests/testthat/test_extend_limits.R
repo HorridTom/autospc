@@ -38,6 +38,18 @@ test_that("Limit extension works correctly for C chart", {
                  dplyr::select(cl, lcl, ucl),
                limit_values)
   
+  expect_equal(results_ext %>%
+                 dplyr::filter(dplyr::row_number() == nrow(test_data) + 1L) %>%
+                 dplyr::pull(plotPeriod) %>%
+                 stringr::str_extract("^[a-z]*"),
+               "display")
+  
+  expect_equal(results_ext %>%
+                 dplyr::filter(dplyr::row_number() == nrow(test_data) + 2L) %>%
+                 dplyr::pull(plotPeriod) %>%
+                 stringr::str_extract("^[a-z]*"),
+               "display")
+  
 })
 
 
@@ -83,5 +95,17 @@ test_that("Limit extension works correctly for P chart", {
                  dplyr::filter(dplyr::row_number() == nrow(test_data) + 2L) %>%
                  dplyr::select(cl, lcl, ucl),
                limit_values)
+  
+  expect_equal(results_ext %>%
+                 dplyr::filter(dplyr::row_number() == nrow(test_data) + 1L) %>%
+                 dplyr::pull(plotPeriod) %>%
+                 stringr::str_extract("^[a-z]*"),
+               "display")
+  
+  expect_equal(results_ext %>%
+                 dplyr::filter(dplyr::row_number() == nrow(test_data) + 2L) %>%
+                 dplyr::pull(plotPeriod) %>%
+                 stringr::str_extract("^[a-z]*"),
+               "display")
   
 })

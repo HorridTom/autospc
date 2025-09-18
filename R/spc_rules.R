@@ -28,6 +28,11 @@ rule_two <- function(df, runRuleLength) {
   runs$values <- rulebreakingruns
   partofrun <- inverse.rle(runs)
   df$rule2 <- partofrun
+  df <- df %>% dplyr::mutate(runStart =
+                               (dplyr::row_number() %in% cumsum(c(1,
+                                                                  runs$lengths))
+                                )
+                             )
   df
   
 }

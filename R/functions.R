@@ -134,6 +134,7 @@ form_calculation_limits <- function(data,
                       dplyr::contains("rule"),
                       dplyr::contains("aboveOrBelow"),
                       dplyr::contains("highlight"),
+                      dplyr::contains("run"),
                       dplyr::any_of("log"))
     }else{
       limits_table <- limits_table %>%
@@ -142,6 +143,7 @@ form_calculation_limits <- function(data,
                       dplyr::contains("rule"),
                       dplyr::contains("aboveOrBelow"),
                       dplyr::contains("highlight"),
+                      dplyr::contains("run"),
                       dplyr::any_of("log"))
     }
   }
@@ -293,10 +295,23 @@ rule2_break_start_positions <- function(limits_table, counter){
   #add a column for start of rule 2 breaks
   #Flags if there is a rule 2 highlight and that is not preceded by a rule 2 highlight 
   limits_table <- limits_table %>% 
-    dplyr::mutate(startOfRule2Break = ifelse(rule2 & rule2 != dplyr::lag(rule2), T, F))
-  next_rule_break_positions <- (which(limits_table$startOfRule2Break[counter:nrow(limits_table)] == T)) + counter - 1
+    dplyr::mutate(startOfRule2Break = rule2 & 
+                    (rule2 != dplyr::lag(rule2) |
+                       different_cl_side(aboveOrBelowCl,
+                                         dplyr::lag(aboveOrBelowCl))))
+                     
+                     next_rule_break_positions <-
+                       (which(limits_table$startOfRule2Break[
+                         counter:nrow(limits_table)
+                         ] == T)) + counter - 1
+                     
+                     next_rule_break_positions
+                     
+}
+
+different_cl_side <- function(x, y) {
   
-  next_rule_break_positions
+  return(x*y == -1)
   
 }
 
@@ -834,5 +849,35 @@ sign_chr <- function(x) {
   )
   
   return(y)
+}
+
+
+counter_at_rule_break <- function(df,
+                                  counter,
+                                  runRuleLength) {
+  
+  if(!(df %>%
+     dplyr::filter(dplyr::row_number() == counter) %>%
+     dplyr::pull(rule2))) {
+    
+    return(FALSE)
+    
+  }
+  
+  start_of_next_run <- df %>%
+    dplyr::mutate(rowNumber = dplyr::row_number()) %>%
+    dplyr::filter(rowNumber >= counter,
+                  runStart) %>%
+    dplyr::slice_head(n = 1L) %>%
+    dplyr::pull(rowNumber)
+  
+  if(length(start_of_next_run) == 0L) {
+    start_of_next_run <- nrow(df) + 1L
+  }
+  
+  result <- start_of_next_run - counter >= runRuleLength
+  
+  return(result)
+  
 }
 

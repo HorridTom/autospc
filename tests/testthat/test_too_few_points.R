@@ -33,8 +33,8 @@ test_that("Charts with showLimits = FALSE behave as expected",{
   result_P <- plot_auto_SPC(test_data2, plotChart = FALSE, chartType = "P", periodMin = 21, showLimits = FALSE)
   
   #expect full limits table to be returned regardless of showLimits status
-  testthat::expect_equal(ncol(result_C), 13)
-  testthat::expect_equal(ncol(result_P), 19)
+  testthat::expect_equal(ncol(result_C), 14)
+  testthat::expect_equal(ncol(result_P), 20)
   
   #expect no warning even for data passed in with too few points
   testthat::expect_warning(plot_auto_SPC(test_data, plotChart = TRUE, chartType = "C", showLimits = FALSE), regexp = NA)

@@ -817,6 +817,11 @@ extend_limits <- function(df,
                        df_ext_last_row)
   }
   
+  # Re-derive plotPeriod to ensure consistent with extension period type display
+  df <- df %>%
+    dplyr::mutate(plotPeriod = paste0(periodType,
+                                      periodStart))
+  
   return(df)
 }
 

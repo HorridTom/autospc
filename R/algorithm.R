@@ -151,7 +151,9 @@ create_SPC_auto_limits_table <- function(data,
           # Identify the next rule break to consider as a triggering rule break:
           # Check whether counter is part way through a rule 2 break already,
           # with at least [runRuleLength] rule 2 break points following.
-          if(all(limits_table$rule2[counter:(counter + runRuleLength - 1)])){
+          if(counter_at_rule_break(df = limits_table,
+                                   counter = counter,
+                                   runRuleLength = runRuleLength)){
             # If so, set next rule break position to the counter. 
             rule2_break_positions <- NA
             rule2_break_position <- counter

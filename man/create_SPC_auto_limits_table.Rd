@@ -8,6 +8,7 @@ create_SPC_auto_limits_table(
   data,
   chartType,
   periodMin,
+  baseline,
   runRuleLength,
   maxNoOfExclusions,
   noRegrets,
@@ -39,6 +40,9 @@ For a P or P' chart, must have columns:
 
 \item{periodMin}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
+
+\item{baseline}{Integer, overrides periodMin for the first calculation period
+only, if specified}
 
 \item{runRuleLength}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}

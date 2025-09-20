@@ -34,6 +34,8 @@
 #' ## Algorithm Parameters
 #' @param periodMin The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
+#' @param baseline Integer, overrides periodMin for the first calculation period
+#' only, if specified
 #' @param runRuleLength The minimum number of consecutive points above or below
 #' the centre line constituting a shift (or "rule 2") break.
 #' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
@@ -157,6 +159,7 @@ plot_auto_SPC <- function(df,
                           chartType = NULL,
                           ## Algorithm Parameters
                           periodMin = 21,
+                          baseline = NULL,
                           runRuleLength = 8,
                           noRecals = FALSE,
                           noRegrets = TRUE,
@@ -232,6 +235,7 @@ plot_auto_SPC <- function(df,
     df,
     chartType = chartType, 
     periodMin = periodMin,
+    baseline = baseline,
     runRuleLength = runRuleLength,
     maxNoOfExclusions  = maxNoOfExclusions,
     noRegrets = noRegrets,

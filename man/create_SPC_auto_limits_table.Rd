@@ -14,6 +14,7 @@ create_SPC_auto_limits_table(
   noRegrets,
   verbosity,
   noRecals,
+  recalEveryShift,
   rule2Tolerance,
   showLimits,
   overhangingReversions,
@@ -59,6 +60,10 @@ none if 0.}
 
 \item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first periodMin points.}
+
+\item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
+and simply re-establish limits at every shift rule break (respecting
+periodMin)}
 
 \item{rule2Tolerance}{Minimum difference between a point's vertical position
 and the centre line to count as "on the centre line" for the purposes of

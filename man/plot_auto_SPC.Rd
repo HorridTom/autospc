@@ -14,6 +14,7 @@ plot_auto_SPC(
   baseline = NULL,
   runRuleLength = 8,
   noRecals = FALSE,
+  recalEveryShift = FALSE,
   noRegrets = TRUE,
   overhangingReversions = TRUE,
   maxNoOfExclusions = 3,
@@ -97,6 +98,10 @@ the centre line constituting a shift (or "rule 2") break.}
 
 \item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first periodMin points.}
+
+\item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
+and simply re-establish limits at every shift rule break (respecting
+periodMin)}
 
 \item{noRegrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}

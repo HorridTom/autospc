@@ -40,6 +40,9 @@
 #' the centre line constituting a shift (or "rule 2") break.
 #' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
 #' extend limits calculated from the first periodMin points.
+#' @param recalEveryShift Boolean - whether to bypass the Stable Shift Algorithm
+#' and simply re-establish limits at every shift rule break (respecting
+#' periodMin)
 #' @param noRegrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhangingReversions Boolean determining whether rule breaks in the
@@ -162,6 +165,7 @@ plot_auto_SPC <- function(df,
                           baseline = NULL,
                           runRuleLength = 8,
                           noRecals = FALSE,
+                          recalEveryShift = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
                           ## SPC Parameters
@@ -241,6 +245,7 @@ plot_auto_SPC <- function(df,
     noRegrets = noRegrets,
     verbosity = verbosity,
     noRecals = noRecals,
+    recalEveryShift = recalEveryShift,
     rule2Tolerance = rule2Tolerance,
     showLimits = showLimits,
     overhangingReversions = overhangingReversions,

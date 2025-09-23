@@ -17,6 +17,7 @@ create_spc_plot <- function(df,
                             r1_col = "orange",
                             r2_col = "steelblue3",
                             point_size = 2,
+                            line_width_sf = 1,
                             includeAnnotations = TRUE,
                             annotation_size = 3,
                             annotation_arrows = FALSE,
@@ -46,7 +47,8 @@ create_spc_plot <- function(df,
                   df = df,
                   r1_col = r1_col,
                   r2_col = r2_col,
-                  point_size = point_size) +
+                  point_size = point_size,
+                  line_width_sf = line_width_sf) +
     ggplot2::ggtitle(title,
                      subtitle = subtitle) +
     ggplot2::labs(x = override_x_title,
@@ -145,12 +147,13 @@ create_timeseries_plot <- function(df,
                                    override_y_title,
                                    ylimlow,
                                    ylimhigh,
-                                   point_size) {
+                                   point_size,
+                                   line_width_sf) {
   
   time_series_plot <- ggplot2::ggplot(df, 
                                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_line(colour = "black",
-                       linewidth = 0.5) +
+                       linewidth = 0.5*line_width_sf) +
     ggplot2::geom_point(colour = "black", size = point_size) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(
@@ -190,6 +193,7 @@ format_SPC <- function(cht,
                        r1_col,
                        r2_col,
                        point_size,
+                       line_width_sf,
                        ymin,
                        ymax) {
   point_colours <- c("Rule 1" = r1_col,
@@ -207,26 +211,26 @@ format_SPC <- function(cht,
   suppressWarnings( # to avoid the warning about using alpha for discrete vars
     cht + 
       ggplot2::geom_line(colour = "black",
-                         linewidth = 0.5,
+                         linewidth = 0.5*line_width_sf,
                          na.rm = TRUE) + 
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,cl,
                                       alpha = plotPeriod),
                          linetype = "solid",
-                         linewidth = 0.75,
+                         linewidth = 0.75*line_width_sf,
                          na.rm = TRUE) +
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,lcl,
                                       alpha = plotPeriod),
                          linetype = "42",
-                         linewidth = 0.5,
+                         linewidth = 0.5*line_width_sf,
                          show.legend = FALSE,
                          na.rm = TRUE) +
       ggplot2::geom_line(data = df, 
                          ggplot2::aes(x,ucl,
                                       alpha = plotPeriod),
                          linetype = "42",
-                         linewidth = 0.5,
+                         linewidth = 0.5*line_width_sf,
                          show.legend = FALSE,
                          na.rm = TRUE) +
       ggplot2::geom_point(ggplot2::aes(colour = highlight),

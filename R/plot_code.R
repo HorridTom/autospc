@@ -109,6 +109,7 @@
 #' @param r2_col Highlight colour for breaks of rule 2 (shifts)
 #' @param point_size Size of plot points, defaults to 2. See
 #' \link[ggplot2]{aes_linetype_size_shape} for more details.
+#' @param line_width_sf Numeric scale factor for plot line widths. 
 #' @param includeAnnotations Boolean specifying whether to show centre line
 #' labels
 #' @param annotation_size Text size for centre line labels
@@ -198,6 +199,7 @@ plot_auto_SPC <- function(df,
                           r1_col = "orange",
                           r2_col = "steelblue3",
                           point_size = 2,
+                          line_width_sf = 1,
                           includeAnnotations = TRUE,
                           annotation_size = 3,
                           align_labels = FALSE,
@@ -340,6 +342,7 @@ plot_auto_SPC <- function(df,
         r1_col = r1_col,
         r2_col = r2_col,
         point_size = point_size,
+        line_width_sf = line_width_sf,
         includeAnnotations = includeAnnotations,
         annotation_size = annotation_size,
         annotation_arrows = annotation_arrows,
@@ -401,7 +404,8 @@ plot_auto_SPC <- function(df,
         override_y_title = override_y_title,
         ylimlow = ylimlow,
         ylimhigh = ylimhigh,
-        point_size = point_size)
+        point_size = point_size,
+        line_width_sf = line_width_sf)
       
       return(p)
     } else {

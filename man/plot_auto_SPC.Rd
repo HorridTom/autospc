@@ -42,6 +42,7 @@ plot_auto_SPC(
   r1_col = "orange",
   r2_col = "steelblue3",
   point_size = 2,
+  line_width_sf = 1,
   includeAnnotations = TRUE,
   annotation_size = 3,
   align_labels = FALSE,
@@ -196,6 +197,8 @@ control limits)}
 
 \item{point_size}{Size of plot points, defaults to 2. See
 \link[ggplot2]{aes_linetype_size_shape} for more details.}
+
+\item{line_width_sf}{Numeric scale factor for plot line widths.}
 
 \item{includeAnnotations}{Boolean specifying whether to show centre line
 labels}

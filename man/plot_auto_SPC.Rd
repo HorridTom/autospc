@@ -41,6 +41,7 @@ plot_auto_SPC(
   extend_limits_to = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
+  point_size = 2,
   includeAnnotations = TRUE,
   annotation_size = 3,
   align_labels = FALSE,
@@ -192,6 +193,9 @@ to extend the final limits out to}
 control limits)}
 
 \item{r2_col}{Highlight colour for breaks of rule 2 (shifts)}
+
+\item{point_size}{Size of plot points, defaults to 2. See
+\link[ggplot2]{aes_linetype_size_shape} for more details.}
 
 \item{includeAnnotations}{Boolean specifying whether to show centre line
 labels}

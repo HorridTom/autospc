@@ -16,6 +16,7 @@ create_spc_plot <- function(df,
                             override_y_title = NULL,
                             r1_col = "orange",
                             r2_col = "steelblue3",
+                            point_size = 2,
                             includeAnnotations = TRUE,
                             annotation_size = 3,
                             annotation_arrows = FALSE,
@@ -41,7 +42,11 @@ create_spc_plot <- function(df,
     caption <- NULL
   }
   
-  p <- format_SPC(pct, df = df, r1_col = r1_col, r2_col = r2_col) +
+  p <- format_SPC(pct,
+                  df = df,
+                  r1_col = r1_col,
+                  r2_col = r2_col,
+                  point_size = point_size) +
     ggplot2::ggtitle(title,
                      subtitle = subtitle) +
     ggplot2::labs(x = override_x_title,
@@ -139,13 +144,14 @@ create_timeseries_plot <- function(df,
                                    override_x_title,
                                    override_y_title,
                                    ylimlow,
-                                   ylimhigh) {
+                                   ylimhigh,
+                                   point_size) {
   
   time_series_plot <- ggplot2::ggplot(df, 
                                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_line(colour = "black",
                        linewidth = 0.5) +
-    ggplot2::geom_point(colour = "black", size = 2) +
+    ggplot2::geom_point(colour = "black", size = point_size) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(
                      colour = "grey80"
@@ -183,6 +189,7 @@ format_SPC <- function(cht,
                        df,
                        r1_col,
                        r2_col,
+                       point_size,
                        ymin,
                        ymax) {
   point_colours <- c("Rule 1" = r1_col,
@@ -223,7 +230,7 @@ format_SPC <- function(cht,
                          show.legend = FALSE,
                          na.rm = TRUE) +
       ggplot2::geom_point(ggplot2::aes(colour = highlight),
-                          size = 2,
+                          size = point_size,
                           na.rm = TRUE) +
       ggplot2::scale_color_manual("Rule triggered*",
                                   values = point_colours) + 

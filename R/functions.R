@@ -2,6 +2,7 @@
 #period
 enough_data_for_new_period <- function(data,
                                        periodMin,
+                                       baseline,
                                        counter,
                                        chartType){
   
@@ -15,7 +16,15 @@ enough_data_for_new_period <- function(data,
       num_remaining_non_missing_data_points + 1L
   }
   
-  enough_data <- num_remaining_non_missing_data_points >= periodMin
+  if(counter == 1L & !is.null(baseline)) {
+    
+    enough_data <- num_remaining_non_missing_data_points >= baseline 
+    
+  } else {
+    
+    enough_data <- num_remaining_non_missing_data_points >= periodMin
+    
+  }
   
   return(enough_data)
 }
@@ -26,6 +35,7 @@ enough_data_for_new_period <- function(data,
 form_calculation_limits <- function(data,
                                     counter,
                                     periodMin,
+                                    baseline,
                                     chartType = "C",
                                     maxNoOfExclusions = 3,
                                     rule2Tolerance,
@@ -40,16 +50,22 @@ form_calculation_limits <- function(data,
     data$n <- as.double(data$n)
   }
   
-  exclusion_points <- find_extremes(data,
-                                    chartType,
-                                    counter,
-                                    periodMin,
-                                    maxNoOfExclusions,
-                                    rule2Tolerance,
+  if(counter == 1L & !is.null(baseline)) {
+    periodLength <- baseline
+  } else {
+    periodLength <- periodMin
+  }
+  
+  exclusion_points <- find_extremes(data = data,
+                                    chartType = chartType,
+                                    counter = counter,
+                                    periodMin = periodLength,
+                                    maxNoOfExclusions = maxNoOfExclusions,
+                                    rule2Tolerance = rule2Tolerance,
                                     runRuleLength = runRuleLength,
                                     mr_screen_max_loops = mr_screen_max_loops)
   
-  calculation_period <- data[counter:(counter + periodMin - 1),]
+  calculation_period <- data[counter:(counter + periodLength - 1),]
   
   #run the calculation of limits excluding extremes for selected section of data
   if(chartType == "C"){
@@ -483,7 +499,8 @@ final_run_of_calc_period_prevents_recalc <- function(
 
 #function to create limits for new calculation and display period with rule breaks
 form_calculation_and_display_limits <- function(data, 
-                                                periodMin, 
+                                                periodMin,
+                                                baseline,
                                                 counter_at_period_start, 
                                                 chartType,
                                                 maxNoOfExclusions,
@@ -492,17 +509,28 @@ form_calculation_and_display_limits <- function(data,
                                                 mr_screen_max_loops){
   
   #form calculation limits for first period
-  limits_table <- form_calculation_limits(data = data, periodMin = periodMin,
-                                          counter = counter_at_period_start, chartType = chartType,
-                                          maxNoOfExclusions  = maxNoOfExclusions,
+  limits_table <- form_calculation_limits(data = data,
+                                          periodMin = periodMin,
+                                          baseline = baseline,
+                                          counter = counter_at_period_start,
+                                          chartType = chartType,
+                                          maxNoOfExclusions = maxNoOfExclusions,
                                           rule2Tolerance = rule2Tolerance,
                                           runRuleLength = runRuleLength,
                                           mr_screen_max_loops = mr_screen_max_loops)
   
   
   #extend display limits to end 
+  
+  if(counter_at_period_start == 1L & !is.null(baseline)) {
+    periodLength <- baseline
+  } else {
+    periodLength <- periodMin
+  }
+  
   limits_table <- form_display_limits(limits_table = limits_table, 
-                                      counter = counter_at_period_start + periodMin,
+                                      counter = counter_at_period_start +
+                                        periodLength,
                                       chartType = chartType)
   
   #add rule breaks considering where periods are

@@ -34,10 +34,15 @@
 #' ## Algorithm Parameters
 #' @param periodMin The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
+#' @param baseline Integer, overrides periodMin for the first calculation period
+#' only, if specified
 #' @param runRuleLength The minimum number of consecutive points above or below
 #' the centre line constituting a shift (or "rule 2") break.
 #' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
 #' extend limits calculated from the first periodMin points.
+#' @param recalEveryShift Boolean - whether to bypass the Stable Shift Algorithm
+#' and simply re-establish limits at every shift rule break (respecting
+#' periodMin)
 #' @param noRegrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhangingReversions Boolean determining whether rule breaks in the
@@ -102,6 +107,9 @@
 #' @param r1_col Highlight colour for breaks of rule 1 (points outside the
 #' control limits)
 #' @param r2_col Highlight colour for breaks of rule 2 (shifts)
+#' @param point_size Size of plot points, defaults to 2. See
+#' \link[ggplot2]{aes_linetype_size_shape} for more details.
+#' @param line_width_sf Numeric scale factor for plot line widths. 
 #' @param includeAnnotations Boolean specifying whether to show centre line
 #' labels
 #' @param annotation_size Text size for centre line labels
@@ -157,8 +165,10 @@ plot_auto_SPC <- function(df,
                           chartType = NULL,
                           ## Algorithm Parameters
                           periodMin = 21,
+                          baseline = NULL,
                           runRuleLength = 8,
                           noRecals = FALSE,
+                          recalEveryShift = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
                           ## SPC Parameters
@@ -188,6 +198,8 @@ plot_auto_SPC <- function(df,
                           extend_limits_to = NULL,
                           r1_col = "orange",
                           r2_col = "steelblue3",
+                          point_size = 2,
+                          line_width_sf = 1,
                           includeAnnotations = TRUE,
                           annotation_size = 3,
                           align_labels = FALSE,
@@ -232,11 +244,13 @@ plot_auto_SPC <- function(df,
     df,
     chartType = chartType, 
     periodMin = periodMin,
+    baseline = baseline,
     runRuleLength = runRuleLength,
     maxNoOfExclusions  = maxNoOfExclusions,
     noRegrets = noRegrets,
     verbosity = verbosity,
     noRecals = noRecals,
+    recalEveryShift = recalEveryShift,
     rule2Tolerance = rule2Tolerance,
     showLimits = showLimits,
     overhangingReversions = overhangingReversions,
@@ -327,6 +341,8 @@ plot_auto_SPC <- function(df,
         override_y_title = override_y_title,
         r1_col = r1_col,
         r2_col = r2_col,
+        point_size = point_size,
+        line_width_sf = line_width_sf,
         includeAnnotations = includeAnnotations,
         annotation_size = annotation_size,
         annotation_arrows = annotation_arrows,
@@ -387,7 +403,9 @@ plot_auto_SPC <- function(df,
         override_x_title = override_x_title,
         override_y_title = override_y_title,
         ylimlow = ylimlow,
-        ylimhigh = ylimhigh)
+        ylimhigh = ylimhigh,
+        point_size = point_size,
+        line_width_sf = line_width_sf)
       
       return(p)
     } else {

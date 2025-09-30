@@ -11,8 +11,10 @@ plot_auto_SPC(
   n,
   chartType = NULL,
   periodMin = 21,
+  baseline = NULL,
   runRuleLength = 8,
   noRecals = FALSE,
+  recalEveryShift = FALSE,
   noRegrets = TRUE,
   overhangingReversions = TRUE,
   maxNoOfExclusions = 3,
@@ -39,6 +41,8 @@ plot_auto_SPC(
   extend_limits_to = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
+  point_size = 2,
+  line_width_sf = 1,
   includeAnnotations = TRUE,
   annotation_size = 3,
   align_labels = FALSE,
@@ -88,11 +92,18 @@ denominator for P and P' charts.}
 \item{periodMin}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
+\item{baseline}{Integer, overrides periodMin for the first calculation period
+only, if specified}
+
 \item{runRuleLength}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}
 
 \item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first periodMin points.}
+
+\item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
+and simply re-establish limits at every shift rule break (respecting
+periodMin)}
 
 \item{noRegrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}
@@ -183,6 +194,11 @@ to extend the final limits out to}
 control limits)}
 
 \item{r2_col}{Highlight colour for breaks of rule 2 (shifts)}
+
+\item{point_size}{Size of plot points, defaults to 2. See
+\link[ggplot2]{aes_linetype_size_shape} for more details.}
+
+\item{line_width_sf}{Numeric scale factor for plot line widths.}
 
 \item{includeAnnotations}{Boolean specifying whether to show centre line
 labels}

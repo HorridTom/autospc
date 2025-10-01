@@ -53,8 +53,7 @@ create_spc_plot <- function(df,
                      subtitle = subtitle) +
     ggplot2::labs(x = override_x_title,
                   y = override_y_title,
-                  caption = paste0(caption),
-                  size = 10) +
+                  caption = paste0(caption)) +
     ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::label_number(big.mark = ","))
@@ -177,8 +176,7 @@ create_timeseries_plot <- function(df,
     ggplot2::ggtitle(title,
                      subtitle = subtitle) +
     ggplot2::labs(x = override_x_title,
-                  y = override_y_title,
-                  size = 10) +
+                  y = override_y_title) +
     ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::number_format(accuracy = 1,

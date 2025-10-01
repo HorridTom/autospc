@@ -1,5 +1,9 @@
 # autospc
 
+<!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/HorridTom/autospc/graph/badge.svg)](https://app.codecov.io/gh/HorridTom/autospc)
+<!-- badges: end -->
+
 ## Overview
 
 autospc provides a rigorous and consistent means of re-establishing limits on

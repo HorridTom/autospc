@@ -91,3 +91,25 @@ test_that("", {
                4L)
   
 })
+
+
+test_that("facet_stages works when relying on x,y columns in df", {
+  
+  set.seed(1234L)
+  
+  result <- facet_stages(df = tibble::tibble(x = 1L:100L,
+                                             y = rnorm(n = 100L)),
+                         split_rows = c(30L, 60L),
+                         chartType = "XMR",
+                         plotChart = FALSE)
+  
+  result_lengths <- result %>%
+    dplyr::group_by(stage) %>%
+    dplyr::summarise(stage_length = dplyr::n()) %>%
+    dplyr::pull(stage_length)
+  
+  expect_equal(result_lengths,
+               c(30L,60L,100L))
+  
+})
+

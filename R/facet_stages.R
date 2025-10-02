@@ -49,9 +49,6 @@ facet_stages <- function(df,
                              df = df,
                              !!!xyn_exprs))
   
-  #xType <- class(df_rn$x)
-  
-  
   preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
   ppi_args <- dots_exprs[which(names(dots_exprs) %in% preprocess_inputs_args)]
   
@@ -147,8 +144,7 @@ create_splits_list <- function(df,
     
     data_splits <- lapply(split_rows,
                           function(x) {
-                            df %>%
-                              dplyr::filter(dplyr::row_number() <= x)
+                            df[1:x,]
                           })
   }
   

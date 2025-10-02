@@ -14,11 +14,6 @@
 #    opposite direction to the triggering rule break and overhanging the end of
 #    the candidate period
 
-library(autospc)
-library(dplyr)
-library(tibble)
-
-
 f_to_df <- function(f,
                     ...,
                     n_start = 1) {

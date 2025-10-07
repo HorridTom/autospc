@@ -618,14 +618,13 @@ add_rule_breaks_respecting_periods <- function(limits_table,
 
 
 #function to rename columns
-rename_columns <- function(df, x, y, n, b) {
+rename_columns <- function(df, x, y, n) {
   
   data_colnames <- colnames(df)
   
   x <- rlang::enquo(x)
   y <- rlang::enquo(y)
   n <- rlang::enquo(n)
-  b <- rlang::enquo(b)
   
   # Rename columns to standard names
   if(!rlang::quo_is_missing(x)) {
@@ -650,14 +649,6 @@ The column specified in the argument y will be used.")
 The column specified in the argument n will be used.")
     }
     df <- df %>% dplyr::rename(n = !!n)
-  }
-  
-  if(!rlang::quo_is_missing(b)) {
-    if("b" %in% data_colnames) {
-      warning("b is present in the data and specified as an argument.
-The column specified in the argument b will be used.")
-    }
-    df <- df %>% dplyr::rename(b = !!b)
   }
   
   return(df)

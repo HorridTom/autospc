@@ -188,7 +188,7 @@ points beginning at the counter.
 The algorithm is visualised in the flow chart below.
 
 ```{r 5.1, fig.width=7, fig.height=7}
-grViz(autospc:::get_algorithm_flow_chart_string())
+grViz(autospc:::algorithm_flow_chart_string)
 ```
 
   
@@ -242,7 +242,7 @@ described in the following table. This shorthand forms the content of the
 `log_entry` column of the log dataframe exported to `log_file_path`.
 
 ```{r 6.2}
-log_exp_tab <- autospc:::get_log_explanation_table()
+log_exp_tab <- autospc:::log_explanation_table
 ```
 
 ```{r 6.3}

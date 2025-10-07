@@ -109,3 +109,36 @@ test_that("Limit extension works correctly for P chart", {
                "display")
   
 })
+
+
+test_extend_limits_pp_answer <- readRDS(
+  "testdata/test_extend_limits_pp_answer.rds")
+
+test_that("Limit extension works correctly for P-prime chart (regression)", {
+  
+  results_ext <- plot_auto_SPC(test_data,
+                               chartType = "P'",
+                               plotChart = FALSE,
+                               extend_limits_to = 35L) %>%
+    dplyr::select(x,
+                  y,
+                  n,
+                  y_numerator,
+                  ucl,
+                  lcl,
+                  cl)
+  
+  test_extend_limits_pp_answer <- test_extend_limits_pp_answer %>%
+    dplyr::select(x,
+                  y,
+                  n,
+                  y_numerator,
+                  ucl,
+                  lcl,
+                  cl)
+  
+  expect_equal(results_ext,
+               test_extend_limits_pp_answer)
+  
+  
+})

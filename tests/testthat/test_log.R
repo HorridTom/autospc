@@ -78,3 +78,57 @@ test_that("log is interpreted correctly (regression)", {
   
 })
 
+
+test_that("specific log entries are interpreted correctly", {
+  
+  interpret_0210 <- interpret_log_entry("0210",
+                                        verbosity = 2)
+  
+  interpret_0410 <- interpret_log_entry("0410",
+                                        verbosity = 2)
+  
+  interpret_050001 <- interpret_log_entry("050001",
+                                          verbosity = 2)
+  
+  interpret_0510 <- interpret_log_entry("0510",
+                                        verbosity = 2)
+  
+  interpret_060011 <- interpret_log_entry("060011",
+                                          verbosity = 2)
+  
+  interpret_0700 <- interpret_log_entry("0700",
+                                        verbosity = 2)
+  
+  interpret_0710 <- interpret_log_entry("0710",
+                                        verbosity = 2)
+  
+  expect_equal(interpret_0210,
+               "Insufficient data to form control limits.")
+  
+  expect_equal(interpret_0410,
+               paste("Insufficient remaining data for further",
+                     "re-establishment of limits."))
+  
+  expect_equal(interpret_050001,
+               paste("There is a shift rule break commencing here,",
+                     "downwards from the current centre line."))
+  
+  expect_equal(interpret_0510,
+               "There are no subsequent shift rule breaks.")
+  
+  expect_equal(interpret_060011,
+               paste("Sufficient data to proceed. Forming candidate limits.",
+                     "There is a shift rule break back towards the prevailing",
+                     "centre line. The final run in the candidate calculation",
+                     "period may become a shift rule break back towards the",
+                     "prevailing centre line."))
+  
+  expect_equal(interpret_0700,
+               "Candidate limits accepted, limits re-established.")
+  
+  expect_equal(interpret_0710,
+               paste("Candidate limits rejected, prevailing limits",
+                     "retained."))
+  
+})
+

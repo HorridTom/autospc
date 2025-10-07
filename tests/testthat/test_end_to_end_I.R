@@ -53,6 +53,22 @@ test_that("XMR chart process works end to end",{
   
   results <- plot_auto_SPC(test_e2e_data,
                            chartType = "XMR",
+                           plotChart = FALSE,
+                           title = "XMR Chart",
+                           subtitle = "Chart subtitle") %>% 
+    dplyr::select(x, y, cl, ucl, lcl,
+                  mr, amr, url, lrl)
+  
+  expect_equal(results, correct_answer_XMR)
+  
+})
+
+
+test_that("XMR chart works with numeric y",{
+  
+  results <- plot_auto_SPC(test_e2e_data %>%
+                             dplyr::mutate(y = as.numeric(y)),
+                           chartType = "XMR",
                            plotChart = FALSE) %>% 
     dplyr::select(x, y, cl, ucl, lcl,
                   mr, amr, url, lrl)

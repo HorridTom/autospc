@@ -75,10 +75,10 @@ generate_example_series_1 <- function() {
                               y[36:38] - 1))
   
   df2b <- f_extend_df(df2,
-                     rnorm,
-                     n = 5,
-                     mean = 10,
-                     sd = 1)
+                      rnorm,
+                      n = 5,
+                      mean = 10,
+                      sd = 1)
   
   # [3]
   df3 <- f_extend_df(df2b,
@@ -129,3 +129,44 @@ generate_example_series_1 <- function() {
   
 }
 
+
+generate_example_series_2 <- function() {
+  
+  set.seed(20251013)
+  
+  df1 <- f_to_df(rpois,
+                 n = 21,
+                 lambda = 20)
+  
+  df2 <- f_extend_df(df1,
+                     rpois,
+                     n = 10,
+                     lambda = 27)
+  
+  df3 <- f_extend_df(df2,
+                     rpois,
+                     n = 3,
+                     lambda = 20)
+  
+  df4 <- f_extend_df(df3,
+                     rpois,
+                     n = 9,
+                     lambda = 25) %>%
+    dplyr::mutate(x = as.integer(x),
+                  y = as.integer(y))
+  
+  df4b <- df4 %>%
+    dplyr::mutate(y = replace(y,
+                              c(35:38),
+                              y[35:38] +
+                                c(-8,0,-6,-6)),
+                  y = replace(y,
+                              c(27:30),
+                              y[27:30] + 5)) %>%
+    dplyr::mutate(x = as.integer(x),
+                  y = as.integer(y))
+  
+  return(list(example_series_2a = df4,
+              example_series_2b = df4b))
+  
+}

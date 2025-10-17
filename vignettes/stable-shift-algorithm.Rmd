@@ -100,7 +100,7 @@ plot_auto_SPC(example_series_2a %>%
                 filter(row_number() <= 35L),
               override_y_title = "Count",
               chartType = "C",
-              extend_limits_to = 43L)
+              extend_limits_to = 47L)
 ```
 
 
@@ -165,13 +165,15 @@ triggering rule break, i.e. day 22.
 plot_auto_SPC(example_series_2a,
               override_y_title = "Count",
               chartType = "C",
-              noRecals = TRUE)
+              noRecals = TRUE,
+              extend_limits_to = 47L)
 ```
 
 ```{r example-3, fig.width=7, fig.height=5, fig.cap="Example 3"}
 plot_auto_SPC(example_series_2a,
               override_y_title = "Count",
-              chartType = "C")
+              chartType = "C",
+              extend_limits_to = 47L)
 ```
 
 ### Opposing rule break
@@ -181,7 +183,7 @@ to as an *opposing rule break*. We also sometimes refer to such a rule break as
 a *reversion*, as in reverting to the original limits.
 
 In Figure \@ref(fig:example-3) there is no opposing rule break within the
-candidate calculation period. Figure \@ref(fig:example-4) shows a different
+candidate calculation period. Figure \@ref(fig:example-4) shows an alternative 
 continuation of the baseline time series we have considered so far. This series
 is identical to the first up to day 26, and differs thereafter. There is still
 a triggering rule break against the baseline limits commencing at day 22. Figure
@@ -193,20 +195,31 @@ Figure \@ref(fig:example-5), commencing on day 31.
 plot_auto_SPC(example_series_2b,
               override_y_title = "Count",
               chartType = "C",
-              noRecals = TRUE)
+              noRecals = TRUE,
+              extend_limits_to = 47L)
 ```
 
 ```{r example-5, fig.width=7, fig.height=5, fig.cap="Example 5"}
 plot_auto_SPC(example_series_2b,
               override_y_title = "Count",
               chartType = "C",
-              recalEveryShift = TRUE)
+              recalEveryShift = TRUE,
+              extend_limits_to = 47L)
 ```
 
 
-If the rule break only reaches the `runRuleLength` threshold after the end of
-the candidate calculation period, it is referred to as an
-*overhanging reversion*.
+If an opposing rule break only reaches the `runRuleLength` threshold after the
+end of the candidate calculation period, it is referred to as an
+*overhanging reversion*. Figure \@ref(fig:example-6) shows another alternative 
+continuation of our example time series, this time showing an
+overhanging reversion commencing on day 40, against the candidate limits.
+
+```{r example-6, fig.width=7, fig.height=5, fig.cap="Example 6"}
+plot_auto_SPC(example_series_2c,
+              override_y_title = "Count",
+              chartType = "C",
+              recalEveryShift = TRUE)
+```
 
 ### Minimum period length
 The SSA requires specification of a minimum number of data points to be used 
@@ -296,7 +309,8 @@ plot_auto_SPC(
   y = Att_All,
   verbosity = 1,
   x_break = 365,
-  x_date_format = "%Y-%b"
+  x_date_format = "%Y-%b",
+  point_size = 1L
 )
 ```
 

@@ -26,6 +26,7 @@ Imports:
     tidyr,
     tools
 Suggests: 
+    bookdown,
     knitr,
     rmarkdown,
     testthat (>= 3.1.7)

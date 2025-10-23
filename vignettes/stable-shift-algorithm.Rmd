@@ -33,7 +33,10 @@ library(DiagrammeR)
 The *autospc* package implements the *Stable Shift Algorithm* for
 re-establishing control limits in statistical process control (SPC) analysis.
 This vignette describes the problem the algorithm addresses, sets out some
-useful terminology, and describes the algorithm.
+useful terminology, describes the algorithm, and explains how to use the
+algorithm log.
+\
+\
 
 # The problem
 
@@ -46,7 +49,9 @@ A standard approach in SPC analysis for quality improvement goes as follows:
 2. Extend the baseline limits into the future
 3. Add data to the chart as time progresses, without updating the control limits
 
-An example is shown in Figure \@ref(fig:extending-limits) .
+An example is shown in Figure \@ref(fig:extending-limits). This uses the
+`ed_attendances_monthly` dataset included with `autospc`. For more information
+on this dataset see `?ed_attendances_monthly`.
 
 ```{r extending-limits, fig.width=7, fig.height=9, fig.cap="Extending baseline control limits"}
 facet_stages(
@@ -74,6 +79,8 @@ the new process. Whilst various textbooks and online resources offer opinions on
 this issue, there is no universally accepted approach. The Stable Shift
 Algorithm (SSA) offers an automated, consistent and rigorous approach to
 re-establishing control limits.
+\
+\
 
 # The Stable Shift Algorithm
 
@@ -82,6 +89,7 @@ re-establishing control limits.
 The main idea of the SSA is to only re-establish limits where:
 
 A. There is evidence that the process has shifted to a new level
+
 B. This shift persists for long enough to compute new control limits
 
 In other words, the SSA re-establishes limits at shift rule breaks, provided
@@ -93,7 +101,10 @@ and describe how it is operationalised in the SSA.
 ## Some terminology
 
 First, it is useful to introduce some terminology. We will refer to Figure 
-\@ref(fig:example-1) to iluustrate the concepts introduced in this section.
+\@ref(fig:example-1) to iluustrate the concepts introduced in this section. This
+figure shows a C-chart for the first 35 data points of the simulated
+`example_series_2a` data included with `autospc`, which for the purpose of this
+section we shall interpret as daily values of a count measure of interest.
 
 ```{r example-1, fig.width=7, fig.height=5, fig.cap="Example 1"}
 plot_auto_SPC(example_series_2a %>%
@@ -151,15 +162,16 @@ rejected or accepted. Candidate limits are formed from the first `periodMin`
 points starting at the first point of the triggering rule break, and this
 period is referred to as the *candidate calculation period*.
 
-In Figure \@ref(fig:example-1), there are fewer than `periodMin` (here 21) points on or
-after the start of the triggering rule break (day 22), so it is not possible to
-re-establish limits at day 22, and there are no candidate limits to consider.
+In Figure \@ref(fig:example-1), there are fewer than `periodMin` (here 21)
+points on or after the start of the triggering rule break (day 22), so it is not
+possible to re-establish limits at day 22, and there are no candidate limits to
+consider.
 
-In Figure \@ref(fig:example-2) we imagine rolling time forward, so that we have more
-data to add to the chart in \@ref(fig:example-1). Figure \@ref(fig:example-2)
-shows the data against the (baseline) calculation limits. Figure 
-\@ref(fig:example-3) shows candidate limits established at the start of the
-triggering rule break, i.e. day 22.
+In Figure \@ref(fig:example-2) we imagine rolling time forward, so that we have
+more data to add to the chart in \@ref(fig:example-1). Figure
+\@ref(fig:example-2) shows the data against the (baseline) calculation limits.
+Figure  \@ref(fig:example-3) shows candidate limits established at the start of
+the triggering rule break, i.e. day 22.
 
 ```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
 plot_auto_SPC(example_series_2a,
@@ -288,7 +300,7 @@ The algorithm is visualised in the flow chart below.
 ```{r 5.1, fig.width=7, fig.height=7}
 grViz(autospc:::algorithm_flow_chart_string)
 ```
-
+\
   
 # Using the algorithm log
 

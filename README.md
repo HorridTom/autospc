@@ -1,4 +1,4 @@
-# autospc
+# autospc <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/HorridTom/autospc/graph/badge.svg)](https://app.codecov.io/gh/HorridTom/autospc)

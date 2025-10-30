@@ -10,6 +10,13 @@
 
 Creates spc charts with control limits and centre line calculations partitioned into distinct periods.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://horridtom.github.io/autospc/}
+}
+
+}
 \author{
 \strong{Maintainer}: Thomas Woodcock \email{woodcock.thomas@gmail.com} (\href{https://orcid.org/0000-0002-4735-4856}{ORCID})
 

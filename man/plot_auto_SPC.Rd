@@ -87,6 +87,9 @@ denominator for P and P' charts.}
 \item{chartType}{The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
+
+Parameters that control behaviour of the algorithm used to re-establish
+control limits.
 }}
 
 \item{periodMin}{The minimum number of points (subgroups) per period,
@@ -113,6 +116,9 @@ opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
 calculation period. Set to FALSE only with noRegrets = FALSE.
 \subsection{SPC Parameters}{
+
+Parameters that control how cetnre line and control limits are established
+for each period, and details of how SPC rules are applied
 }}
 
 \item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
@@ -141,6 +147,8 @@ on the chart.}
 \item{floatingMedian_n}{The number of points to use for calculation of the
 floating median, if present.
 \subsection{Output Type}{
+
+Arguments that control how the result is outputted
 }}
 
 \item{plotChart}{Boolean specifying whether to plot the chart. If not, the
@@ -164,6 +172,8 @@ none if 0.}
 The file extension provided (.rds or .csv) determines the type of file the
 log data is saved to. Full log data is saved, regardless of verbosity.
 \subsection{Chart Appearance}{
+
+Arguments that control aspects of chart visualisation
 }}
 
 \item{title}{Optional string specifying chart title. Overrides df$title.}

@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![Codecov test coverage](https://codecov.io/gh/HorridTom/autospc/graph/badge.svg)](https://app.codecov.io/gh/HorridTom/autospc)
+[![R-CMD-check](https://github.com/HorridTom/autospc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/HorridTom/autospc/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Overview

@@ -32,6 +32,8 @@
 #' "XMR", "MR", "C", "C'", "P", "P'".
 #' 
 #' ## Algorithm Parameters
+#' Parameters that control behaviour of the algorithm used to re-establish
+#' control limits.
 #' @param periodMin The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
 #' @param baseline Integer, overrides periodMin for the first calculation period
@@ -51,6 +53,8 @@
 #' calculation period. Set to FALSE only with noRegrets = FALSE.
 #' 
 #' ## SPC Parameters
+#' Parameters that control how cetnre line and control limits are established
+#' for each period, and details of how SPC rules are applied
 #' @param maxNoOfExclusions The maximum number of extreme points to exclude from 
 #' limit calculations.
 #' @param highlightExclusions Boolean signifying whether excluded points are
@@ -73,6 +77,7 @@
 #' floating median, if present.
 
 #' ## Output Type
+#' Arguments that control how the result is outputted
 #' @param plotChart Boolean specifying whether to plot the chart. If not, the
 #' data is returned with centre line, control limits and other analytic output
 #' appended as columns.
@@ -90,6 +95,7 @@
 #' log data is saved to. Full log data is saved, regardless of verbosity.
 #' 
 #' ## Chart Appearance
+#' Arguments that control aspects of chart visualisation 
 #' @param title Optional string specifying chart title. Overrides df$title.
 #' @param subtitle Optional string specifying subtitle. Overrides df$subtitle.
 #' @param use_caption Boolean controlling whether the caption is displayed.

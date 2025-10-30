@@ -37,6 +37,9 @@ For a P or P' chart, must have columns:
 \item{chartType}{The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
+
+Parameters that control behaviour of the algorithm used to re-establish
+control limits.
 }}
 
 \item{periodMin}{The minimum number of points (subgroups) per period,
@@ -77,6 +80,9 @@ opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
 calculation period. Set to FALSE only with noRegrets = FALSE.
 \subsection{SPC Parameters}{
+
+Parameters that control how cetnre line and control limits are established
+for each period, and details of how SPC rules are applied
 }}
 
 \item{mr_screen_max_loops}{Integer or Inf specifying maximum number of times

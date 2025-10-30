@@ -6,6 +6,8 @@
 \alias{autospc-package}
 \title{autospc: Automatically Partitioned SPC Charts}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Creates spc charts with control limits and centre line calculations partitioned into distinct periods.
 }
 \author{

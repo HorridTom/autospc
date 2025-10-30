@@ -12,7 +12,7 @@ A data frame with 109 rows and 9 columns
 \item{Within_4h}{Total attendances that were < 4 hours}
 \item{Over_4h}{Total attendances that were > 4 hours}
 \item{Percent_in_4h}{Percentage of attendances within 4 hours}
-\item{E_Adm_ViaAE}{Total emergency admissions via emergency department}
+\item{E_Adm_Via_ED}{Total emergency admissions via emergency department}
 \item{E_Adm_Over_4h}{Total > 4 hours from decision to admit to admission}
 }
 }

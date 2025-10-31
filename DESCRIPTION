@@ -14,9 +14,7 @@ Imports:
     dplyr (>= 1.1.1),
     fpCompare,
     ggplot2 (>= 3.4.2),
-    ggpp,
     ggpubr (>= 0.6.0),
-    ggrepel,
     lifecycle (>= 1.0.3),
     magrittr (>= 2.0.3),
     rlang (>= 1.1.0),
@@ -28,7 +26,9 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.1.7)
+    testthat (>= 3.1.7),
+    ggrepel,
+    ggpp
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

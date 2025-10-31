@@ -44,6 +44,7 @@ plot_auto_SPC(
   point_size = 2,
   line_width_sf = 1,
   includeAnnotations = TRUE,
+  basicAnnotations = TRUE,
   annotation_size = 3,
   align_labels = FALSE,
   flip_labels = FALSE,
@@ -212,6 +213,10 @@ control limits)}
 
 \item{includeAnnotations}{Boolean specifying whether to show centre line
 labels}
+
+\item{basicAnnotations}{Boolean specifying whether to force use of basic
+annotation positioning. When TRUE (the default), suggested packages ggrepel
+and ggpp are not required, but annotation arrows are not supported.}
 
 \item{annotation_size}{Text size for centre line labels}
 

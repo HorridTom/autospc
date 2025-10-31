@@ -44,7 +44,7 @@ plot_auto_SPC(
   point_size = 2,
   line_width_sf = 1,
   includeAnnotations = TRUE,
-  basicAnnotations = TRUE,
+  basicAnnotations = getRversion() < "4.3.0",
   annotation_size = 3,
   align_labels = FALSE,
   flip_labels = FALSE,
@@ -215,8 +215,9 @@ control limits)}
 labels}
 
 \item{basicAnnotations}{Boolean specifying whether to force use of basic
-annotation positioning. When TRUE (the default), suggested packages ggrepel
-and ggpp are not required, but annotation arrows are not supported.}
+annotation positioning. When TRUE, suggested packages ggrepel
+and ggpp are not required, but annotation arrows are not supported. Defaults
+to TRUE for R versions prior to 4.3, FALSE otherwise.}
 
 \item{annotation_size}{Text size for centre line labels}
 

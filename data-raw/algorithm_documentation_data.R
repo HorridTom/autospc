@@ -117,8 +117,8 @@ get_log_explanation_table <- function() {
 algorithm_flow_chart_string <- get_algorithm_flow_chart_string()
 log_explanation_table <- get_log_explanation_table()
 
-usethis::use_data(algorithm_flow_chart_string,
-                  log_explanation_table,
-                  internal = TRUE,
-                  overwrite = TRUE)
+# usethis::use_data(algorithm_flow_chart_string,
+#                   log_explanation_table,
+#                   internal = TRUE,
+#                   overwrite = TRUE)
 

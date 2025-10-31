@@ -139,7 +139,8 @@ add_annotations_to_plot_pp <- function(p,
                                                 segment.inflect = FALSE,
                                                 segment.square = FALSE,
                                                 arrow = grid::arrow(length = grid::unit(0.015, "npc")),
-                                                na.rm = TRUE)
+                                                na.rm = TRUE,
+                                                max.overlaps = Inf)
   } else {
     p_annotated <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
                                                              y = cl,
@@ -153,7 +154,8 @@ add_annotations_to_plot_pp <- function(p,
                                                 force             = 0,
                                                 hjust             = 0,
                                                 min.segment.length = Inf,
-                                                na.rm = TRUE)
+                                                na.rm = TRUE,
+                                                max.overlaps = Inf)
   }
   
   return(p_annotated)

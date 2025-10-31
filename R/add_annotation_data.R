@@ -76,6 +76,35 @@ add_annotations_to_plot <- function(p,
                                     annotation_arrows,
                                     annotation_curvature) {
   
+  if(FALSE & (rlang::is_installed("ggrepel") & rlang::is_installed("ggpp"))) {
+    p_annotated <- add_annotations_to_plot_pp(
+      p = p,
+      df = df,
+      annotation_size = annotation_size,
+      annotation_arrows = annotation_arrows,
+      annotation_curvature = annotation_curvature
+    )
+  } else {
+    p_annotated <- add_annotations_to_plot_basic(
+      p = p,
+      df = df,
+      annotation_size = annotation_size,
+      annotation_arrows = annotation_arrows,
+      annotation_curvature = annotation_curvature
+    )
+  }
+  
+  return(p_annotated)
+  
+}
+
+
+add_annotations_to_plot_pp <- function(p,
+                                       df,
+                                       annotation_size,
+                                       annotation_arrows,
+                                       annotation_curvature) {
+  
   if(annotation_arrows) {
     
     p_annotated <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
@@ -117,4 +146,30 @@ add_annotations_to_plot <- function(p,
   }
   
   return(p_annotated)
+  
 }
+
+
+add_annotations_to_plot_basic <- function(p,
+                                          df,
+                                          annotation_size,
+                                          annotation_arrows,
+                                          annotation_curvature) {
+  
+  x_range <- max(df$x, na.rm = TRUE) - min(df$x, na.rm = TRUE)
+  x_nudge <- x_range/25
+  
+  p_annotated <- p +
+    ggplot2::geom_text(mapping = ggplot2::aes(x = x,
+                                              y = annotation_level,
+                                              label = cl_label),
+                       nudge_x = x_nudge,
+                       na.rm = TRUE,
+                       color = "grey40",
+                       size = annotation_size,
+                       fontface = "bold")
+  
+  return(p_annotated)
+  
+}
+

@@ -72,9 +72,49 @@ add_annotation_data <- function(df,
 
 add_annotations_to_plot <- function(p,
                                     df,
+                                    basicAnnotations,
                                     annotation_size,
                                     annotation_arrows,
                                     annotation_curvature) {
+  
+  useBasicAnnotations <- basicAnnotations
+  
+  if(!basicAnnotations &
+     !(rlang::is_installed("ggrepel") & rlang::is_installed("ggpp"))) {
+    warning(paste("Packages ggrepel and ggpp are required for basicAnnotations",
+    "= FALSE. Using basicAnnotations = TRUE. To use",
+    "basicAnnotations = FALSE, please ensure both packages are installed."))
+    useBasicAnnotations <- TRUE
+  }
+  
+  if(!useBasicAnnotations) {
+    p_annotated <- add_annotations_to_plot_pp(
+      p = p,
+      df = df,
+      annotation_size = annotation_size,
+      annotation_arrows = annotation_arrows,
+      annotation_curvature = annotation_curvature
+    )
+  } else {
+    p_annotated <- add_annotations_to_plot_basic(
+      p = p,
+      df = df,
+      annotation_size = annotation_size,
+      annotation_arrows = annotation_arrows,
+      annotation_curvature = annotation_curvature
+    )
+  }
+  
+  return(p_annotated)
+  
+}
+
+
+add_annotations_to_plot_pp <- function(p,
+                                       df,
+                                       annotation_size,
+                                       annotation_arrows,
+                                       annotation_curvature) {
   
   if(annotation_arrows) {
     
@@ -99,7 +139,8 @@ add_annotations_to_plot <- function(p,
                                                 segment.inflect = FALSE,
                                                 segment.square = FALSE,
                                                 arrow = grid::arrow(length = grid::unit(0.015, "npc")),
-                                                na.rm = TRUE)
+                                                na.rm = TRUE,
+                                                max.overlaps = Inf)
   } else {
     p_annotated <- p + ggrepel::geom_text_repel(ggplot2::aes(x = x,
                                                              y = cl,
@@ -113,8 +154,35 @@ add_annotations_to_plot <- function(p,
                                                 force             = 0,
                                                 hjust             = 0,
                                                 min.segment.length = Inf,
-                                                na.rm = TRUE)
+                                                na.rm = TRUE,
+                                                max.overlaps = Inf)
   }
   
   return(p_annotated)
+  
 }
+
+
+add_annotations_to_plot_basic <- function(p,
+                                          df,
+                                          annotation_size,
+                                          annotation_arrows,
+                                          annotation_curvature) {
+  
+  x_range <- max(df$x, na.rm = TRUE) - min(df$x, na.rm = TRUE)
+  x_nudge <- x_range/25
+  
+  p_annotated <- p +
+    ggplot2::geom_text(mapping = ggplot2::aes(x = x,
+                                              y = annotation_level,
+                                              label = cl_label),
+                       nudge_x = x_nudge,
+                       na.rm = TRUE,
+                       color = "grey40",
+                       size = annotation_size,
+                       fontface = "bold")
+  
+  return(p_annotated)
+  
+}
+

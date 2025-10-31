@@ -19,6 +19,7 @@ create_spc_plot <- function(df,
                             point_size = 2,
                             line_width_sf = 1,
                             includeAnnotations = TRUE,
+                            basicAnnotations = FALSE,
                             annotation_size = 3,
                             annotation_arrows = FALSE,
                             annotation_curvature = 0.3,
@@ -68,6 +69,7 @@ create_spc_plot <- function(df,
     
     p <- add_annotations_to_plot(p = p,
                                  df = df,
+                                 basicAnnotations = basicAnnotations,
                                  annotation_size = annotation_size,
                                  annotation_arrows = annotation_arrows,
                                  annotation_curvature = annotation_curvature)
@@ -126,12 +128,20 @@ create_spc_plot <- function(df,
     p_mr <- p_mr + 
       ggplot2::labs(caption = caption)
     
-    p <- ggpubr::ggarrange(p, p_mr,
-                           ncol = 1,
-                           nrow = 2,
-                           legend = "right",
-                           common.legend = TRUE,
-                           align = "v")
+    legend <- cowplot::get_legend(p)
+    
+    p_no_legend <- p + ggplot2::theme(legend.position = "none")
+    p_mr_no_legend <- p_mr + ggplot2::theme(legend.position = "none")
+    
+    p <- cowplot::plot_grid(
+      cowplot::plot_grid(p_no_legend, p_mr_no_legend, 
+                         ncol = 1, 
+                         align = "v"),
+      legend,
+      ncol = 2,
+      rel_widths = c(1, 0.2)
+    )
+  
   }
   
   return(p)
@@ -157,7 +167,7 @@ create_timeseries_plot <- function(df,
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(
                      colour = "grey80"
-                     ),
+                   ),
                    panel.grid.minor = ggplot2::element_blank(),
                    panel.background = ggplot2::element_blank(),
                    axis.text.x = ggplot2::element_text(angle = 45,
@@ -257,18 +267,18 @@ format_SPC <- function(cht,
                                       override.aes = list(
                                         alpha = if(
                                           !is.na(first_display_period)
-                                          ) {
-                                        c(1, 0.4)
-                                      } else {
-                                        c(1)
-                                      }
+                                        ) {
+                                          c(1, 0.4)
+                                        } else {
+                                          c(1)
+                                        }
                                       )
                                     )
       ) +
       ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                      panel.grid.major.x = ggplot2::element_line(
                        colour = "grey80"
-                       ),
+                     ),
                      panel.grid.minor = ggplot2::element_blank(),
                      panel.background = ggplot2::element_blank(),
                      axis.text.x = ggplot2::element_text(angle = 45,

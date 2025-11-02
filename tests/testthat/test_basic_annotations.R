@@ -3,7 +3,8 @@ test_that("Annotation is completed regardless of basicAnnotation", {
 
   result_f <- plot_auto_SPC(example_series_1,
                           chartType = "XMR",
-                          basicAnnotations = FALSE)
+                          basicAnnotations = FALSE,
+                          annotation_arrows = TRUE)
   
   result_t <- plot_auto_SPC(example_series_1,
                             chartType = "XMR",

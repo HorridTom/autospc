@@ -11,7 +11,7 @@ control limits."><meta property="og:image" content="https://horridtom.github.io/
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9034</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9035</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,6 +86,7 @@ control limits.</p>
 <span>  point_size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  line_width_sf <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  includeAnnotations <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  basicAnnotations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric_version.html" class="external-link">getRversion</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;</span> <span class="st">"4.3.0"</span>,</span>
 <span>  annotation_size <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  align_labels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  flip_labels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -333,6 +334,13 @@ control limits)</p></dd>
 <dt id="arg-includeannotations">includeAnnotations<a class="anchor" aria-label="anchor" href="#arg-includeannotations"></a></dt>
 <dd><p>Boolean specifying whether to show centre line
 labels</p></dd>
+
+
+<dt id="arg-basicannotations">basicAnnotations<a class="anchor" aria-label="anchor" href="#arg-basicannotations"></a></dt>
+<dd><p>Boolean specifying whether to force use of basic
+annotation positioning. When TRUE, suggested packages ggrepel
+and ggpp are not required, but annotation arrows are not supported. Defaults
+to TRUE for R versions prior to 4.3, FALSE otherwise.</p></dd>
 
 
 <dt id="arg-annotation-size">annotation_size<a class="anchor" aria-label="anchor" href="#arg-annotation-size"></a></dt>

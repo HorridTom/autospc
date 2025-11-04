@@ -1,6 +1,6 @@
 Package: autospc
 Title: Automatically Partitioned SPC Charts
-Version: 0.0.0.9034
+Version: 0.0.0.9035
 Authors@R: c(
     person("Thomas", "Woodcock", , "woodcock.thomas@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4735-4856")),
@@ -10,13 +10,11 @@ Description: Creates spc charts with control limits and centre line
     calculations partitioned into distinct periods.
 License: GPL-3
 Imports: 
+    cowplot,
     DiagrammeR,
     dplyr (>= 1.1.1),
     fpCompare,
     ggplot2 (>= 3.4.2),
-    ggpp,
-    ggpubr (>= 0.6.0),
-    ggrepel,
     lifecycle (>= 1.0.3),
     magrittr (>= 2.0.3),
     rlang (>= 1.1.0),
@@ -28,13 +26,15 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.1.7)
+    testthat (>= 3.1.7),
+    ggrepel,
+    ggpp
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: 
-    R (>= 4.3.0)
+    R (>= 4.2.0)
 VignetteBuilder: knitr
 URL: https://horridtom.github.io/autospc/

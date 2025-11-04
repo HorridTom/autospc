@@ -118,6 +118,10 @@
 #' @param line_width_sf Numeric scale factor for plot line widths. 
 #' @param includeAnnotations Boolean specifying whether to show centre line
 #' labels
+#' @param basicAnnotations Boolean specifying whether to force use of basic
+#' annotation positioning. When TRUE, suggested packages ggrepel
+#' and ggpp are not required, but annotation arrows are not supported. Defaults
+#' to TRUE for R versions prior to 4.3, FALSE otherwise.
 #' @param annotation_size Text size for centre line labels
 #' @param align_labels Boolean specifying whether or not to align centre line
 #' labels at a fixed vertical position
@@ -207,6 +211,7 @@ plot_auto_SPC <- function(df,
                           point_size = 2,
                           line_width_sf = 1,
                           includeAnnotations = TRUE,
+                          basicAnnotations = getRversion() < '4.3.0',
                           annotation_size = 3,
                           align_labels = FALSE,
                           flip_labels = FALSE,
@@ -350,6 +355,7 @@ plot_auto_SPC <- function(df,
         point_size = point_size,
         line_width_sf = line_width_sf,
         includeAnnotations = includeAnnotations,
+        basicAnnotations = basicAnnotations,
         annotation_size = annotation_size,
         annotation_arrows = annotation_arrows,
         annotation_curvature = annotation_arrow_curve,

@@ -10,9 +10,6 @@ name: R-CMD-check.yaml
 
 permissions: read-all
 
-env:
-  _R_CHECK_FORCE_SUGGESTS_: false
-
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}

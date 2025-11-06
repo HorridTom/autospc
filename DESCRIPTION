@@ -24,6 +24,7 @@ Imports:
     tidyr,
     tools
 Suggests: 
+    bookdown,
     knitr,
     rmarkdown,
     testthat,

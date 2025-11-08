@@ -25,8 +25,8 @@ preprocess_inputs <- function(
      all(xType!= c("POSIXct", "POSIXt")) & 
      all(xType != "numeric") & 
      all(xType != "integer")) {
-    print(paste0("Please make sure that your x column is a",
-                 "'Date', 'numeric' or 'integer' type."))
+    warning(paste("Please make sure that your x column is a",
+                 "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
   
   #decide whether the chart is C or P depending on data format if not specified 

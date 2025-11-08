@@ -21,10 +21,10 @@ preprocess_inputs <- function(
   #get type from x variable so that ggplot axes are correct
   #currently only accepting Date, numeric and integer as acceptable types
   xType <- class(df$x)
-  if(xType != "Date" & 
+  if(all(xType != "Date") & 
      all(xType!= c("POSIXct", "POSIXt")) & 
-     xType != "numeric" & 
-     xType != "integer") {
+     all(xType != "numeric") & 
+     all(xType != "integer")) {
     print(paste0("Please make sure that your x column is a",
                  "'Date', 'numeric' or 'integer' type."))
   }

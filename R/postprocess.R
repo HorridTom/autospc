@@ -88,7 +88,7 @@ postprocess <- function(
   }
   
   # Convert x column back to date if necessary
-  if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){ 
+  if(any(xType == "Date")) { 
     df <- df %>%
       dplyr::mutate(x = as.Date(x))
   }

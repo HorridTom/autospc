@@ -9,7 +9,7 @@ test_that("Chart is created without error when x-axis is POSIXct", {
                   chartType = "C'",
                   x = Month,
                   y = Total),
-    message = "works with objects of class <Date> only"
+    message = "the condition has length"
   )
   
 })

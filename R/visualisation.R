@@ -108,8 +108,8 @@ create_spc_plot <- function(df,
       x_break <- (end_x - start_x) / 40
     }
     
-    p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
-                                         limits = c(start_x, end_x))
+    p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
+                                       limits = c(start_x, end_x))
     
   } else {
     # get x axis breaks
@@ -117,8 +117,8 @@ create_spc_plot <- function(df,
       x_break <- (end_x - start_x) / 40
     }
     
-    p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
-                                       limits = c(start_x, end_x))
+    p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+                                         limits = c(start_x, end_x))
     
   }
   

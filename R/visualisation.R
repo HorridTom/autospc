@@ -108,6 +108,11 @@ create_spc_plot <- function(df,
       x_break <- (end_x - start_x) / 40
     }
     
+    if(any(class(x_break) != "difftime")) {
+      rlang::abort(paste("Please specify x_break as a difftime object when",
+                         "x is POSIXct."))
+    }
+    
     p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
                                        limits = c(start_x, end_x))
     

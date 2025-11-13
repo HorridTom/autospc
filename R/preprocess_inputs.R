@@ -21,12 +21,12 @@ preprocess_inputs <- function(
   #get type from x variable so that ggplot axes are correct
   #currently only accepting Date, numeric and integer as acceptable types
   xType <- class(df$x)
-  if(xType != "Date" & 
+  if(all(xType != "Date") & 
      all(xType!= c("POSIXct", "POSIXt")) & 
-     xType != "numeric" & 
-     xType != "integer") {
-    print(paste0("Please make sure that your x column is a",
-                 "'Date', 'numeric' or 'integer' type."))
+     all(xType != "numeric") & 
+     all(xType != "integer")) {
+    warning(paste("Please make sure that your x column is a",
+                 "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
   
   #decide whether the chart is C or P depending on data format if not specified 

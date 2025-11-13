@@ -76,7 +76,7 @@ create_spc_plot <- function(df,
   }
   
   #formats x axis depending on x type
-  if(xType == "Date" | xType == "POSIXct" | xType == "POSIXt"){
+  if(any(xType == "Date")) {
     
     #get x axis breaks
     if(is.null(x_break)) {
@@ -93,7 +93,7 @@ create_spc_plot <- function(df,
                                               as.Date(end_x))
     )
     
-  } else if(xType == "integer") {
+  } else if(any(xType == "integer")) {
     # get x axis breaks
     if(is.null(x_break)) {
       x_break <- (end_x - start_x) / 40
@@ -101,6 +101,21 @@ create_spc_plot <- function(df,
     
     p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, 10),
                                          limits = c(start_x, end_x))
+  } else if(any(xType == "POSIXct")) {
+    
+    # get x axis breaks
+    if(is.null(x_break)) {
+      x_break <- (end_x - start_x) / 40
+    }
+    
+    if(any(class(x_break) != "difftime")) {
+      rlang::abort(paste("Please specify x_break as a difftime object when",
+                         "x is POSIXct."))
+    }
+    
+    p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
+                                       limits = c(start_x, end_x))
+    
   } else {
     # get x axis breaks
     if(is.null(x_break)) {
@@ -109,6 +124,7 @@ create_spc_plot <- function(df,
     
     p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
                                          limits = c(start_x, end_x))
+    
   }
   
   if(!is.null(split_rows)) {
@@ -141,7 +157,7 @@ create_spc_plot <- function(df,
       ncol = 2,
       rel_widths = c(1, 0.2)
     )
-  
+    
   }
   
   return(p)

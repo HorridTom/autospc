@@ -40,12 +40,9 @@ create_spc_plot <- function(df,
                      "outside the control limits \nRule 2: Eight or more",
                      "consecutive points all above, or all below, the centre",
                      "line")
-  } else {
-    caption <- NULL
-  }
-  if (use_caption) {
     rule_title <- "Rule triggered *"
   } else {
+    caption <- NULL
     rule_title <- "Rule triggered"
   }
   
@@ -54,7 +51,7 @@ create_spc_plot <- function(df,
                   r1_col = r1_col,
                   r2_col = r2_col,
                   point_size = point_size,
-                  rule_title =rule_title,
+                  rule_title = rule_title,
                   line_width_sf = line_width_sf) +
     ggplot2::ggtitle(title,
                      subtitle = subtitle) +

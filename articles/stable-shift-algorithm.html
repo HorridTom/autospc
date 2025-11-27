@@ -54,10 +54,7 @@
 </nav><div class="container template-article">
 
 
-
-<link href="stable-shift-algorithm_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
-<script src="stable-shift-algorithm_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="stable-shift-algorithm_files/viz-1.8.2/viz.js"></script><link href="stable-shift-algorithm_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-<script src="stable-shift-algorithm_files/grViz-binding-1.0.11/grViz.js"></script><div class="row">
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>The Stable Shift Algorithm</h1>
             
@@ -81,34 +78,35 @@
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rich-iannone.github.io/DiagrammeR/" class="external-link">DiagrammeR</a></span><span class="op">)</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<div class="section level2" number="1">
+<h2 id="introduction">
+<span class="header-section-number">1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <em>autospc</em> package implements the <em>Stable Shift
-Algorithm</em> for re-establishing control limits in statistical process
-control (SPC) analysis. This vignette describes the problem the
-algorithm addresses, sets out some useful terminology, and describes the
-algorithm.</p>
+<p>The <em>autospc</em> package implements the <em>Stable Shift Algorithm</em> for
+re-establishing control limits in statistical process control (SPC) analysis.
+This vignette describes the problem the algorithm addresses, sets out some
+useful terminology, describes the algorithm, and explains how to use the
+algorithm log.<br><br></p>
 </div>
-<div class="section level2">
-<h2 id="the-problem">The problem<a class="anchor" aria-label="anchor" href="#the-problem"></a>
+<div class="section level2" number="2">
+<h2 id="the-problem">
+<span class="header-section-number">2</span> The problem<a class="anchor" aria-label="anchor" href="#the-problem"></a>
 </h2>
-<p>A standard approach in SPC analysis for quality improvement goes as
-follows:</p>
+<p>A standard approach in SPC analysis for quality improvement goes as follows:</p>
 <ol style="list-style-type: decimal">
 <li>Establish a baseline:
 <ul>
 <li>gather or extract data over a period of time prior to a planned
 improvement initiative</li>
-<li>plot this data on a control chart, forming baseline control
-limits</li>
+<li>plot this data on a control chart, forming baseline control limits</li>
 </ul>
 </li>
 <li>Extend the baseline limits into the future</li>
-<li>Add data to the chart as time progresses, without updating the
-control limits</li>
+<li>Add data to the chart as time progresses, without updating the control limits</li>
 </ol>
-<p>This is exemplified in the following three charts.</p>
+<p>An example is shown in Figure <a href="#fig:extending-limits">2.1</a>. This uses the
+<code>ed_attendances_monthly</code> dataset included with <code>autospc</code>. For more information
+on this dataset see <code><a href="../reference/ed_attendances_monthly.html">?ed_attendances_monthly</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/facet_stages.html">facet_stages</a></span><span class="op">(</span></span>
 <span>  <span class="va">ed_attendances_monthly</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
@@ -130,183 +128,292 @@ control limits</li>
 <span><span class="co">#&gt;   method                  from   </span></span>
 <span><span class="co">#&gt;   heightDetails.titleGrob ggplot2</span></span>
 <span><span class="co">#&gt;   widthDetails.titleGrob  ggplot2</span></span></code></pre></div>
-<p><img src="stable-shift-algorithm_files/figure-html/2.0-1.png" class="r-plt" width="672"></p>
-<p>As data is added, the process may shift to a higher or lower level.
-Indeed, this is often the aim of an improvement initiative. This prompts
-the question of whether and when the control limits should be
-re-established to better represent the new process. Whilst various
-textbooks and online resources offer opinions on this issue, there is no
-universally accepted approach. The Stable Shift Algorithm (SSA) offers
-an automated, consistent and rigorous approach to re-establishing
-control limits.</p>
+<div class="figure">
+<span style="display:block;" id="fig:extending-limits"></span>
+<img src="stable-shift-algorithm_files/figure-html/extending-limits-1.png" alt="Extending baseline control limits"><p class="caption">
+Figure 2.1: Extending baseline control limits
+</p>
 </div>
-<div class="section level2">
-<h2 id="the-stable-shift-algorithm-overview">The Stable Shift Algorithm: Overview<a class="anchor" aria-label="anchor" href="#the-stable-shift-algorithm-overview"></a>
+<p>As data is added, the process may shift to a higher or lower level. Indeed, this
+is often the aim of an improvement initiative. This prompts the question of
+whether and when the control limits should be re-established to better represent
+the new process. Whilst various textbooks and online resources offer opinions on
+this issue, there is no universally accepted approach. The Stable Shift
+Algorithm (SSA) offers an automated, consistent and rigorous approach to
+re-establishing control limits.<br><br></p>
+</div>
+<div class="section level2" number="3">
+<h2 id="the-stable-shift-algorithm">
+<span class="header-section-number">3</span> The Stable Shift Algorithm<a class="anchor" aria-label="anchor" href="#the-stable-shift-algorithm"></a>
 </h2>
+<div class="section level3" number="3.1">
+<h3 id="overview">
+<span class="header-section-number">3.1</span> Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h3>
 <p>The main idea of the SSA is to only re-establish limits where:</p>
-<ol style="list-style-type: decimal">
-<li>There is evidence that the process has shifted to a new level</li>
-<li>This shift persists for long enough to compute new control
-limits</li>
-</ol>
-<p>In other words, the SSA re-establishes limits at shift rule breaks,
-provided that the shift is not “transient” in some sense. Here
-“transient” means that once we calculate the new control limits, there
-is not a shift rule break back towards the original process. In the next
-two sections we make this idea precise and describe how it is
-operationalised in the SSA.</p>
+<p>A. There is evidence that the process has shifted to a new level</p>
+<p>B. This shift persists for long enough to compute new control limits</p>
+<p>In other words, the SSA re-establishes limits at shift rule breaks, provided
+that the shift is not “transient” in some sense. Here “transient” means that
+once we calculate the new control limits, there is not a shift rule break back
+towards the original process. In the next two sections we make this idea precise
+and describe how it is operationalised in the SSA.</p>
 </div>
-<div class="section level2">
-<h2 id="some-terminology">Some terminology<a class="anchor" aria-label="anchor" href="#some-terminology"></a>
-</h2>
-<p>First, it is useful to introduce some terminology.</p>
-<div class="section level3">
-<h3 id="calculation-and-display-periods">Calculation and display periods<a class="anchor" aria-label="anchor" href="#calculation-and-display-periods"></a>
+<div class="section level3" number="3.2">
+<h3 id="some-terminology">
+<span class="header-section-number">3.2</span> Some terminology<a class="anchor" aria-label="anchor" href="#some-terminology"></a>
 </h3>
+<p>First, it is useful to introduce some terminology. We will refer to Figure
+<a href="#fig:example-1">3.1</a> to illustrate the concepts introduced in this section. This
+figure shows a C-chart for the first 35 data points of the simulated
+<code>example_series_2a</code> data included with <code>autospc</code>, which for the purpose of this
+section we shall interpret as daily values of a count measure of interest.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2a</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>                <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">35L</span><span class="op">)</span>,</span>
+<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<span style="display:block;" id="fig:example-1"></span>
+<img src="stable-shift-algorithm_files/figure-html/example-1-1.png" alt="Example 1"><p class="caption">
+Figure 3.1: Example 1
+</p>
 </div>
-<div class="section level3">
-<h3 id="rule-breaking-run">Rule-breaking run<a class="anchor" aria-label="anchor" href="#rule-breaking-run"></a>
-</h3>
-<p>A <em>rule-breaking run</em> is a run whose length is greater than or
-equal to the threshold for a rule break (<code>runRuleLength</code>),
-set to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>8</mn><annotation encoding="application/x-tex">8</annotation></semantics></math>
-by default in <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>.</p>
-<p>Runs that are subsets of longer runs count here, so for example with
-the default <code>runRuleLength = 8</code>, a run of length 10 actually
-comprises three rule-breaking runs, commencing at the first, second and
-third points in the length 10 run. In this example, the first
-rule-breaking run has length 10, the second 9, and the third 8. The run
-that commences on the fourth point of the length 10 run is not
+<div class="section level4" number="3.2.1">
+<h4 id="calculation-and-display-periods">
+<span class="header-section-number">3.2.1</span> Calculation and display periods<a class="anchor" aria-label="anchor" href="#calculation-and-display-periods"></a>
+</h4>
+<p>The data used to calculate a set of control limits comes from a contiguous
+period of time, with the possible exception of some excluded points. This period
+of time is referred to as the <em>calculation period</em> of the limits.</p>
+<p>When the limits are extended into the future, beyond their calculation period,
+the period over which they are extended is referred to as the <em>display period</em>.</p>
+<p>In charts produced by <em>autospc</em>, limits are displayed as black dashed lines over
+their calculation period, and grey dashed lines over their display period. For
+example, in <a href="#fig:example-1">3.1</a>, there is one calculation period, covering
+days 1 to 21 inclusive, extended into its display period covering day 22
+onwards.</p>
+</div>
+<div class="section level4" number="3.2.2">
+<h4 id="rule-breaking-run">
+<span class="header-section-number">3.2.2</span> Rule-breaking run<a class="anchor" aria-label="anchor" href="#rule-breaking-run"></a>
+</h4>
+<p>A <em>rule-breaking run</em> is a run whose length is greater than or equal to the
+threshold for a shift rule break (<code>runRuleLength</code>), set to <span class="math inline">\(8\)</span> by default in
+<code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>. In <a href="#fig:example-1">3.1</a>, there is a rule-breaking run of
+length 10 starting on day 22. By default, rule-breaking runs are highlighted in
+blue by <code>autospc</code>.</p>
+<p>Runs that are subsets of longer runs with the same end point count here, so for
+example with the default <code>runRuleLength = 8</code>, the run of length 10 in
+<a href="#fig:example-1">3.1</a> actually comprises three rule-breaking runs, commencing at
+the first, second and third points in the length 10 run. In this example, the
+first rule-breaking run starts on day 22 and has length 10, the second starts on
+day 23 and has length 9, and the third starts on day 24 and has length 8. The
+run that commences on day 25, the fourth point of the length 10 run, is not
 rule-breaking, since it is of length 7 only.</p>
 </div>
-<div class="section level3">
-<h3 id="triggering-rule-break">Triggering rule break<a class="anchor" aria-label="anchor" href="#triggering-rule-break"></a>
-</h3>
-<p>In the SSA, a rule breaking run can trigger consideration of whether
-to re-establish limits. Such a run is referred to as a <em>triggering
-rule break</em>.</p>
+<div class="section level4" number="3.2.3">
+<h4 id="triggering-rule-break">
+<span class="header-section-number">3.2.3</span> Triggering rule break<a class="anchor" aria-label="anchor" href="#triggering-rule-break"></a>
+</h4>
+<p>In the SSA, a rule-breaking run commencing during a display period triggers
+consideration of whether to re-establish limits. Such a run is referred to as a
+<em>triggering rule break</em>.</p>
+<p>In <a href="#fig:example-1">3.1</a> the highlighted rule-breaking run is a triggering rule
+break.</p>
 </div>
-<div class="section level3">
-<h3 id="candidate-limits">Candidate limits<a class="anchor" aria-label="anchor" href="#candidate-limits"></a>
-</h3>
-<p>In order to decide whether to re-establish control limits at a
-triggering rule break, the SSA requires consideration of the set of
-limits that <em>would</em> be established. These are referred to as
-<em>candidate limits</em> until they are either rejected or accepted.
-Candidate limits are formed from the first <code>periodMin</code> points
-starting at the first point of the triggering rule break, and this
+<div class="section level4" number="3.2.4">
+<h4 id="candidate-limits">
+<span class="header-section-number">3.2.4</span> Candidate limits<a class="anchor" aria-label="anchor" href="#candidate-limits"></a>
+</h4>
+<p>In order to decide whether to re-establish control limits at a triggering rule
+break, the SSA requires consideration of the set of limits that <em>would</em> be
+established. These are referred to as <em>candidate limits</em> until they are either
+rejected or accepted. Candidate limits are formed from the first <code>periodMin</code>
+points starting at the first point of the triggering rule break, and this
 period is referred to as the <em>candidate calculation period</em>.</p>
+<p>In Figure <a href="#fig:example-1">3.1</a>, there are fewer than <code>periodMin</code> (here 21)
+points on or after the start of the triggering rule break (day 22), so it is not
+possible to re-establish limits at day 22, and there are no candidate limits to
+consider.</p>
+<p>In Figure <a href="#fig:example-2">3.2</a> we imagine rolling time forward, so that we have
+more data to add to the chart in <a href="#fig:example-1">3.1</a>. Figure
+<a href="#fig:example-2">3.2</a> shows the data against the (baseline) calculation limits.
+Figure <a href="#fig:example-3">3.3</a> shows candidate limits established at the start of
+the triggering rule break, i.e. day 22.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
+<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              noRecals <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<span style="display:block;" id="fig:example-2"></span>
+<img src="stable-shift-algorithm_files/figure-html/example-2-1.png" alt="Example 2"><p class="caption">
+Figure 3.2: Example 2
+</p>
 </div>
-<div class="section level3">
-<h3 id="opposing-rule-break">Opposing rule break<a class="anchor" aria-label="anchor" href="#opposing-rule-break"></a>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
+<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<span style="display:block;" id="fig:example-3"></span>
+<img src="stable-shift-algorithm_files/figure-html/example-3-1.png" alt="Example 3"><p class="caption">
+Figure 3.3: Example 3
+</p>
+</div>
+</div>
+<div class="section level4" number="3.2.5">
+<h4 id="opposing-rule-break">
+<span class="header-section-number">3.2.5</span> Opposing rule break<a class="anchor" aria-label="anchor" href="#opposing-rule-break"></a>
+</h4>
+<p>If there is a rule break within the candidate calculation period, and that rule
+break is in the opposite direction to the triggering rule break, it is referred
+to as an <em>opposing rule break</em>. We also sometimes refer to such a rule break as
+a <em>reversion</em>, as in reverting to the original limits.</p>
+<p>In Figure <a href="#fig:example-3">3.3</a> there is no opposing rule break within the
+candidate calculation period. Figure <a href="#fig:example-4">3.4</a> shows an alternative
+continuation of the baseline time series we have considered so far. This series
+is identical to the first up to day 26, and differs thereafter. There is still
+a triggering rule break against the baseline limits commencing at day 22. Figure
+<a href="#fig:example-5">3.5</a> shows candidate limits established from the start of this
+triggering rule break, i.e. from day 22. There is an opposing rule break in
+Figure <a href="#fig:example-5">3.5</a>, commencing on day 31.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
+<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              noRecals <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<span style="display:block;" id="fig:example-4"></span>
+<img src="stable-shift-algorithm_files/figure-html/example-4-1.png" alt="Example 4"><p class="caption">
+Figure 3.4: Example 4
+</p>
+</div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
+<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              recalEveryShift <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<span style="display:block;" id="fig:example-5"></span>
+<img src="stable-shift-algorithm_files/figure-html/example-5-1.png" alt="Example 5"><p class="caption">
+Figure 3.5: Example 5
+</p>
+</div>
+<p>If an opposing rule break only reaches the <code>runRuleLength</code> threshold after the
+end of the candidate calculation period, it is referred to as an
+<em>overhanging reversion</em>. Figure <a href="#fig:example-6">3.6</a> shows another alternative
+continuation of our example time series, this time showing an
+overhanging reversion commencing on day 40, against the candidate limits.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2c</span>,</span>
+<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              recalEveryShift <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="figure">
+<span style="display:block;" id="fig:example-6"></span>
+<img src="stable-shift-algorithm_files/figure-html/example-6-1.png" alt="Example 6"><p class="caption">
+Figure 3.6: Example 6
+</p>
+</div>
+</div>
+<div class="section level4" number="3.2.6">
+<h4 id="minimum-period-length">
+<span class="header-section-number">3.2.6</span> Minimum period length<a class="anchor" aria-label="anchor" href="#minimum-period-length"></a>
+</h4>
+<p>The SSA requires specification of a minimum number of data points to be used
+for calculation of control limits, <span class="math inline">\(n_{min}\)</span>. Whilst those using SPC in practice
+may not often make such a minimum explicit, in a way it is always there
+implicitly - nobody would compute control limits from two data points would
+they? In fact, various authors offer guidance on what such a minimum should be,
+with values ranging from 17 to 25 points.</p>
+<p>In <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>, <span class="math inline">\(n_{min}\)</span> is specified by the <code>periodMin</code> argument,
+defaulting to 21. This default is above the commonly recommended minimum values
+and represents a convenient choice for daily data, since it is a multiple of 7.
+This means that in the presence of weekly “seasonal” (periodic) variation over
+the 7 day period the limits are not unduly affected by which day of the week the
+limit calculation period begins on. When using monthly data, it is preferable to
+use <span class="math inline">\(n_{min} = 24\)</span>, for the same reason.</p>
+</div>
+</div>
+<div class="section level3" number="3.3">
+<h3 id="details-of-the-algorithm">
+<span class="header-section-number">3.3</span> Details of the algorithm<a class="anchor" aria-label="anchor" href="#details-of-the-algorithm"></a>
 </h3>
-<p>If there is a rule break within the candidate calculation period, and
-that rule break is in the opposite direction to the triggering rule
-break, it is referred to as an <em>opposing rule break</em>. We also
-sometimes refer to such a rule break as a <em>reversion</em>, as in
-reverting to the original limits. If the rule break only reaches the
-<code>runRuleLength</code> threshold after the end of the candidate
-calculation period, it is referred to as an <em>overhanging
-reversion</em>.</p>
-</div>
-<div class="section level3">
-<h3 id="minimum-period-length">Minimum period length<a class="anchor" aria-label="anchor" href="#minimum-period-length"></a>
-</h3>
-<p>The SSA requires specification of a minimum number of data points to
-be used for calculation of control limits,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">n_{min}</annotation></semantics></math>.
-Whilst those using SPC in practice may not often make such a minimum
-explicit, in a way it is always there implicitly - nobody would compute
-control limits from two data points would they? In fact, various authors
-offer guidance on what such a minimum should be, with values ranging
-from 17 to 25 points. In <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">n_{min}</annotation></semantics></math>
-is specified by the <code>periodMin</code> argument, defaulting to
-21.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="the-stable-shift-algorithm-details">The Stable Shift Algorithm: Details<a class="anchor" aria-label="anchor" href="#the-stable-shift-algorithm-details"></a>
-</h2>
 <p>The steps of the algorithm are as follows:</p>
 <ol style="list-style-type: decimal">
 <li><p>Algorithm counter initialised to the first data point.</p></li>
-<li><p>Check there is sufficient data to form at least one set of
-limits. If a time series has fewer points than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">n_{min}</annotation></semantics></math>,
-then according to the SSA no control limits can be established. If a
-time series has length
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
-with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>≤</mo><mi>n</mi><mo>&lt;</mo><mn>2</mn><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">n_{min}\leq n &lt; 2n_{min}</annotation></semantics></math>,
-then there are sufficient data points to form one period. The SSA
-establishes limits calculated from the first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">n_{min}</annotation></semantics></math>
-points, with limits extended over the remainder of the data. However, in
-this case there are not sufficient data points to re-establish a second
-set of limits, so the SSA terminates after establishing this first set
-of limits.</p></li>
+<li><p>Check there is sufficient data to form at least one set of limits.
+If a time series has fewer points than <span class="math inline">\(n_{min}\)</span>, then according to the SSA
+no control limits can be established. If a time series has length <span class="math inline">\(n\)</span> with
+<span class="math inline">\(n_{min}\leq n &lt; 2n_{min}\)</span>, then there are sufficient data points to form one
+period. The SSA establishes limits calculated from the first <span class="math inline">\(n_{min}\)</span> points,
+with limits extended over the remainder of the data. However, in this case there
+are not sufficient data points to re-establish a second set of limits, so the
+SSA terminates after establishing this first set of limits.</p></li>
 </ol>
-<p>From here on, therefore, we assume that the number of data points in
-the time series to be analysed is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mn>2</mn><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">n \geq 2n_{min}</annotation></semantics></math>.
-After the first set of limits are established, the counter is set to the
-first point after the end of this first calculation period.</p>
+<p>From here on, therefore, we assume that the number of data points in the time
+series to be analysed is <span class="math inline">\(n \geq 2n_{min}\)</span>. After the first set of limits are
+established, the counter is set to the first point after the end of this first
+calculation period.</p>
 <ol start="3" style="list-style-type: decimal">
 <li><p>Main algorithm loop begins</p></li>
-<li><p>If there are fewer than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">n_{min}</annotation></semantics></math>
-data points remaining from the counter, then there are insufficient data
-points to further re-establish limits, and the algorithm
-terminates.</p></li>
-<li><p>If there are no further rule-breaking runs, then the algorithm
-terminates. If there is at least one rule-breaking run, the algorithm
-sets the counter to the first data point of the first such run, now
-labelled the triggering run.</p></li>
-<li><p>Again check there is sufficient data remaining from the counter.
-If not, terminate. If so, candidate limits are formed from the first
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">n_{min}</annotation></semantics></math>
-data points beginning at the counter.</p></li>
+<li><p>If there are fewer than <span class="math inline">\(n_{min}\)</span> data points remaining from the counter,
+then there are insufficient data points to further re-establish limits, and the
+algorithm terminates.</p></li>
+<li><p>If there are no further rule-breaking runs, then the algorithm terminates. If
+there is at least one rule-breaking run, the algorithm sets the counter to the
+first data point of the first such run, now labelled the triggering run.</p></li>
+<li><p>Again check there is sufficient data remaining from the counter. If not,
+terminate. If so, candidate limits are formed from the first <span class="math inline">\(n_{min}\)</span> data
+points beginning at the counter.</p></li>
 <li>
 <p>Decide whether to accept or reject the candidate limits:</p>
 <ol style="list-style-type: lower-roman">
-<li><p>If there at least one opposing rule break commencing within the
-candidate calculation period, then the candidate limits are rejected,
-the counter is set to the next rule-breaking run (after the triggering
-rule break) against the prevailing limits, and the algorithm continues
-from (3).</p></li>
-<li><p>If the final run of the candidate calculation period could become
-an opposing rule break with the addition of more data to the time
-series, then the candidate limits are rejected, the counter is set to
-the next rule-breaking run (after the triggering rule break) against the
-prevailing limits, and the algorithm continues from (3).</p></li>
+<li><p>If there is at least one opposing rule break commencing within the candidate
+calculation period, then the candidate limits are rejected, the counter is
+set to the next rule-breaking run (after the triggering rule break) against
+the prevailing limits, and the algorithm continues from (3).</p></li>
+<li><p>If the final run of the candidate calculation period could become an
+opposing rule break with the addition of more data to the time series, then
+the candidate limits are rejected, the counter is set to the next
+rule-breaking run (after the triggering rule break) against the prevailing
+limits, and the algorithm continues from (3).</p></li>
 <li><p>If neither of the conditions of (i) and (ii) are met, then the
-candidate limits are accepted, established from the start of the
-triggering rule break, and extended over the rest of the data. The
-counter is set to the first point after the end of the new calculation
-period, and the algorithm continues from (3).</p></li>
+candidate limits are accepted, established from the start of the triggering
+rule break, and extended over the rest of the data. The counter is set to
+the first point after the end of the new calculation period, and the
+algorithm continues from (3).</p></li>
 </ol>
 </li>
 </ol>
 <p>The algorithm is visualised in the flow chart below.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rich-iannone.github.io/DiagrammeR/reference/grViz.html" class="external-link">grViz</a></span><span class="op">(</span><span class="fu">autospc</span><span class="fu">:::</span><span class="va">algorithm_flow_chart_string</span><span class="op">)</span></span></code></pre></div>
 <div class="grViz html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:672px;height:672px;"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"diagram":"\n      digraph {\n      \n  # graph attributes\n  graph [overlap = true]\n  rankdir=TB\n\n  # node attributes\n  node [shape = box,\n        fontname = Helvetica,\n        color = black]\n\n  # edge attributes\n  edge [color = black]\n\n  # node statements\n  A [label = \"(1) Initialise Algorithm\nCounter = 1\", width = 3, group = c];\n  B [shape = diamond, label = \"(2) Sufficient data for\nat least one period?\", width = 3, group = c];\n  C [label = \"End\", width = 1];\n  D [shape = diamond, label = \"(3) Loop while\nremaining data\", width = 3, group = c];\n  E [shape = diamond, label = \"(4) Sufficient data remaining\nto form a new period?\", width = 3, group = c];\n  F [label = \"Identify subsequent\nrule-breaking runs\", width = 3, group = c];\n  G [shape = diamond, label = \"(5) Is there at least\none subsequent rule break?\", width = 3, group = c];\n  H [label = \"Set counter to next rule break\nand record its direction\", width = 3, group = c];\n  I [shape = diamond, label = \"(6) Sufficient data remaining\nto form a new period?\", width = 3, group = c];\n  J [label = \"Establish candidate limits\", width = 3, group = c];\n  K [shape = diamond, label = \"(7) Is there an opposing rule break\nor does the final run prevent\nestablishment of new limits?\", width = 3, group = c];\n  L [label = \"Accept candidate limits:\nre-establish limits at the counter\", width = 3];\n  M [label = \"Reject candidate limits\", width = 3];\n  N [label = \"Set counter to next\nrule-breaking run\", width = 3]\n\n  # edge statements\n  A -> B;\n  B -> C [label = \"N (2b)\"]; B -> D [label = \"Y (2a)\"];\n  D -> C [label = \"N (3b)\"]; D -> E [label = \"Y (3a)\"];\n  E -> C [label = \"N (4b)\"]; E -> F [label = \"Y (4a)\"];\n  F -> G;\n  G -> C [label = \"N (5b)\"]; G -> H [label = \"Y (5a)\"];\n  H -> I;\n  I -> C [label = \"N (6b)\"]; I -> J [label = \"Y (6a)\"];\n  J -> K;\n  K -> L [label = \"N (7a)\"]; K -> M [label = \"Y (7b)\"];\n  L -> N;\n  M -> N;\n  N -> D\n  \n  {rank = same; L; M}\n  \n      }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"diagram":"\n      digraph {\n      \n  # graph attributes\n  graph [overlap = true]\n  rankdir=TB\n\n  # node attributes\n  node [shape = box,\n        fontname = Helvetica,\n        color = black]\n\n  # edge attributes\n  edge [color = black]\n\n  # node statements\n  A [label = \"(1) Initialise Algorithm\nCounter = 1\", width = 3, group = c];\n  B [shape = diamond, label = \"(2) Sufficient data for\nat least one period?\", width = 3, group = c];\n  C [label = \"End\", width = 1];\n  D [shape = diamond, label = \"(3) Loop while\nremaining data\", width = 3, group = c];\n  E [shape = diamond, label = \"(4) Sufficient data remaining\nto form a new period?\", width = 3, group = c];\n  F [label = \"Identify subsequent\nrule-breaking runs\", width = 3, group = c];\n  G [shape = diamond, label = \"(5) Is there at least\none subsequent rule break?\", width = 3, group = c];\n  H [label = \"Set counter to next rule break\nand record its direction\", width = 3, group = c];\n  I [shape = diamond, label = \"(6) Sufficient data remaining\nto form a new period?\", width = 3, group = c];\n  J [label = \"Establish candidate limits\", width = 3, group = c];\n  K [shape = diamond, label = \"(7) Is there an opposing rule break\nor does the final run prevent\nestablishment of new limits?\", width = 3, group = c];\n  L [label = \"Accept candidate limits:\nre-establish limits at the counter\", width = 3];\n  M [label = \"Reject candidate limits\", width = 3];\n  N [label = \"Set counter to next\nrule-breaking run\", width = 3]\n\n  # edge statements\n  A -> B;\n  B -> C [label = \"N (2b)\"]; B -> D [label = \"Y (2a)\"];\n  D -> C [label = \"N (3b)\"]; D -> E [label = \"Y (3a)\"];\n  E -> C [label = \"N (4b)\"]; E -> F [label = \"Y (4a)\"];\n  F -> G;\n  G -> C [label = \"N (5b)\"]; G -> H [label = \"Y (5a)\"];\n  H -> I;\n  I -> C [label = \"N (6b)\"]; I -> J [label = \"Y (6a)\"];\n  J -> K;\n  K -> L [label = \"N (7a)\"]; K -> M [label = \"Y (7b)\"];\n  L -> N;\n  M -> N;\n  N -> D\n  \n  {rank = same; L; M}\n  \n      }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p><br></p>
 </div>
-<div class="section level2">
-<h2 id="using-the-algorithm-log">Using the algorithm log<a class="anchor" aria-label="anchor" href="#using-the-algorithm-log"></a>
+</div>
+<div class="section level2" number="4">
+<h2 id="using-the-algorithm-log">
+<span class="header-section-number">4</span> Using the algorithm log<a class="anchor" aria-label="anchor" href="#using-the-algorithm-log"></a>
 </h2>
-<p>If you would like to view a log of the path through the flow diagram
-above for a given timeseries, there are two ways you can do this.</p>
-<div class="section level3">
-<h3 id="print-log-to-console">Print log to console<a class="anchor" aria-label="anchor" href="#print-log-to-console"></a>
+<p>If you would like to view a log of the path through the flow diagram above for a
+given timeseries, there are two ways you can do this.</p>
+<div class="section level3" number="4.1">
+<h3 id="print-log-to-console">
+<span class="header-section-number">4.1</span> Print log to console<a class="anchor" aria-label="anchor" href="#print-log-to-console"></a>
 </h3>
-<p>To print a log out to the console, set the <code>verbosity</code>
-argument of <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code> to either <code>1</code> (for
-basic log information) or <code>2</code> (for full detail).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>To print a log out to the console, set the <code>verbosity</code> argument of
+<code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code> to either <code>1</code> (for basic log information) or <code>2</code> (for full
+detail).</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span></span>
 <span>  <span class="va">ed_attendances_monthly</span>, </span>
 <span>  chartType <span class="op">=</span> <span class="st">"C'"</span>, </span>
@@ -314,7 +421,8 @@ basic log information) or <code>2</code> (for full detail).</p>
 <span>  y <span class="op">=</span> <span class="va">Att_All</span>,</span>
 <span>  verbosity <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  x_break <span class="op">=</span> <span class="fl">365</span>,</span>
-<span>  x_date_format <span class="op">=</span> <span class="st">"%Y-%b"</span></span>
+<span>  x_date_format <span class="op">=</span> <span class="st">"%Y-%b"</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="fl">1L</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; C':</span></span>
@@ -357,47 +465,43 @@ basic log information) or <code>2</code> (for full detail).</p>
 <span><span class="co">#&gt; Counter at 92, 2023-01-01:</span></span>
 <span><span class="co">#&gt; - Insufficient remaining data for further re-establishment of</span></span>
 <span><span class="co">#&gt; limits.</span></span></code></pre></div>
-<p><img src="stable-shift-algorithm_files/figure-html/6.1-1.png" class="r-plt" width="672"></p>
+<p><img src="stable-shift-algorithm_files/figure-html/6.1-1.png"><!-- --></p>
 </div>
-<div class="section level3">
-<h3 id="save-log-to-a-file">Save log to a file<a class="anchor" aria-label="anchor" href="#save-log-to-a-file"></a>
+<div class="section level3" number="4.2">
+<h3 id="save-log-to-a-file">
+<span class="header-section-number">4.2</span> Save log to a file<a class="anchor" aria-label="anchor" href="#save-log-to-a-file"></a>
 </h3>
-<p>To save the log to a file, provide a file path using the
-<code>log_file_path</code> argument of <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>. If
-the file path you provide ends <code>".rds"</code> the log will be saved
-to an rds file, if it ends <code>".csv"</code> the log will be saved to
-a csv file.</p>
-<p>The data frame that is saved has one row for each log entry, and
-contains the following columns:</p>
+<p>To save the log to a file, provide a file path using the <code>log_file_path</code>
+argument of <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>. If the file path you provide ends <code>".rds"</code> the
+log will be saved to an rds file, if it ends <code>".csv"</code> the log will be saved to a
+csv file.</p>
+<p>The data frame that is saved has one row for each log entry, and contains the
+following columns:</p>
 <ul>
 <li>
-<code>counter</code> : the counter value (row number of the
-dataframe passed to the <code>df</code> argument of
-<code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>) that the log entry refers to</li>
+<code>counter</code> : the counter value (row number of the dataframe
+passed to the <code>df</code> argument of <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>) that the log entry refers to</li>
 <li>
-<code>x</code> : the value of the <code>x</code> column at this
-counter value (the column passed as <code>x</code> to
-<code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>)</li>
+<code>x</code> : the value of the <code>x</code> column at this counter value (the
+column passed as <code>x</code> to <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>)</li>
 <li>
-<code>log_entry</code> : the log entry, recorded in shorthand (see
-below)</li>
+<code>log_entry</code> : the log entry, recorded in shorthand (see below)</li>
 <li>
-<code>interpretation</code> : text interpretation of the log
-entry</li>
+<code>interpretation</code> : text interpretation of the log entry</li>
 </ul>
-<p>Note that full log details are saved, regardless of the value of the
-<code>verbosity</code> argument.</p>
+<p>Note that full log details are saved, regardless of the value of the <code>verbosity</code>
+argument.</p>
 </div>
-<div class="section level3">
-<h3 id="log-shorthand">Log shorthand<a class="anchor" aria-label="anchor" href="#log-shorthand"></a>
+<div class="section level3" number="4.3">
+<h3 id="log-shorthand">
+<span class="header-section-number">4.3</span> Log shorthand<a class="anchor" aria-label="anchor" href="#log-shorthand"></a>
 </h3>
-<p>The log is populated as the algorithm executes, using a shorthand
-notation described in the following table. This shorthand forms the
-content of the <code>log_entry</code> column of the log dataframe
-exported to <code>log_file_path</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>The log is populated as the algorithm executes, using a shorthand notation
+described in the following table. This shorthand forms the content of the
+<code>log_entry</code> column of the log dataframe exported to <code>log_file_path</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_exp_tab</span> <span class="op">&lt;-</span> <span class="fu">autospc</span><span class="fu">:::</span><span class="va">log_explanation_table</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_exp_tab</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -420,8 +524,7 @@ exported to <code>log_file_path</code>.</p>
 <tr class="even">
 <td align="left">2</td>
 <td align="left">02xx</td>
-<td align="left">Check whether there are sufficient data to form at
-least one set of limits.</td>
+<td align="left">Check whether there are sufficient data to form at least one set of limits.</td>
 </tr>
 <tr class="odd">
 <td align="left"></td>
@@ -441,8 +544,7 @@ least one set of limits.</td>
 <tr class="even">
 <td align="left">4</td>
 <td align="left">04xxyy</td>
-<td align="left">Check whether there are sufficient data to proceed
-(Yes/No), and find subsequent rule breaks.</td>
+<td align="left">Check whether there are sufficient data to proceed (Yes/No), and find subsequent rule breaks.</td>
 </tr>
 <tr class="odd">
 <td align="left"></td>
@@ -467,8 +569,7 @@ least one set of limits.</td>
 <tr class="odd">
 <td align="left">5</td>
 <td align="left">05xxyy</td>
-<td align="left">Check whether there are any subsequent rule
-breaks.</td>
+<td align="left">Check whether there are any subsequent rule breaks.</td>
 </tr>
 <tr class="even">
 <td align="left"></td>
@@ -493,8 +594,7 @@ breaks.</td>
 <tr class="even">
 <td align="left">6</td>
 <td align="left">06xxyz</td>
-<td align="left">Check whether there are sufficient data to
-proceed.</td>
+<td align="left">Check whether there are sufficient data to proceed.</td>
 </tr>
 <tr class="odd">
 <td align="left"></td>
@@ -524,20 +624,17 @@ proceed.</td>
 <tr class="even">
 <td align="left"></td>
 <td align="left"></td>
-<td align="left">z = 0: Final run does not prevent re-establishment of
-limits</td>
+<td align="left">z = 0: Final run does not prevent re-establishment of limits</td>
 </tr>
 <tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
-<td align="left">z = 1: Final run prevents re-establishment of
-limits.</td>
+<td align="left">z = 1: Final run prevents re-establishment of limits.</td>
 </tr>
 <tr class="even">
 <td align="left">7</td>
 <td align="left">07xx</td>
-<td align="left">Decide whether to re-establish limits. xx = 00: Yes, xx
-= 10: No.</td>
+<td align="left">Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No.</td>
 </tr>
 </tbody>
 </table>

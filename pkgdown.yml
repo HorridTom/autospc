@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   stable-shift-algorithm: stable-shift-algorithm.html
-last_built: 2025-11-20T15:49Z
+last_built: 2025-11-27T14:01Z
 urls:
   reference: https://horridtom.github.io/autospc/reference
   article: https://horridtom.github.io/autospc/articles

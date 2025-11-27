@@ -239,8 +239,15 @@ for calculation of control limits, $n_{min}$. Whilst those using SPC in practice
 may not often make such a minimum explicit, in a way it is always there
 implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
-with values ranging from 17 to 25 points. In `plot_auto_SPC()`, $n_{min}$ is
-specified by the `periodMin` argument, defaulting to 21.
+with values ranging from 17 to 25 points.
+
+In `plot_auto_SPC()`, $n_{min}$ is specified by the `periodMin` argument,
+defaulting to 21. This default is above the commonly recommended minimum values
+and represents a convenient choice for daily data, since it is a multiple of 7.
+This means that in the presence of weekly "seasonal" (periodic) variation over
+the 7 day period the limits are not unduly affected by which day of the week the
+limit calculation period begins on. When using monthly data, it is preferable to
+use $n_{min} = 24$, for the same reason.
 
 ## Details of the algorithm
 

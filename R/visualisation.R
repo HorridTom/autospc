@@ -75,56 +75,53 @@ create_spc_plot <- function(df,
                                  annotation_curvature = annotation_curvature)
   }
   
-  #formats x axis depending on x type
+  # Format x-axis depending on x type
   if(any(xType == "Date")) {
-    
-    #get x axis breaks
     if(is.null(x_break)) {
-      x_break <- as.numeric(difftime(as.Date(end_x),
-                                     as.Date(start_x),
-                                     units = "days")) / 40
+      p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
+                                     breaks = scales::breaks_pretty(),
+                                     limits = c(as.Date(start_x),
+                                                as.Date(end_x)))
+    } else {
+      p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
+                                     breaks = seq(as.Date(start_x),
+                                                  as.Date(end_x),
+                                                  x_break),
+                                     limits = c(as.Date(start_x),
+                                                as.Date(end_x)))
     }
-    
-    p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
-                                   breaks = seq(as.Date(start_x),
-                                                as.Date(end_x),
-                                                x_break),
-                                   limits = c(as.Date(start_x),
-                                              as.Date(end_x))
-    )
-    
   } else if(any(xType == "integer")) {
-    # get x axis breaks
     if(is.null(x_break)) {
-      x_break <- (end_x - start_x) / 40
+      p <- p + ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
+                                           limits = c(start_x,
+                                                      end_x))
+    } else {
+      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x,
+                                                        end_x,
+                                                        x_break),
+                                           limits = c(start_x,
+                                                      end_x))
     }
-    
-    p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
-                                         limits = c(start_x, end_x))
   } else if(any(xType == "POSIXct")) {
-    
-    # get x axis breaks
     if(is.null(x_break)) {
-      x_break <- (end_x - start_x) / 40
-    }
-    
-    if(any(class(x_break) != "difftime")) {
-      rlang::abort(paste("Please specify x_break as a difftime object when",
-                         "x is POSIXct."))
-    }
-    
-    p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
-                                       limits = c(start_x, end_x))
-    
-  } else {
-    # get x axis breaks
-    if(is.null(x_break)) {
-      x_break <- (end_x - start_x) / 40
-    }
-    
-    p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+      p <- p + ggplot2::scale_x_datetime(breaks = scales::breaks_pretty(),
                                          limits = c(start_x, end_x))
-    
+    } else {
+      if(any(class(x_break) != "difftime")) {
+        rlang::abort(paste("Please specify x_break as a difftime object when",
+                           "x is POSIXct."))
+      }
+      p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
+                                         limits = c(start_x, end_x))
+    }
+  } else {
+    if(is.null(x_break)) {
+      p <- p + ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
+                                           limits = c(start_x, end_x))
+    } else {
+      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+                                           limits = c(start_x, end_x))
+    }
   }
   
   if(!is.null(split_rows)) {

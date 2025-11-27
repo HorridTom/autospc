@@ -166,7 +166,18 @@ generate_example_series_2 <- function() {
     dplyr::mutate(x = as.integer(x),
                   y = as.integer(y))
   
+  df4c <- df4 %>%
+    dplyr::mutate(y = replace(y,
+                              c(38:43),
+                              y[38:43] + c(6,1,1,-7,-1,-3))) %>%
+    f_extend_df(rpois,
+                n = 4,
+                lambda = 24) %>%
+    dplyr::mutate(x = as.integer(x),
+                  y = as.integer(y))
+  
   return(list(example_series_2a = df4,
-              example_series_2b = df4b))
+              example_series_2b = df4b,
+              example_series_2c = df4c))
   
 }

@@ -1,9 +1,13 @@
 ---
 title: "The Stable Shift Algorithm"
 output:
-  rmarkdown::html_vignette:
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
     toc: true
     number_sections: true
+pkgdown:
+  as_is: true
 vignette: >
   %\VignetteIndexEntry{The Stable Shift Algorithm}
   %\VignetteEngine{knitr::rmarkdown}
@@ -29,7 +33,10 @@ library(DiagrammeR)
 The *autospc* package implements the *Stable Shift Algorithm* for
 re-establishing control limits in statistical process control (SPC) analysis.
 This vignette describes the problem the algorithm addresses, sets out some
-useful terminology, and describes the algorithm.
+useful terminology, describes the algorithm, and explains how to use the
+algorithm log.
+\
+\
 
 # The problem
 
@@ -42,9 +49,11 @@ A standard approach in SPC analysis for quality improvement goes as follows:
 2. Extend the baseline limits into the future
 3. Add data to the chart as time progresses, without updating the control limits
 
-This is exemplified in the following three charts.
+An example is shown in Figure \@ref(fig:extending-limits). This uses the
+`ed_attendances_monthly` dataset included with `autospc`. For more information
+on this dataset see `?ed_attendances_monthly`.
 
-```{r 2.0, fig.width=7, fig.height=9}
+```{r extending-limits, fig.width=7, fig.height=7, fig.cap="Extending baseline control limits"}
 facet_stages(
   ed_attendances_monthly %>%
     filter(row_number() <= 32L),
@@ -70,13 +79,18 @@ the new process. Whilst various textbooks and online resources offer opinions on
 this issue, there is no universally accepted approach. The Stable Shift
 Algorithm (SSA) offers an automated, consistent and rigorous approach to
 re-establishing control limits.
+\
+\
 
-# The Stable Shift Algorithm: Overview
+# The Stable Shift Algorithm
+
+## Overview
 
 The main idea of the SSA is to only re-establish limits where:
 
-1. There is evidence that the process has shifted to a new level
-2. This shift persists for long enough to compute new control limits
+A. There is evidence that the process has shifted to a new level
+
+B. This shift persists for long enough to compute new control limits
 
 In other words, the SSA re-establishes limits at shift rule breaks, provided
 that the shift is not "transient" in some sense. Here "transient" means that
@@ -84,55 +98,158 @@ once we calculate the new control limits, there is not a shift rule break back
 towards the original process. In the next two sections we make this idea precise
 and describe how it is operationalised in the SSA.
 
-# Some terminology
+## Some terminology
 
-First, it is useful to introduce some terminology.
+First, it is useful to introduce some terminology. We will refer to Figure 
+\@ref(fig:example-1) to illustrate the concepts introduced in this section. This
+figure shows a C-chart for the first 35 data points of the simulated
+`example_series_2a` data included with `autospc`, which for the purpose of this
+section we shall interpret as daily values of a count measure of interest.
 
-## Calculation and display periods
+```{r example-1, fig.width=7, fig.height=5, fig.cap="Example 1"}
+plot_auto_SPC(example_series_2a %>%
+                filter(row_number() <= 35L),
+              override_y_title = "Count",
+              chartType = "C",
+              extend_limits_to = 47L)
+```
 
-## Rule-breaking run
+
+### Calculation and display periods
+
+The data used to calculate a set of control limits comes from a contiguous
+period of time, with the possible exception of some excluded points. This period
+of time is referred to as the *calculation period* of the limits.
+
+When the limits are extended into the future, beyond their calculation period, 
+the period over which they are extended is referred to as the *display period*.
+
+In charts produced by *autospc*, limits are displayed as black dashed lines over
+their calculation period, and grey dashed lines over their display period. For
+example, in \@ref(fig:example-1), there is one calculation period, covering
+days 1 to 21 inclusive, extended into its display period covering day 22
+onwards.
+
+### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
-threshold for a rule break (`runRuleLength`), set to $8$ by default in
-`plot_auto_SPC()`. 
+threshold for a shift rule break (`runRuleLength`), set to $8$ by default in
+`plot_auto_SPC()`. In \@ref(fig:example-1), there is a rule-breaking run of
+length 10 starting on day 22. By default, rule-breaking runs are highlighted in
+blue by `autospc`.
 
-Runs that are subsets of longer runs count here, so for example with the default
-`runRuleLength = 8`, a run of length 10 actually comprises three rule-breaking 
-runs, commencing at the first, second and third points in the length 10 run.
-In this example, the first rule-breaking run has length 10, the second 9, and
-the third 8. The run that commences on the fourth point of the length 10 run is 
-not rule-breaking, since it is of length 7 only.
+Runs that are subsets of longer runs with the same end point count here, so for
+example with the default `runRuleLength = 8`, the run of length 10 in
+\@ref(fig:example-1) actually comprises three rule-breaking runs, commencing at
+the first, second and third points in the length 10 run. In this example, the
+first rule-breaking run starts on day 22 and has length 10, the second starts on
+day 23 and has length 9, and the third starts on day 24 and has length 8. The
+run that commences on day 25, the fourth point of the length 10 run, is not
+rule-breaking, since it is of length 7 only.
 
-## Triggering rule break
-In the SSA, a rule breaking run can trigger consideration of whether to
-re-establish limits. Such a run is referred to as a *triggering rule break*.
+### Triggering rule break
+In the SSA, a rule-breaking run commencing during a display period triggers
+consideration of whether to re-establish limits. Such a run is referred to as a
+*triggering rule break*.
 
-## Candidate limits
+In \@ref(fig:example-1) the highlighted rule-breaking run is a triggering rule 
+break.
+
+### Candidate limits
 In order to decide whether to re-establish control limits at a triggering rule
-break, the
-SSA requires consideration of the set of limits that _would_ be established.
-These are referred to as *candidate limits* until they are either rejected or
-accepted. Candidate limits are formed from the first `periodMin` points starting
-at the first point of the triggering rule break, and this period is referred to
-as the *candidate calculation period*.
+break, the SSA requires consideration of the set of limits that _would_ be
+established. These are referred to as *candidate limits* until they are either
+rejected or accepted. Candidate limits are formed from the first `periodMin`
+points starting at the first point of the triggering rule break, and this
+period is referred to as the *candidate calculation period*.
 
-## Opposing rule break
+In Figure \@ref(fig:example-1), there are fewer than `periodMin` (here 21)
+points on or after the start of the triggering rule break (day 22), so it is not
+possible to re-establish limits at day 22, and there are no candidate limits to
+consider.
+
+In Figure \@ref(fig:example-2) we imagine rolling time forward, so that we have
+more data to add to the chart in \@ref(fig:example-1). Figure
+\@ref(fig:example-2) shows the data against the (baseline) calculation limits.
+Figure  \@ref(fig:example-3) shows candidate limits established at the start of
+the triggering rule break, i.e. day 22.
+
+```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
+plot_auto_SPC(example_series_2a,
+              override_y_title = "Count",
+              chartType = "C",
+              noRecals = TRUE,
+              extend_limits_to = 47L)
+```
+
+```{r example-3, fig.width=7, fig.height=5, fig.cap="Example 3"}
+plot_auto_SPC(example_series_2a,
+              override_y_title = "Count",
+              chartType = "C",
+              extend_limits_to = 47L)
+```
+
+### Opposing rule break
 If there is a rule break within the candidate calculation period, and that rule
 break is in the opposite direction to the triggering rule break, it is referred
 to as an *opposing rule break*. We also sometimes refer to such a rule break as
-a *reversion*, as in reverting to the original limits. If the rule break only
-reaches the `runRuleLength` threshold after the end of the candidate calculation
-period, it is referred to as an *overhanging reversion*.
+a *reversion*, as in reverting to the original limits.
 
-## Minimum period length
+In Figure \@ref(fig:example-3) there is no opposing rule break within the
+candidate calculation period. Figure \@ref(fig:example-4) shows an alternative 
+continuation of the baseline time series we have considered so far. This series
+is identical to the first up to day 26, and differs thereafter. There is still
+a triggering rule break against the baseline limits commencing at day 22. Figure
+\@ref(fig:example-5) shows candidate limits established from the start of this 
+triggering rule break, i.e. from day 22. There is an opposing rule break in 
+Figure \@ref(fig:example-5), commencing on day 31.
+
+```{r example-4, fig.width=7, fig.height=5, fig.cap="Example 4"}
+plot_auto_SPC(example_series_2b,
+              override_y_title = "Count",
+              chartType = "C",
+              noRecals = TRUE,
+              extend_limits_to = 47L)
+```
+
+```{r example-5, fig.width=7, fig.height=5, fig.cap="Example 5"}
+plot_auto_SPC(example_series_2b,
+              override_y_title = "Count",
+              chartType = "C",
+              recalEveryShift = TRUE,
+              extend_limits_to = 47L)
+```
+
+
+If an opposing rule break only reaches the `runRuleLength` threshold after the
+end of the candidate calculation period, it is referred to as an
+*overhanging reversion*. Figure \@ref(fig:example-6) shows another alternative 
+continuation of our example time series, this time showing an
+overhanging reversion commencing on day 40, against the candidate limits.
+
+```{r example-6, fig.width=7, fig.height=5, fig.cap="Example 6"}
+plot_auto_SPC(example_series_2c,
+              override_y_title = "Count",
+              chartType = "C",
+              recalEveryShift = TRUE)
+```
+
+### Minimum period length
 The SSA requires specification of a minimum number of data points to be used 
 for calculation of control limits, $n_{min}$. Whilst those using SPC in practice
 may not often make such a minimum explicit, in a way it is always there
 implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
-with values ranging from 17 to 25 points. In `plot_auto_SPC()`, $n_{min}$ is
-specified by the `periodMin` argument, defaulting to 21.
+with values ranging from 17 to 25 points.
 
-# The Stable Shift Algorithm: Details
+In `plot_auto_SPC()`, $n_{min}$ is specified by the `periodMin` argument,
+defaulting to 21. This default is above the commonly recommended minimum values
+and represents a convenient choice for daily data, since it is a multiple of 7.
+This means that in the presence of weekly "seasonal" (periodic) variation over
+the 7 day period the limits are not unduly affected by which day of the week the
+limit calculation period begins on. When using monthly data, it is preferable to
+use $n_{min} = 24$, for the same reason.
+
+## Details of the algorithm
 
 The steps of the algorithm are as follows:
 
@@ -168,7 +285,7 @@ points beginning at the counter.
 
 7. Decide whether to accept or reject the candidate limits:
 
-    i. If there at least one opposing rule break commencing within the candidate
+    i. If there is at least one opposing rule break commencing within the candidate
     calculation period, then the candidate limits are rejected, the counter is
     set to the next rule-breaking run (after the triggering rule break) against
     the prevailing limits, and the algorithm continues from (3).
@@ -190,7 +307,7 @@ The algorithm is visualised in the flow chart below.
 ```{r 5.1, fig.width=7, fig.height=7}
 grViz(autospc:::algorithm_flow_chart_string)
 ```
-
+\
   
 # Using the algorithm log
 
@@ -211,7 +328,8 @@ plot_auto_SPC(
   y = Att_All,
   verbosity = 1,
   x_break = 365,
-  x_date_format = "%Y-%b"
+  x_date_format = "%Y-%b",
+  point_size = 1L
 )
 ```
 

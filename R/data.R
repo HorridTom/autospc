@@ -67,3 +67,20 @@
 #' @source Simulated data
 #' 
 "example_series_2b"
+
+#' Example Time Series 2c
+#' 
+#' A fourth simulated example time series used in illustrating features of the
+#' Stable Shift Algorithm. The first 43 rows are identical to example_series_2a
+#' except at six time points, all occurring at or after x = 38.
+#' 
+#' @format
+#' A data frame with 47 rows and 2 columns
+#' \describe{
+#'  \item{x}{Consecutive integer time}
+#'  \item{y}{Integer time series}
+#' } 
+#' 
+#' @source Simulated data
+#' 
+"example_series_2c"

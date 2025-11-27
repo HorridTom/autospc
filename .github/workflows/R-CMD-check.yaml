@@ -56,6 +56,7 @@ jobs:
             any::testthat
             any::rmarkdown
             any::knitr
+            any::bookdown
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2

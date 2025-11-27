@@ -53,7 +53,7 @@ An example is shown in Figure \@ref(fig:extending-limits). This uses the
 `ed_attendances_monthly` dataset included with `autospc`. For more information
 on this dataset see `?ed_attendances_monthly`.
 
-```{r extending-limits, fig.width=7, fig.height=9, fig.cap="Extending baseline control limits"}
+```{r extending-limits, fig.width=7, fig.height=7, fig.cap="Extending baseline control limits"}
 facet_stages(
   ed_attendances_monthly %>%
     filter(row_number() <= 32L),
@@ -101,7 +101,7 @@ and describe how it is operationalised in the SSA.
 ## Some terminology
 
 First, it is useful to introduce some terminology. We will refer to Figure 
-\@ref(fig:example-1) to iluustrate the concepts introduced in this section. This
+\@ref(fig:example-1) to illustrate the concepts introduced in this section. This
 figure shows a C-chart for the first 35 data points of the simulated
 `example_series_2a` data included with `autospc`, which for the purpose of this
 section we shall interpret as daily values of a count measure of interest.
@@ -278,7 +278,7 @@ points beginning at the counter.
 
 7. Decide whether to accept or reject the candidate limits:
 
-    i. If there at least one opposing rule break commencing within the candidate
+    i. If there is at least one opposing rule break commencing within the candidate
     calculation period, then the candidate limits are rejected, the counter is
     set to the next rule-breaking run (after the triggering rule break) against
     the prevailing limits, and the algorithm continues from (3).

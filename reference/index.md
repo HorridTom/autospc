@@ -12,6 +12,8 @@
   : Example Time Series 2a
 - [`example_series_2b`](https://horridtom.github.io/autospc/reference/example_series_2b.md)
   : Example Time Series 2b
+- [`example_series_2c`](https://horridtom.github.io/autospc/reference/example_series_2c.md)
+  : Example Time Series 2c
 - [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
   : facet_stages
 - [`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md)

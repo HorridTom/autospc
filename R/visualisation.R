@@ -40,8 +40,10 @@ create_spc_plot <- function(df,
                      "outside the control limits \nRule 2: Eight or more",
                      "consecutive points all above, or all below, the centre",
                      "line")
+    rule_title <- "Rule triggered*"
   } else {
     caption <- NULL
+    rule_title <- "Rule triggered"
   }
   
   p <- format_SPC(pct,
@@ -49,6 +51,7 @@ create_spc_plot <- function(df,
                   r1_col = r1_col,
                   r2_col = r2_col,
                   point_size = point_size,
+                  rule_title = rule_title,
                   line_width_sf = line_width_sf) +
     ggplot2::ggtitle(title,
                      subtitle = subtitle) +
@@ -215,6 +218,7 @@ format_SPC <- function(cht,
                        r2_col,
                        point_size,
                        line_width_sf,
+                       rule_title,
                        ymin,
                        ymax) {
   point_colours <- c("Rule 1" = r1_col,
@@ -257,7 +261,7 @@ format_SPC <- function(cht,
       ggplot2::geom_point(ggplot2::aes(colour = highlight),
                           size = point_size,
                           na.rm = TRUE) +
-      ggplot2::scale_color_manual("Rule triggered*",
+      ggplot2::scale_color_manual(rule_title,
                                   values = point_colours) + 
       ggplot2::scale_alpha_discrete("Period Type",
                                     labels = if(!is.na(first_display_period)) {

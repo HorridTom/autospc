@@ -40,7 +40,7 @@ create_spc_plot <- function(df,
                      "outside the control limits \nRule 2: Eight or more",
                      "consecutive points all above, or all below, the centre",
                      "line")
-    rule_title <- "Rule triggered *"
+    rule_title <- "Rule triggered*"
   } else {
     caption <- NULL
     rule_title <- "Rule triggered"

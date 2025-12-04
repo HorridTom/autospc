@@ -10,7 +10,7 @@ autospc(
   y,
   n,
   chart_type = NULL,
-  periodMin = 21,
+  period_min = 21,
   baseline = NULL,
   runRuleLength = 8,
   noRecals = FALSE,
@@ -93,21 +93,21 @@ Parameters that control behaviour of the algorithm used to re-establish
 control limits.
 }}
 
-\item{periodMin}{The minimum number of points (subgroups) per period,
+\item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline}{Integer, overrides periodMin for the first calculation period
+\item{baseline}{Integer, overrides period_min for the first calculation period
 only, if specified}
 
 \item{runRuleLength}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}
 
 \item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
-extend limits calculated from the first periodMin points.}
+extend limits calculated from the first period_min points.}
 
 \item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
 and simply re-establish limits at every shift rule break (respecting
-periodMin)}
+period_min)}
 
 \item{noRegrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}

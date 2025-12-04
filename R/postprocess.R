@@ -5,7 +5,7 @@
 postprocess <- function(
     df,
     chart_type = NULL,
-    periodMin = 21,
+    period_min = 21,
     showLimits = TRUE,
     override_x_title = NULL,
     override_y_title = NULL,
@@ -32,7 +32,7 @@ postprocess <- function(
   end_x <- max(x_max, x_pad_end)
   
   # Chart y limit
-  if(num_non_missing_y < periodMin) {
+  if(num_non_missing_y < period_min) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
   } else if(chart_type != "XMR") {
@@ -49,7 +49,7 @@ postprocess <- function(
     }
   }
   
-  if(num_non_missing_y < periodMin) {
+  if(num_non_missing_y < period_min) {
     ylimhigh <- max(df$y,
                     na.rm = TRUE)
   } else if(chart_type == "C" | chart_type == "C'") {

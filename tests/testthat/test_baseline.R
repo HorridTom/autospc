@@ -5,7 +5,7 @@ test_that("", {
     chart_type = "C'",
     x = Month_Start,
     y = Att_All,
-    periodMin = 21L,
+    period_min = 21L,
     baseline = 63L,
     plotChart = FALSE
   )

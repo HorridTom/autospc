@@ -7,7 +7,7 @@
 create_SPC_auto_limits_table(
   data,
   chart_type,
-  periodMin,
+  period_min,
   baseline,
   runRuleLength,
   maxNoOfExclusions,
@@ -44,10 +44,10 @@ Parameters that control behaviour of the algorithm used to re-establish
 control limits.
 }}
 
-\item{periodMin}{The minimum number of points (subgroups) per period,
+\item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline}{Integer, overrides periodMin for the first calculation period
+\item{baseline}{Integer, overrides period_min for the first calculation period
 only, if specified}
 
 \item{runRuleLength}{The minimum number of consecutive points above or below
@@ -64,11 +64,11 @@ standard output log; the higher the number the more information is provided,
 none if 0.}
 
 \item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
-extend limits calculated from the first periodMin points.}
+extend limits calculated from the first period_min points.}
 
 \item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
 and simply re-establish limits at every shift rule break (respecting
-periodMin)}
+period_min)}
 
 \item{rule2Tolerance}{Minimum difference between a point's vertical position
 and the centre line to count as "on the centre line" for the purposes of
@@ -110,7 +110,7 @@ df <- ed_attendances_monthly \%>\%
 limits_table <- create_SPC_auto_limits_table(
   df,
   chart_type = "C'",
-  periodMin = 21,
+  period_min = 21,
   baseline = NULL,
   runRuleLength = 8,
   maxNoOfExclusions = 3,

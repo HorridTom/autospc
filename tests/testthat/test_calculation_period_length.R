@@ -3,11 +3,11 @@ test_data <- readRDS("testdata/test_data.rds")
 
 test_that("Calculation period is correct length",{
   
-  periodMin <- 21L
+  period_min <- 21L
   
   algorithm_results <- autospc(test_data,
                                      chart_type = "C'",
-                                     periodMin = periodMin,
+                                     period_min = period_min,
                                      plotChart = FALSE,
                                      noRegrets = TRUE)
   
@@ -17,7 +17,7 @@ test_that("Calculation period is correct length",{
     dplyr::summarise(calcPeriodLength = dplyr::n()) %>% 
     dplyr::pull(calcPeriodLength)
   
-  correct_lengths <- rep(periodMin,
+  correct_lengths <- rep(period_min,
                          times = length(calculation_period_lengths))
   
   testthat::expect_equal(calculation_period_lengths,

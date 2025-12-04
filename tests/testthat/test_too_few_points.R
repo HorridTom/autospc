@@ -17,8 +17,8 @@ test_data2 <- data.frame(x = 1:50,
 test_that("Charts with fewer points than min period error handle",{
   
   #hide warnings for part of this test
-  result_C <- suppressWarnings(autospc(test_data, plotChart = FALSE, chart_type = "C", periodMin = 21))
-  result_P <- suppressWarnings(autospc(test_data, plotChart = FALSE, chart_type = "P", periodMin = 21))
+  result_C <- suppressWarnings(autospc(test_data, plotChart = FALSE, chart_type = "C", period_min = 21))
+  result_P <- suppressWarnings(autospc(test_data, plotChart = FALSE, chart_type = "P", period_min = 21))
 
   testthat::expect_equal(ncol(result_C), 4)
   testthat::expect_equal(ncol(result_P), 5)
@@ -29,8 +29,8 @@ test_that("Charts with fewer points than min period error handle",{
 
 test_that("Charts with showLimits = FALSE behave as expected",{
   
-  result_C <- autospc(test_data2, plotChart = FALSE, chart_type = "C", periodMin = 21, showLimits = FALSE)
-  result_P <- autospc(test_data2, plotChart = FALSE, chart_type = "P", periodMin = 21, showLimits = FALSE)
+  result_C <- autospc(test_data2, plotChart = FALSE, chart_type = "C", period_min = 21, showLimits = FALSE)
+  result_P <- autospc(test_data2, plotChart = FALSE, chart_type = "P", period_min = 21, showLimits = FALSE)
   
   #expect full limits table to be returned regardless of showLimits status
   testthat::expect_equal(ncol(result_C), 14)

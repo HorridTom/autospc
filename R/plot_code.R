@@ -34,17 +34,17 @@
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish
 #' control limits.
-#' @param periodMin The minimum number of points (subgroups) per period,
+#' @param period_min The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
-#' @param baseline Integer, overrides periodMin for the first calculation period
+#' @param baseline Integer, overrides period_min for the first calculation period
 #' only, if specified
 #' @param runRuleLength The minimum number of consecutive points above or below
 #' the centre line constituting a shift (or "rule 2") break.
 #' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
-#' extend limits calculated from the first periodMin points.
+#' extend limits calculated from the first period_min points.
 #' @param recalEveryShift Boolean - whether to bypass the Stable Shift Algorithm
 #' and simply re-establish limits at every shift rule break (respecting
-#' periodMin)
+#' period_min)
 #' @param noRegrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhangingReversions Boolean determining whether rule breaks in the
@@ -174,7 +174,7 @@ autospc <- function(data,
                           n,
                           chart_type = NULL,
                           ## Algorithm Parameters
-                          periodMin = 21,
+                          period_min = 21,
                           baseline = NULL,
                           runRuleLength = 8,
                           noRecals = FALSE,
@@ -254,7 +254,7 @@ autospc <- function(data,
   data <- create_SPC_auto_limits_table(
     data,
     chart_type = chart_type, 
-    periodMin = periodMin,
+    period_min = period_min,
     baseline = baseline,
     runRuleLength = runRuleLength,
     maxNoOfExclusions  = maxNoOfExclusions,
@@ -279,7 +279,7 @@ autospc <- function(data,
   postprocessing_vars <- postprocess(
     df = data,
     chart_type = chart_type,
-    periodMin = periodMin,
+    period_min = period_min,
     showLimits = showLimits,
     override_x_title = override_x_title,
     override_y_title = override_y_title,
@@ -301,7 +301,7 @@ autospc <- function(data,
   
   
   # Check whether limits are to be displayed on chart
-  if(showLimits & num_non_missing_y >= periodMin){
+  if(showLimits & num_non_missing_y >= period_min){
     
     data <- postprocess_spc(
       df = data,
@@ -344,7 +344,7 @@ autospc <- function(data,
         ylimlow = ylimlow,
         ylimhigh = ylimhigh,
         num_non_missing_y = num_non_missing_y,
-        periodMin = periodMin,
+        period_min = period_min,
         title = title,
         subtitle = subtitle,
         use_caption = use_caption,

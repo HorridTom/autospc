@@ -18,7 +18,7 @@
 #' limits_table <- create_SPC_auto_limits_table(
 #'   df,
 #'   chart_type = "C'",
-#'   periodMin = 21,
+#'   period_min = 21,
 #'   baseline = NULL,
 #'   runRuleLength = 8,
 #'   maxNoOfExclusions = 3,
@@ -37,7 +37,7 @@
 #' @export
 create_SPC_auto_limits_table <- function(data, 
                                          chart_type,
-                                         periodMin,
+                                         period_min,
                                          baseline,
                                          runRuleLength,
                                          maxNoOfExclusions,
@@ -79,7 +79,7 @@ create_SPC_auto_limits_table <- function(data,
                            entry = "0100")
   # Check whether there are enough data points to form one period
   if(!enough_data_for_new_period(data = data,
-                                 periodMin = periodMin,
+                                 period_min = period_min,
                                  baseline = baseline,
                                  counter = counter,
                                  chart_type = chart_type)){
@@ -101,7 +101,7 @@ create_SPC_auto_limits_table <- function(data,
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
       data = data, 
-      periodMin = periodMin,
+      period_min = period_min,
       baseline = baseline,
       counter_at_period_start = counter, 
       chart_type = chart_type, 
@@ -118,7 +118,7 @@ create_SPC_auto_limits_table <- function(data,
     if(counter == 1L & !is.null(baseline)) {
       counter <- counter + baseline
     } else {
-      counter <- counter + periodMin
+      counter <- counter + period_min
     }
     
     if(!noRecals){
@@ -131,7 +131,7 @@ create_SPC_auto_limits_table <- function(data,
         
         # [4] Check whether enough points after the counter to form new period
         if(!enough_data_for_new_period(data = limits_table,
-                                       periodMin = periodMin,
+                                       period_min = period_min,
                                        baseline = baseline,
                                        counter = counter,
                                        chart_type = chart_type)) {        
@@ -214,7 +214,7 @@ create_SPC_auto_limits_table <- function(data,
             # form a new period
             
             if(!enough_data_for_new_period(data = limits_table,
-                                           periodMin = periodMin,
+                                           period_min = period_min,
                                            baseline = baseline,
                                            counter = counter,
                                            chart_type = chart_type)){
@@ -228,12 +228,12 @@ create_SPC_auto_limits_table <- function(data,
             } else {
               
               # [6a] There are sufficient points. Establish candidate limits
-              # using the first periodMin points from the counter as calculation
+              # using the first period_min points from the counter as calculation
               # period
               
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
-                periodMin = periodMin,
+                period_min = period_min,
                 baseline = baseline,
                 counter_at_period_start = counter,
                 chart_type = chart_type,
@@ -248,7 +248,7 @@ create_SPC_auto_limits_table <- function(data,
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
                 counter,
-                periodMin,
+                period_min,
                 triggering_rule_break_direction,
                 rule2Tolerance = rule2Tolerance,
                 runRuleLength = runRuleLength,
@@ -292,7 +292,7 @@ create_SPC_auto_limits_table <- function(data,
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
-                counter <- counter + periodMin
+                counter <- counter + period_min
                 
               } else {
                 # [7b] If not (i.e. there is an opposing rule break, or the

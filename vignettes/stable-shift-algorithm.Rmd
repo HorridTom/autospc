@@ -63,7 +63,7 @@ facet_stages(
   x = Month_Start, 
   y = Att_All,
   chart_type = "C'",
-  periodMin = 24,
+  period_min = 24,
   use_caption = FALSE,
   x_break = 91.25,
   x_date_format = "%Y-%b",
@@ -158,11 +158,11 @@ break.
 In order to decide whether to re-establish control limits at a triggering rule
 break, the SSA requires consideration of the set of limits that _would_ be
 established. These are referred to as *candidate limits* until they are either
-rejected or accepted. Candidate limits are formed from the first `periodMin`
+rejected or accepted. Candidate limits are formed from the first `period_min`
 points starting at the first point of the triggering rule break, and this
 period is referred to as the *candidate calculation period*.
 
-In Figure \@ref(fig:example-1), there are fewer than `periodMin` (here 21)
+In Figure \@ref(fig:example-1), there are fewer than `period_min` (here 21)
 points on or after the start of the triggering rule break (day 22), so it is not
 possible to re-establish limits at day 22, and there are no candidate limits to
 consider.
@@ -241,7 +241,7 @@ implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
 with values ranging from 17 to 25 points.
 
-In `autospc()`, $n_{min}$ is specified by the `periodMin` argument,
+In `autospc()`, $n_{min}$ is specified by the `period_min` argument,
 defaulting to 21. This default is above the commonly recommended minimum values
 and represents a convenient choice for daily data, since it is a multiple of 7.
 This means that in the presence of weekly "seasonal" (periodic) variation over

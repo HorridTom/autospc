@@ -5,7 +5,7 @@ test_that(paste0("break points are inserted even with no change in centre line",
                  "(bug 149 fixed)"), {
                    
                    result <- autospc(bug_148_data,
-                                           chartType = "C",
+                                           chart_type = "C",
                                            plotChart = FALSE)
                    
                    num_breakpoints = sum(result %>%

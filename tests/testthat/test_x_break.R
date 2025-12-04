@@ -2,15 +2,15 @@
 test_that("Integer x breaks are as specified by x_break", {
   
   plot_10 <- autospc(example_series_1,
-                     chartType = "C",
+                     chart_type = "C",
                      x_break = 10)
   
   plot_20 <- autospc(example_series_1,
-                     chartType = "C",
+                     chart_type = "C",
                      x_break = 20)
   
   plot_5<- autospc(example_series_1,
-                   chartType = "C",
+                   chart_type = "C",
                    x_break = 5)
   
   n_x_breaks_10 <- length(as.numeric(na.omit(

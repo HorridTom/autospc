@@ -7,7 +7,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Create and store XmR chart 
   chart_result <- autospc::autospc(test_median_data,
-                                   chartType = 'XMR',
+                                   chart_type = 'XMR',
                                    floatingMedian = "yes",
                                    floatingMedian_n = test_median_n,
                                    showMR = FALSE)
@@ -51,7 +51,7 @@ test_that("the median is not generated nor plotted when floatingMedian is set to
   
   # Create and store XmR chart 
   chart_result <- autospc::autospc(test_median_data,
-                                   chartType = 'XMR',
+                                   chart_type = 'XMR',
                                    floatingMedian = "no",
                                    floatingMedian_n = test_median_n,
                                    showMR = FALSE)
@@ -71,7 +71,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Create and store XmR chart
   auto_median_result <- autospc::autospc(test_data_with_rule2_break,
-                                         chartType = 'XMR',
+                                         chart_type = 'XMR',
                                          floatingMedian = "auto",
                                          floatingMedian_n = test_median_n,
                                          showMR = FALSE)
@@ -117,7 +117,7 @@ test_that("Median is not plotted when floatingMedian is set to auto and there is
   
   # Create and store XmR chart 
   chart_result <- autospc::autospc(test_median_without_rule2_break,
-                                   chartType = 'XMR',
+                                   chart_type = 'XMR',
                                    floatingMedian = "auto",
                                    floatingMedian_n = test_median_n,
                                    showMR = FALSE)
@@ -141,7 +141,7 @@ test_that("NAs do not prevent median from being plotted",{
   
   # Create and store XmR chart 
   chart_result <- autospc::autospc(test_median_data_na,
-                                   chartType = 'XMR',
+                                   chart_type = 'XMR',
                                    floatingMedian = "yes",
                                    floatingMedian_n = test_median_n,
                                    showMR = FALSE)

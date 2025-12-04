@@ -6,7 +6,7 @@
 \usage{
 create_SPC_auto_limits_table(
   data,
-  chartType,
+  chart_type,
   periodMin,
   baseline,
   runRuleLength,
@@ -36,7 +36,7 @@ For a P or P' chart, must have columns for:
 \item and optionally, a title and subtitle for the plot.
 }}
 
-\item{chartType}{The type of chart you wish to plot. Available options are:
+\item{chart_type}{The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
@@ -109,7 +109,7 @@ df <- ed_attendances_monthly \%>\%
 
 limits_table <- create_SPC_auto_limits_table(
   df,
-  chartType = "C'",
+  chart_type = "C'",
   periodMin = 21,
   baseline = NULL,
   runRuleLength = 8,

@@ -1,6 +1,6 @@
 create_spc_plot <- function(df,
                             p_mr = NA,
-                            chartType = NULL,
+                            chart_type = NULL,
                             xType,
                             start_x,
                             end_x,
@@ -34,7 +34,7 @@ create_spc_plot <- function(df,
                          ggplot2::aes(x,y))
   
   if(use_caption) {
-    caption <- paste(chartType,
+    caption <- paste(chart_type,
                      "Shewhart Chart.",
                      "\n*Shewhart chart rules apply \nRule 1: Any point",
                      "outside the control limits \nRule 2: Eight or more",
@@ -134,7 +134,7 @@ create_spc_plot <- function(df,
     
   }
   
-  if((chartType == "XMR") & showMR) {
+  if((chart_type == "XMR") & showMR) {
     p <- p + 
       ggplot2::labs(caption = NULL,
                     x = NULL) + 

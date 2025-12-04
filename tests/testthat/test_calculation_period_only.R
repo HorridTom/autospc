@@ -3,7 +3,7 @@ test_data <- readRDS("testdata/test_e2e_data.rds")
 test_that("calculation period only chart is created without warning", {
   
   plot_1 <- autospc(test_data,
-                    chartType = "XMR",
+                    chart_type = "XMR",
                     plotChart = TRUE,
                     includeAnnotations = FALSE)
   

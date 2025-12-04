@@ -62,7 +62,7 @@ facet_stages(
                  "Further data added" = 32L),
   x = Month_Start, 
   y = Att_All,
-  chartType = "C'",
+  chart_type = "C'",
   periodMin = 24,
   use_caption = FALSE,
   x_break = 91.25,
@@ -110,7 +110,7 @@ section we shall interpret as daily values of a count measure of interest.
 autospc(example_series_2a %>%
                 filter(row_number() <= 35L),
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               extend_limits_to = 47L)
 ```
 
@@ -176,7 +176,7 @@ the triggering rule break, i.e. day 22.
 ```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
 autospc(example_series_2a,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               noRecals = TRUE,
               extend_limits_to = 47L)
 ```
@@ -184,7 +184,7 @@ autospc(example_series_2a,
 ```{r example-3, fig.width=7, fig.height=5, fig.cap="Example 3"}
 autospc(example_series_2a,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               extend_limits_to = 47L)
 ```
 
@@ -206,7 +206,7 @@ Figure \@ref(fig:example-5), commencing on day 31.
 ```{r example-4, fig.width=7, fig.height=5, fig.cap="Example 4"}
 autospc(example_series_2b,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               noRecals = TRUE,
               extend_limits_to = 47L)
 ```
@@ -214,7 +214,7 @@ autospc(example_series_2b,
 ```{r example-5, fig.width=7, fig.height=5, fig.cap="Example 5"}
 autospc(example_series_2b,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               recalEveryShift = TRUE,
               extend_limits_to = 47L)
 ```
@@ -229,7 +229,7 @@ overhanging reversion commencing on day 40, against the candidate limits.
 ```{r example-6, fig.width=7, fig.height=5, fig.cap="Example 6"}
 autospc(example_series_2c,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               recalEveryShift = TRUE)
 ```
 
@@ -323,7 +323,7 @@ detail).
 ```{r 6.1, fig.width=7, fig.height=4.3}
 autospc(
   ed_attendances_monthly, 
-  chartType = "C'", 
+  chart_type = "C'", 
   x = Month_Start, 
   y = Att_All,
   verbosity = 1,

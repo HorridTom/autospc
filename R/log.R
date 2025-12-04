@@ -266,13 +266,13 @@ interpret_log <- function(df,
 
 log_output <- function(df,
                        verbosity,
-                       chartType ,
+                       chart_type ,
                        log_file_path) {
   if(verbosity > 0){
     log_text <- interpret_log(df,
                               verbosity = verbosity)
     cat(paste0("\n",
-               chartType,
+               chart_type,
                ":\n\n"))
     cat(log_text)
     cat("\n\n")

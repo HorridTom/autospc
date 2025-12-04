@@ -20,19 +20,19 @@ test_that(
   "SSA variants perform correctly on first 96 points of example_series_1", {
     
     result_ssa <- autospc(example_series_1[1:96,],
-                          chartType = "XMR",
+                          chart_type = "XMR",
                           plotChart = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE)
     
     result_nRF_oRT <- autospc(example_series_1[1:96,],
-                              chartType = "XMR",
+                              chart_type = "XMR",
                               plotChart = FALSE,
                               noRegrets = FALSE,
                               overhangingReversions = TRUE)
     
     result_nRF_oRF <- autospc(example_series_1[1:96,],
-                              chartType = "XMR",
+                              chart_type = "XMR",
                               plotChart = FALSE,
                               noRegrets = FALSE,
                               overhangingReversions = FALSE)
@@ -62,19 +62,19 @@ test_that(
   "SSA variants perform correctly on full example_series_1", {
     
     result_ssa <- autospc(example_series_1,
-                          chartType = "XMR",
+                          chart_type = "XMR",
                           plotChart = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE)
     
     result_nRF_oRT <- autospc(example_series_1,
-                              chartType = "XMR",
+                              chart_type = "XMR",
                               plotChart = FALSE,
                               noRegrets = FALSE,
                               overhangingReversions = TRUE)
     
     result_nRF_oRF <- autospc(example_series_1,
-                              chartType = "XMR",
+                              chart_type = "XMR",
                               plotChart = FALSE,
                               noRegrets = FALSE,
                               overhangingReversions = FALSE)
@@ -105,7 +105,7 @@ test_that("warning is issued if incompatible variant requested", {
   expect_warning(
     autospc(
       ed_attendances_monthly, 
-      chartType = "C'", 
+      chart_type = "C'", 
       x = Month_Start, 
       y = Att_All,
       noRegrets = TRUE,

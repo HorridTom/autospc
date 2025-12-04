@@ -1,7 +1,7 @@
 
 preprocess_inputs <- function(
     df,
-    chartType,
+    chart_type,
     title = NULL,
     subtitle = NULL,
     upper_annotation_sf = NULL,
@@ -30,18 +30,18 @@ preprocess_inputs <- function(
   }
   
   #decide whether the chart is C or P depending on data format if not specified 
-  if(is.null(chartType)) {
+  if(is.null(chart_type)) {
     
     lifecycle::deprecate_warn(
       when = "0.0.0.9008",
-      what = I("chartType  = NULL"),
+      what = I("chart_type  = NULL"),
       details = I("Please explicitly pass the desired chart type")
     )
     
     if(all(c("x", "y") %in% colnames(df))) {
-      chartType <- "C'"
+      chart_type <- "C'"
     } else if(all(c("x", "n", "y") %in% colnames(df))) {
-      chartType <- "P'"
+      chart_type <- "P'"
     } else {
       print(paste0("The data you have input is not in the correct format. ",
                    "For C charts, data must contain at least columns 'x' and ",
@@ -50,7 +50,7 @@ preprocess_inputs <- function(
     }
   }
   
-  if(chartType == "MR") {
+  if(chart_type == "MR") {
     mrs <- get_mrs(y = df$y)
     df <- df %>% dplyr::mutate(y = mrs)
   }
@@ -71,7 +71,7 @@ preprocess_inputs <- function(
                          "equivalent to upper_annotation_sf = 1.1."))
     )
     
-    if(!is.null(override_annotation_dist_P) & startsWith(chartType, "P")) {
+    if(!is.null(override_annotation_dist_P) & startsWith(chart_type, "P")) {
       oad <- override_annotation_dist_P
     } else {
       oad <- override_annotation_dist
@@ -88,7 +88,7 @@ preprocess_inputs <- function(
   }
   
   if(is.null(upper_annotation_sf)) {
-    upper_annotation_sf <- ifelse(startsWith(chartType, "P"),
+    upper_annotation_sf <- ifelse(startsWith(chart_type, "P"),
                                   1.04,
                                   1.1)
   }
@@ -100,7 +100,7 @@ preprocess_inputs <- function(
   
   return(list(
     df = df,
-    chartType = chartType,
+    chart_type = chart_type,
     title = title,
     subtitle = subtitle,
     xType = xType,

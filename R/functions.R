@@ -4,14 +4,14 @@ enough_data_for_new_period <- function(data,
                                        periodMin,
                                        baseline,
                                        counter,
-                                       chartType){
+                                       chart_type){
   
   num_remaining_non_missing_data_points <- data %>%
     dplyr::filter(dplyr::row_number() >= counter) %>%
     dplyr::filter(!is.na(y)) %>%
     nrow()
   
-  if(chartType == "MR") {
+  if(chart_type == "MR") {
     num_remaining_non_missing_data_points <-
       num_remaining_non_missing_data_points + 1L
   }
@@ -36,7 +36,7 @@ form_calculation_limits <- function(data,
                                     counter,
                                     periodMin,
                                     baseline,
-                                    chartType = "C",
+                                    chart_type = "C",
                                     maxNoOfExclusions = 3,
                                     rule2Tolerance,
                                     runRuleLength,
@@ -57,7 +57,7 @@ form_calculation_limits <- function(data,
   }
   
   exclusion_points <- find_extremes(data = data,
-                                    chartType = chartType,
+                                    chart_type = chart_type,
                                     counter = counter,
                                     periodMin = periodLength,
                                     maxNoOfExclusions = maxNoOfExclusions,
@@ -68,22 +68,22 @@ form_calculation_limits <- function(data,
   calculation_period <- data[counter:(counter + periodLength - 1),]
   
   #run the calculation of limits excluding extremes for selected section of data
-  if(chartType == "C"){
+  if(chart_type == "C"){
     limits_list <- get_c_limits(y = calculation_period$y, exclusion_points = exclusion_points)
     
-  }else if(chartType == "C'"){
+  }else if(chart_type == "C'"){
     limits_list <- get_cp_limits(y = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = mr_screen_max_loops)
     
-  }else if(chartType == "P"){
+  }else if(chart_type == "P"){
     limits_list <- get_p_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
     
-  }else if(chartType == "P'"){
+  }else if(chart_type == "P'"){
     limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100, mr_screen_max_loops = mr_screen_max_loops)
     
-  }else if(chartType == "XMR"){
+  }else if(chart_type == "XMR"){
     limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = mr_screen_max_loops)
     
-  }else if(chartType == "MR"){
+  }else if(chart_type == "MR"){
     limits_list <- get_mr_limits(mr = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = 0L)  
     
   }
@@ -107,7 +107,7 @@ form_calculation_limits <- function(data,
       dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) 
     
     #only selects n if P chart
-    if(chartType == "P" | chartType == "P'"){
+    if(chart_type == "P" | chart_type == "P'"){
       limits_table <- limits_table %>%
         dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded,
                       dplyr::any_of("log"))
@@ -143,7 +143,7 @@ form_calculation_limits <- function(data,
                                      dplyr::row_number() == counter))
     
     #only selects n if P chart
-    if(chartType == "P" | chartType == "P'"){
+    if(chart_type == "P" | chart_type == "P'"){
       limits_table <- limits_table %>%
         dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, 
                       dplyr::contains("breakPoint"),
@@ -170,7 +170,7 @@ form_calculation_limits <- function(data,
 
 #function to find most extreme points outside of control limits and return their positions
 find_extremes <- function(data,
-                          chartType,
+                          chart_type,
                           counter,
                           periodMin,
                           maxNoOfExclusions,
@@ -187,22 +187,22 @@ find_extremes <- function(data,
     
     calculation_period <- data[counter:(counter + periodMin - 1),]
     
-    if(chartType == "C"){
+    if(chart_type == "C"){
       limits_list <- get_c_limits(y = calculation_period$y, exclusion_points = exclusion_points)
       
-    }else if(chartType == "C'"){
+    }else if(chart_type == "C'"){
       limits_list <- get_cp_limits(y = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = mr_screen_max_loops)
       
-    }else if(chartType == "P"){
+    }else if(chart_type == "P"){
       limits_list <- get_p_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100)
       
-    }else if(chartType == "P'"){
+    }else if(chart_type == "P'"){
       limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100, mr_screen_max_loops = mr_screen_max_loops)
     
-    }else if(chartType == "XMR"){
+    }else if(chart_type == "XMR"){
       limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = mr_screen_max_loops)
       
-    }else if(chartType == "MR"){
+    }else if(chart_type == "MR"){
       limits_list <- get_mr_limits(mr = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = 0L)  
       calculation_period$y <- get_mr_limits(mr = calculation_period$y,
                                             exclusion_points = NULL,
@@ -257,14 +257,14 @@ find_extremes <- function(data,
 
 
 #function to form display limits (period extension)
-form_display_limits <- function(limits_table, counter, chartType = "C'"){
+form_display_limits <- function(limits_table, counter, chart_type = "C'"){
   
   if(counter > nrow(limits_table)) {
     # No display limits needed - no data beyond calculation period
     return(limits_table)
   }
   
-  if(chartType == "C" | chartType == "C'" | chartType == "XMR" | chartType == "MR"){
+  if(chart_type == "C" | chart_type == "C'" | chart_type == "XMR" | chart_type == "MR"){
     limits_table[counter:nrow(limits_table), "ucl"] <- limits_table[(counter - 1), "ucl"]
     limits_table[counter:nrow(limits_table), "lcl"] <- limits_table[(counter - 1), "lcl"]
     limits_table[counter:nrow(limits_table), "cl"] <- limits_table[(counter - 1), "cl"]
@@ -502,7 +502,7 @@ form_calculation_and_display_limits <- function(data,
                                                 periodMin,
                                                 baseline,
                                                 counter_at_period_start, 
-                                                chartType,
+                                                chart_type,
                                                 maxNoOfExclusions,
                                                 rule2Tolerance,
                                                 runRuleLength,
@@ -513,7 +513,7 @@ form_calculation_and_display_limits <- function(data,
                                           periodMin = periodMin,
                                           baseline = baseline,
                                           counter = counter_at_period_start,
-                                          chartType = chartType,
+                                          chart_type = chart_type,
                                           maxNoOfExclusions = maxNoOfExclusions,
                                           rule2Tolerance = rule2Tolerance,
                                           runRuleLength = runRuleLength,
@@ -531,7 +531,7 @@ form_calculation_and_display_limits <- function(data,
   limits_table <- form_display_limits(limits_table = limits_table, 
                                       counter = counter_at_period_start +
                                         periodLength,
-                                      chartType = chartType)
+                                      chart_type = chart_type)
   
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 
@@ -749,7 +749,7 @@ add_floating_median <- function(df,
 
 
 extend_limits <- function(df,
-                          chartType,
+                          chart_type,
                           extend_limits_to,
                           x_max) {
   
@@ -768,7 +768,7 @@ extend_limits <- function(df,
     # varying denominators use limit values derived from the mean denominator 
     # for the final period. Other chart types use the (constant) limits from the 
     # final period.
-    switch(chartType,
+    switch(chart_type,
            P = {
              ext_calc_data <- df %>%
                dplyr::filter(plotPeriod == last_calc_period) %>%

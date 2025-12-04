@@ -53,7 +53,7 @@ For example:
 
 ```
 autospc(ed_attendances_monthly,
-                chartType = "C'",
+                chart_type = "C'",
                 x = Month_Start,
                 y = Att_All)
 ```
@@ -75,7 +75,7 @@ For example:
 
 ```
 autospc(ed_attendances_monthly,
-                chartType = "P'",
+                chart_type = "P'",
                 x = Month_Start,
                 y = Within_4h,
                 n = Att_All)
@@ -92,7 +92,7 @@ table format using `plotChart = FALSE`, as follows:
 
 ```
 limits_table <- autospc(ed_attendances_monthly,
-                              chartType = "P'",
+                              chart_type = "P'",
                               x = Month_Start,
                               y = Within_4h,
                               n = Att_All,

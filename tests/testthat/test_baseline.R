@@ -2,7 +2,7 @@ test_that("", {
   
   result_data <- autospc(
     ed_attendances_monthly,
-    chartType = "C'",
+    chart_type = "C'",
     x = Month_Start,
     y = Att_All,
     periodMin = 21L,

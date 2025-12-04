@@ -6,7 +6,7 @@ test_that("Chart is created without error when x-axis is POSIXct", {
   
   expect_no_error(
     autospc(POSIXct_x_data,
-                  chartType = "C'",
+                  chart_type = "C'",
                   x = Month,
                   y = Total),
     message = "the condition has length"
@@ -19,7 +19,7 @@ test_that("x_break argument accepts difftime when x-axis is POSIXct", {
   
   expect_no_error(
     autospc(POSIXct_x_data,
-                  chartType = "C'",
+                  chart_type = "C'",
                   x = Month,
                   y = Total,
                   x_break = as.difftime(6, units = "weeks")),
@@ -33,7 +33,7 @@ test_that("Error thrown when x_break not difftime and x-axis is POSIXct", {
   
   expect_error(
     autospc(POSIXct_x_data,
-                  chartType = "C'",
+                  chart_type = "C'",
                   x = Month,
                   y = Total,
                   x_break = 6),

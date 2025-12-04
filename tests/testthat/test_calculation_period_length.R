@@ -6,7 +6,7 @@ test_that("Calculation period is correct length",{
   periodMin <- 21L
   
   algorithm_results <- autospc(test_data,
-                                     chartType = "C'",
+                                     chart_type = "C'",
                                      periodMin = periodMin,
                                      plotChart = FALSE,
                                      noRegrets = TRUE)

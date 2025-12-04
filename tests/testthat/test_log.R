@@ -50,7 +50,7 @@ correct_log_df <- structure(
 
 invisible(capture.output(
   df_out <- autospc::autospc(test_data,
-                                   chartType = "P",
+                                   chart_type = "P",
                                    verbosity = 2L,
                                    plotChart = FALSE)
 ))

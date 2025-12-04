@@ -10,28 +10,28 @@ test_that("check rule length for run of 6", {
   
   results6 <- autospc(
     test_data6, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 6, 
     periodMin = 21
     )
   results7 <- autospc(
     test_data6, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 7, 
     periodMin = 21
     )
   results8 <- autospc(
     test_data6, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 8, 
     periodMin = 21
     )
   results9 <- autospc(
     test_data6, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 9, 
     periodMin = 21
@@ -52,28 +52,28 @@ test_that("check rule length for run of 7", {
   
   results6 <- autospc(
     test_data7, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 6, 
     periodMin = 21
     )
   results7 <- autospc(
     test_data7, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 7, 
     periodMin = 21
     )
   results8 <- autospc(
     test_data7, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 8, 
     periodMin = 21
     )
   results9 <- autospc(
     test_data7, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 9, 
     periodMin = 21
@@ -91,28 +91,28 @@ test_that("check rule length for run of 8", {
   
   results6 <- autospc(
     test_data8, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 6, 
     periodMin = 21
     )
   results7 <- autospc(
     test_data8, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 7, 
     periodMin = 21
     )
   results8 <- autospc(
     test_data8, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 8, 
     periodMin = 21
     )
   results9 <- autospc(
     test_data8, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 9, 
     periodMin = 21
@@ -130,28 +130,28 @@ test_that("rule length change for run of 9", {
   
   results6 <- autospc(
     test_data9, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 6, 
     periodMin = 21
     )
   results7 <- autospc(
     test_data9, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 7, 
     periodMin = 21
     )
   results8 <- autospc(
     test_data9, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 8, 
     periodMin = 21
     )
   results9 <- autospc(
     test_data9, 
-    chartType = "XMR", 
+    chart_type = "XMR", 
     plotChart = FALSE, 
     runRuleLength = 9, 
     periodMin = 21

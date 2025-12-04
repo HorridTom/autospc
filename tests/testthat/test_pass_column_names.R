@@ -9,13 +9,13 @@ test_that("Renaming columns doesn't change the result",{
     dplyr::select(month = x, count = y)
   
   result1 <- autospc(test_data1,
-                           chartType = "C'",
+                           chart_type = "C'",
                            plotChart = FALSE)
   
   result2 <- autospc(test_data2,
                            x = month,
                            y = count,
-                           chartType = "C'",
+                           chart_type = "C'",
                            plotChart = FALSE)
   
   testthat::expect_equal(result1, result2)

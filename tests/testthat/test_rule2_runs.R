@@ -12,7 +12,7 @@ test_data <- structure(list(x = 1:40, y = c(49.4550391796525, 50.9836438579084,
 test_that("Runs on the centre line do not show as rule 2 breaks with tolerance",{
   
   result <- autospc(test_data,
-                          chartType = "C'",
+                          chart_type = "C'",
                           plotChart = FALSE, 
                           rule2Tolerance = 0.11)
   result <- result$rule2

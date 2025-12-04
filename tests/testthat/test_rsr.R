@@ -4,7 +4,7 @@ test_that("recalEveryShift works correctly", {
   
   result_data <- autospc(
     test_rsr_data,
-    chartType = "C'",
+    chart_type = "C'",
     x = Month_Start,
     y = Total_Att,
     recalEveryShift = TRUE,

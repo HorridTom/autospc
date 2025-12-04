@@ -17,7 +17,7 @@
 #'
 #' limits_table <- create_SPC_auto_limits_table(
 #'   df,
-#'   chartType = "C'",
+#'   chart_type = "C'",
 #'   periodMin = 21,
 #'   baseline = NULL,
 #'   runRuleLength = 8,
@@ -36,7 +36,7 @@
 #'
 #' @export
 create_SPC_auto_limits_table <- function(data, 
-                                         chartType,
+                                         chart_type,
                                          periodMin,
                                          baseline,
                                          runRuleLength,
@@ -61,7 +61,7 @@ create_SPC_auto_limits_table <- function(data,
   
   # add y column of percentages for P and P' charts. This is to avoid issues
   # with joins later 
-  if(chartType == "P" | chartType == "P'"){
+  if(chart_type == "P" | chart_type == "P'"){
     data <- data %>% 
       dplyr::mutate(y_numerator = y) %>%
       dplyr::mutate(y = y * 100 / n) %>%
@@ -82,7 +82,7 @@ create_SPC_auto_limits_table <- function(data,
                                  periodMin = periodMin,
                                  baseline = baseline,
                                  counter = counter,
-                                 chartType = chartType)){
+                                 chart_type = chart_type)){
     
     data <- record_log_entry(df = data,
                              counter = counter,
@@ -104,7 +104,7 @@ create_SPC_auto_limits_table <- function(data,
       periodMin = periodMin,
       baseline = baseline,
       counter_at_period_start = counter, 
-      chartType = chartType, 
+      chart_type = chart_type, 
       maxNoOfExclusions  = maxNoOfExclusions, 
       rule2Tolerance = rule2Tolerance,
       runRuleLength = runRuleLength,
@@ -134,7 +134,7 @@ create_SPC_auto_limits_table <- function(data,
                                        periodMin = periodMin,
                                        baseline = baseline,
                                        counter = counter,
-                                       chartType = chartType)) {        
+                                       chart_type = chart_type)) {        
           
           limits_table <- record_log_entry(df = limits_table,
                                            counter = counter,
@@ -217,7 +217,7 @@ create_SPC_auto_limits_table <- function(data,
                                            periodMin = periodMin,
                                            baseline = baseline,
                                            counter = counter,
-                                           chartType = chartType)){
+                                           chart_type = chart_type)){
               
               limits_table <- record_log_entry(df = limits_table,
                                                counter = counter,
@@ -236,7 +236,7 @@ create_SPC_auto_limits_table <- function(data,
                 periodMin = periodMin,
                 baseline = baseline,
                 counter_at_period_start = counter,
-                chartType = chartType,
+                chart_type = chart_type,
                 maxNoOfExclusions = maxNoOfExclusions,
                 rule2Tolerance = rule2Tolerance,
                 runRuleLength = runRuleLength,

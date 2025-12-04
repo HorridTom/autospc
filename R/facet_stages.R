@@ -13,7 +13,7 @@
 #' facet_stages(
 #'   ed_attendances_monthly,
 #'   split_rows = c(30L, 60L, 90L),
-#'   chartType = "C'",
+#'   chart_type = "C'",
 #'   x = Month_Start,
 #'   y = Att_All, 
 #'   x_break = 365
@@ -27,7 +27,7 @@ facet_stages <- function(data,
   
   dots_exprs <- rlang::exprs(...)
   
-  if(dots_exprs$chartType == "XMR") {
+  if(dots_exprs$chart_type == "XMR") {
     if(!("showMR" %in% names(dots_exprs))) {
       
       dots_exprs$showMR <- FALSE
@@ -35,7 +35,7 @@ facet_stages <- function(data,
     } else if (dots_exprs$showMR) {
       warning(paste("`facet_stages()` does not support `showMR = TRUE`.",
                     "Setting `showMR` to `FALSE`. To facet an MR chart by",
-                    "stages use `facet_stages()` with `chartType = MR`."))
+                    "stages use `facet_stages()` with `chart_type = MR`."))
       
       dots_exprs$showMR <- FALSE
     }
@@ -57,7 +57,7 @@ facet_stages <- function(data,
                                          df = df_rn,
                                          !!!ppi_args))
   
-  chartType           <- preprocessed_vars$chartType
+  chart_type           <- preprocessed_vars$chart_type
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType

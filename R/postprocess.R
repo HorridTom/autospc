@@ -4,7 +4,7 @@
 # are to be displayed
 postprocess <- function(
     df,
-    chartType = NULL,
+    chart_type = NULL,
     periodMin = 21,
     showLimits = TRUE,
     override_x_title = NULL,
@@ -19,7 +19,7 @@ postprocess <- function(
     dplyr::filter(!is.na(y)) %>%
     nrow()
   
-  if(chartType == "MR") {
+  if(chart_type == "MR") {
     num_non_missing_y <- num_non_missing_y + 1L
   }
   
@@ -35,7 +35,7 @@ postprocess <- function(
   if(num_non_missing_y < periodMin) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
-  } else if(chartType != "XMR") {
+  } else if(chart_type != "XMR") {
     ylimlow <- 0
   } else {
     ylimlow <- min(df$lcl,
@@ -52,12 +52,12 @@ postprocess <- function(
   if(num_non_missing_y < periodMin) {
     ylimhigh <- max(df$y,
                     na.rm = TRUE)
-  } else if(chartType == "C" | chartType == "C'") {
+  } else if(chart_type == "C" | chart_type == "C'") {
     ylimhigh <- max(df$ucl,
                     df$y,
                     na.rm = TRUE) + max(df$ucl,
                                         na.rm = TRUE)/10 + 10
-  } else if (chartType == "XMR" | chartType == "MR") {
+  } else if (chart_type == "XMR" | chart_type == "MR") {
     ylimhigh <- max(df$ucl,
                     df$y,
                     na.rm = TRUE)*1.1
@@ -71,7 +71,7 @@ postprocess <- function(
   }
   
   # Ensure axis titles available
-  ytitle <- switch(chartType,
+  ytitle <- switch(chart_type,
                    C = "Number",
                    `C'` = "Number",
                    P = "Percentage",
@@ -110,7 +110,7 @@ postprocess <- function(
 # be displayed
 postprocess_spc <- function(
     df,
-    chartType,
+    chart_type,
     highlightExclusions,
     floatingMedian,
     floatingMedian_n,
@@ -149,7 +149,7 @@ postprocess_spc <- function(
   
   # add annotation information
   df <- add_annotation_data(df = df,
-                            chartType = chartType,
+                            chart_type = chart_type,
                             ylimhigh = ylimhigh,
                             align_labels = align_labels,
                             flip_labels = flip_labels,
@@ -174,7 +174,7 @@ postprocess_spc <- function(
   
   # Extend display limits
   df <- extend_limits(df = df,
-                      chartType = chartType,
+                      chart_type = chart_type,
                       extend_limits_to = extend_limits_to,
                       x_max = x_max)
   

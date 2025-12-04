@@ -10,6 +10,6 @@ test_that("autospc does not throw an error with integer x values", {
     dplyr::mutate(y = as.integer(y))
   # Expect no error when calling autospc with this data
   expect_error(
-    autospc(df1, chartType = "C'", title = "my title", subtitle = "my subtitle"),
+    autospc(df1, chart_type = "C'", title = "my title", subtitle = "my subtitle"),
     NA)
 })

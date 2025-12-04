@@ -5,7 +5,7 @@ test_that("facet_stages produces correct data output", {
   faceted_results <- facet_stages(
     ed_attendances_monthly,
     split_rows = c(30L, 60L, 90L),
-    chartType = "C'",
+    chart_type = "C'",
     x = Month_Start,
     y = Att_All, 
     plotChart = FALSE
@@ -13,7 +13,7 @@ test_that("facet_stages produces correct data output", {
   
   stage2 <- autospc(ed_attendances_monthly %>%
                       dplyr::filter(dplyr::row_number() <= 60L),
-                    chartType = "C'",
+                    chart_type = "C'",
                     x = Month_Start,
                     y = Att_All, 
                     plotChart = FALSE)
@@ -79,7 +79,7 @@ test_that("", {
   faceted_plot <- facet_stages(
     ed_attendances_monthly,
     split_rows = c(30L, 60L, 90L),
-    chartType = "C'",
+    chart_type = "C'",
     x = Month_Start,
     y = Att_All, 
     plotChart = TRUE
@@ -100,7 +100,7 @@ test_that("facet_stages works when relying on x,y columns in data", {
   result <- facet_stages(tibble::tibble(x = 1L:100L,
                                         y = rnorm(n = 100L)),
                          split_rows = c(30L, 60L),
-                         chartType = "XMR",
+                         chart_type = "XMR",
                          plotChart = FALSE)
   
   result_lengths <- result %>%

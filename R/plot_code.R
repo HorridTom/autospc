@@ -28,7 +28,7 @@
 #'  }
 #' @param n Name of column (passed using tidyselect semantics) to use as
 #' denominator for P and P' charts.
-#' @param chartType The type of chart you wish to plot. Available options are:
+#' @param chart_type The type of chart you wish to plot. Available options are:
 #' "XMR", "MR", "C", "C'", "P", "P'".
 #' 
 #' ## Algorithm Parameters
@@ -144,7 +144,7 @@
 #' # Using a C' chart to track changes in the count of monthly attendance 
 #' autospc(
 #'   ed_attendances_monthly, 
-#'   chartType = "C'", 
+#'   chart_type = "C'", 
 #'   x = Month_Start, 
 #'   y = Att_All
 #' )
@@ -152,7 +152,7 @@
 #' #Using a P' chart to track changes in the percentage admitted within 4 hours
 #' autospc(
 #'   ed_attendances_monthly, 
-#'   chartType = "P'", 
+#'   chart_type = "P'", 
 #'   x = Month_Start, 
 #'   y = Within_4h, 
 #'   n = Att_All
@@ -161,7 +161,7 @@
 #' #using a runRuleLength of 7 when tracking monthly attendance
 #' autospc(
 #'   ed_attendances_monthly, 
-#'   chartType = "C'", 
+#'   chart_type = "C'", 
 #'   x = Month_Start, 
 #'   y = Att_All,
 #'   runRuleLength = 7
@@ -172,7 +172,7 @@ autospc <- function(data,
                           x,
                           y,
                           n,
-                          chartType = NULL,
+                          chart_type = NULL,
                           ## Algorithm Parameters
                           periodMin = 21,
                           baseline = NULL,
@@ -232,7 +232,7 @@ autospc <- function(data,
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(
     df = data,
-    chartType = chartType,
+    chart_type = chart_type,
     title = title,
     subtitle = subtitle,
     upper_annotation_sf = upper_annotation_sf,
@@ -242,7 +242,7 @@ autospc <- function(data,
   )
   
   data                <- preprocessed_vars$df
-  chartType           <- preprocessed_vars$chartType
+  chart_type           <- preprocessed_vars$chart_type
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType
@@ -253,7 +253,7 @@ autospc <- function(data,
   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,
-    chartType = chartType, 
+    chart_type = chart_type, 
     periodMin = periodMin,
     baseline = baseline,
     runRuleLength = runRuleLength,
@@ -271,14 +271,14 @@ autospc <- function(data,
   # Output log data
   log_output(data,
              verbosity = verbosity,
-             chartType = chartType,
+             chart_type = chart_type,
              log_file_path = log_file_path)
   
   # Postprocess data
   
   postprocessing_vars <- postprocess(
     df = data,
-    chartType = chartType,
+    chart_type = chart_type,
     periodMin = periodMin,
     showLimits = showLimits,
     override_x_title = override_x_title,
@@ -305,7 +305,7 @@ autospc <- function(data,
     
     data <- postprocess_spc(
       df = data,
-      chartType = chartType,
+      chart_type = chart_type,
       highlightExclusions = highlightExclusions,
       floatingMedian = floatingMedian,
       floatingMedian_n = floatingMedian_n,
@@ -319,9 +319,9 @@ autospc <- function(data,
       x_max = x_max
     )
     
-    if((chartType == "XMR") & showMR) {
+    if((chart_type == "XMR") & showMR) {
       mc <- match.call()
-      mc[["chartType"]] <- "MR"
+      mc[["chart_type"]] <- "MR"
       if("title" %in% names(mc)) {mc[["title"]] <- NULL}
       if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
       mc[["data"]] <- rlang::expr(df_original)
@@ -336,7 +336,7 @@ autospc <- function(data,
       p <- create_spc_plot(
         df = data,
         p_mr = p_mr,
-        chartType = chartType,
+        chart_type = chart_type,
         xType = xType,
         start_x = start_x,
         end_x = end_x,
@@ -385,7 +385,7 @@ autospc <- function(data,
     } else {
       # (!plotChart)
       
-      if(chartType == "XMR" & showMR) {
+      if(chart_type == "XMR" & showMR) {
         
         data <- data %>%
           dplyr::left_join(p_mr %>%

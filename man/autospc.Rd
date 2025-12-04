@@ -9,7 +9,7 @@ autospc(
   x,
   y,
   n,
-  chartType = NULL,
+  chart_type = NULL,
   periodMin = 21,
   baseline = NULL,
   runRuleLength = 8,
@@ -85,7 +85,7 @@ P' charts.
 \item{n}{Name of column (passed using tidyselect semantics) to use as
 denominator for P and P' charts.}
 
-\item{chartType}{The type of chart you wish to plot. Available options are:
+\item{chart_type}{The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
@@ -255,7 +255,7 @@ control limits.
 # Using a C' chart to track changes in the count of monthly attendance 
 autospc(
   ed_attendances_monthly, 
-  chartType = "C'", 
+  chart_type = "C'", 
   x = Month_Start, 
   y = Att_All
 )
@@ -263,7 +263,7 @@ autospc(
 #Using a P' chart to track changes in the percentage admitted within 4 hours
 autospc(
   ed_attendances_monthly, 
-  chartType = "P'", 
+  chart_type = "P'", 
   x = Month_Start, 
   y = Within_4h, 
   n = Att_All
@@ -272,7 +272,7 @@ autospc(
 #using a runRuleLength of 7 when tracking monthly attendance
 autospc(
   ed_attendances_monthly, 
-  chartType = "C'", 
+  chart_type = "C'", 
   x = Month_Start, 
   y = Att_All,
   runRuleLength = 7

@@ -9,7 +9,7 @@ create_SPC_auto_limits_table(
   chart_type,
   period_min,
   baseline,
-  runRuleLength,
+  shift_rule_threshold,
   maxNoOfExclusions,
   noRegrets,
   verbosity,
@@ -50,7 +50,7 @@ i.e. the minimum number of points required to form control limits.}
 \item{baseline}{Integer, overrides period_min for the first calculation period
 only, if specified}
 
-\item{runRuleLength}{The minimum number of consecutive points above or below
+\item{shift_rule_threshold}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}
 
 \item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
@@ -112,7 +112,7 @@ limits_table <- create_SPC_auto_limits_table(
   chart_type = "C'",
   period_min = 21,
   baseline = NULL,
-  runRuleLength = 8,
+  shift_rule_threshold = 8,
   maxNoOfExclusions = 3,
   noRegrets = TRUE,
   verbosity = 1L,

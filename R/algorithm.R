@@ -20,7 +20,7 @@
 #'   chart_type = "C'",
 #'   period_min = 21,
 #'   baseline = NULL,
-#'   runRuleLength = 8,
+#'   shift_rule_threshold = 8,
 #'   maxNoOfExclusions = 3,
 #'   noRegrets = TRUE,
 #'   verbosity = 1L,
@@ -39,7 +39,7 @@ create_SPC_auto_limits_table <- function(data,
                                          chart_type,
                                          period_min,
                                          baseline,
-                                         runRuleLength,
+                                         shift_rule_threshold,
                                          maxNoOfExclusions,
                                          noRegrets,
                                          verbosity,
@@ -107,7 +107,7 @@ create_SPC_auto_limits_table <- function(data,
       chart_type = chart_type, 
       maxNoOfExclusions  = maxNoOfExclusions, 
       rule2Tolerance = rule2Tolerance,
-      runRuleLength = runRuleLength,
+      shift_rule_threshold = shift_rule_threshold,
       mr_screen_max_loops = mr_screen_max_loops)
     
     limits_table <- record_log_entry(df = limits_table,
@@ -149,10 +149,10 @@ create_SPC_auto_limits_table <- function(data,
           
           # Identify the next rule break to consider as a triggering rule break:
           # Check whether counter is part way through a rule 2 break already,
-          # with at least [runRuleLength] rule 2 break points following.
+          # with at least [shift_rule_threshold] rule 2 break points following.
           if(counter_at_rule_break(df = limits_table,
                                    counter = counter,
-                                   runRuleLength = runRuleLength)){
+                                   shift_rule_threshold = shift_rule_threshold)){
             # If so, set next rule break position to the counter. 
             rule2_break_positions <- NA
             rule2_break_position <- counter
@@ -166,7 +166,7 @@ create_SPC_auto_limits_table <- function(data,
             
           } else {
             # If not, i.e. if either the counter is not within a rule 2 break,
-            # or it is but there are fewer than [runRuleLength] points of the
+            # or it is but there are fewer than [shift_rule_threshold] points of the
             # run following, then scan for start of next rule 2 break.
             rule2_break_positions <- rule2_break_start_positions(
               limits_table = limits_table,
@@ -239,7 +239,7 @@ create_SPC_auto_limits_table <- function(data,
                 chart_type = chart_type,
                 maxNoOfExclusions = maxNoOfExclusions,
                 rule2Tolerance = rule2Tolerance,
-                runRuleLength = runRuleLength,
+                shift_rule_threshold = shift_rule_threshold,
                 mr_screen_max_loops = mr_screen_max_loops)
               
               # Establish whether there is a rule break in the opposite
@@ -251,7 +251,7 @@ create_SPC_auto_limits_table <- function(data,
                 period_min,
                 triggering_rule_break_direction,
                 rule2Tolerance = rule2Tolerance,
-                runRuleLength = runRuleLength,
+                shift_rule_threshold = shift_rule_threshold,
                 overhangingReversions = overhangingReversions)[[1]]
               
               # Establish whether (for no regrets) the final run in the
@@ -308,10 +308,10 @@ create_SPC_auto_limits_table <- function(data,
                 # Check whether:
                 # 1) no further rule breaks have been identified OR
                 # 2) counter is part way through a rule 2 break with at least
-                # [runRuleLength] points of the run following
+                # [shift_rule_threshold] points of the run following
                 if(is.na(rule2_break_positions[2]) | 
                    all(
-                     limits_table$rule2[counter:(counter + runRuleLength - 1)]
+                     limits_table$rule2[counter:(counter + shift_rule_threshold - 1)]
                    )){
                   
                   # If so, advance the counter by 1

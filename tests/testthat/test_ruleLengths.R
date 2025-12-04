@@ -5,35 +5,35 @@ test_data9 <- readRDS("testdata/test_rulelength_data/test_e2e_data_9.rds")
 
 # these tests use the "limitChange" column to check whether limits are 
 # recalculated after 21 points, or if they become display limits, 
-# based on different runRuleLengths
+# based on different shift_rule_thresholds
 test_that("check rule length for run of 6", {
   
   results6 <- autospc(
     test_data6, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 6, 
+    shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data6, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 7, 
+    shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data6, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 8, 
+    shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data6, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 9, 
+    shift_rule_threshold = 9, 
     period_min = 21
     )
   resultslist <- unlist(c(results6[22,"limitChange"], 
@@ -54,28 +54,28 @@ test_that("check rule length for run of 7", {
     test_data7, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 6, 
+    shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data7, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 7, 
+    shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data7, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 8, 
+    shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data7, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 9, 
+    shift_rule_threshold = 9, 
     period_min = 21
     )
   resultslist <- unlist(c(results6[22,"limitChange"], 
@@ -93,28 +93,28 @@ test_that("check rule length for run of 8", {
     test_data8, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 6, 
+    shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data8, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 7, 
+    shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data8, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 8, 
+    shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data8, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 9, 
+    shift_rule_threshold = 9, 
     period_min = 21
     )
   resultslist <- unlist(c(results6[22,"limitChange"], 
@@ -132,28 +132,28 @@ test_that("rule length change for run of 9", {
     test_data9, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 6, 
+    shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data9, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 7, 
+    shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data9, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 8, 
+    shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data9, 
     chart_type = "XMR", 
     plotChart = FALSE, 
-    runRuleLength = 9, 
+    shift_rule_threshold = 9, 
     period_min = 21
     )
   resultslist <- unlist(c(results6[22,"limitChange"], 

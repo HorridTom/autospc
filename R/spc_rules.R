@@ -7,24 +7,24 @@
 
 add_rule_breaks <- function(x,
                             rule2Tolerance,
-                            runRuleLength) {
+                            shift_rule_threshold) {
 
     x <- x %>%
       dplyr::mutate(rule1 = (y > ucl) | (y < lcl)) %>%
       dplyr::mutate(aboveOrBelowCl = dplyr::case_when(abs(y - cl) %<=% rule2Tolerance ~ 0L,
                                                       (y - cl) %>>% rule2Tolerance ~ 1L,
                                                       (y - cl) %<<% -rule2Tolerance ~ -1L)) %>%
-      rule_two(runRuleLength = runRuleLength) %>%
+      rule_two(shift_rule_threshold = shift_rule_threshold) %>%
       dplyr::mutate(rule2 = dplyr::if_else(rule2 & aboveOrBelowCl == 0L, FALSE, rule2)) %>%
       add_highlight() %>%
       dplyr::relocate(aboveOrBelowCl, .after = rule2)
 
 }
 
-rule_two <- function(df, runRuleLength) {
+rule_two <- function(df, shift_rule_threshold) {
 
   runs <- rle(unlist(df$aboveOrBelowCl))
-  rulebreakingruns <- runs$lengths >= runRuleLength
+  rulebreakingruns <- runs$lengths >= shift_rule_threshold
   runs$values <- rulebreakingruns
   partofrun <- inverse.rle(runs)
   df$rule2 <- partofrun

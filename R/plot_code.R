@@ -38,7 +38,7 @@
 #' i.e. the minimum number of points required to form control limits. 
 #' @param baseline Integer, overrides period_min for the first calculation period
 #' only, if specified
-#' @param runRuleLength The minimum number of consecutive points above or below
+#' @param shift_rule_threshold The minimum number of consecutive points above or below
 #' the centre line constituting a shift (or "rule 2") break.
 #' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
 #' extend limits calculated from the first period_min points.
@@ -158,13 +158,13 @@
 #'   n = Att_All
 #' )
 #'
-#' #using a runRuleLength of 7 when tracking monthly attendance
+#' #using a shift_rule_threshold of 7 when tracking monthly attendance
 #' autospc(
 #'   ed_attendances_monthly, 
 #'   chart_type = "C'", 
 #'   x = Month_Start, 
 #'   y = Att_All,
-#'   runRuleLength = 7
+#'   shift_rule_threshold = 7
 #' )
 #' 
 #' @export
@@ -176,7 +176,7 @@ autospc <- function(data,
                           ## Algorithm Parameters
                           period_min = 21,
                           baseline = NULL,
-                          runRuleLength = 8,
+                          shift_rule_threshold = 8,
                           noRecals = FALSE,
                           recalEveryShift = FALSE,
                           noRegrets = TRUE,
@@ -256,7 +256,7 @@ autospc <- function(data,
     chart_type = chart_type, 
     period_min = period_min,
     baseline = baseline,
-    runRuleLength = runRuleLength,
+    shift_rule_threshold = shift_rule_threshold,
     maxNoOfExclusions  = maxNoOfExclusions,
     noRegrets = noRegrets,
     verbosity = verbosity,

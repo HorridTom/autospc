@@ -5,7 +5,7 @@ test_that("Start of subsequent rule 2 breaks identified correctly",{
   
   test_data <- add_rule_breaks(test_data,
                                rule2Tolerance = 0,
-                               runRuleLength = 8L)
+                               shift_rule_threshold = 8L)
   
   results <- rule2_break_start_positions(test_data, counter = 22)
   

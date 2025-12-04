@@ -132,13 +132,13 @@ onwards.
 
 ### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
-threshold for a shift rule break (`runRuleLength`), set to $8$ by default in
+threshold for a shift rule break (`shift_rule_threshold`), set to $8$ by default in
 `autospc()`. In \@ref(fig:example-1), there is a rule-breaking run of
 length 10 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by `autospc`.
 
 Runs that are subsets of longer runs with the same end point count here, so for
-example with the default `runRuleLength = 8`, the run of length 10 in
+example with the default `shift_rule_threshold = 8`, the run of length 10 in
 \@ref(fig:example-1) actually comprises three rule-breaking runs, commencing at
 the first, second and third points in the length 10 run. In this example, the
 first rule-breaking run starts on day 22 and has length 10, the second starts on
@@ -220,7 +220,7 @@ autospc(example_series_2b,
 ```
 
 
-If an opposing rule break only reaches the `runRuleLength` threshold after the
+If an opposing rule break only reaches the `shift_rule_threshold` threshold after the
 end of the candidate calculation period, it is referred to as an
 *overhanging reversion*. Figure \@ref(fig:example-6) shows another alternative 
 continuation of our example time series, this time showing an

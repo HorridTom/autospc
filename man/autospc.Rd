@@ -5,7 +5,7 @@
 \title{Plot SPC charts with automated limit recalculation}
 \usage{
 autospc(
-  df,
+  data,
   x,
   y,
   n,
@@ -57,7 +57,7 @@ autospc(
 )
 }
 \arguments{
-\item{df}{A data frame. For an XMR, C or C' chart, must have columns for:
+\item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
 \itemize{
 \item the subgrouping variable, to be plotted on the horizontal axis, (x);
 \item the variable of interest to be plotted on the vertical axis (y);

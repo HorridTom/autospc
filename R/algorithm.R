@@ -2,18 +2,6 @@
 #'
 #' `create_SPC_auto_limits_table` applies the Stable Shift Algorithm to automate
 #' recalculation of control limits.
-#'
-#' @param data A data frame. For an XMR, C or C' chart, must have columns:
-#' \itemize{
-#'  \item x, the subgrouping variable, to be plotted on the horizontal axis;
-#'  \item y, the variable of interest to be plotted on the vertical axis;
-#' } \cr
-#' For a P or P' chart, must have columns:
-#' \itemize{
-#'  \item x, the subgrouping variable, to be plotted on the horizontal axis;
-#'  \item n, the total count or denominator;
-#'  \item y, the count meeting criteria, or numerator;
-#' }
 #' 
 #' @inheritParams autospc
 #'

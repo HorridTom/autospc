@@ -344,7 +344,7 @@ The data frame that is saved has one row for each log entry, and contains the
 following columns:
 
  - `counter`        : the counter value (row number of the dataframe
- passed to the `df` argument of `autospc()`) that the log entry refers to
+ passed to the `data` argument of `autospc()`) that the log entry refers to
  - `x`              : the value of the `x` column at this counter value (the
  column passed as `x` to `autospc()`)
  - `log_entry`      : the log entry, recorded in shorthand (see below)

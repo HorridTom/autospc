@@ -4,10 +4,10 @@
 \alias{facet_stages}
 \title{facet_stages}
 \usage{
-facet_stages(df, split_rows, plotChart = TRUE, ...)
+facet_stages(data, split_rows, plotChart = TRUE, ...)
 }
 \arguments{
-\item{df}{A data frame. For an XMR, C or C' chart, must have columns for:
+\item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
 \itemize{
 \item the subgrouping variable, to be plotted on the horizontal axis, (x);
 \item the variable of interest to be plotted on the vertical axis (y);

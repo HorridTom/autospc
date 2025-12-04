@@ -20,7 +20,7 @@
 #' )
 #' 
 #' @export  
-facet_stages <- function(df,
+facet_stages <- function(data,
                          split_rows,
                          plotChart = TRUE,
                          ...) {
@@ -46,7 +46,7 @@ facet_stages <- function(df,
   xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
   
   df_rn <- eval(rlang::call2("rename_columns",
-                             df = df,
+                             df = data,
                              !!!xyn_exprs))
   
   preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
@@ -67,20 +67,20 @@ facet_stages <- function(df,
   split_rows <- sort(split_rows)
   
   # Ensure the last split row is the end of the data
-  if(split_rows[length(split_rows)] != nrow(df)) {
+  if(split_rows[length(split_rows)] != nrow(data)) {
     split_rows <- c(split_rows,
-                    nrow(df))
+                    nrow(data))
   }
   
   
-  data_splits_list <- create_splits_list(df = df,
+  data_splits_list <- create_splits_list(df = data,
                                          split_rows = split_rows)
   
   results_splits_list <- lapply(
     data_splits_list,
     function(x) {
       eval(rlang::call2("autospc",
-                        df = x,
+                        data = x,
                         !!!dots_exprs))
     }
   )

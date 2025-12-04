@@ -19,23 +19,23 @@ calc_period_starts <- function(df) {
 test_that(
   "SSA variants perform correctly on first 96 points of example_series_1", {
     
-    result_ssa <- autospc(df = example_series_1[1:96,],
-                                chartType = "XMR",
-                                plotChart = FALSE,
-                                noRegrets = TRUE,
-                                overhangingReversions = TRUE)
+    result_ssa <- autospc(example_series_1[1:96,],
+                          chartType = "XMR",
+                          plotChart = FALSE,
+                          noRegrets = TRUE,
+                          overhangingReversions = TRUE)
     
-    result_nRF_oRT <- autospc(df = example_series_1[1:96,],
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = TRUE)
+    result_nRF_oRT <- autospc(example_series_1[1:96,],
+                              chartType = "XMR",
+                              plotChart = FALSE,
+                              noRegrets = FALSE,
+                              overhangingReversions = TRUE)
     
-    result_nRF_oRF <- autospc(df = example_series_1[1:96,],
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = FALSE)
+    result_nRF_oRF <- autospc(example_series_1[1:96,],
+                              chartType = "XMR",
+                              plotChart = FALSE,
+                              noRegrets = FALSE,
+                              overhangingReversions = FALSE)
     
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
@@ -61,23 +61,23 @@ test_that(
 test_that(
   "SSA variants perform correctly on full example_series_1", {
     
-    result_ssa <- autospc(df = example_series_1,
-                                chartType = "XMR",
-                                plotChart = FALSE,
-                                noRegrets = TRUE,
-                                overhangingReversions = TRUE)
+    result_ssa <- autospc(example_series_1,
+                          chartType = "XMR",
+                          plotChart = FALSE,
+                          noRegrets = TRUE,
+                          overhangingReversions = TRUE)
     
-    result_nRF_oRT <- autospc(df = example_series_1,
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = TRUE)
+    result_nRF_oRT <- autospc(example_series_1,
+                              chartType = "XMR",
+                              plotChart = FALSE,
+                              noRegrets = FALSE,
+                              overhangingReversions = TRUE)
     
-    result_nRF_oRF <- autospc(df = example_series_1,
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = FALSE)
+    result_nRF_oRF <- autospc(example_series_1,
+                              chartType = "XMR",
+                              plotChart = FALSE,
+                              noRegrets = FALSE,
+                              overhangingReversions = FALSE)
     
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()

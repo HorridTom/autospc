@@ -12,11 +12,11 @@ test_that("facet_stages produces correct data output", {
   )
   
   stage2 <- autospc(ed_attendances_monthly %>%
-                            dplyr::filter(dplyr::row_number() <= 60L),
-                          chartType = "C'",
-                          x = Month_Start,
-                          y = Att_All, 
-                          plotChart = FALSE)
+                      dplyr::filter(dplyr::row_number() <= 60L),
+                    chartType = "C'",
+                    x = Month_Start,
+                    y = Att_All, 
+                    plotChart = FALSE)
   
   expect_equal(faceted_results %>%
                  dplyr::group_by(stage) %>%
@@ -93,12 +93,12 @@ test_that("", {
 })
 
 
-test_that("facet_stages works when relying on x,y columns in df", {
+test_that("facet_stages works when relying on x,y columns in data", {
   
   set.seed(1234L)
   
-  result <- facet_stages(df = tibble::tibble(x = 1L:100L,
-                                             y = rnorm(n = 100L)),
+  result <- facet_stages(tibble::tibble(x = 1L:100L,
+                                        y = rnorm(n = 100L)),
                          split_rows = c(30L, 60L),
                          chartType = "XMR",
                          plotChart = FALSE)

@@ -5,17 +5,17 @@ test_that("Bug 90 is fixed: periodMin respected even with NAs", {
   
   # The mnoe_bug_data has missing data such that there is 
   # insufficient data to re-establish limits
-  result_with_missing_data <- autospc(df = mnoe_bug_data,
-                                            chartType = "P'",
-                                            periodMin = 24L,
-                                            maxNoOfExclusions = 0L,
-                                            plotChart = FALSE)
+  result_with_missing_data <- autospc(mnoe_bug_data,
+                                      chartType = "P'",
+                                      periodMin = 24L,
+                                      maxNoOfExclusions = 0L,
+                                      plotChart = FALSE)
   
   # Establish the number of (non-missing) data points within each calculation
   # period in the algorithm results
   calc_period_lengths <- result_with_missing_data %>% 
     dplyr::filter(!is.na(y),
-           periodType == "calculation") %>% 
+                  periodType == "calculation") %>% 
     dplyr::group_by(plotPeriod) %>%
     dplyr::summarise(period_length = dplyr::n())
   

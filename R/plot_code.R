@@ -4,7 +4,7 @@
 #' dataframe, applying the Stable Shift Algorithm to automate recalculation of
 #' control limits.
 #' 
-#' @param df A data frame. For an XMR, C or C' chart, must have columns for:
+#' @param data A data frame. For an XMR, C or C' chart, must have columns for:
 #' \itemize{
 #'  \item the subgrouping variable, to be plotted on the horizontal axis, (x);
 #'  \item the variable of interest to be plotted on the vertical axis (y);
@@ -168,7 +168,7 @@
 #' )
 #' 
 #' @export
-autospc <- function(df,
+autospc <- function(data,
                           x,
                           y,
                           n,
@@ -223,15 +223,15 @@ autospc <- function(df,
                           override_annotation_dist_P = NULL
 ) { 
   
-  df_original <- df
+  df_original <- data
   
   # Rename columns if passed
-  df <- rename_columns(df = df,
+  data <- rename_columns(df = data,
                        x = {{ x }}, y = {{ y }}, n = {{ n }})
   
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(
-    df = df,
+    df = data,
     chartType = chartType,
     title = title,
     subtitle = subtitle,
@@ -241,7 +241,7 @@ autospc <- function(df,
     override_annotation_dist_P = override_annotation_dist_P
   )
   
-  df                  <- preprocessed_vars$df
+  data                <- preprocessed_vars$df
   chartType           <- preprocessed_vars$chartType
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
@@ -251,8 +251,8 @@ autospc <- function(df,
   
   
   # Get control limits
-  df <- create_SPC_auto_limits_table(
-    df,
+  data <- create_SPC_auto_limits_table(
+    data,
     chartType = chartType, 
     periodMin = periodMin,
     baseline = baseline,
@@ -269,7 +269,7 @@ autospc <- function(df,
   )
   
   # Output log data
-  log_output(df,
+  log_output(data,
              verbosity = verbosity,
              chartType = chartType,
              log_file_path = log_file_path)
@@ -277,7 +277,7 @@ autospc <- function(df,
   # Postprocess data
   
   postprocessing_vars <- postprocess(
-    df = df,
+    df = data,
     chartType = chartType,
     periodMin = periodMin,
     showLimits = showLimits,
@@ -289,7 +289,7 @@ autospc <- function(df,
     xType = xType
   )
   
-  df                 <- postprocessing_vars$df
+  data               <- postprocessing_vars$df
   override_x_title   <- postprocessing_vars$override_x_title
   override_y_title   <- postprocessing_vars$override_y_title
   num_non_missing_y  <- postprocessing_vars$num_non_missing_y
@@ -303,8 +303,8 @@ autospc <- function(df,
   # Check whether limits are to be displayed on chart
   if(showLimits & num_non_missing_y >= periodMin){
     
-    df <- postprocess_spc(
-      df = df,
+    data <- postprocess_spc(
+      df = data,
       chartType = chartType,
       highlightExclusions = highlightExclusions,
       floatingMedian = floatingMedian,
@@ -324,7 +324,7 @@ autospc <- function(df,
       mc[["chartType"]] <- "MR"
       if("title" %in% names(mc)) {mc[["title"]] <- NULL}
       if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
-      mc[["df"]] <- rlang::expr(df_original)
+      mc[["data"]] <- rlang::expr(df_original)
       
       p_mr <- eval(mc)
     } else {
@@ -334,7 +334,7 @@ autospc <- function(df,
     if(plotChart){
       
       p <- create_spc_plot(
-        df = df,
+        df = data,
         p_mr = p_mr,
         chartType = chartType,
         xType = xType,
@@ -387,7 +387,7 @@ autospc <- function(df,
       
       if(chartType == "XMR" & showMR) {
         
-        df <- df %>%
+        data <- data %>%
           dplyr::left_join(p_mr %>%
                              dplyr::select(x,
                                            mr = y,
@@ -400,16 +400,16 @@ autospc <- function(df,
                         dplyr::everything())
       }
       
-      df <- df %>%
+      data <- data %>%
         dplyr::filter(!is.na(x))
       
-      return(df)
+      return(data)
     }
     
   } else { # Plot only the time series, without limits
     if(plotChart == TRUE) {
       p <- create_timeseries_plot(
-        df = df,
+        df = data,
         title = title,
         subtitle = subtitle,
         override_x_title = override_x_title,
@@ -421,7 +421,7 @@ autospc <- function(df,
       
       return(p)
     } else {
-      return(df) # Table output
+      return(data) # Table output
     }
   }
 }

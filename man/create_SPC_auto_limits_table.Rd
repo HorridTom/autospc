@@ -22,16 +22,18 @@ create_SPC_auto_limits_table(
 )
 }
 \arguments{
-\item{data}{A data frame. For an XMR, C or C' chart, must have columns:
+\item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
 \itemize{
-\item x, the subgrouping variable, to be plotted on the horizontal axis;
-\item y, the variable of interest to be plotted on the vertical axis;
+\item the subgrouping variable, to be plotted on the horizontal axis, (x);
+\item the variable of interest to be plotted on the vertical axis (y);
+\item and optionally, a title and subtitle for the plot.
 } \cr
-For a P or P' chart, must have columns:
+For a P or P' chart, must have columns for:
 \itemize{
-\item x, the subgrouping variable, to be plotted on the horizontal axis;
-\item n, the total count or denominator;
-\item y, the count meeting criteria, or numerator;
+\item the subgrouping variable, to be plotted on the horizontal axis, (x);
+\item the total count or denominator (n);
+\item the count meeting criteria, or numerator (y);
+\item and optionally, a title and subtitle for the plot.
 }}
 
 \item{chartType}{The type of chart you wish to plot. Available options are:

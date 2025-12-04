@@ -51,7 +51,7 @@ test_e2e_data <- readRDS("testdata/test_e2e_data.rds")
 
 test_that("XMR chart process works end to end",{
   
-  results <- plot_auto_SPC(test_e2e_data,
+  results <- autospc(test_e2e_data,
                            chartType = "XMR",
                            plotChart = FALSE,
                            title = "XMR Chart",
@@ -66,7 +66,7 @@ test_that("XMR chart process works end to end",{
 
 test_that("XMR chart works with numeric y",{
   
-  results <- plot_auto_SPC(test_e2e_data %>%
+  results <- autospc(test_e2e_data %>%
                              dplyr::mutate(y = as.numeric(y)),
                            chartType = "XMR",
                            plotChart = FALSE) %>% 

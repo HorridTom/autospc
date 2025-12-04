@@ -15,7 +15,7 @@
 #'  \item y, the count meeting criteria, or numerator;
 #' }
 #' 
-#' @inheritParams plot_auto_SPC
+#' @inheritParams autospc
 #'
 #' @return data frame with limits, rule breaks and additional info needed for
 #'   plotting

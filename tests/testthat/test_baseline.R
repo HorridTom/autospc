@@ -1,6 +1,6 @@
 test_that("", {
   
-  result_data <- plot_auto_SPC(
+  result_data <- autospc(
     ed_attendances_monthly,
     chartType = "C'",
     x = Month_Start,

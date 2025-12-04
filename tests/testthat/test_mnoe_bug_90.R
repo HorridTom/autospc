@@ -5,7 +5,7 @@ test_that("Bug 90 is fixed: periodMin respected even with NAs", {
   
   # The mnoe_bug_data has missing data such that there is 
   # insufficient data to re-establish limits
-  result_with_missing_data <- plot_auto_SPC(df = mnoe_bug_data,
+  result_with_missing_data <- autospc(df = mnoe_bug_data,
                                             chartType = "P'",
                                             periodMin = 24L,
                                             maxNoOfExclusions = 0L,

@@ -1,11 +1,11 @@
 
 #' facet_stages
-#' @inheritParams plot_auto_SPC
+#' @inheritParams autospc
 #' @param split_rows A vector of row numbers specifying the stages to display
 #' results at. Names specify facet strip labels.
-#' @param ... Arguments passed to [autospc::plot_auto_SPC()]
+#' @param ... Arguments passed to [autospc::autospc()]
 #'
-#' @returns Faceted plot showing results of [autospc::plot_auto_SPC()] at
+#' @returns Faceted plot showing results of [autospc::autospc()] at
 #' different stages as specified by split_rows
 #'
 #' @examples
@@ -79,7 +79,7 @@ facet_stages <- function(df,
   results_splits_list <- lapply(
     data_splits_list,
     function(x) {
-      eval(rlang::call2("plot_auto_SPC",
+      eval(rlang::call2("autospc",
                         df = x,
                         !!!dots_exprs))
     }

@@ -11,7 +11,7 @@ test_that("facet_stages produces correct data output", {
     plotChart = FALSE
   )
   
-  stage2 <- plot_auto_SPC(ed_attendances_monthly %>%
+  stage2 <- autospc(ed_attendances_monthly %>%
                             dplyr::filter(dplyr::row_number() <= 60L),
                           chartType = "C'",
                           x = Month_Start,

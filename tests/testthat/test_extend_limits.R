@@ -10,11 +10,11 @@ test_data <- structure(list(x = 1:21,
                        row.names = c(NA, -21L))
 
 test_that("Limit extension works correctly for C chart", {
-  results_nex <- plot_auto_SPC(test_data,
+  results_nex <- autospc(test_data,
                                chartType = "C",
                                plotChart = FALSE)
   
-  results_ext <- plot_auto_SPC(test_data,
+  results_ext <- autospc(test_data,
                                chartType = "C",
                                plotChart = FALSE,
                                extend_limits_to = 35L)
@@ -54,11 +54,11 @@ test_that("Limit extension works correctly for C chart", {
 
 
 test_that("Limit extension works correctly for P chart", {
-  results_nex <- plot_auto_SPC(test_data,
+  results_nex <- autospc(test_data,
                                chartType = "P",
                                plotChart = FALSE)
   
-  results_ext <- plot_auto_SPC(test_data,
+  results_ext <- autospc(test_data,
                                chartType = "P",
                                plotChart = FALSE,
                                extend_limits_to = 35L)
@@ -116,7 +116,7 @@ test_extend_limits_pp_answer <- readRDS(
 
 test_that("Limit extension works correctly for P-prime chart (regression)", {
   
-  results_ext <- plot_auto_SPC(test_data,
+  results_ext <- autospc(test_data,
                                chartType = "P'",
                                plotChart = FALSE,
                                extend_limits_to = 35L) %>%

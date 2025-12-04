@@ -2,7 +2,6 @@
 % Please edit documentation in R/autospc-package.R
 \docType{package}
 \name{autospc-package}
-\alias{autospc}
 \alias{autospc-package}
 \title{autospc: Automatically Partitioned SPC Charts}
 \description{

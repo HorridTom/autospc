@@ -107,7 +107,7 @@ figure shows a C-chart for the first 35 data points of the simulated
 section we shall interpret as daily values of a count measure of interest.
 
 ```{r example-1, fig.width=7, fig.height=5, fig.cap="Example 1"}
-plot_auto_SPC(example_series_2a %>%
+autospc(example_series_2a %>%
                 filter(row_number() <= 35L),
               override_y_title = "Count",
               chartType = "C",
@@ -133,7 +133,7 @@ onwards.
 ### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
 threshold for a shift rule break (`runRuleLength`), set to $8$ by default in
-`plot_auto_SPC()`. In \@ref(fig:example-1), there is a rule-breaking run of
+`autospc()`. In \@ref(fig:example-1), there is a rule-breaking run of
 length 10 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by `autospc`.
 
@@ -174,7 +174,7 @@ Figure  \@ref(fig:example-3) shows candidate limits established at the start of
 the triggering rule break, i.e. day 22.
 
 ```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
-plot_auto_SPC(example_series_2a,
+autospc(example_series_2a,
               override_y_title = "Count",
               chartType = "C",
               noRecals = TRUE,
@@ -182,7 +182,7 @@ plot_auto_SPC(example_series_2a,
 ```
 
 ```{r example-3, fig.width=7, fig.height=5, fig.cap="Example 3"}
-plot_auto_SPC(example_series_2a,
+autospc(example_series_2a,
               override_y_title = "Count",
               chartType = "C",
               extend_limits_to = 47L)
@@ -204,7 +204,7 @@ triggering rule break, i.e. from day 22. There is an opposing rule break in
 Figure \@ref(fig:example-5), commencing on day 31.
 
 ```{r example-4, fig.width=7, fig.height=5, fig.cap="Example 4"}
-plot_auto_SPC(example_series_2b,
+autospc(example_series_2b,
               override_y_title = "Count",
               chartType = "C",
               noRecals = TRUE,
@@ -212,7 +212,7 @@ plot_auto_SPC(example_series_2b,
 ```
 
 ```{r example-5, fig.width=7, fig.height=5, fig.cap="Example 5"}
-plot_auto_SPC(example_series_2b,
+autospc(example_series_2b,
               override_y_title = "Count",
               chartType = "C",
               recalEveryShift = TRUE,
@@ -227,7 +227,7 @@ continuation of our example time series, this time showing an
 overhanging reversion commencing on day 40, against the candidate limits.
 
 ```{r example-6, fig.width=7, fig.height=5, fig.cap="Example 6"}
-plot_auto_SPC(example_series_2c,
+autospc(example_series_2c,
               override_y_title = "Count",
               chartType = "C",
               recalEveryShift = TRUE)
@@ -241,7 +241,7 @@ implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
 with values ranging from 17 to 25 points.
 
-In `plot_auto_SPC()`, $n_{min}$ is specified by the `periodMin` argument,
+In `autospc()`, $n_{min}$ is specified by the `periodMin` argument,
 defaulting to 21. This default is above the commonly recommended minimum values
 and represents a convenient choice for daily data, since it is a multiple of 7.
 This means that in the presence of weekly "seasonal" (periodic) variation over
@@ -317,11 +317,11 @@ given timeseries, there are two ways you can do this.
 ## Print log to console
 
 To print a log out to the console, set the `verbosity` argument of
-`plot_auto_SPC()` to either `1` (for basic log information) or `2` (for full
+`autospc()` to either `1` (for basic log information) or `2` (for full
 detail).
 
 ```{r 6.1, fig.width=7, fig.height=4.3}
-plot_auto_SPC(
+autospc(
   ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
@@ -336,7 +336,7 @@ plot_auto_SPC(
 ## Save log to a file
 
 To save the log to a file, provide a file path using the `log_file_path`
-argument of `plot_auto_SPC()`. If the file path you provide ends `".rds"` the
+argument of `autospc()`. If the file path you provide ends `".rds"` the
 log will be saved to an rds file, if it ends `".csv"` the log will be saved to a
 csv file. 
 
@@ -344,9 +344,9 @@ The data frame that is saved has one row for each log entry, and contains the
 following columns:
 
  - `counter`        : the counter value (row number of the dataframe
- passed to the `df` argument of `plot_auto_SPC()`) that the log entry refers to
+ passed to the `df` argument of `autospc()`) that the log entry refers to
  - `x`              : the value of the `x` column at this counter value (the
- column passed as `x` to `plot_auto_SPC()`)
+ column passed as `x` to `autospc()`)
  - `log_entry`      : the log entry, recorded in shorthand (see below)
  - `interpretation` : text interpretation of the log entry
  

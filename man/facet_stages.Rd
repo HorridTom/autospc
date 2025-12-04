@@ -28,10 +28,10 @@ results at. Names specify facet strip labels.}
 data is returned with centre line, control limits and other analytic output
 appended as columns.}
 
-\item{...}{Arguments passed to \code{\link[=plot_auto_SPC]{plot_auto_SPC()}}}
+\item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
 }
 \value{
-Faceted plot showing results of \code{\link[=plot_auto_SPC]{plot_auto_SPC()}} at
+Faceted plot showing results of \code{\link[=autospc]{autospc()}} at
 different stages as specified by split_rows
 }
 \description{

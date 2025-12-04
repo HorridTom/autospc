@@ -63,13 +63,13 @@ test_data3 <- data.frame(x = 1:50,
 
 test_that("P charts with zero attendances error handle",{
   
-  result1 <- plot_auto_SPC(test_data1, chartType = "P'", plotChart = FALSE, periodMin = 21) %>%
+  result1 <- autospc(test_data1, chartType = "P'", plotChart = FALSE, periodMin = 21) %>%
     dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
   
-  result2 <- plot_auto_SPC(test_data2, chartType = "P'", plotChart = FALSE, periodMin = 21) %>%
+  result2 <- autospc(test_data2, chartType = "P'", plotChart = FALSE, periodMin = 21) %>%
     dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
   
-  result3 <- plot_auto_SPC(test_data3, chartType = "P'", plotChart = FALSE, periodMin = 21) %>%
+  result3 <- autospc(test_data3, chartType = "P'", plotChart = FALSE, periodMin = 21) %>%
     dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
   
   testthat::expect_equal(all(is.na(result1$y[24:28])), TRUE)

@@ -11,7 +11,7 @@ autospc provides a rigorous and consistent means of re-establishing limits on
 Shewhart charts (also known as control charts), using the
 _Stable Shift Algorithm_.
 
-The main function is `plot_auto_SPC()`, which plots Shewhart charts of various
+The main function is `autospc()`, which plots Shewhart charts of various
 types appropriate for different types of data, with limits established using the
 algorithm.
 
@@ -44,15 +44,15 @@ loaded.
 For a **C, C' or XmR** chart the data must have the following columns:
 
 * Your x-axis variable: date, POSIXct, numeric or integer type. The name of this
-column can be specified in the `x` argument of `plot_auto_SPC()`.
+column can be specified in the `x` argument of `autospc()`.
 
 * Your y-axis variable : numeric or integer type. The name of this column can be
-specified in the `y` argument of the `plot_auto_SPC()` function.
+specified in the `y` argument of the `autospc()` function.
 
 For example:
 
 ```
-plot_auto_SPC(ed_attendances_monthly,
+autospc(ed_attendances_monthly,
                 chartType = "C'",
                 x = Month_Start,
                 y = Att_All)
@@ -61,20 +61,20 @@ plot_auto_SPC(ed_attendances_monthly,
 For a **P or P'** chart the data must have the following columns:
 
 * Your x-axis variable: date, POSIXct, numeric or integer type. The name of this
-column can be specified in the `x` argument of `plot_auto_SPC()`.
+column can be specified in the `x` argument of `autospc()`.
 
 * The denominator or total count (e.g. number of ED attendances): numeric or
 integer type. The name of this column can be specified in the `n` argument of
-`plot_auto_SPC()`.
+`autospc()`.
 
 * The numerator (e.g. number of ED attendances less than 4 hours in duration): 
 numeric or integer type. The name of this column can be specified in the `y`
-argument of `plot_auto_SPC()`.
+argument of `autospc()`.
 
 For example:
 
 ```
-plot_auto_SPC(ed_attendances_monthly,
+autospc(ed_attendances_monthly,
                 chartType = "P'",
                 x = Month_Start,
                 y = Within_4h,
@@ -82,7 +82,7 @@ plot_auto_SPC(ed_attendances_monthly,
 ```
 
 The parameters of the Stable Shift Algorithm, and the appearance of the chart,
-can be configured through various arguments. Use `?autospc::plot_auto_SPC` to
+can be configured through various arguments. Use `?autospc::autospc` to
 find out more.
 
 ### Analysis output as a table
@@ -91,7 +91,7 @@ In addition to the default plot output, analysis results can be obtained in
 table format using `plotChart = FALSE`, as follows:
 
 ```
-limits_table <- plot_auto_SPC(ed_attendances_monthly,
+limits_table <- autospc(ed_attendances_monthly,
                               chartType = "P'",
                               x = Month_Start,
                               y = Within_4h,

@@ -19,19 +19,19 @@ calc_period_starts <- function(df) {
 test_that(
   "SSA variants perform correctly on first 96 points of example_series_1", {
     
-    result_ssa <- plot_auto_SPC(df = example_series_1[1:96,],
+    result_ssa <- autospc(df = example_series_1[1:96,],
                                 chartType = "XMR",
                                 plotChart = FALSE,
                                 noRegrets = TRUE,
                                 overhangingReversions = TRUE)
     
-    result_nRF_oRT <- plot_auto_SPC(df = example_series_1[1:96,],
+    result_nRF_oRT <- autospc(df = example_series_1[1:96,],
                                     chartType = "XMR",
                                     plotChart = FALSE,
                                     noRegrets = FALSE,
                                     overhangingReversions = TRUE)
     
-    result_nRF_oRF <- plot_auto_SPC(df = example_series_1[1:96,],
+    result_nRF_oRF <- autospc(df = example_series_1[1:96,],
                                     chartType = "XMR",
                                     plotChart = FALSE,
                                     noRegrets = FALSE,
@@ -61,19 +61,19 @@ test_that(
 test_that(
   "SSA variants perform correctly on full example_series_1", {
     
-    result_ssa <- plot_auto_SPC(df = example_series_1,
+    result_ssa <- autospc(df = example_series_1,
                                 chartType = "XMR",
                                 plotChart = FALSE,
                                 noRegrets = TRUE,
                                 overhangingReversions = TRUE)
     
-    result_nRF_oRT <- plot_auto_SPC(df = example_series_1,
+    result_nRF_oRT <- autospc(df = example_series_1,
                                     chartType = "XMR",
                                     plotChart = FALSE,
                                     noRegrets = FALSE,
                                     overhangingReversions = TRUE)
     
-    result_nRF_oRF <- plot_auto_SPC(df = example_series_1,
+    result_nRF_oRF <- autospc(df = example_series_1,
                                     chartType = "XMR",
                                     plotChart = FALSE,
                                     noRegrets = FALSE,
@@ -103,7 +103,7 @@ test_that(
 test_that("warning is issued if incompatible variant requested", {
   
   expect_warning(
-    plot_auto_SPC(
+    autospc(
       ed_attendances_monthly, 
       chartType = "C'", 
       x = Month_Start, 

@@ -8,11 +8,11 @@ test_that("Renaming columns doesn't change the result",{
   test_data2 <- test_data %>%
     dplyr::select(month = x, count = y)
   
-  result1 <- plot_auto_SPC(test_data1,
+  result1 <- autospc(test_data1,
                            chartType = "C'",
                            plotChart = FALSE)
   
-  result2 <- plot_auto_SPC(test_data2,
+  result2 <- autospc(test_data2,
                            x = month,
                            y = count,
                            chartType = "C'",

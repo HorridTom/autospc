@@ -1,6 +1,6 @@
 #' Plot SPC charts with automated limit recalculation
 #' 
-#' `plot_auto_SPC()` creates a statistical process control chart from a
+#' `autospc()` creates a statistical process control chart from a
 #' dataframe, applying the Stable Shift Algorithm to automate recalculation of
 #' control limits.
 #' 
@@ -142,7 +142,7 @@
 #'
 #' @examples 
 #' # Using a C' chart to track changes in the count of monthly attendance 
-#' plot_auto_SPC(
+#' autospc(
 #'   ed_attendances_monthly, 
 #'   chartType = "C'", 
 #'   x = Month_Start, 
@@ -150,7 +150,7 @@
 #' )
 #'    
 #' #Using a P' chart to track changes in the percentage admitted within 4 hours
-#' plot_auto_SPC(
+#' autospc(
 #'   ed_attendances_monthly, 
 #'   chartType = "P'", 
 #'   x = Month_Start, 
@@ -159,7 +159,7 @@
 #' )
 #'
 #' #using a runRuleLength of 7 when tracking monthly attendance
-#' plot_auto_SPC(
+#' autospc(
 #'   ed_attendances_monthly, 
 #'   chartType = "C'", 
 #'   x = Month_Start, 
@@ -168,7 +168,7 @@
 #' )
 #' 
 #' @export
-plot_auto_SPC <- function(df,
+autospc <- function(df,
                           x,
                           y,
                           n,

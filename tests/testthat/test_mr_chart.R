@@ -27,23 +27,23 @@ test_that("mR chart limits the same as qicharts2 v.0.7.2",{
 
 test_that("mR chart created without error",{
   expect_no_error(
-    chart <- plot_auto_SPC(df = mr_data, chartType = "MR", plotChart = TRUE)
+    chart <- autospc(df = mr_data, chartType = "MR", plotChart = TRUE)
   )
 })
 
 test_that("mr_screen_max_loops makes no difference to mr chart limits",{
   
-  results_table_0 <- plot_auto_SPC(df = extreme_mr_data,
+  results_table_0 <- autospc(df = extreme_mr_data,
                                    chartType = "MR",
                                    plotChart = FALSE,
                                    mr_screen_max_loops = 0)
   
-  results_table_1 <- plot_auto_SPC(df = extreme_mr_data,
+  results_table_1 <- autospc(df = extreme_mr_data,
                                    chartType = "MR",
                                    plotChart = FALSE,
                                    mr_screen_max_loops = 1)
   
-  results_table_inf <- plot_auto_SPC(df = extreme_mr_data,
+  results_table_inf <- autospc(df = extreme_mr_data,
                                    chartType = "MR",
                                    plotChart = FALSE,
                                    mr_screen_max_loops = Inf)

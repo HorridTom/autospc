@@ -49,7 +49,7 @@ correct_log_df <- structure(
 
 
 invisible(capture.output(
-  df_out <- autospc::plot_auto_SPC(test_data,
+  df_out <- autospc::autospc(test_data,
                                    chartType = "P",
                                    verbosity = 2L,
                                    plotChart = FALSE)

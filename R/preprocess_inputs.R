@@ -61,9 +61,9 @@ preprocess_inputs <- function(
     
     lifecycle::deprecate_warn(
       when = "0.0.0.9010",
-      what = I(paste0("plot_auto_SPC(override_annotation_dist,",
+      what = I(paste0("autospc(override_annotation_dist,",
                       "override_annotation_dist_P)")),
-      details = I(paste0("Please use `plot_auto_SPC(upper_annotation_sf, ",
+      details = I(paste0("Please use `autospc(upper_annotation_sf, ",
                          "lower_annotation_sf)` instead. ",
                          "Note that equivalent new arguments can be obtained ",
                          "from the old by transforming as follows: 1+1/x. ",

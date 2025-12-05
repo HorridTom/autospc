@@ -17,7 +17,7 @@ autospc(
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
-  maxNoOfExclusions = 3,
+  max_exclusions = 3,
   highlightExclusions = TRUE,
   mr_screen_max_loops = 1L,
   rule2Tolerance = 0,
@@ -122,7 +122,7 @@ Parameters that control how cetnre line and control limits are established
 for each period, and details of how SPC rules are applied
 }}
 
-\item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
+\item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations.}
 
 \item{highlightExclusions}{Boolean signifying whether excluded points are

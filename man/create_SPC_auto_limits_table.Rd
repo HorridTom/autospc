@@ -10,7 +10,7 @@ create_SPC_auto_limits_table(
   period_min,
   baseline_length,
   shift_rule_threshold,
-  maxNoOfExclusions,
+  max_exclusions,
   no_regrets,
   verbosity,
   baseline_only,
@@ -53,7 +53,7 @@ only, if specified}
 \item{shift_rule_threshold}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}
 
-\item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
+\item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations.}
 
 \item{no_regrets}{Boolean signifying which version of the algorithm should be
@@ -113,7 +113,7 @@ limits_table <- create_SPC_auto_limits_table(
   period_min = 21,
   baseline_length = NULL,
   shift_rule_threshold = 8,
-  maxNoOfExclusions = 3,
+  max_exclusions = 3,
   no_regrets = TRUE,
   verbosity = 1L,
   baseline_only = FALSE,

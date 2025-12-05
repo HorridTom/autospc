@@ -37,7 +37,7 @@ form_calculation_limits <- function(data,
                                     period_min,
                                     baseline_length,
                                     chart_type = "C",
-                                    maxNoOfExclusions = 3,
+                                    max_exclusions = 3,
                                     rule2Tolerance,
                                     shift_rule_threshold,
                                     mr_screen_max_loops){
@@ -60,7 +60,7 @@ form_calculation_limits <- function(data,
                                     chart_type = chart_type,
                                     counter = counter,
                                     period_min = periodLength,
-                                    maxNoOfExclusions = maxNoOfExclusions,
+                                    max_exclusions = max_exclusions,
                                     rule2Tolerance = rule2Tolerance,
                                     shift_rule_threshold = shift_rule_threshold,
                                     mr_screen_max_loops = mr_screen_max_loops)
@@ -173,7 +173,7 @@ find_extremes <- function(data,
                           chart_type,
                           counter,
                           period_min,
-                          maxNoOfExclusions,
+                          max_exclusions,
                           rule2Tolerance,
                           shift_rule_threshold,
                           mr_screen_max_loops){
@@ -183,7 +183,7 @@ find_extremes <- function(data,
   exclusion_points <- NULL
   furthest_extremes <- NULL
   
-  while(i <= maxNoOfExclusions){
+  while(i <= max_exclusions){
     
     calculation_period <- data[counter:(counter + period_min - 1),]
     
@@ -243,8 +243,8 @@ find_extremes <- function(data,
   }
 
   #check whether there are more than 3 exclusion points (due to points with the same values)
-  if(length(exclusion_points) > maxNoOfExclusions){
-    exclusion_points <- exclusion_points[1:maxNoOfExclusions]
+  if(length(exclusion_points) > max_exclusions){
+    exclusion_points <- exclusion_points[1:max_exclusions]
   }
   
   if(length(exclusion_points) == 0){
@@ -503,7 +503,7 @@ form_calculation_and_display_limits <- function(data,
                                                 baseline_length,
                                                 counter_at_period_start, 
                                                 chart_type,
-                                                maxNoOfExclusions,
+                                                max_exclusions,
                                                 rule2Tolerance,
                                                 shift_rule_threshold,
                                                 mr_screen_max_loops){
@@ -514,7 +514,7 @@ form_calculation_and_display_limits <- function(data,
                                           baseline_length = baseline_length,
                                           counter = counter_at_period_start,
                                           chart_type = chart_type,
-                                          maxNoOfExclusions = maxNoOfExclusions,
+                                          max_exclusions = max_exclusions,
                                           rule2Tolerance = rule2Tolerance,
                                           shift_rule_threshold = shift_rule_threshold,
                                           mr_screen_max_loops = mr_screen_max_loops)

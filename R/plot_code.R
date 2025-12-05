@@ -55,7 +55,7 @@
 #' ## SPC Parameters
 #' Parameters that control how cetnre line and control limits are established
 #' for each period, and details of how SPC rules are applied
-#' @param maxNoOfExclusions The maximum number of extreme points to exclude from 
+#' @param max_exclusions The maximum number of extreme points to exclude from 
 #' limit calculations.
 #' @param highlightExclusions Boolean signifying whether excluded points are
 #' greyed out.
@@ -182,7 +182,7 @@ autospc <- function(data,
                           no_regrets = TRUE,
                           overhanging_reversions = TRUE,
                           ## SPC Parameters
-                          maxNoOfExclusions = 3,
+                          max_exclusions = 3,
                           highlightExclusions = TRUE,
                           mr_screen_max_loops = 1L,
                           rule2Tolerance = 0,
@@ -257,7 +257,7 @@ autospc <- function(data,
     period_min = period_min,
     baseline_length = baseline_length,
     shift_rule_threshold = shift_rule_threshold,
-    maxNoOfExclusions  = maxNoOfExclusions,
+    max_exclusions  = max_exclusions,
     no_regrets = no_regrets,
     verbosity = verbosity,
     baseline_only = baseline_only,

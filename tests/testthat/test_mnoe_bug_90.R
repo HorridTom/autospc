@@ -8,7 +8,7 @@ test_that("Bug 90 is fixed: period_min respected even with NAs", {
   result_with_missing_data <- autospc(mnoe_bug_data,
                                       chart_type = "P'",
                                       period_min = 24L,
-                                      maxNoOfExclusions = 0L,
+                                      max_exclusions = 0L,
                                       plotChart = FALSE)
   
   # Establish the number of (non-missing) data points within each calculation

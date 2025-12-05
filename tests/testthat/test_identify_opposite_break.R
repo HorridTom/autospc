@@ -78,7 +78,7 @@ test_that("Rule 2 break within candidate period in opposite direction identified
 test_that("Opposite rule break after candidate calc period doesn't prevent recalculation",{
   #should recalc
   test_op_break6 <- autospc(test_op_break6_data,
-                                  noRegrets = TRUE,
+                                  no_regrets = TRUE,
                                   chart_type = "C'",
                                   plotChart = FALSE)
   

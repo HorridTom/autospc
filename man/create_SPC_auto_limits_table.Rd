@@ -11,7 +11,7 @@ create_SPC_auto_limits_table(
   baseline_length,
   shift_rule_threshold,
   maxNoOfExclusions,
-  noRegrets,
+  no_regrets,
   verbosity,
   baseline_only,
   establish_every_shift,
@@ -56,7 +56,7 @@ the centre line constituting a shift (or "rule 2") break.}
 \item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
 limit calculations.}
 
-\item{noRegrets}{Boolean signifying which version of the algorithm should be
+\item{no_regrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
@@ -80,7 +80,7 @@ and control limits}
 \item{overhangingReversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.
+calculation period. Set to FALSE only with no_regrets = FALSE.
 \subsection{SPC Parameters}{
 
 Parameters that control how cetnre line and control limits are established
@@ -114,7 +114,7 @@ limits_table <- create_SPC_auto_limits_table(
   baseline_length = NULL,
   shift_rule_threshold = 8,
   maxNoOfExclusions = 3,
-  noRegrets = TRUE,
+  no_regrets = TRUE,
   verbosity = 1L,
   baseline_only = FALSE,
   establish_every_shift = FALSE,

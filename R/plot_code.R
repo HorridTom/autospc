@@ -45,12 +45,12 @@
 #' @param establish_every_shift Boolean - whether to bypass the Stable Shift Algorithm
 #' and simply re-establish limits at every shift rule break (respecting
 #' period_min)
-#' @param noRegrets Boolean signifying which version of the algorithm should be
+#' @param no_regrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhangingReversions Boolean determining whether rule breaks in the
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
-#' calculation period. Set to FALSE only with noRegrets = FALSE.
+#' calculation period. Set to FALSE only with no_regrets = FALSE.
 #' 
 #' ## SPC Parameters
 #' Parameters that control how cetnre line and control limits are established
@@ -179,7 +179,7 @@ autospc <- function(data,
                           shift_rule_threshold = 8,
                           baseline_only = FALSE,
                           establish_every_shift = FALSE,
-                          noRegrets = TRUE,
+                          no_regrets = TRUE,
                           overhangingReversions = TRUE,
                           ## SPC Parameters
                           maxNoOfExclusions = 3,
@@ -258,7 +258,7 @@ autospc <- function(data,
     baseline_length = baseline_length,
     shift_rule_threshold = shift_rule_threshold,
     maxNoOfExclusions  = maxNoOfExclusions,
-    noRegrets = noRegrets,
+    no_regrets = no_regrets,
     verbosity = verbosity,
     baseline_only = baseline_only,
     establish_every_shift = establish_every_shift,

@@ -9,7 +9,7 @@ test_that("Calculation period is correct length",{
                                      chart_type = "C'",
                                      period_min = period_min,
                                      plotChart = FALSE,
-                                     noRegrets = TRUE)
+                                     no_regrets = TRUE)
   
   calculation_period_lengths <- algorithm_results %>% 
     dplyr::filter(periodType == "calculation") %>% 

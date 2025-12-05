@@ -22,7 +22,7 @@
 #'   baseline_length = NULL,
 #'   shift_rule_threshold = 8,
 #'   maxNoOfExclusions = 3,
-#'   noRegrets = TRUE,
+#'   no_regrets = TRUE,
 #'   verbosity = 1L,
 #'   baseline_only = FALSE,
 #'   establish_every_shift = FALSE,
@@ -41,7 +41,7 @@ create_SPC_auto_limits_table <- function(data,
                                          baseline_length,
                                          shift_rule_threshold,
                                          maxNoOfExclusions,
-                                         noRegrets,
+                                         no_regrets,
                                          verbosity,
                                          baseline_only,
                                          establish_every_shift,
@@ -51,9 +51,9 @@ create_SPC_auto_limits_table <- function(data,
                                          mr_screen_max_loops
 ) {
   
-  if(noRegrets & !overhangingReversions) {
-    warning(paste0("Setting noRegrets = TRUE and overhangingReversions = ",
-                   "FALSE does not make sense, since noRegrets requires ",
+  if(no_regrets & !overhangingReversions) {
+    warning(paste0("Setting no_regrets = TRUE and overhangingReversions = ",
+                   "FALSE does not make sense, since no_regrets requires ",
                    "consideration of overhanging reversions. Changing ",
                    "overhangingReversions to TRUE."))
     overhangingReversions <- TRUE
@@ -275,12 +275,12 @@ create_SPC_auto_limits_table <- function(data,
               # Check whether either we recalculate at every shift OR:
               # 1) There is no opposing rule break AND
               # 2) Either:
-              #     a) noRegrets is FALSE OR
+              #     a) no_regrets is FALSE OR
               #     b) the final run does not prevent re-establishment of limits
               if(establish_every_shift |
                  (!opposite_rule_break &
-                  ((noRegrets == TRUE & !final_run_prevents) |
-                   noRegrets == FALSE))){
+                  ((no_regrets == TRUE & !final_run_prevents) |
+                   no_regrets == FALSE))){
                 # [7a] If so, re-establish limits at the counter, confirming the
                 # candidate limits
                 

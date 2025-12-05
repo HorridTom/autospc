@@ -11,9 +11,9 @@ autospc(
   n,
   chart_type = NULL,
   period_min = 21,
-  baseline = NULL,
+  baseline_length = NULL,
   shift_rule_threshold = 8,
-  noRecals = FALSE,
+  baseline_only = FALSE,
   recalEveryShift = FALSE,
   noRegrets = TRUE,
   overhangingReversions = TRUE,
@@ -96,13 +96,13 @@ control limits.
 \item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline}{Integer, overrides period_min for the first calculation period
+\item{baseline_length}{Integer, overrides period_min for the first calculation period
 only, if specified}
 
 \item{shift_rule_threshold}{The minimum number of consecutive points above or below
 the centre line constituting a shift (or "rule 2") break.}
 
-\item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
+\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first period_min points.}
 
 \item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm

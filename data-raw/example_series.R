@@ -1,5 +1,5 @@
 # Construct a time series with the following features:
-# 1. A stable baseline + some stable extension
+# 1. A stable baseline_length + some stable extension
 # 2. A triggering rule break, candidate limits rejected due to opposing run
 #    entirely contained within the candidate period.
 # 3. A triggering rule break, with no opposing run or possibility of one through

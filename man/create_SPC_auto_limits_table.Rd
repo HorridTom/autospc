@@ -8,12 +8,12 @@ create_SPC_auto_limits_table(
   data,
   chart_type,
   period_min,
-  baseline,
+  baseline_length,
   shift_rule_threshold,
   maxNoOfExclusions,
   noRegrets,
   verbosity,
-  noRecals,
+  baseline_only,
   recalEveryShift,
   rule2Tolerance,
   showLimits,
@@ -47,7 +47,7 @@ control limits.
 \item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline}{Integer, overrides period_min for the first calculation period
+\item{baseline_length}{Integer, overrides period_min for the first calculation period
 only, if specified}
 
 \item{shift_rule_threshold}{The minimum number of consecutive points above or below
@@ -63,7 +63,7 @@ used. Defines whether limits can change as more data is added or not.}
 standard output log; the higher the number the more information is provided,
 none if 0.}
 
-\item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
+\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first period_min points.}
 
 \item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
@@ -111,12 +111,12 @@ limits_table <- create_SPC_auto_limits_table(
   df,
   chart_type = "C'",
   period_min = 21,
-  baseline = NULL,
+  baseline_length = NULL,
   shift_rule_threshold = 8,
   maxNoOfExclusions = 3,
   noRegrets = TRUE,
   verbosity = 1L,
-  noRecals = FALSE,
+  baseline_only = FALSE,
   recalEveryShift = FALSE,
   rule2Tolerance = 0,
   showLimits = TRUE,

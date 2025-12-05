@@ -36,11 +36,11 @@
 #' control limits.
 #' @param period_min The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
-#' @param baseline Integer, overrides period_min for the first calculation period
+#' @param baseline_length Integer, overrides period_min for the first calculation period
 #' only, if specified
 #' @param shift_rule_threshold The minimum number of consecutive points above or below
 #' the centre line constituting a shift (or "rule 2") break.
-#' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
+#' @param baseline_only Boolean - if TRUE, do not recalculate control limits, instead
 #' extend limits calculated from the first period_min points.
 #' @param recalEveryShift Boolean - whether to bypass the Stable Shift Algorithm
 #' and simply re-establish limits at every shift rule break (respecting
@@ -175,9 +175,9 @@ autospc <- function(data,
                           chart_type = NULL,
                           ## Algorithm Parameters
                           period_min = 21,
-                          baseline = NULL,
+                          baseline_length = NULL,
                           shift_rule_threshold = 8,
-                          noRecals = FALSE,
+                          baseline_only = FALSE,
                           recalEveryShift = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
@@ -255,12 +255,12 @@ autospc <- function(data,
     data,
     chart_type = chart_type, 
     period_min = period_min,
-    baseline = baseline,
+    baseline_length = baseline_length,
     shift_rule_threshold = shift_rule_threshold,
     maxNoOfExclusions  = maxNoOfExclusions,
     noRegrets = noRegrets,
     verbosity = verbosity,
-    noRecals = noRecals,
+    baseline_only = baseline_only,
     recalEveryShift = recalEveryShift,
     rule2Tolerance = rule2Tolerance,
     showLimits = showLimits,

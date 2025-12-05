@@ -177,7 +177,7 @@ the triggering rule break, i.e. day 22.
 autospc(example_series_2a,
               override_y_title = "Count",
               chart_type = "C",
-              noRecals = TRUE,
+              baseline_only = TRUE,
               extend_limits_to = 47L)
 ```
 
@@ -207,7 +207,7 @@ Figure \@ref(fig:example-5), commencing on day 31.
 autospc(example_series_2b,
               override_y_title = "Count",
               chart_type = "C",
-              noRecals = TRUE,
+              baseline_only = TRUE,
               extend_limits_to = 47L)
 ```
 

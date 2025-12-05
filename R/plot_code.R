@@ -57,7 +57,7 @@
 #' for each period, and details of how SPC rules are applied
 #' @param max_exclusions The maximum number of extreme points to exclude from 
 #' limit calculations.
-#' @param highlightExclusions Boolean signifying whether excluded points are
+#' @param highlight_exclusions Boolean signifying whether excluded points are
 #' greyed out.
 #' @param mr_screen_max_loops Integer or Inf specifying maximum number of times
 #' to recursively ignore mr values above the upper range limit when calculating
@@ -183,7 +183,7 @@ autospc <- function(data,
                           overhanging_reversions = TRUE,
                           ## SPC Parameters
                           max_exclusions = 3,
-                          highlightExclusions = TRUE,
+                          highlight_exclusions = TRUE,
                           mr_screen_max_loops = 1L,
                           rule2Tolerance = 0,
                           floatingMedian = "no",
@@ -306,7 +306,7 @@ autospc <- function(data,
     data <- postprocess_spc(
       df = data,
       chart_type = chart_type,
-      highlightExclusions = highlightExclusions,
+      highlight_exclusions = highlight_exclusions,
       floatingMedian = floatingMedian,
       floatingMedian_n = floatingMedian_n,
       extend_limits_to = extend_limits_to,

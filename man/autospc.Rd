@@ -18,7 +18,7 @@ autospc(
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
   max_exclusions = 3,
-  highlightExclusions = TRUE,
+  highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   rule2Tolerance = 0,
   floatingMedian = "no",
@@ -125,7 +125,7 @@ for each period, and details of how SPC rules are applied
 \item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations.}
 
-\item{highlightExclusions}{Boolean signifying whether excluded points are
+\item{highlight_exclusions}{Boolean signifying whether excluded points are
 greyed out.}
 
 \item{mr_screen_max_loops}{Integer or Inf specifying maximum number of times

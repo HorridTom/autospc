@@ -111,7 +111,7 @@ postprocess <- function(
 postprocess_spc <- function(
     df,
     chart_type,
-    highlightExclusions,
+    highlight_exclusions,
     floatingMedian,
     floatingMedian_n,
     extend_limits_to,
@@ -133,7 +133,7 @@ postprocess_spc <- function(
   # ??NEEDED?? Store break points as vector
   breakPoints <- which(df$breakPoint)
   
-  if(highlightExclusions) {
+  if(highlight_exclusions) {
     # Show exclusions on chart
     df <- df %>% dplyr::mutate(
       highlight = ifelse(excluded & !is.na(excluded),

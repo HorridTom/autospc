@@ -25,7 +25,7 @@
 #'   noRegrets = TRUE,
 #'   verbosity = 1L,
 #'   baseline_only = FALSE,
-#'   recalEveryShift = FALSE,
+#'   establish_every_shift = FALSE,
 #'   rule2Tolerance = 0,
 #'   showLimits = TRUE,
 #'   overhangingReversions = TRUE,
@@ -44,7 +44,7 @@ create_SPC_auto_limits_table <- function(data,
                                          noRegrets,
                                          verbosity,
                                          baseline_only,
-                                         recalEveryShift,
+                                         establish_every_shift,
                                          rule2Tolerance,
                                          showLimits,
                                          overhangingReversions,
@@ -277,7 +277,7 @@ create_SPC_auto_limits_table <- function(data,
               # 2) Either:
               #     a) noRegrets is FALSE OR
               #     b) the final run does not prevent re-establishment of limits
-              if(recalEveryShift |
+              if(establish_every_shift |
                  (!opposite_rule_break &
                   ((noRegrets == TRUE & !final_run_prevents) |
                    noRegrets == FALSE))){

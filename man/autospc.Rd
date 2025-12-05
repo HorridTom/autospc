@@ -14,7 +14,7 @@ autospc(
   baseline_length = NULL,
   shift_rule_threshold = 8,
   baseline_only = FALSE,
-  recalEveryShift = FALSE,
+  establish_every_shift = FALSE,
   noRegrets = TRUE,
   overhangingReversions = TRUE,
   maxNoOfExclusions = 3,
@@ -105,7 +105,7 @@ the centre line constituting a shift (or "rule 2") break.}
 \item{baseline_only}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first period_min points.}
 
-\item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
+\item{establish_every_shift}{Boolean - whether to bypass the Stable Shift Algorithm
 and simply re-establish limits at every shift rule break (respecting
 period_min)}
 

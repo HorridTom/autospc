@@ -14,7 +14,7 @@ create_SPC_auto_limits_table(
   noRegrets,
   verbosity,
   baseline_only,
-  recalEveryShift,
+  establish_every_shift,
   rule2Tolerance,
   showLimits,
   overhangingReversions,
@@ -66,7 +66,7 @@ none if 0.}
 \item{baseline_only}{Boolean - if TRUE, do not recalculate control limits, instead
 extend limits calculated from the first period_min points.}
 
-\item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
+\item{establish_every_shift}{Boolean - whether to bypass the Stable Shift Algorithm
 and simply re-establish limits at every shift rule break (respecting
 period_min)}
 
@@ -117,7 +117,7 @@ limits_table <- create_SPC_auto_limits_table(
   noRegrets = TRUE,
   verbosity = 1L,
   baseline_only = FALSE,
-  recalEveryShift = FALSE,
+  establish_every_shift = FALSE,
   rule2Tolerance = 0,
   showLimits = TRUE,
   overhangingReversions = TRUE,

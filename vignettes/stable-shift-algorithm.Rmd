@@ -215,7 +215,7 @@ autospc(example_series_2b,
 autospc(example_series_2b,
               override_y_title = "Count",
               chart_type = "C",
-              recalEveryShift = TRUE,
+              establish_every_shift = TRUE,
               extend_limits_to = 47L)
 ```
 
@@ -230,7 +230,7 @@ overhanging reversion commencing on day 40, against the candidate limits.
 autospc(example_series_2c,
               override_y_title = "Count",
               chart_type = "C",
-              recalEveryShift = TRUE)
+              establish_every_shift = TRUE)
 ```
 
 ### Minimum period length

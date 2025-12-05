@@ -42,7 +42,7 @@
 #' the centre line constituting a shift (or "rule 2") break.
 #' @param baseline_only Boolean - if TRUE, do not recalculate control limits, instead
 #' extend limits calculated from the first period_min points.
-#' @param recalEveryShift Boolean - whether to bypass the Stable Shift Algorithm
+#' @param establish_every_shift Boolean - whether to bypass the Stable Shift Algorithm
 #' and simply re-establish limits at every shift rule break (respecting
 #' period_min)
 #' @param noRegrets Boolean signifying which version of the algorithm should be
@@ -178,7 +178,7 @@ autospc <- function(data,
                           baseline_length = NULL,
                           shift_rule_threshold = 8,
                           baseline_only = FALSE,
-                          recalEveryShift = FALSE,
+                          establish_every_shift = FALSE,
                           noRegrets = TRUE,
                           overhangingReversions = TRUE,
                           ## SPC Parameters
@@ -261,7 +261,7 @@ autospc <- function(data,
     noRegrets = noRegrets,
     verbosity = verbosity,
     baseline_only = baseline_only,
-    recalEveryShift = recalEveryShift,
+    establish_every_shift = establish_every_shift,
     rule2Tolerance = rule2Tolerance,
     showLimits = showLimits,
     overhangingReversions = overhangingReversions,

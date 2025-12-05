@@ -4,7 +4,7 @@
 #    entirely contained within the candidate period.
 # 3. A triggering rule break, with no opposing run or possibility of one through
 #    continuation of the final run in the candidate period, hence candidate
-#    limits accepted regardless of no_regrets and overhangingReversions
+#    limits accepted regardless of no_regrets and overhanging_reversions
 # 4. A triggering rule break against the new limits, no opposing rule break but
 #    with the final run (of length e.g. 2) of the candidate period in the
 #    opposite direction to the triggering rule break (run becoming of length

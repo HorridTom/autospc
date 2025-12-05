@@ -1,4 +1,4 @@
-# Tests for variants of SSA selected using overhangingReversions and no_regrets
+# Tests for variants of SSA selected using overhanging_reversions and no_regrets
 
 calc_period_starts <- function(df) {
   
@@ -23,19 +23,19 @@ test_that(
                           chart_type = "XMR",
                           plotChart = FALSE,
                           no_regrets = TRUE,
-                          overhangingReversions = TRUE)
+                          overhanging_reversions = TRUE)
     
     result_nRF_oRT <- autospc(example_series_1[1:96,],
                               chart_type = "XMR",
                               plotChart = FALSE,
                               no_regrets = FALSE,
-                              overhangingReversions = TRUE)
+                              overhanging_reversions = TRUE)
     
     result_nRF_oRF <- autospc(example_series_1[1:96,],
                               chart_type = "XMR",
                               plotChart = FALSE,
                               no_regrets = FALSE,
-                              overhangingReversions = FALSE)
+                              overhanging_reversions = FALSE)
     
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
@@ -65,19 +65,19 @@ test_that(
                           chart_type = "XMR",
                           plotChart = FALSE,
                           no_regrets = TRUE,
-                          overhangingReversions = TRUE)
+                          overhanging_reversions = TRUE)
     
     result_nRF_oRT <- autospc(example_series_1,
                               chart_type = "XMR",
                               plotChart = FALSE,
                               no_regrets = FALSE,
-                              overhangingReversions = TRUE)
+                              overhanging_reversions = TRUE)
     
     result_nRF_oRF <- autospc(example_series_1,
                               chart_type = "XMR",
                               plotChart = FALSE,
                               no_regrets = FALSE,
-                              overhangingReversions = FALSE)
+                              overhanging_reversions = FALSE)
     
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
@@ -109,7 +109,7 @@ test_that("warning is issued if incompatible variant requested", {
       x = Month_Start, 
       y = Att_All,
       no_regrets = TRUE,
-      overhangingReversions = FALSE
+      overhanging_reversions = FALSE
     ),
     "no_regrets requires consideration of overhanging reversions")
   

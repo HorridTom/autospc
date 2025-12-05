@@ -16,7 +16,7 @@ autospc(
   baseline_only = FALSE,
   establish_every_shift = FALSE,
   no_regrets = TRUE,
-  overhangingReversions = TRUE,
+  overhanging_reversions = TRUE,
   maxNoOfExclusions = 3,
   highlightExclusions = TRUE,
   mr_screen_max_loops = 1L,
@@ -112,7 +112,7 @@ period_min)}
 \item{no_regrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}
 
-\item{overhangingReversions}{Boolean determining whether rule breaks in the
+\item{overhanging_reversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
 calculation period. Set to FALSE only with no_regrets = FALSE.

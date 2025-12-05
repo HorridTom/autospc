@@ -17,7 +17,7 @@ create_SPC_auto_limits_table(
   establish_every_shift,
   rule2Tolerance,
   showLimits,
-  overhangingReversions,
+  overhanging_reversions,
   mr_screen_max_loops
 )
 }
@@ -77,7 +77,7 @@ shift rule breaks}
 \item{showLimits}{Boolean controlling whether or not to display centre line
 and control limits}
 
-\item{overhangingReversions}{Boolean determining whether rule breaks in the
+\item{overhanging_reversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
 calculation period. Set to FALSE only with no_regrets = FALSE.
@@ -120,7 +120,7 @@ limits_table <- create_SPC_auto_limits_table(
   establish_every_shift = FALSE,
   rule2Tolerance = 0,
   showLimits = TRUE,
-  overhangingReversions = TRUE,
+  overhanging_reversions = TRUE,
   mr_screen_max_loops = 1L
 )
 

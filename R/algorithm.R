@@ -28,7 +28,7 @@
 #'   establish_every_shift = FALSE,
 #'   rule2Tolerance = 0,
 #'   showLimits = TRUE,
-#'   overhangingReversions = TRUE,
+#'   overhanging_reversions = TRUE,
 #'   mr_screen_max_loops = 1L
 #' )
 #'
@@ -47,16 +47,16 @@ create_SPC_auto_limits_table <- function(data,
                                          establish_every_shift,
                                          rule2Tolerance,
                                          showLimits,
-                                         overhangingReversions,
+                                         overhanging_reversions,
                                          mr_screen_max_loops
 ) {
   
-  if(no_regrets & !overhangingReversions) {
-    warning(paste0("Setting no_regrets = TRUE and overhangingReversions = ",
+  if(no_regrets & !overhanging_reversions) {
+    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
                    "FALSE does not make sense, since no_regrets requires ",
                    "consideration of overhanging reversions. Changing ",
-                   "overhangingReversions to TRUE."))
-    overhangingReversions <- TRUE
+                   "overhanging_reversions to TRUE."))
+    overhanging_reversions <- TRUE
   }
   
   # add y column of percentages for P and P' charts. This is to avoid issues
@@ -252,7 +252,7 @@ create_SPC_auto_limits_table <- function(data,
                 triggering_rule_break_direction,
                 rule2Tolerance = rule2Tolerance,
                 shift_rule_threshold = shift_rule_threshold,
-                overhangingReversions = overhangingReversions)[[1]]
+                overhanging_reversions = overhanging_reversions)[[1]]
               
               # Establish whether (for no regrets) the final run in the
               # candidate calculation period prevents re-establishment of limits

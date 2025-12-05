@@ -341,15 +341,15 @@ identify_opposite_break <- function(limits_table,
                                     triggering_rule_break_direction,
                                     rule2Tolerance,
                                     shift_rule_threshold,
-                                    overhangingReversions = TRUE){
+                                    overhanging_reversions = TRUE){
   
   # start rule breaks from candidate period as not to include "hang over" rule
   # breaks from prev period
-  # overhangingReversions controls whether to include "hang over" into following
+  # overhanging_reversions controls whether to include "hang over" into following
   # display period
   
   candidate_start <- counter
-  if(overhangingReversions) {
+  if(overhanging_reversions) {
     candidate_end <- nrow(limits_table)
   } else {
     candidate_end <- counter + period_min - 1L
@@ -378,7 +378,7 @@ identify_opposite_break <- function(limits_table,
                                                  TRUE, 
                                                  FALSE))
   
-  if(!overhangingReversions & nrow(limits_table) > candidate_end) {
+  if(!overhanging_reversions & nrow(limits_table) > candidate_end) {
     
     limits_table_tail <- limits_table[(candidate_end + 1L):nrow(limits_table),]
     limits_table_tail <- limits_table_tail %>% 

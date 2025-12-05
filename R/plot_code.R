@@ -47,7 +47,7 @@
 #' period_min)
 #' @param no_regrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
-#' @param overhangingReversions Boolean determining whether rule breaks in the
+#' @param overhanging_reversions Boolean determining whether rule breaks in the
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
 #' calculation period. Set to FALSE only with no_regrets = FALSE.
@@ -180,7 +180,7 @@ autospc <- function(data,
                           baseline_only = FALSE,
                           establish_every_shift = FALSE,
                           no_regrets = TRUE,
-                          overhangingReversions = TRUE,
+                          overhanging_reversions = TRUE,
                           ## SPC Parameters
                           maxNoOfExclusions = 3,
                           highlightExclusions = TRUE,
@@ -264,7 +264,7 @@ autospc <- function(data,
     establish_every_shift = establish_every_shift,
     rule2Tolerance = rule2Tolerance,
     showLimits = showLimits,
-    overhangingReversions = overhangingReversions,
+    overhanging_reversions = overhanging_reversions,
     mr_screen_max_loops = mr_screen_max_loops
   )
   

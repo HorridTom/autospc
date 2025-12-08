@@ -47,11 +47,11 @@ control limits.
 \item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline_length}{Integer, overrides period_min for the first calculation period
-only, if specified}
+\item{baseline_length}{Integer, overrides period_min for the first
+calculation period only, if specified}
 
-\item{shift_rule_threshold}{The minimum number of consecutive points above or below
-the centre line constituting a shift (or "rule 2") break.}
+\item{shift_rule_threshold}{The minimum number of consecutive points above or
+below the centre line constituting a shift (or "rule 2") break.}
 
 \item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations.}
@@ -63,16 +63,16 @@ used. Defines whether limits can change as more data is added or not.}
 standard output log; the higher the number the more information is provided,
 none if 0.}
 
-\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits, instead
-extend limits calculated from the first period_min points.}
+\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits,
+instead extend limits calculated from the first period_min points.}
 
-\item{establish_every_shift}{Boolean - whether to bypass the Stable Shift Algorithm
-and simply re-establish limits at every shift rule break (respecting
-period_min)}
+\item{establish_every_shift}{Boolean - whether to bypass the Stable Shift
+Algorithm and simply re-establish limits at every shift rule break
+(respecting period_min)}
 
-\item{centre_line_tolerance}{Minimum difference between a point's vertical position
-and the centre line to count as "on the centre line" for the purposes of
-shift rule breaks}
+\item{centre_line_tolerance}{Minimum difference between a point's vertical
+position and the centre line to count as "on the centre line" for the
+purposes ofshift rule breaks}
 
 \item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}

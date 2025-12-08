@@ -36,15 +36,15 @@
 #' control limits.
 #' @param period_min The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
-#' @param baseline_length Integer, overrides period_min for the first calculation period
-#' only, if specified
-#' @param shift_rule_threshold The minimum number of consecutive points above or below
-#' the centre line constituting a shift (or "rule 2") break.
-#' @param baseline_only Boolean - if TRUE, do not recalculate control limits, instead
-#' extend limits calculated from the first period_min points.
-#' @param establish_every_shift Boolean - whether to bypass the Stable Shift Algorithm
-#' and simply re-establish limits at every shift rule break (respecting
-#' period_min)
+#' @param baseline_length Integer, overrides period_min for the first
+#' calculation period only, if specified
+#' @param shift_rule_threshold The minimum number of consecutive points above or
+#' below the centre line constituting a shift (or "rule 2") break.
+#' @param baseline_only Boolean - if TRUE, do not recalculate control limits,
+#' instead extend limits calculated from the first period_min points.
+#' @param establish_every_shift Boolean - whether to bypass the Stable Shift
+#' Algorithm and simply re-establish limits at every shift rule break
+#' (respecting period_min)
 #' @param no_regrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhanging_reversions Boolean determining whether rule breaks in the
@@ -63,9 +63,9 @@
 #' to recursively ignore mr values above the upper range limit when calculating
 #' xmr limits. Note this does not affect the calculation of the upper range
 #' limit on the mr chart.
-#' @param centre_line_tolerance Minimum difference between a point's vertical position
-#' and the centre line to count as "on the centre line" for the purposes of 
-#' shift rule breaks
+#' @param centre_line_tolerance Minimum difference between a point's vertical
+#' position and the centre line to count as "on the centre line" for the
+#' purposes ofshift rule breaks
 #' @param floating_median Whether to add a floating median line to the chart,
 #' calculated based on the final floating_median_n data points on the chart:
 #' "no" - do not display a floating median,

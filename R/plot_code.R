@@ -66,14 +66,14 @@
 #' @param centre_line_tolerance Minimum difference between a point's vertical position
 #' and the centre line to count as "on the centre line" for the purposes of 
 #' shift rule breaks
-#' @param floatingMedian Whether to add a floating median line to the chart,
-#' calculated based on the final floatingMedian_n data points on the chart:
+#' @param floating_median Whether to add a floating median line to the chart,
+#' calculated based on the final floating_median_n data points on the chart:
 #' "no" - do not display a floating median,
 #' "yes" - display a floating median,
 #' "auto" - display a floating median if and only if there is at least one point
-#' that is part of a shift rule break in the final floatingMedian_n data points
+#' that is part of a shift rule break in the final floating_median_n data points
 #' on the chart.
-#' @param floatingMedian_n The number of points to use for calculation of the
+#' @param floating_median_n The number of points to use for calculation of the
 #' floating median, if present.
 
 #' ## Output Type
@@ -186,8 +186,8 @@ autospc <- function(data,
                           highlight_exclusions = TRUE,
                           mr_screen_max_loops = 1L,
                           centre_line_tolerance = 0,
-                          floatingMedian = "no",
-                          floatingMedian_n = 12L,
+                          floating_median = "no",
+                          floating_median_n = 12L,
                           ## Output Type
                           plotChart = TRUE,
                           showLimits = TRUE,
@@ -307,8 +307,8 @@ autospc <- function(data,
       df = data,
       chart_type = chart_type,
       highlight_exclusions = highlight_exclusions,
-      floatingMedian = floatingMedian,
-      floatingMedian_n = floatingMedian_n,
+      floating_median = floating_median,
+      floating_median_n = floating_median_n,
       extend_limits_to = extend_limits_to,
       align_labels = align_labels,
       flip_labels = flip_labels,
@@ -359,7 +359,7 @@ autospc <- function(data,
         annotation_size = annotation_size,
         annotation_arrows = annotation_arrows,
         annotation_curvature = annotation_arrow_curve,
-        floatingMedian_n = floatingMedian_n,
+        floating_median_n = floating_median_n,
         showMR = showMR,
         x_break = x_break,
         x_date_format = x_date_format

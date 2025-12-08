@@ -21,8 +21,8 @@ autospc(
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
-  floatingMedian = "no",
-  floatingMedian_n = 12L,
+  floating_median = "no",
+  floating_median_n = 12L,
   plotChart = TRUE,
   showLimits = TRUE,
   showMR = TRUE,
@@ -137,15 +137,15 @@ limit on the mr chart.}
 and the centre line to count as "on the centre line" for the purposes of
 shift rule breaks}
 
-\item{floatingMedian}{Whether to add a floating median line to the chart,
-calculated based on the final floatingMedian_n data points on the chart:
+\item{floating_median}{Whether to add a floating median line to the chart,
+calculated based on the final floating_median_n data points on the chart:
 "no" - do not display a floating median,
 "yes" - display a floating median,
 "auto" - display a floating median if and only if there is at least one point
-that is part of a shift rule break in the final floatingMedian_n data points
+that is part of a shift rule break in the final floating_median_n data points
 on the chart.}
 
-\item{floatingMedian_n}{The number of points to use for calculation of the
+\item{floating_median_n}{The number of points to use for calculation of the
 floating median, if present.
 \subsection{Output Type}{
 

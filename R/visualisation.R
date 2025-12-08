@@ -23,7 +23,7 @@ create_spc_plot <- function(df,
                             annotation_size = 3,
                             annotation_arrows = FALSE,
                             annotation_curvature = 0.3,
-                            floatingMedian_n = 12L,
+                            floating_median_n = 12L,
                             showMR = TRUE,
                             x_break = NULL,
                             x_date_format = "%Y-%m-%d",
@@ -65,7 +65,7 @@ create_spc_plot <- function(df,
   if("median" %in% colnames(df)) {
     p <- add_floating_median(p = p,
                              df = df,
-                             floatingMedian_n = floatingMedian_n)
+                             floating_median_n = floating_median_n)
   }
   
   if(includeAnnotations == TRUE){

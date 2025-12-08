@@ -682,25 +682,25 @@ fill_NA <- function(x) {
 # Check whether a floating median is required, and add a column to df providing
 # its values if so
 floating_median_column <- function(df,
-                                       floatingMedian,
-                                       floatingMedian_n) {
+                                       floating_median,
+                                       floating_median_n) {
   
   median_from_x <- df %>%
     dplyr::mutate(non_missing_y = !is.na(y)) %>%
     dplyr::arrange(dplyr::desc(x)) %>%
     dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing_y)) %>%
-    dplyr::filter(cumulative_num_non_missing == floatingMedian_n) %>%
+    dplyr::filter(cumulative_num_non_missing == floating_median_n) %>%
     dplyr::pull(x) %>%
     max()
   
-  addFloatingMedian <- switch(EXPR = floatingMedian,
+  addfloating_median <- switch(EXPR = floating_median,
                               yes = TRUE,
                               auto = any(df %>%
                                            dplyr::filter(x >= median_from_x) %>% 
                                            dplyr::pull(rule2)),
                               FALSE)
   
-  if(addFloatingMedian) {
+  if(addfloating_median) {
     
     df <- df %>%
       dplyr::mutate(median =
@@ -721,7 +721,7 @@ floating_median_column <- function(df,
 # Add floating median line to the plot p
 add_floating_median <- function(df,
                                 p,
-                                floatingMedian_n) {
+                                floating_median_n) {
   
   p <- p +
     ggplot2::geom_line(data = df, 
@@ -733,10 +733,10 @@ add_floating_median <- function(df,
                        na.rm = TRUE) +
     ggplot2::annotate("text",
                       x = df %>%
-                        dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
+                        dplyr::filter(dplyr::row_number() == nrow(df) - floating_median_n + 1L) %>%
                         dplyr::pull(x),
                       y = df %>%
-                        dplyr::filter(dplyr::row_number() == nrow(df) - floatingMedian_n + 1L) %>%
+                        dplyr::filter(dplyr::row_number() == nrow(df) - floating_median_n + 1L) %>%
                         dplyr::pull(median)*0.95,
                       label = "Median",
                       size = 3,

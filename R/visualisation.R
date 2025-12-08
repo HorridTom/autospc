@@ -81,49 +81,57 @@ create_spc_plot <- function(df,
   # Format x-axis depending on x type
   if(any(xType == "Date")) {
     if(is.null(x_break)) {
-      p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
-                                     breaks = scales::breaks_pretty(),
-                                     limits = c(as.Date(start_x),
-                                                as.Date(end_x)))
+      p <- p + 
+        ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
+                              breaks = scales::breaks_pretty(),
+                              limits = c(as.Date(start_x),
+                                         as.Date(end_x)))
     } else {
-      p <- p + ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
-                                     breaks = seq(as.Date(start_x),
-                                                  as.Date(end_x),
-                                                  x_break),
-                                     limits = c(as.Date(start_x),
-                                                as.Date(end_x)))
+      p <- p + 
+        ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
+                              breaks = seq(as.Date(start_x),
+                                           as.Date(end_x),
+                                           x_break),
+                              limits = c(as.Date(start_x),
+                                         as.Date(end_x)))
     }
   } else if(any(xType == "integer")) {
     if(is.null(x_break)) {
-      p <- p + ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
-                                           limits = c(start_x,
-                                                      end_x))
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
+                                    limits = c(start_x,
+                                               end_x))
     } else {
-      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x,
-                                                        end_x,
-                                                        x_break),
-                                           limits = c(start_x,
-                                                      end_x))
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = seq(start_x,
+                                                 end_x,
+                                                 x_break),
+                                    limits = c(start_x,
+                                               end_x))
     }
   } else if(any(xType == "POSIXct")) {
     if(is.null(x_break)) {
-      p <- p + ggplot2::scale_x_datetime(breaks = scales::breaks_pretty(),
-                                         limits = c(start_x, end_x))
+      p <- p + 
+        ggplot2::scale_x_datetime(breaks = scales::breaks_pretty(),
+                                  limits = c(start_x, end_x))
     } else {
       if(any(class(x_break) != "difftime")) {
         rlang::abort(paste("Please specify x_break as a difftime object when",
                            "x is POSIXct."))
       }
-      p <- p + ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
-                                         limits = c(start_x, end_x))
+      p <- p + 
+        ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
+                                  limits = c(start_x, end_x))
     }
   } else {
     if(is.null(x_break)) {
-      p <- p + ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
-                                           limits = c(start_x, end_x))
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
+                                    limits = c(start_x, end_x))
     } else {
-      p <- p + ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
-                                           limits = c(start_x, end_x))
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+                                    limits = c(start_x, end_x))
     }
   }
   
@@ -146,8 +154,10 @@ create_spc_plot <- function(df,
     
     legend <- cowplot::get_legend(p)
     
-    p_no_legend <- p + ggplot2::theme(legend.position = "none")
-    p_mr_no_legend <- p_mr + ggplot2::theme(legend.position = "none")
+    p_no_legend <- p + 
+      ggplot2::theme(legend.position = "none")
+    p_mr_no_legend <- p_mr + 
+      ggplot2::theme(legend.position = "none")
     
     p <- cowplot::plot_grid(
       cowplot::plot_grid(p_no_legend, p_mr_no_legend, 

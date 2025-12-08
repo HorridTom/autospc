@@ -91,7 +91,8 @@ add_annotations_to_plot <- function(p,
       paste(
         "Packages ggrepel and ggpp are required for basic_annotations",
         "= FALSE. Using basic_annotations = TRUE. To use",
-        "basic_annotations = FALSE, please ensure both packages are installed."))
+        "basic_annotations = FALSE, please ensure both packages are installed.")
+    )
     use_basic_annotations <- TRUE
   }
   

@@ -91,13 +91,13 @@ form_calculation_limits <- function(data,
   calculation_period$cl <- limits_list$cl
   calculation_period$ucl <- limits_list$ucl
   calculation_period$lcl <- limits_list$lcl
-
+  
   calculation_period <- calculation_period %>%
     dplyr::select(x, y, ucl,lcl, cl) %>%
     dplyr::mutate(periodType = "calculation") %>%
     dplyr::mutate(excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F))
-
-
+  
+  
   #first period does not already have the additional columns
   if(counter == 1){
     
@@ -140,7 +140,7 @@ form_calculation_limits <- function(data,
     
     limits_table <- limits_table %>% 
       dplyr::mutate(breakPoint = (breakPoint |
-                                     dplyr::row_number() == counter))
+                                    dplyr::row_number() == counter))
     
     #only selects n if P chart
     if(chart_type == "P" | chart_type == "P'"){
@@ -198,7 +198,7 @@ find_extremes <- function(data,
       
     }else if(chart_type == "P'"){
       limits_list <- get_pp_limits(y = calculation_period$y_numerator, n = calculation_period$n, exclusion_points = exclusion_points, multiply = 100, mr_screen_max_loops = mr_screen_max_loops)
-    
+      
     }else if(chart_type == "XMR"){
       limits_list <- get_i_limits(y = calculation_period$y, exclusion_points = exclusion_points, mr_screen_max_loops = mr_screen_max_loops)
       
@@ -222,7 +222,7 @@ find_extremes <- function(data,
     calculation_period <- calculation_period %>% 
       dplyr::mutate(aboveCl = ifelse(y > cl, TRUE,ifelse(y < cl, FALSE, NA))) %>%
       dplyr::mutate(rule1Distance = ifelse(rule1 & aboveCl, y - ucl, 
-                                    ifelse(rule1 & !aboveCl, lcl - y, NA))) %>%
+                                           ifelse(rule1 & !aboveCl, lcl - y, NA))) %>%
       #set already established extremes as NA
       dplyr::mutate(rule1Distance = ifelse(dplyr::row_number() %in% 
                                              exclusion_points, NA, rule1Distance))
@@ -241,7 +241,7 @@ find_extremes <- function(data,
     exclusion_points <- c(exclusion_points, exclusion_point)
     i = i + 1
   }
-
+  
   #check whether there are more than 3 exclusion points (due to points with the same values)
   if(length(exclusion_points) > max_exclusions){
     exclusion_points <- exclusion_points[1:max_exclusions]
@@ -300,7 +300,7 @@ form_display_limits <- function(limits_table, counter, chart_type = "C'"){
     
     
   }
-
+  
   limits_table
   
 }
@@ -315,14 +315,14 @@ rule2_break_start_positions <- function(limits_table, counter){
                     (rule2 != dplyr::lag(rule2) |
                        different_cl_side(aboveOrBelowCl,
                                          dplyr::lag(aboveOrBelowCl))))
-                     
-                     next_rule_break_positions <-
-                       (which(limits_table$startOfRule2Break[
-                         counter:nrow(limits_table)
-                         ] == T)) + counter - 1
-                     
-                     next_rule_break_positions
-                     
+  
+  next_rule_break_positions <-
+    (which(limits_table$startOfRule2Break[
+      counter:nrow(limits_table)
+    ] == T)) + counter - 1
+  
+  next_rule_break_positions
+  
 }
 
 different_cl_side <- function(x, y) {
@@ -359,15 +359,15 @@ identify_opposite_break <- function(limits_table,
   limits_table_candidate <- add_rule_breaks(limits_table_candidate,
                                             centre_line_tolerance = centre_line_tolerance,
                                             shift_rule_threshold = shift_rule_threshold)
-
+  
   limits_table_candidate <- limits_table_candidate %>%
     dplyr::mutate(laggedAOBC = dplyr::lag(aboveOrBelowCl),
                   newRun = dplyr::if_else((is.na(laggedAOBC) | (aboveOrBelowCl != 0 &
-                                            aboveOrBelowCl != laggedAOBC)),
+                                                                  aboveOrBelowCl != laggedAOBC)),
                                           TRUE,
                                           FALSE),
                   runCount = cumsum(newRun))
-
+  
   #looks for a rule break in the opposite direction within the candidate period
   # Don't consider the first run as a potential opposite rule break. If it is
   # in the same direction as the triggering run, it can't be an opposite break,
@@ -410,7 +410,7 @@ identify_opposite_break <- function(limits_table,
       output <- list(TRUE, next_rule_break_position, limits_table_candidate)
     }
   }
-
+  
   output
 }
 
@@ -418,17 +418,17 @@ identify_opposite_break <- function(limits_table,
 # Function to establish whether the final run in the candidate calculation
 # period prevents the recalculation (for no regrets)
 final_run_of_calc_period_prevents_recalc <- function(
-  candidate_limits_table,
-  triggering_rule_break_direction) {
+    candidate_limits_table,
+    triggering_rule_break_direction) {
   
   # Filter data to exclude everything prior to the last calculation period 
   data <- candidate_limits_table
   data <- data %>%
     dplyr::mutate(laggedPeriodType = dplyr::lag(periodType),
-      newPeriod = dplyr::if_else((is.na(laggedPeriodType) |
-                            laggedPeriodType != periodType), TRUE, FALSE),
-      periodCount = cumsum(newPeriod)
-      )
+                  newPeriod = dplyr::if_else((is.na(laggedPeriodType) |
+                                                laggedPeriodType != periodType), TRUE, FALSE),
+                  periodCount = cumsum(newPeriod)
+    )
   period_table <- data %>%
     dplyr::distinct(periodType, periodCount)
   
@@ -439,7 +439,7 @@ final_run_of_calc_period_prevents_recalc <- function(
   
   data <- data %>%
     dplyr::filter(periodCount >= last_calc_period)
-
+  
   #handles NA value that appears sometimes at the end of the data 
   if(is.na(data$y[nrow(data)])){
     data <- data[1:(nrow(data) - 1),]
@@ -535,9 +535,9 @@ form_calculation_and_display_limits <- function(data,
   
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 
-                                               counter = counter_at_period_start,
-                                               centre_line_tolerance = centre_line_tolerance,
-                                               shift_rule_threshold = shift_rule_threshold)
+                                                     counter = counter_at_period_start,
+                                                     centre_line_tolerance = centre_line_tolerance,
+                                                     shift_rule_threshold = shift_rule_threshold)
   
   
   limits_table
@@ -549,9 +549,9 @@ form_calculation_and_display_limits <- function(data,
 #actual break points, not period starts, hence it relies on the breakPoint
 #column not being TRUE on the first row.
 add_rule_breaks_respecting_periods <- function(limits_table,
-                                         counter,
-                                         centre_line_tolerance,
-                                         shift_rule_threshold){
+                                               counter,
+                                               centre_line_tolerance,
+                                               shift_rule_threshold){
   
   #get breakpoint positions
   breakpoints <- which(limits_table$breakPoint)
@@ -682,8 +682,8 @@ fill_NA <- function(x) {
 # Check whether a floating median is required, and add a column to df providing
 # its values if so
 floating_median_column <- function(df,
-                                       floating_median,
-                                       floating_median_n) {
+                                   floating_median,
+                                   floating_median_n) {
   
   median_from_x <- df %>%
     dplyr::mutate(non_missing_y = !is.na(y)) %>%
@@ -694,11 +694,11 @@ floating_median_column <- function(df,
     max()
   
   addfloating_median <- switch(EXPR = floating_median,
-                              yes = TRUE,
-                              auto = any(df %>%
-                                           dplyr::filter(x >= median_from_x) %>% 
-                                           dplyr::pull(rule2)),
-                              FALSE)
+                               yes = TRUE,
+                               auto = any(df %>%
+                                            dplyr::filter(x >= median_from_x) %>% 
+                                            dplyr::pull(rule2)),
+                               FALSE)
   
   if(addfloating_median) {
     
@@ -876,8 +876,8 @@ counter_at_rule_break <- function(df,
                                   shift_rule_threshold) {
   
   if(!(df %>%
-     dplyr::filter(dplyr::row_number() == counter) %>%
-     dplyr::pull(rule2))) {
+       dplyr::filter(dplyr::row_number() == counter) %>%
+       dplyr::pull(rule2))) {
     
     return(FALSE)
     

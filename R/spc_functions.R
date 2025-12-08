@@ -14,9 +14,10 @@ get_c_limits <- function(y,
   }
   
   if(na.rm == FALSE & any(is.na(y))){
-    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
+    stop(paste("There are missing values in the input data. Set na.rm to TRUE",
+               "if you wish to ignore these."))
   }
-
+  
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
@@ -33,7 +34,9 @@ get_c_limits <- function(y,
   
   lcl[lcl < 0 & is.finite(lcl)] <- 0
   
-  list(cl = rep(cl, length(y)), ucl = rep(ucl, length(y)), lcl = rep(lcl, length(y)))
+  list(cl = rep(cl, length(y)),
+       ucl = rep(ucl, length(y)),
+       lcl = rep(lcl, length(y)))
 }
 
 #get p chart limits
@@ -58,7 +61,8 @@ get_p_limits <- function(y,
   }
   
   if(na.rm == FALSE & (any(is.na(y)) | any(is.na(y)) )){
-    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
+    stop(paste("There are missing values in the input data. Set na.rm to TRUE",
+               "if you wish to ignore these."))
   }
   
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
@@ -80,9 +84,9 @@ get_p_limits <- function(y,
   cl <- cl * multiply
   ucl <- cl + 3 * stdev * multiply
   lcl <- cl - 3 * stdev * multiply
-
+  
   lcl[lcl < 0 & is.finite(lcl)] <- 0
-
+  
   list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
 }
 
@@ -104,23 +108,24 @@ get_cp_limits <- function(y,
   }
   
   if(na.rm == FALSE & any(is.na(y))){
-    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
+    stop(paste("There are missing values in the input data. Set na.rm to TRUE",
+               "if you wish to ignore these."))
   }
-
+  
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     #exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
   }else{
     y_excl <- y
   }
-
+  
   cl <- mean(y_excl, na.rm = TRUE)
   
   n_excl <- 1 #######
   cl <- cl
   stdev <- sqrt(cl / n_excl)
   z_i <- (y_excl - cl) / stdev
-
+  
   mr  <- abs(diff(z_i))
   mr_lims <- mr_lims_calc(mr = mr,
                           mr_screen_max_loops = mr_screen_max_loops)
@@ -132,8 +137,10 @@ get_cp_limits <- function(y,
   lcl <- cl - 3 * stdev
   
   lcl[lcl < 0 & is.finite(lcl)] <- 0
-
-  list(cl = rep(cl, length(y)), ucl = rep(ucl, length(y)), lcl = rep(lcl, length(y)))
+  
+  list(cl = rep(cl, length(y)),
+       ucl = rep(ucl, length(y)),
+       lcl = rep(lcl, length(y)))
 }
 
 
@@ -161,7 +168,8 @@ get_pp_limits <- function(y,
   }
   
   if(na.rm == FALSE & (any(is.na(y)) | any(is.na(n)) )){
-    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
+    stop(paste("There are missing values in the input data. Set na.rm to TRUE",
+               "if you wish to ignore these."))
   }
   
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
@@ -176,7 +184,7 @@ get_pp_limits <- function(y,
   #if there are missing y or n values then set both to NA
   n_excl[which(is.na(y_excl))] <- NA
   y_excl[which(is.na(n_excl))] <- NA
-
+  
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE) 
   
   y_new <- y_excl / n_excl
@@ -188,14 +196,14 @@ get_pp_limits <- function(y,
   
   stdev <- sqrt(cl * (1 - cl) / n_excl)
   z_i <- (y_new - cl) / stdev
-
+  
   
   mr  <- abs(diff(z_i))
   mr_lims <- mr_lims_calc(mr = mr,
                           mr_screen_max_loops = mr_screen_max_loops)
   amr <- mr_lims$mean_mr
   ulmr <- mr_lims$ucl_mr
-
+  
   sigma_z <- amr / 1.128
   
   #recalc stdev with excluded data
@@ -209,9 +217,9 @@ get_pp_limits <- function(y,
   cl <- cl * multiply
   ucl <- cl + 3 * stdev * multiply
   lcl <- cl - 3 * stdev * multiply
-
+  
   lcl[lcl < 0 & is.finite(lcl)] <- 0
-
+  
   list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
 }
 
@@ -233,7 +241,8 @@ get_i_limits <- function(y,
   }
   
   if(na.rm == FALSE & any(is.na(y))){
-    stop("There are missing values in the input data. Set na.rm to TRUE if you wish to ignore these.")
+    stop(paste("There are missing values in the input data. Set na.rm to TRUE",
+               "if you wish to ignore these."))
   }
   
   #exclude exclusion points from calculations
@@ -254,7 +263,9 @@ get_i_limits <- function(y,
   lcl_i <- mean_i - (3 * sigma)
   
   #lists the results
-  return(list(cl = rep(mean_i, length(y)), ucl = rep(ucl_i, length(y)), lcl = rep(lcl_i, length(y))))
+  return(list(cl = rep(mean_i, length(y)),
+              ucl = rep(ucl_i, length(y)),
+              lcl = rep(lcl_i, length(y))))
 }
 
 # Get moving ranges
@@ -325,5 +336,4 @@ mr_lims_calc <- function(mr,
   return(list(mean_mr = mean_mr,
               ucl_mr = ucl_mr))
 }
-
 

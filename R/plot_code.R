@@ -169,65 +169,65 @@
 #' 
 #' @export
 autospc <- function(data,
-                          x,
-                          y,
-                          n,
-                          chart_type = NULL,
-                          ## Algorithm Parameters
-                          period_min = 21,
-                          baseline_length = NULL,
-                          shift_rule_threshold = 8,
-                          baseline_only = FALSE,
-                          establish_every_shift = FALSE,
-                          no_regrets = TRUE,
-                          overhanging_reversions = TRUE,
-                          ## SPC Parameters
-                          max_exclusions = 3,
-                          highlight_exclusions = TRUE,
-                          mr_screen_max_loops = 1L,
-                          centre_line_tolerance = 0,
-                          floating_median = "no",
-                          floating_median_n = 12L,
-                          ## Output Type
-                          plot_chart = TRUE,
-                          show_limits = TRUE,
-                          show_mr = TRUE,
-                          write_table = FALSE,
-                          verbosity = 0L,
-                          log_file_path = NULL,
-                          ## Chart Appearance
-                          title = NULL,
-                          subtitle = NULL,
-                          use_caption = TRUE,
-                          override_x_title = NULL,
-                          override_y_title = NULL,
-                          override_y_lim = NULL,
-                          x_break = NULL,
-                          x_date_format = "%Y-%m-%d",
-                          x_pad_end = NULL,
-                          extend_limits_to = NULL,
-                          r1_col = "orange",
-                          r2_col = "steelblue3",
-                          point_size = 2,
-                          line_width_sf = 1,
-                          include_annotations = TRUE,
-                          basic_annotations = getRversion() < '4.3.0',
-                          annotation_size = 3,
-                          align_labels = FALSE,
-                          flip_labels = FALSE,
-                          upper_annotation_sf = NULL,
-                          lower_annotation_sf = NULL,
-                          annotation_arrows = FALSE,
-                          annotation_arrow_curve = 0.3,
-                          override_annotation_dist = NULL,
-                          override_annotation_dist_P = NULL
+                    x,
+                    y,
+                    n,
+                    chart_type = NULL,
+                    ## Algorithm Parameters
+                    period_min = 21,
+                    baseline_length = NULL,
+                    shift_rule_threshold = 8,
+                    baseline_only = FALSE,
+                    establish_every_shift = FALSE,
+                    no_regrets = TRUE,
+                    overhanging_reversions = TRUE,
+                    ## SPC Parameters
+                    max_exclusions = 3,
+                    highlight_exclusions = TRUE,
+                    mr_screen_max_loops = 1L,
+                    centre_line_tolerance = 0,
+                    floating_median = "no",
+                    floating_median_n = 12L,
+                    ## Output Type
+                    plot_chart = TRUE,
+                    show_limits = TRUE,
+                    show_mr = TRUE,
+                    write_table = FALSE,
+                    verbosity = 0L,
+                    log_file_path = NULL,
+                    ## Chart Appearance
+                    title = NULL,
+                    subtitle = NULL,
+                    use_caption = TRUE,
+                    override_x_title = NULL,
+                    override_y_title = NULL,
+                    override_y_lim = NULL,
+                    x_break = NULL,
+                    x_date_format = "%Y-%m-%d",
+                    x_pad_end = NULL,
+                    extend_limits_to = NULL,
+                    r1_col = "orange",
+                    r2_col = "steelblue3",
+                    point_size = 2,
+                    line_width_sf = 1,
+                    include_annotations = TRUE,
+                    basic_annotations = getRversion() < '4.3.0',
+                    annotation_size = 3,
+                    align_labels = FALSE,
+                    flip_labels = FALSE,
+                    upper_annotation_sf = NULL,
+                    lower_annotation_sf = NULL,
+                    annotation_arrows = FALSE,
+                    annotation_arrow_curve = 0.3,
+                    override_annotation_dist = NULL,
+                    override_annotation_dist_P = NULL
 ) { 
   
   df_original <- data
   
   # Rename columns if passed
   data <- rename_columns(df = data,
-                       x = {{ x }}, y = {{ y }}, n = {{ n }})
+                         x = {{ x }}, y = {{ y }}, n = {{ n }})
   
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(

@@ -152,7 +152,8 @@ create_SPC_auto_limits_table <- function(data,
           # with at least [shift_rule_threshold] rule 2 break points following.
           if(counter_at_rule_break(df = limits_table,
                                    counter = counter,
-                                   shift_rule_threshold = shift_rule_threshold)){
+                                   shift_rule_threshold = shift_rule_threshold)
+          ) {
             # If so, set next rule break position to the counter. 
             rule2_break_positions <- NA
             rule2_break_position <- counter
@@ -166,8 +167,8 @@ create_SPC_auto_limits_table <- function(data,
             
           } else {
             # If not, i.e. if either the counter is not within a rule 2 break,
-            # or it is but there are fewer than [shift_rule_threshold] points of the
-            # run following, then scan for start of next rule 2 break.
+            # or it is but there are fewer than [shift_rule_threshold] points of
+            # the run following, then scan for start of next rule 2 break.
             rule2_break_positions <- rule2_break_start_positions(
               limits_table = limits_table,
               counter = counter)
@@ -228,8 +229,8 @@ create_SPC_auto_limits_table <- function(data,
             } else {
               
               # [6a] There are sufficient points. Establish candidate limits
-              # using the first period_min points from the counter as calculation
-              # period
+              # using the first period_min points from the counter as
+              # calculation period
               
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
@@ -311,7 +312,8 @@ create_SPC_auto_limits_table <- function(data,
                 # [shift_rule_threshold] points of the run following
                 if(is.na(rule2_break_positions[2]) | 
                    all(
-                     limits_table$rule2[counter:(counter + shift_rule_threshold - 1)]
+                     limits_table$rule2[counter:(counter + shift_rule_threshold 
+                                                 - 1)]
                    )){
                   
                   # If so, advance the counter by 1

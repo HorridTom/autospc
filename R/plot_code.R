@@ -85,7 +85,7 @@
 #' and control limits
 #' @param show_mr Logical controlling whether the moving range chart is included
 #' in XMR chart
-#' @param writeTable Boolean specifying whether to save the data as a CSV 
+#' @param write_table Boolean specifying whether to save the data as a CSV 
 #' (useful for doing lots of charts at a time).
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
@@ -192,7 +192,7 @@ autospc <- function(data,
                           plot_chart = TRUE,
                           show_limits = TRUE,
                           show_mr = TRUE,
-                          writeTable = FALSE,
+                          write_table = FALSE,
                           verbosity = 0L,
                           log_file_path = NULL,
                           ## Chart Appearance
@@ -369,7 +369,7 @@ autospc <- function(data,
         return(p) # Chart output
       )
       
-    } else if(writeTable) {
+    } else if(write_table) {
       # (!plot_chart)
       
       title <- gsub(":", "_",title)

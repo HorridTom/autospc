@@ -26,7 +26,7 @@ autospc(
   plot_chart = TRUE,
   show_limits = TRUE,
   show_mr = TRUE,
-  writeTable = FALSE,
+  write_table = FALSE,
   verbosity = 0L,
   log_file_path = NULL,
   title = NULL,
@@ -162,7 +162,7 @@ and control limits}
 \item{show_mr}{Logical controlling whether the moving range chart is included
 in XMR chart}
 
-\item{writeTable}{Boolean specifying whether to save the data as a CSV
+\item{write_table}{Boolean specifying whether to save the data as a CSV
 (useful for doing lots of charts at a time).}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the

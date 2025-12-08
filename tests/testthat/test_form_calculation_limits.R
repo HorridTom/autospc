@@ -7,7 +7,7 @@ test_that("Calculation period is formed correctly",{
                                                 counter = 1,
                                                 period_min = 21,
                                                 baseline_length = NULL,
-                                                rule2Tolerance = 0,
+                                                centre_line_tolerance = 0,
                                                 shift_rule_threshold = 8)
   result_counter_one_ucl <- result_counter_one$ucl[1:21]
   result_counter_one_cl <- result_counter_one$cl[1:21]
@@ -17,7 +17,7 @@ test_that("Calculation period is formed correctly",{
                                                 counter = 100,
                                                 period_min = 21,
                                                 baseline_length = NULL,
-                                                rule2Tolerance = 0,
+                                                centre_line_tolerance = 0,
                                                 shift_rule_threshold = 8)
   result_counter_100_ucl <- result_counter_100$ucl[100:120]
   result_counter_100_cl <- result_counter_100$cl[100:120]

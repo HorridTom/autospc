@@ -26,7 +26,7 @@
 #'   verbosity = 1L,
 #'   baseline_only = FALSE,
 #'   establish_every_shift = FALSE,
-#'   rule2Tolerance = 0,
+#'   centre_line_tolerance = 0,
 #'   showLimits = TRUE,
 #'   overhanging_reversions = TRUE,
 #'   mr_screen_max_loops = 1L
@@ -45,7 +45,7 @@ create_SPC_auto_limits_table <- function(data,
                                          verbosity,
                                          baseline_only,
                                          establish_every_shift,
-                                         rule2Tolerance,
+                                         centre_line_tolerance,
                                          showLimits,
                                          overhanging_reversions,
                                          mr_screen_max_loops
@@ -106,7 +106,7 @@ create_SPC_auto_limits_table <- function(data,
       counter_at_period_start = counter, 
       chart_type = chart_type, 
       max_exclusions  = max_exclusions, 
-      rule2Tolerance = rule2Tolerance,
+      centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold,
       mr_screen_max_loops = mr_screen_max_loops)
     
@@ -238,7 +238,7 @@ create_SPC_auto_limits_table <- function(data,
                 counter_at_period_start = counter,
                 chart_type = chart_type,
                 max_exclusions = max_exclusions,
-                rule2Tolerance = rule2Tolerance,
+                centre_line_tolerance = centre_line_tolerance,
                 shift_rule_threshold = shift_rule_threshold,
                 mr_screen_max_loops = mr_screen_max_loops)
               
@@ -250,7 +250,7 @@ create_SPC_auto_limits_table <- function(data,
                 counter,
                 period_min,
                 triggering_rule_break_direction,
-                rule2Tolerance = rule2Tolerance,
+                centre_line_tolerance = centre_line_tolerance,
                 shift_rule_threshold = shift_rule_threshold,
                 overhanging_reversions = overhanging_reversions)[[1]]
               

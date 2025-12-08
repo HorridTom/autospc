@@ -14,7 +14,7 @@ test_that("Runs on the centre line do not show as rule 2 breaks with tolerance",
   result <- autospc(test_data,
                           chart_type = "C'",
                           plotChart = FALSE, 
-                          rule2Tolerance = 0.11)
+                          centre_line_tolerance = 0.11)
   result <- result$rule2
   
   correct_answer <- rep(FALSE, 40)

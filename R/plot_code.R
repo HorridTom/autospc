@@ -63,7 +63,7 @@
 #' to recursively ignore mr values above the upper range limit when calculating
 #' xmr limits. Note this does not affect the calculation of the upper range
 #' limit on the mr chart.
-#' @param rule2Tolerance Minimum difference between a point's vertical position
+#' @param centre_line_tolerance Minimum difference between a point's vertical position
 #' and the centre line to count as "on the centre line" for the purposes of 
 #' shift rule breaks
 #' @param floatingMedian Whether to add a floating median line to the chart,
@@ -185,7 +185,7 @@ autospc <- function(data,
                           max_exclusions = 3,
                           highlight_exclusions = TRUE,
                           mr_screen_max_loops = 1L,
-                          rule2Tolerance = 0,
+                          centre_line_tolerance = 0,
                           floatingMedian = "no",
                           floatingMedian_n = 12L,
                           ## Output Type
@@ -262,7 +262,7 @@ autospc <- function(data,
     verbosity = verbosity,
     baseline_only = baseline_only,
     establish_every_shift = establish_every_shift,
-    rule2Tolerance = rule2Tolerance,
+    centre_line_tolerance = centre_line_tolerance,
     showLimits = showLimits,
     overhanging_reversions = overhanging_reversions,
     mr_screen_max_loops = mr_screen_max_loops

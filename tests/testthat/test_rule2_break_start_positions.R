@@ -4,7 +4,7 @@ test_data <- readRDS("testdata/test_data_rule2_break.rds")
 test_that("Start of subsequent rule 2 breaks identified correctly",{
   
   test_data <- add_rule_breaks(test_data,
-                               rule2Tolerance = 0,
+                               centre_line_tolerance = 0,
                                shift_rule_threshold = 8L)
   
   results <- rule2_break_start_positions(test_data, counter = 22)

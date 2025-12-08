@@ -38,7 +38,7 @@ form_calculation_limits <- function(data,
                                     baseline_length,
                                     chart_type = "C",
                                     max_exclusions = 3,
-                                    rule2Tolerance,
+                                    centre_line_tolerance,
                                     shift_rule_threshold,
                                     mr_screen_max_loops){
   
@@ -61,7 +61,7 @@ form_calculation_limits <- function(data,
                                     counter = counter,
                                     period_min = periodLength,
                                     max_exclusions = max_exclusions,
-                                    rule2Tolerance = rule2Tolerance,
+                                    centre_line_tolerance = centre_line_tolerance,
                                     shift_rule_threshold = shift_rule_threshold,
                                     mr_screen_max_loops = mr_screen_max_loops)
   
@@ -174,7 +174,7 @@ find_extremes <- function(data,
                           counter,
                           period_min,
                           max_exclusions,
-                          rule2Tolerance,
+                          centre_line_tolerance,
                           shift_rule_threshold,
                           mr_screen_max_loops){
   
@@ -217,7 +217,7 @@ find_extremes <- function(data,
       dplyr::select(x,y,ucl,lcl, cl)
     
     calculation_period <- add_rule_breaks(calculation_period,
-                                          rule2Tolerance = rule2Tolerance,
+                                          centre_line_tolerance = centre_line_tolerance,
                                           shift_rule_threshold = shift_rule_threshold)
     calculation_period <- calculation_period %>% 
       dplyr::mutate(aboveCl = ifelse(y > cl, TRUE,ifelse(y < cl, FALSE, NA))) %>%
@@ -339,7 +339,7 @@ identify_opposite_break <- function(limits_table,
                                     counter,
                                     period_min, 
                                     triggering_rule_break_direction,
-                                    rule2Tolerance,
+                                    centre_line_tolerance,
                                     shift_rule_threshold,
                                     overhanging_reversions = TRUE){
   
@@ -357,7 +357,7 @@ identify_opposite_break <- function(limits_table,
   
   limits_table_candidate <- limits_table[candidate_start:candidate_end,]
   limits_table_candidate <- add_rule_breaks(limits_table_candidate,
-                                            rule2Tolerance = rule2Tolerance,
+                                            centre_line_tolerance = centre_line_tolerance,
                                             shift_rule_threshold = shift_rule_threshold)
 
   limits_table_candidate <- limits_table_candidate %>%
@@ -504,7 +504,7 @@ form_calculation_and_display_limits <- function(data,
                                                 counter_at_period_start, 
                                                 chart_type,
                                                 max_exclusions,
-                                                rule2Tolerance,
+                                                centre_line_tolerance,
                                                 shift_rule_threshold,
                                                 mr_screen_max_loops){
   
@@ -515,7 +515,7 @@ form_calculation_and_display_limits <- function(data,
                                           counter = counter_at_period_start,
                                           chart_type = chart_type,
                                           max_exclusions = max_exclusions,
-                                          rule2Tolerance = rule2Tolerance,
+                                          centre_line_tolerance = centre_line_tolerance,
                                           shift_rule_threshold = shift_rule_threshold,
                                           mr_screen_max_loops = mr_screen_max_loops)
   
@@ -536,7 +536,7 @@ form_calculation_and_display_limits <- function(data,
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(limits_table = limits_table, 
                                                counter = counter_at_period_start,
-                                               rule2Tolerance = rule2Tolerance,
+                                               centre_line_tolerance = centre_line_tolerance,
                                                shift_rule_threshold = shift_rule_threshold)
   
   
@@ -550,7 +550,7 @@ form_calculation_and_display_limits <- function(data,
 #column not being TRUE on the first row.
 add_rule_breaks_respecting_periods <- function(limits_table,
                                          counter,
-                                         rule2Tolerance,
+                                         centre_line_tolerance,
                                          shift_rule_threshold){
   
   #get breakpoint positions
@@ -562,7 +562,7 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     
     #add rule breaks to all of data
     limits_table <- add_rule_breaks(x = limits_table,
-                                    rule2Tolerance = rule2Tolerance,
+                                    centre_line_tolerance = centre_line_tolerance,
                                     shift_rule_threshold = shift_rule_threshold)
     
   }else if(length(breakpoints) == 1){
@@ -574,10 +574,10 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     
     #add rule breaks to the old and new periods separately 
     limits_table_top <- add_rule_breaks(x = limits_table_top,
-                                        rule2Tolerance = rule2Tolerance,
+                                        centre_line_tolerance = centre_line_tolerance,
                                         shift_rule_threshold = shift_rule_threshold)
     limits_table_bottom <- add_rule_breaks(x = limits_table_bottom,
-                                           rule2Tolerance = rule2Tolerance,
+                                           centre_line_tolerance = centre_line_tolerance,
                                            shift_rule_threshold = shift_rule_threshold)
     
     #put data back together
@@ -599,10 +599,10 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     
     #add rule breaks to the penultimate and new periods only
     limits_table_mid <- add_rule_breaks(x = limits_table_mid,
-                                        rule2Tolerance = rule2Tolerance,
+                                        centre_line_tolerance = centre_line_tolerance,
                                         shift_rule_threshold = shift_rule_threshold)
     limits_table_bottom <- add_rule_breaks(x = limits_table_bottom,
-                                           rule2Tolerance = rule2Tolerance,
+                                           centre_line_tolerance = centre_line_tolerance,
                                            shift_rule_threshold = shift_rule_threshold)
     
     #put data back together

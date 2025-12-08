@@ -15,7 +15,7 @@ create_SPC_auto_limits_table(
   verbosity,
   baseline_only,
   establish_every_shift,
-  rule2Tolerance,
+  centre_line_tolerance,
   showLimits,
   overhanging_reversions,
   mr_screen_max_loops
@@ -70,7 +70,7 @@ extend limits calculated from the first period_min points.}
 and simply re-establish limits at every shift rule break (respecting
 period_min)}
 
-\item{rule2Tolerance}{Minimum difference between a point's vertical position
+\item{centre_line_tolerance}{Minimum difference between a point's vertical position
 and the centre line to count as "on the centre line" for the purposes of
 shift rule breaks}
 
@@ -118,7 +118,7 @@ limits_table <- create_SPC_auto_limits_table(
   verbosity = 1L,
   baseline_only = FALSE,
   establish_every_shift = FALSE,
-  rule2Tolerance = 0,
+  centre_line_tolerance = 0,
   showLimits = TRUE,
   overhanging_reversions = TRUE,
   mr_screen_max_loops = 1L

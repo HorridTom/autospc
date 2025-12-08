@@ -78,24 +78,24 @@ add_annotation_data <- function(df,
 
 add_annotations_to_plot <- function(p,
                                     df,
-                                    basicAnnotations,
+                                    basic_annotations,
                                     annotation_size,
                                     annotation_arrows,
                                     annotation_curvature) {
   
-  useBasicAnnotations <- basicAnnotations
+  use_basic_annotations <- basic_annotations
   
-  if(!basicAnnotations &
+  if(!basic_annotations &
      !(rlang::is_installed("ggrepel") & rlang::is_installed("ggpp"))) {
     warning(
       paste(
-        "Packages ggrepel and ggpp are required for basicAnnotations",
-        "= FALSE. Using basicAnnotations = TRUE. To use",
-        "basicAnnotations = FALSE, please ensure both packages are installed."))
-    useBasicAnnotations <- TRUE
+        "Packages ggrepel and ggpp are required for basic_annotations",
+        "= FALSE. Using basic_annotations = TRUE. To use",
+        "basic_annotations = FALSE, please ensure both packages are installed."))
+    use_basic_annotations <- TRUE
   }
   
-  if(!useBasicAnnotations) {
+  if(!use_basic_annotations) {
     p_annotated <- add_annotations_to_plot_pp(
       p = p,
       df = df,

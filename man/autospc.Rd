@@ -43,8 +43,8 @@ autospc(
   r2_col = "steelblue3",
   point_size = 2,
   line_width_sf = 1,
-  includeAnnotations = TRUE,
-  basicAnnotations = getRversion() < "4.3.0",
+  include_annotations = TRUE,
+  basic_annotations = getRversion() < "4.3.0",
   annotation_size = 3,
   align_labels = FALSE,
   flip_labels = FALSE,
@@ -211,10 +211,10 @@ control limits)}
 
 \item{line_width_sf}{Numeric scale factor for plot line widths.}
 
-\item{includeAnnotations}{Boolean specifying whether to show centre line
+\item{include_annotations}{Boolean specifying whether to show centre line
 labels}
 
-\item{basicAnnotations}{Boolean specifying whether to force use of basic
+\item{basic_annotations}{Boolean specifying whether to force use of basic
 annotation positioning. When TRUE, suggested packages ggrepel
 and ggpp are not required, but annotation arrows are not supported. Defaults
 to TRUE for R versions prior to 4.3, FALSE otherwise.}

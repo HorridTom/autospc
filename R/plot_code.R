@@ -116,9 +116,9 @@
 #' @param point_size Size of plot points, defaults to 2. See
 #' \link[ggplot2]{aes_linetype_size_shape} for more details.
 #' @param line_width_sf Numeric scale factor for plot line widths. 
-#' @param includeAnnotations Boolean specifying whether to show centre line
+#' @param include_annotations Boolean specifying whether to show centre line
 #' labels
-#' @param basicAnnotations Boolean specifying whether to force use of basic
+#' @param basic_annotations Boolean specifying whether to force use of basic
 #' annotation positioning. When TRUE, suggested packages ggrepel
 #' and ggpp are not required, but annotation arrows are not supported. Defaults
 #' to TRUE for R versions prior to 4.3, FALSE otherwise.
@@ -210,8 +210,8 @@ autospc <- function(data,
                           r2_col = "steelblue3",
                           point_size = 2,
                           line_width_sf = 1,
-                          includeAnnotations = TRUE,
-                          basicAnnotations = getRversion() < '4.3.0',
+                          include_annotations = TRUE,
+                          basic_annotations = getRversion() < '4.3.0',
                           annotation_size = 3,
                           align_labels = FALSE,
                           flip_labels = FALSE,
@@ -354,8 +354,8 @@ autospc <- function(data,
         r2_col = r2_col,
         point_size = point_size,
         line_width_sf = line_width_sf,
-        includeAnnotations = includeAnnotations,
-        basicAnnotations = basicAnnotations,
+        include_annotations = include_annotations,
+        basic_annotations = basic_annotations,
         annotation_size = annotation_size,
         annotation_arrows = annotation_arrows,
         annotation_curvature = annotation_arrow_curve,

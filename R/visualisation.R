@@ -18,8 +18,8 @@ create_spc_plot <- function(df,
                             r2_col = "steelblue3",
                             point_size = 2,
                             line_width_sf = 1,
-                            includeAnnotations = TRUE,
-                            basicAnnotations = FALSE,
+                            include_annotations = TRUE,
+                            basic_annotations = FALSE,
                             annotation_size = 3,
                             annotation_arrows = FALSE,
                             annotation_curvature = 0.3,
@@ -68,11 +68,11 @@ create_spc_plot <- function(df,
                              floating_median_n = floating_median_n)
   }
   
-  if(includeAnnotations == TRUE){
+  if(include_annotations == TRUE){
     
     p <- add_annotations_to_plot(p = p,
                                  df = df,
-                                 basicAnnotations = basicAnnotations,
+                                 basic_annotations = basic_annotations,
                                  annotation_size = annotation_size,
                                  annotation_arrows = annotation_arrows,
                                  annotation_curvature = annotation_curvature)

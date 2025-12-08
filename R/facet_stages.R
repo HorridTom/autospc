@@ -28,16 +28,16 @@ facet_stages <- function(data,
   dots_exprs <- rlang::exprs(...)
   
   if(dots_exprs$chart_type == "XMR") {
-    if(!("showMR" %in% names(dots_exprs))) {
+    if(!("show_mr" %in% names(dots_exprs))) {
       
-      dots_exprs$showMR <- FALSE
+      dots_exprs$show_mr <- FALSE
       
-    } else if (dots_exprs$showMR) {
-      warning(paste("`facet_stages()` does not support `showMR = TRUE`.",
-                    "Setting `showMR` to `FALSE`. To facet an MR chart by",
+    } else if (dots_exprs$show_mr) {
+      warning(paste("`facet_stages()` does not support `show_mr = TRUE`.",
+                    "Setting `show_mr` to `FALSE`. To facet an MR chart by",
                     "stages use `facet_stages()` with `chart_type = MR`."))
       
-      dots_exprs$showMR <- FALSE
+      dots_exprs$show_mr <- FALSE
     }
   }
   

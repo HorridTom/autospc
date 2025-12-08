@@ -24,7 +24,7 @@ create_spc_plot <- function(df,
                             annotation_arrows = FALSE,
                             annotation_curvature = 0.3,
                             floating_median_n = 12L,
-                            showMR = TRUE,
+                            show_mr = TRUE,
                             x_break = NULL,
                             x_date_format = "%Y-%m-%d",
                             split_rows = NULL) {
@@ -134,7 +134,7 @@ create_spc_plot <- function(df,
     
   }
   
-  if((chart_type == "XMR") & showMR) {
+  if((chart_type == "XMR") & show_mr) {
     p <- p + 
       ggplot2::labs(caption = NULL,
                     x = NULL) + 

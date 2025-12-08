@@ -7,13 +7,13 @@ test_that("Bug 154 is fixed: rule columns populate correctly", {
                                dplyr::filter(x <= 287L),
                              chart_type = "XMR",
                              plot_chart = FALSE,
-                             showMR = FALSE)
+                             show_mr = FALSE)
   
   results_2 <- autospc(bug_148_data %>%
                                dplyr::filter(x <= 288L),
                              chart_type = "XMR",
                              plot_chart = FALSE,
-                             showMR = FALSE)
+                             show_mr = FALSE)
   
   rule2_NAs_1 <- results_1 %>% 
     dplyr::summarise(num_nas = sum(is.na(rule2))) %>% 

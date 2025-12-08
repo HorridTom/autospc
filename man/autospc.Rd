@@ -25,7 +25,7 @@ autospc(
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
-  showMR = TRUE,
+  show_mr = TRUE,
   writeTable = FALSE,
   verbosity = 0L,
   log_file_path = NULL,
@@ -159,7 +159,7 @@ appended as columns.}
 \item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
 
-\item{showMR}{Logical controlling whether the moving range chart is included
+\item{show_mr}{Logical controlling whether the moving range chart is included
 in XMR chart}
 
 \item{writeTable}{Boolean specifying whether to save the data as a CSV

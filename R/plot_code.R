@@ -83,7 +83,7 @@
 #' appended as columns.
 #' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
-#' @param showMR Logical controlling whether the moving range chart is included
+#' @param show_mr Logical controlling whether the moving range chart is included
 #' in XMR chart
 #' @param writeTable Boolean specifying whether to save the data as a CSV 
 #' (useful for doing lots of charts at a time).
@@ -191,7 +191,7 @@ autospc <- function(data,
                           ## Output Type
                           plot_chart = TRUE,
                           show_limits = TRUE,
-                          showMR = TRUE,
+                          show_mr = TRUE,
                           writeTable = FALSE,
                           verbosity = 0L,
                           log_file_path = NULL,
@@ -319,7 +319,7 @@ autospc <- function(data,
       x_max = x_max
     )
     
-    if((chart_type == "XMR") & showMR) {
+    if((chart_type == "XMR") & show_mr) {
       mc <- match.call()
       mc[["chart_type"]] <- "MR"
       if("title" %in% names(mc)) {mc[["title"]] <- NULL}
@@ -360,7 +360,7 @@ autospc <- function(data,
         annotation_arrows = annotation_arrows,
         annotation_curvature = annotation_arrow_curve,
         floating_median_n = floating_median_n,
-        showMR = showMR,
+        show_mr = show_mr,
         x_break = x_break,
         x_date_format = x_date_format
       )
@@ -385,7 +385,7 @@ autospc <- function(data,
     } else {
       # (!plot_chart)
       
-      if(chart_type == "XMR" & showMR) {
+      if(chart_type == "XMR" & show_mr) {
         
         data <- data %>%
           dplyr::left_join(p_mr %>%

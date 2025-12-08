@@ -22,7 +22,7 @@ correct_answer_PP <- readRDS("testdata/test_data_end_to_end/correct_answer_PP.rd
 
 test_that("C chart process works end to end",{
   
-  results <- autospc(test_data, chart_type = "C", plotChart = FALSE)
+  results <- autospc(test_data, chart_type = "C", plot_chart = FALSE)
   results <- results %>%
     dplyr::select(x, y, ucl, lcl, cl, periodType, 
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
@@ -34,7 +34,7 @@ test_that("C chart process works end to end",{
 
 test_that("C prime chart process works end to end",{
   
-  results <- autospc(test_data, chart_type = "C'", plotChart = FALSE)
+  results <- autospc(test_data, chart_type = "C'", plot_chart = FALSE)
   results <- results %>%
     dplyr::select(x, y, ucl, lcl, cl, periodType, 
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
@@ -46,7 +46,7 @@ test_that("C prime chart process works end to end",{
 
 test_that("P chart process works end to end",{
   
-  results <- autospc(test_data, chart_type = "P", plotChart = FALSE)
+  results <- autospc(test_data, chart_type = "P", plot_chart = FALSE)
   results <- results %>%
     dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, 
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
@@ -58,7 +58,7 @@ test_that("P chart process works end to end",{
 
 test_that("P prime chart process works end to end",{
   
-  results <- autospc(test_data, chart_type = "P'", plotChart = FALSE)
+  results <- autospc(test_data, chart_type = "P'", plot_chart = FALSE)
   results <- results %>%
     dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, 
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 

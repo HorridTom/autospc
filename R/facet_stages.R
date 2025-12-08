@@ -22,7 +22,7 @@
 #' @export  
 facet_stages <- function(data,
                          split_rows,
-                         plotChart = TRUE,
+                         plot_chart = TRUE,
                          ...) {
   
   dots_exprs <- rlang::exprs(...)
@@ -41,7 +41,7 @@ facet_stages <- function(data,
     }
   }
   
-  dots_exprs$plotChart <- FALSE
+  dots_exprs$plot_chart <- FALSE
   
   xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
   
@@ -90,7 +90,7 @@ facet_stages <- function(data,
     .id = "stage"
   )
   
-  if(!plotChart) {
+  if(!plot_chart) {
     return(results_data)
   }
   

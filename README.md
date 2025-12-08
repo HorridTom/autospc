@@ -88,7 +88,7 @@ find out more.
 ### Analysis output as a table
 
 In addition to the default plot output, analysis results can be obtained in
-table format using `plotChart = FALSE`, as follows:
+table format using `plot_chart = FALSE`, as follows:
 
 ```
 limits_table <- autospc(ed_attendances_monthly,
@@ -96,7 +96,7 @@ limits_table <- autospc(ed_attendances_monthly,
                               x = Month_Start,
                               y = Within_4h,
                               n = Att_All,
-                              plotChart = FALSE)
+                              plot_chart = FALSE)
                               
 head(limits_table,
       n = 5L)

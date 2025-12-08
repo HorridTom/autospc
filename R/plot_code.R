@@ -78,7 +78,7 @@
 
 #' ## Output Type
 #' Arguments that control how the result is outputted
-#' @param plotChart Boolean specifying whether to plot the chart. If not, the
+#' @param plot_chart Boolean specifying whether to plot the chart. If not, the
 #' data is returned with centre line, control limits and other analytic output
 #' appended as columns.
 #' @param showLimits Boolean controlling whether or not to display centre line
@@ -189,7 +189,7 @@ autospc <- function(data,
                           floating_median = "no",
                           floating_median_n = 12L,
                           ## Output Type
-                          plotChart = TRUE,
+                          plot_chart = TRUE,
                           showLimits = TRUE,
                           showMR = TRUE,
                           writeTable = FALSE,
@@ -331,7 +331,7 @@ autospc <- function(data,
       p_mr <- NA
     }
     
-    if(plotChart){
+    if(plot_chart){
       
       p <- create_spc_plot(
         df = data,
@@ -370,7 +370,7 @@ autospc <- function(data,
       )
       
     } else if(writeTable) {
-      # (!plotChart)
+      # (!plot_chart)
       
       title <- gsub(":", "_",title)
       subtitle <- gsub(":","_", subtitle)
@@ -383,7 +383,7 @@ autospc <- function(data,
                 row.names = FALSE)
       
     } else {
-      # (!plotChart)
+      # (!plot_chart)
       
       if(chart_type == "XMR" & showMR) {
         
@@ -407,7 +407,7 @@ autospc <- function(data,
     }
     
   } else { # Plot only the time series, without limits
-    if(plotChart == TRUE) {
+    if(plot_chart == TRUE) {
       p <- create_timeseries_plot(
         df = data,
         title = title,

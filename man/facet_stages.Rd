@@ -4,7 +4,7 @@
 \alias{facet_stages}
 \title{facet_stages}
 \usage{
-facet_stages(data, split_rows, plotChart = TRUE, ...)
+facet_stages(data, split_rows, plot_chart = TRUE, ...)
 }
 \arguments{
 \item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
@@ -24,7 +24,7 @@ For a P or P' chart, must have columns for:
 \item{split_rows}{A vector of row numbers specifying the stages to display
 results at. Names specify facet strip labels.}
 
-\item{plotChart}{Boolean specifying whether to plot the chart. If not, the
+\item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
 data is returned with centre line, control limits and other analytic output
 appended as columns.}
 

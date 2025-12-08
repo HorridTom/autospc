@@ -4,7 +4,7 @@ test_that("calculation period only chart is created without warning", {
   
   plot_1 <- autospc(test_data,
                     chart_type = "XMR",
-                    plotChart = TRUE,
+                    plot_chart = TRUE,
                     includeAnnotations = FALSE)
   
   expect_no_warning(print(plot_1),

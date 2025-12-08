@@ -21,19 +21,19 @@ test_that(
     
     result_ssa <- autospc(example_series_1[1:96,],
                           chart_type = "XMR",
-                          plotChart = FALSE,
+                          plot_chart = FALSE,
                           no_regrets = TRUE,
                           overhanging_reversions = TRUE)
     
     result_nRF_oRT <- autospc(example_series_1[1:96,],
                               chart_type = "XMR",
-                              plotChart = FALSE,
+                              plot_chart = FALSE,
                               no_regrets = FALSE,
                               overhanging_reversions = TRUE)
     
     result_nRF_oRF <- autospc(example_series_1[1:96,],
                               chart_type = "XMR",
-                              plotChart = FALSE,
+                              plot_chart = FALSE,
                               no_regrets = FALSE,
                               overhanging_reversions = FALSE)
     
@@ -63,19 +63,19 @@ test_that(
     
     result_ssa <- autospc(example_series_1,
                           chart_type = "XMR",
-                          plotChart = FALSE,
+                          plot_chart = FALSE,
                           no_regrets = TRUE,
                           overhanging_reversions = TRUE)
     
     result_nRF_oRT <- autospc(example_series_1,
                               chart_type = "XMR",
-                              plotChart = FALSE,
+                              plot_chart = FALSE,
                               no_regrets = FALSE,
                               overhanging_reversions = TRUE)
     
     result_nRF_oRF <- autospc(example_series_1,
                               chart_type = "XMR",
-                              plotChart = FALSE,
+                              plot_chart = FALSE,
                               no_regrets = FALSE,
                               overhanging_reversions = FALSE)
     

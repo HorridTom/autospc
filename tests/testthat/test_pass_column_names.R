@@ -10,13 +10,13 @@ test_that("Renaming columns doesn't change the result",{
   
   result1 <- autospc(test_data1,
                            chart_type = "C'",
-                           plotChart = FALSE)
+                           plot_chart = FALSE)
   
   result2 <- autospc(test_data2,
                            x = month,
                            y = count,
                            chart_type = "C'",
-                           plotChart = FALSE)
+                           plot_chart = FALSE)
   
   testthat::expect_equal(result1, result2)
   

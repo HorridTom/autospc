@@ -7,7 +7,7 @@ test_that("", {
     y = Att_All,
     period_min = 21L,
     baseline_length = 63L,
-    plotChart = FALSE
+    plot_chart = FALSE
   )
   
   result <- result_data %>%

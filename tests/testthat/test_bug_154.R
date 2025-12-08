@@ -6,13 +6,13 @@ test_that("Bug 154 is fixed: rule columns populate correctly", {
   results_1 <- autospc(bug_148_data %>%
                                dplyr::filter(x <= 287L),
                              chart_type = "XMR",
-                             plotChart = FALSE,
+                             plot_chart = FALSE,
                              showMR = FALSE)
   
   results_2 <- autospc(bug_148_data %>%
                                dplyr::filter(x <= 288L),
                              chart_type = "XMR",
-                             plotChart = FALSE,
+                             plot_chart = FALSE,
                              showMR = FALSE)
   
   rule2_NAs_1 <- results_1 %>% 

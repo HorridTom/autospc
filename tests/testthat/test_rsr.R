@@ -8,7 +8,7 @@ test_that("establish_every_shift works correctly", {
     x = Month_Start,
     y = Total_Att,
     establish_every_shift = TRUE,
-    plotChart = FALSE
+    plot_chart = FALSE
   )
   
   result <- result_data %>%

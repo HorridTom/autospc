@@ -17,30 +17,30 @@ test_data2 <- data.frame(x = 1:50,
 test_that("Charts with fewer points than min period error handle",{
   
   #hide warnings for part of this test
-  result_C <- suppressWarnings(autospc(test_data, plotChart = FALSE, chart_type = "C", period_min = 21))
-  result_P <- suppressWarnings(autospc(test_data, plotChart = FALSE, chart_type = "P", period_min = 21))
+  result_C <- suppressWarnings(autospc(test_data, plot_chart = FALSE, chart_type = "C", period_min = 21))
+  result_P <- suppressWarnings(autospc(test_data, plot_chart = FALSE, chart_type = "P", period_min = 21))
 
   testthat::expect_equal(ncol(result_C), 4)
   testthat::expect_equal(ncol(result_P), 5)
-  testthat::expect_warning(autospc(test_data, plotChart = TRUE, chart_type = "C"))
-  testthat::expect_warning(autospc(test_data, plotChart = TRUE, chart_type = "P"))
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C"))
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P"))
   
 })
 
 test_that("Charts with showLimits = FALSE behave as expected",{
   
-  result_C <- autospc(test_data2, plotChart = FALSE, chart_type = "C", period_min = 21, showLimits = FALSE)
-  result_P <- autospc(test_data2, plotChart = FALSE, chart_type = "P", period_min = 21, showLimits = FALSE)
+  result_C <- autospc(test_data2, plot_chart = FALSE, chart_type = "C", period_min = 21, showLimits = FALSE)
+  result_P <- autospc(test_data2, plot_chart = FALSE, chart_type = "P", period_min = 21, showLimits = FALSE)
   
   #expect full limits table to be returned regardless of showLimits status
   testthat::expect_equal(ncol(result_C), 14)
   testthat::expect_equal(ncol(result_P), 20)
   
   #expect no warning even for data passed in with too few points
-  testthat::expect_warning(autospc(test_data, plotChart = TRUE, chart_type = "C", showLimits = FALSE), regexp = NA)
-  testthat::expect_warning(autospc(test_data, plotChart = TRUE, chart_type = "P", showLimits = FALSE), regexp = NA)
-  testthat::expect_warning(autospc(test_data, plotChart = TRUE, chart_type = "C", showLimits = FALSE), regexp = NA)
-  testthat::expect_warning(autospc(test_data, plotChart = TRUE, chart_type = "P", showLimits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", showLimits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P", showLimits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", showLimits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P", showLimits = FALSE), regexp = NA)
   
   
 })

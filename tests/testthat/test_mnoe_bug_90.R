@@ -9,7 +9,7 @@ test_that("Bug 90 is fixed: period_min respected even with NAs", {
                                       chart_type = "P'",
                                       period_min = 24L,
                                       max_exclusions = 0L,
-                                      plotChart = FALSE)
+                                      plot_chart = FALSE)
   
   # Establish the number of (non-missing) data points within each calculation
   # period in the algorithm results

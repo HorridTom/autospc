@@ -52,7 +52,7 @@ invisible(capture.output(
   df_out <- autospc::autospc(test_data,
                                    chart_type = "P",
                                    verbosity = 2L,
-                                   plotChart = FALSE)
+                                   plot_chart = FALSE)
 ))
 
 log_out <- df_out %>%

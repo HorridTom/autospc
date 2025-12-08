@@ -6,7 +6,7 @@ test_that(paste0("break points are inserted even with no change in centre line",
                    
                    result <- autospc(bug_148_data,
                                            chart_type = "C",
-                                           plotChart = FALSE)
+                                           plot_chart = FALSE)
                    
                    num_breakpoints = sum(result %>%
                                            dplyr::filter(dplyr::row_number()

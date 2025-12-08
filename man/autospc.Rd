@@ -23,7 +23,7 @@ autospc(
   centre_line_tolerance = 0,
   floating_median = "no",
   floating_median_n = 12L,
-  plotChart = TRUE,
+  plot_chart = TRUE,
   showLimits = TRUE,
   showMR = TRUE,
   writeTable = FALSE,
@@ -152,7 +152,7 @@ floating median, if present.
 Arguments that control how the result is outputted
 }}
 
-\item{plotChart}{Boolean specifying whether to plot the chart. If not, the
+\item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
 data is returned with centre line, control limits and other analytic output
 appended as columns.}
 

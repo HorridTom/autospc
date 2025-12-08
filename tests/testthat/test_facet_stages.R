@@ -8,7 +8,7 @@ test_that("facet_stages produces correct data output", {
     chart_type = "C'",
     x = Month_Start,
     y = Att_All, 
-    plotChart = FALSE
+    plot_chart = FALSE
   )
   
   stage2 <- autospc(ed_attendances_monthly %>%
@@ -16,7 +16,7 @@ test_that("facet_stages produces correct data output", {
                     chart_type = "C'",
                     x = Month_Start,
                     y = Att_All, 
-                    plotChart = FALSE)
+                    plot_chart = FALSE)
   
   expect_equal(faceted_results %>%
                  dplyr::group_by(stage) %>%
@@ -82,7 +82,7 @@ test_that("", {
     chart_type = "C'",
     x = Month_Start,
     y = Att_All, 
-    plotChart = TRUE
+    plot_chart = TRUE
   )
   
   faceted_build <- ggplot2::ggplot_build(faceted_plot)
@@ -101,7 +101,7 @@ test_that("facet_stages works when relying on x,y columns in data", {
                                         y = rnorm(n = 100L)),
                          split_rows = c(30L, 60L),
                          chart_type = "XMR",
-                         plotChart = FALSE)
+                         plot_chart = FALSE)
   
   result_lengths <- result %>%
     dplyr::group_by(stage) %>%

@@ -4,7 +4,7 @@ test_that("Consecutive opposite shifts are considered distinct",{
                           x = Month_Start,
                           y = Within_4h,
                           chart_type = "C'",
-                          plotChart = FALSE)
+                          plot_chart = FALSE)
   
   result <- result_df %>% 
     dplyr::group_by(plotPeriod) %>%

@@ -11,28 +11,28 @@ test_that("check rule length for run of 6", {
   results6 <- autospc(
     test_data6, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data6, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data6, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data6, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 9, 
     period_min = 21
     )
@@ -53,28 +53,28 @@ test_that("check rule length for run of 7", {
   results6 <- autospc(
     test_data7, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data7, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data7, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data7, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 9, 
     period_min = 21
     )
@@ -92,28 +92,28 @@ test_that("check rule length for run of 8", {
   results6 <- autospc(
     test_data8, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data8, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data8, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data8, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 9, 
     period_min = 21
     )
@@ -131,28 +131,28 @@ test_that("rule length change for run of 9", {
   results6 <- autospc(
     test_data9, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 6, 
     period_min = 21
     )
   results7 <- autospc(
     test_data9, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 7, 
     period_min = 21
     )
   results8 <- autospc(
     test_data9, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 8, 
     period_min = 21
     )
   results9 <- autospc(
     test_data9, 
     chart_type = "XMR", 
-    plotChart = FALSE, 
+    plot_chart = FALSE, 
     shift_rule_threshold = 9, 
     period_min = 21
     )

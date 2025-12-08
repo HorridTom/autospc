@@ -16,7 +16,7 @@ create_SPC_auto_limits_table(
   baseline_only,
   establish_every_shift,
   centre_line_tolerance,
-  showLimits,
+  show_limits,
   overhanging_reversions,
   mr_screen_max_loops
 )
@@ -74,7 +74,7 @@ period_min)}
 and the centre line to count as "on the centre line" for the purposes of
 shift rule breaks}
 
-\item{showLimits}{Boolean controlling whether or not to display centre line
+\item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
 
 \item{overhanging_reversions}{Boolean determining whether rule breaks in the
@@ -119,7 +119,7 @@ limits_table <- create_SPC_auto_limits_table(
   baseline_only = FALSE,
   establish_every_shift = FALSE,
   centre_line_tolerance = 0,
-  showLimits = TRUE,
+  show_limits = TRUE,
   overhanging_reversions = TRUE,
   mr_screen_max_loops = 1L
 )

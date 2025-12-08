@@ -24,7 +24,7 @@ autospc(
   floating_median = "no",
   floating_median_n = 12L,
   plot_chart = TRUE,
-  showLimits = TRUE,
+  show_limits = TRUE,
   showMR = TRUE,
   writeTable = FALSE,
   verbosity = 0L,
@@ -156,7 +156,7 @@ Arguments that control how the result is outputted
 data is returned with centre line, control limits and other analytic output
 appended as columns.}
 
-\item{showLimits}{Boolean controlling whether or not to display centre line
+\item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
 
 \item{showMR}{Logical controlling whether the moving range chart is included

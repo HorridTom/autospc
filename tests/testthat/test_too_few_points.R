@@ -27,20 +27,20 @@ test_that("Charts with fewer points than min period error handle",{
   
 })
 
-test_that("Charts with showLimits = FALSE behave as expected",{
+test_that("Charts with show_limits = FALSE behave as expected",{
   
-  result_C <- autospc(test_data2, plot_chart = FALSE, chart_type = "C", period_min = 21, showLimits = FALSE)
-  result_P <- autospc(test_data2, plot_chart = FALSE, chart_type = "P", period_min = 21, showLimits = FALSE)
+  result_C <- autospc(test_data2, plot_chart = FALSE, chart_type = "C", period_min = 21, show_limits = FALSE)
+  result_P <- autospc(test_data2, plot_chart = FALSE, chart_type = "P", period_min = 21, show_limits = FALSE)
   
-  #expect full limits table to be returned regardless of showLimits status
+  #expect full limits table to be returned regardless of show_limits status
   testthat::expect_equal(ncol(result_C), 14)
   testthat::expect_equal(ncol(result_P), 20)
   
   #expect no warning even for data passed in with too few points
-  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", showLimits = FALSE), regexp = NA)
-  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P", showLimits = FALSE), regexp = NA)
-  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", showLimits = FALSE), regexp = NA)
-  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P", showLimits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", show_limits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P", show_limits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", show_limits = FALSE), regexp = NA)
+  testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P", show_limits = FALSE), regexp = NA)
   
   
 })

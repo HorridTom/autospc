@@ -27,7 +27,7 @@
 #'   baseline_only = FALSE,
 #'   establish_every_shift = FALSE,
 #'   centre_line_tolerance = 0,
-#'   showLimits = TRUE,
+#'   show_limits = TRUE,
 #'   overhanging_reversions = TRUE,
 #'   mr_screen_max_loops = 1L
 #' )
@@ -46,7 +46,7 @@ create_SPC_auto_limits_table <- function(data,
                                          baseline_only,
                                          establish_every_shift,
                                          centre_line_tolerance,
-                                         showLimits,
+                                         show_limits,
                                          overhanging_reversions,
                                          mr_screen_max_loops
 ) {
@@ -88,7 +88,7 @@ create_SPC_auto_limits_table <- function(data,
                              counter = counter,
                              entry = "0210")
     
-    if(showLimits == TRUE){
+    if(show_limits == TRUE){
       warning(paste("The input data has fewer than the minimum number of",
                     "points needed to calculate one period. Timeseries data",
                     "without limits has been displayed."))

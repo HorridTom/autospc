@@ -81,7 +81,7 @@
 #' @param plot_chart Boolean specifying whether to plot the chart. If not, the
 #' data is returned with centre line, control limits and other analytic output
 #' appended as columns.
-#' @param showLimits Boolean controlling whether or not to display centre line
+#' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
 #' @param showMR Logical controlling whether the moving range chart is included
 #' in XMR chart
@@ -190,7 +190,7 @@ autospc <- function(data,
                           floating_median_n = 12L,
                           ## Output Type
                           plot_chart = TRUE,
-                          showLimits = TRUE,
+                          show_limits = TRUE,
                           showMR = TRUE,
                           writeTable = FALSE,
                           verbosity = 0L,
@@ -263,7 +263,7 @@ autospc <- function(data,
     baseline_only = baseline_only,
     establish_every_shift = establish_every_shift,
     centre_line_tolerance = centre_line_tolerance,
-    showLimits = showLimits,
+    show_limits = show_limits,
     overhanging_reversions = overhanging_reversions,
     mr_screen_max_loops = mr_screen_max_loops
   )
@@ -280,7 +280,7 @@ autospc <- function(data,
     df = data,
     chart_type = chart_type,
     period_min = period_min,
-    showLimits = showLimits,
+    show_limits = show_limits,
     override_x_title = override_x_title,
     override_y_title = override_y_title,
     override_y_lim = override_y_lim,
@@ -301,7 +301,7 @@ autospc <- function(data,
   
   
   # Check whether limits are to be displayed on chart
-  if(showLimits & num_non_missing_y >= period_min){
+  if(show_limits & num_non_missing_y >= period_min){
     
     data <- postprocess_spc(
       df = data,

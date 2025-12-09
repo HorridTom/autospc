@@ -1,10 +1,10 @@
-#get c chart limits
-#Input y data as vector. Returns cl, ucl and lcl as named list.
+# Get c chart limits
+# Input y data as vector. Returns cl, ucl and lcl as named list.
 get_c_limits <- function(y, 
                          exclusion_points = NULL,
                          na.rm = TRUE){
   
-  #send error messages if data is not in the right format
+  # Errors if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
   }
@@ -19,9 +19,9 @@ get_c_limits <- function(y,
   }
   
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
-    #exclude exclusion points from calculations
+    # Exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
-  }else{
+  } else {
     y_excl <- y
   }
   
@@ -39,15 +39,16 @@ get_c_limits <- function(y,
        lcl = rep(lcl, length(y)))
 }
 
-#get p chart limits
-#Input y and n data as vectors. Returns cl, ucl and lcl as named list.
+
+# Get p chart limits
+# Input y and n data as vectors. Returns cl, ucl and lcl as named list.
 get_p_limits <- function(y, 
                          n,
                          exclusion_points = NULL,
                          multiply = 1,
                          na.rm = TRUE){
   
-  #send error messages if data is not in the right format
+  # Errors if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
   }
@@ -66,7 +67,7 @@ get_p_limits <- function(y,
   }
   
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
-    #exclude exclusion points from calculations
+    # Exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
     n_excl <- n[-exclusion_points]
   }else{
@@ -74,7 +75,7 @@ get_p_limits <- function(y,
     n_excl <- n
   }
   
-  #if there are missing y or n values then set both to NA
+  # If there are missing y or n values then set both to NA
   n_excl[which(is.na(y_excl))] <- NA
   y_excl[which(is.na(n_excl))] <- NA
   
@@ -90,15 +91,16 @@ get_p_limits <- function(y,
   list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
 }
 
-#get C prime limits
-#this is the same as U prime with n = 1
-#Input y and n data as vectors. Returns cl, ucl and lcl as named list.
+
+# Get C prime limits
+# This is the same as U prime with n = 1
+# Input y and n data as vectors. Returns cl, ucl and lcl as named list.
 get_cp_limits <- function(y,
                           exclusion_points = NULL,
                           na.rm = TRUE,
                           mr_screen_max_loops = 1){
   
-  #send error messages if data is not in the right format
+  # Errors if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
   }
@@ -113,15 +115,15 @@ get_cp_limits <- function(y,
   }
   
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
-    #exclude exclusion points from calculations
+    # Exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
-  }else{
+  } else {
     y_excl <- y
   }
   
   cl <- mean(y_excl, na.rm = TRUE)
   
-  n_excl <- 1 #######
+  n_excl <- 1 # Makes explicit the relationship with u-prime charts
   cl <- cl
   stdev <- sqrt(cl / n_excl)
   z_i <- (y_excl - cl) / stdev
@@ -144,8 +146,8 @@ get_cp_limits <- function(y,
 }
 
 
-#get P prime limits
-#Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
+# Get P prime limits
+# Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
 get_pp_limits <- function(y, 
                           n,
                           exclusion_points = NULL, 
@@ -154,7 +156,7 @@ get_pp_limits <- function(y,
                           mr_screen_max_loops = 1,
                           use_nbar_for_stdev = FALSE){
   
-  #send error messages if data is not in the right format
+  # Errors if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
   }
@@ -173,15 +175,15 @@ get_pp_limits <- function(y,
   }
   
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
-    #exclude exclusion points from calculations
+    # Exclude exclusion points from calculations
     y_excl <- y[-exclusion_points]
     n_excl <- n[-exclusion_points]
-  }else{
+  } else {
     y_excl <- y
     n_excl <- n
   }
   
-  #if there are missing y or n values then set both to NA
+  # If there are missing y or n values then set both to NA
   n_excl[which(is.na(y_excl))] <- NA
   y_excl[which(is.na(n_excl))] <- NA
   
@@ -206,7 +208,7 @@ get_pp_limits <- function(y,
   
   sigma_z <- amr / 1.128
   
-  #recalc stdev with excluded data
+  # Recalculate stdev with excluded data
   if(use_nbar_for_stdev) {
     n <- mean(n,
               na.rm = TRUE)
@@ -223,15 +225,15 @@ get_pp_limits <- function(y,
   list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
 }
 
-#get i limits
-#Input y as a vector. returns cl, ucl and lcl as a list. 
 
+# Get i limits
+# Input y as a vector. returns cl, ucl and lcl as a list. 
 get_i_limits <- function(y, 
                          na.rm = TRUE,
                          mr_screen_max_loops = 1,
                          exclusion_points = NULL){
   
-  #sends error messages if data is not in the correct format
+  # Errors if data is not in the right format
   if(length(y) == 0){
     stop("The input data has zero observations.")
   }
@@ -245,14 +247,14 @@ get_i_limits <- function(y,
                "if you wish to ignore these."))
   }
   
-  #exclude exclusion points from calculations
+  # Exclude exclusion points from calculations
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     y_excl <- y[-exclusion_points]
   }else{
     y_excl <- y
   }
   
-  # calculations of limits for i charts
+  # Calculations of limits for I charts
   mr <- abs(diff(y_excl))
   mr_lims <- mr_lims_calc(mr = mr,
                           mr_screen_max_loops = mr_screen_max_loops)
@@ -262,7 +264,7 @@ get_i_limits <- function(y,
   ucl_i <- mean_i + (3 * sigma)
   lcl_i <- mean_i - (3 * sigma)
   
-  #lists the results
+  # Lists the results
   return(list(cl = rep(mean_i, length(y)),
               ucl = rep(ucl_i, length(y)),
               lcl = rep(lcl_i, length(y))))
@@ -271,7 +273,7 @@ get_i_limits <- function(y,
 # Get moving ranges
 get_mrs <- function(y,
                     exclusion_points = NULL) {
-  #exclude exclusion points from calculations
+  # Exclude exclusion points from calculations
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     y_excl <- y[-exclusion_points]
   }else{
@@ -285,13 +287,14 @@ get_mrs <- function(y,
   return(mrs)
 }
 
+
 # Get moving range limits 
 get_mr_limits <- function(mr,
                           na.rm = TRUE,
                           mr_screen_max_loops = 0,
                           exclusion_points = NULL) {
   
-  #exclude exclusion points from calculations
+  # Exclude exclusion points from calculations
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     mr_excl <- mr[-exclusion_points]
   }else{
@@ -315,18 +318,19 @@ get_mr_limits <- function(mr,
 mr_lims_calc <- function(mr,
                          mr_screen_max_loops) {
   
-  # calculations of limits for i charts
+  # Calculation of limits for mr chart
   mean_mr <- mean(mr,
                   na.rm = TRUE)
   ucl_mr <- 3.267 * mean_mr
   
-  #removes moving ranges that are above the ucl_mr and
-  # recalculates the mean_mr
+  # Recursively removes moving ranges that are above the upper range limit and
+  # recalculates the average moving range. mr_screen_max_loops sets the maximum
+  # number of times this procedure is performed.
   i <- 0L
   
   while(any(mr > ucl_mr, na.rm = TRUE) & (i < mr_screen_max_loops)){
     
-    mr <- mr[mr < ucl_mr] # removes any mR values above the ucl
+    mr <- mr[mr < ucl_mr] # removes any mr values above the url
     mean_mr <- mean(mr, na.rm = TRUE)
     ucl_mr <- 3.267 * mean_mr
     

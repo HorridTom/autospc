@@ -3,7 +3,8 @@ test_data <- readRDS("testdata/test_data.rds")
 
 test_that("Linetypes are formed correctly", {
   
-  test_plt <- plot_auto_SPC(df = test_data, chartType = "C'")
+  test_plt <- autospc(test_data,
+                      chart_type = "C'")
   
   layer_2 <- ggplot2::layer_data(test_plt, 2) %>% dplyr::arrange(x)
   layer_4 <- ggplot2::layer_data(test_plt, 4) %>% dplyr::arrange(x)
@@ -18,5 +19,5 @@ test_that("Linetypes are formed correctly", {
   
   expect_identical(rle_layer_2, correct_answer_2)
   expect_identical(rle_layer_4, correct_answer_4)
-    
+  
 })

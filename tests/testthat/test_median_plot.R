@@ -1,25 +1,25 @@
 # Load test data
 test_median_data <- readRDS("testdata/test_median_data.rds")
 
-test_that("the series of medians being plotted are correctly calculated when floatingMedian is set to yes", {
+test_that("the series of medians being plotted are correctly calculated when floating_median is set to yes", {
   # Set the n points for the median 
   test_median_n <- 12L 
-
+  
   # Create and store XmR chart 
-  chart_result <- autospc::plot_auto_SPC(df = test_median_data,
-                                  chartType = 'XMR',
-                                  floatingMedian = "yes",
-                                  floatingMedian_n = test_median_n,
-                                  showMR = FALSE)
+  chart_result <- autospc::autospc(test_median_data,
+                                   chart_type = 'XMR',
+                                   floating_median = "yes",
+                                   floating_median_n = test_median_n,
+                                   show_mr = FALSE)
   
   # Store XmR chart data  
   chart_result_data <- chart_result$data 
-
+  
   # Extract all median values from the result data  
   result_median <- chart_result_data %>% 
     dplyr::filter(!is.na(median)) %>% 
     dplyr::pull(median)
-
+  
   # Test that the length of the test_median__n points matches the length of the median points calculated
   expect_equal(length(result_median),test_median_n)
   
@@ -45,16 +45,16 @@ test_that("the series of medians being plotted are correctly calculated when flo
   expect_equal(result_median, correct_median)
 })
 
-test_that("the median is not generated nor plotted when floatingMedian is set to no", {
+test_that("the median is not generated nor plotted when floating_median is set to no", {
   # Set the n points for the median 
   test_median_n <- 12L 
   
   # Create and store XmR chart 
-  chart_result <- autospc::plot_auto_SPC(df = test_median_data,
-                                         chartType = 'XMR',
-                                         floatingMedian = "no",
-                                         floatingMedian_n = test_median_n,
-                                         showMR = FALSE)
+  chart_result <- autospc::autospc(test_median_data,
+                                   chart_type = 'XMR',
+                                   floating_median = "no",
+                                   floating_median_n = test_median_n,
+                                   show_mr = FALSE)
   # Store XmR chart data  
   chart_result_data <- chart_result$data
   
@@ -62,24 +62,24 @@ test_that("the median is not generated nor plotted when floatingMedian is set to
   expect_false("median" %in% names(chart_result_data))
 })
 
-test_that("the series of medians being plotted are correctly calculated when floatingMedian is set to auto", {
-  # Load test df where last floatingMedian_n contains at least 1 shift rule 2 break 
+test_that("the series of medians being plotted are correctly calculated when floating_median is set to auto", {
+  # Load test df where last floating_median_n contains at least 1 shift rule 2 break 
   test_data_with_rule2_break <- readRDS("testdata/test_medianWithRule2Break.rds")
   
   # Set the n points for the median 
   test_median_n <- 12L 
   
   # Create and store XmR chart
-  auto_median_result <- autospc::plot_auto_SPC(df = test_data_with_rule2_break,
-                                              chartType = 'XMR',
-                                              floatingMedian = "auto",
-                                              floatingMedian_n = test_median_n,
-                                              showMR = FALSE)
+  auto_median_result <- autospc::autospc(test_data_with_rule2_break,
+                                         chart_type = 'XMR',
+                                         floating_median = "auto",
+                                         floating_median_n = test_median_n,
+                                         show_mr = FALSE)
   # Store XmR chart data 
   auto_median_result_data <- auto_median_result$data 
   
   # Extract all median values from the result data  
-    auto_result_median <- auto_median_result_data %>% 
+  auto_result_median <- auto_median_result_data %>% 
     dplyr::filter(!is.na(median)) %>% 
     dplyr::pull(median)
   
@@ -108,20 +108,20 @@ test_that("the series of medians being plotted are correctly calculated when flo
   expect_equal(auto_result_median, correct_median_auto)
 })
 
-test_that("Median is not plotted when floatingMedian is set to auto and there is not a shift rule 2 break in the last floatingMedian_n rows", {
+test_that("Median is not plotted when floating_median is set to auto and there is not a shift rule 2 break in the last floating_median_n rows", {
   # Load test df where last 12 points does not contain a shift rule 2 break 
   test_median_without_rule2_break <- readRDS("testdata/test_medianNoRule2Breaks.rds")
   
   # Set the n points for the median
   test_median_n <- 12L
-
+  
   # Create and store XmR chart 
-  chart_result <- autospc::plot_auto_SPC(df = test_median_without_rule2_break,
-                                         chartType = 'XMR',
-                                         floatingMedian = "auto",
-                                         floatingMedian_n = test_median_n,
-                                         showMR = FALSE)
-
+  chart_result <- autospc::autospc(test_median_without_rule2_break,
+                                   chart_type = 'XMR',
+                                   floating_median = "auto",
+                                   floating_median_n = test_median_n,
+                                   show_mr = FALSE)
+  
   chart_result_data <- chart_result$data
   
   # Test that the median is not calculated nor plotted when there is not a shift rule 2 break in last 12L points 
@@ -133,18 +133,18 @@ test_that("NAs do not prevent median from being plotted",{
   # Set the n points for the median 
   test_median_n <- 12L 
   
-  # Introduce NA withing last floatingMedian_n points
+  # Introduce NA withing last floating_median_n points
   test_median_data_na <- test_median_data %>% 
     dplyr::mutate(y = dplyr::if_else(dplyr::row_number() == 124L,
                                      NA_integer_,
                                      y))
   
   # Create and store XmR chart 
-  chart_result <- autospc::plot_auto_SPC(df = test_median_data_na,
-                                         chartType = 'XMR',
-                                         floatingMedian = "yes",
-                                         floatingMedian_n = test_median_n,
-                                         showMR = FALSE)
+  chart_result <- autospc::autospc(test_median_data_na,
+                                   chart_type = 'XMR',
+                                   floating_median = "yes",
+                                   floating_median_n = test_median_n,
+                                   show_mr = FALSE)
   # Store XmR chart data  
   chart_result_data <- chart_result$data
   

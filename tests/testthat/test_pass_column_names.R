@@ -8,15 +8,15 @@ test_that("Renaming columns doesn't change the result",{
   test_data2 <- test_data %>%
     dplyr::select(month = x, count = y)
   
-  result1 <- plot_auto_SPC(test_data1,
-                           chartType = "C'",
-                           plotChart = FALSE)
+  result1 <- autospc(test_data1,
+                           chart_type = "C'",
+                           plot_chart = FALSE)
   
-  result2 <- plot_auto_SPC(test_data2,
+  result2 <- autospc(test_data2,
                            x = month,
                            y = count,
-                           chartType = "C'",
-                           plotChart = FALSE)
+                           chart_type = "C'",
+                           plot_chart = FALSE)
   
   testthat::expect_equal(result1, result2)
   

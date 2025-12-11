@@ -5,8 +5,8 @@ POSIXct_x_data <- readRDS(file.path("testdata",
 test_that("Chart is created without error when x-axis is POSIXct", {
   
   expect_no_error(
-    plot_auto_SPC(POSIXct_x_data,
-                  chartType = "C'",
+    autospc(POSIXct_x_data,
+                  chart_type = "C'",
                   x = Month,
                   y = Total),
     message = "the condition has length"
@@ -18,8 +18,8 @@ test_that("Chart is created without error when x-axis is POSIXct", {
 test_that("x_break argument accepts difftime when x-axis is POSIXct", {
   
   expect_no_error(
-    plot_auto_SPC(POSIXct_x_data,
-                  chartType = "C'",
+    autospc(POSIXct_x_data,
+                  chart_type = "C'",
                   x = Month,
                   y = Total,
                   x_break = as.difftime(6, units = "weeks")),
@@ -32,8 +32,8 @@ test_that("x_break argument accepts difftime when x-axis is POSIXct", {
 test_that("Error thrown when x_break not difftime and x-axis is POSIXct", {
   
   expect_error(
-    plot_auto_SPC(POSIXct_x_data,
-                  chartType = "C'",
+    autospc(POSIXct_x_data,
+                  chart_type = "C'",
                   x = Month,
                   y = Total,
                   x_break = 6),

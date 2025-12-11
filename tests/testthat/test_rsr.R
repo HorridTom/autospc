@@ -1,14 +1,14 @@
 test_rsr_data <- readRDS("testdata/test_rsr_data.rds")
 
-test_that("recalEveryShift works correctly", {
+test_that("establish_every_shift works correctly", {
   
-  result_data <- plot_auto_SPC(
+  result_data <- autospc(
     test_rsr_data,
-    chartType = "C'",
+    chart_type = "C'",
     x = Month_Start,
     y = Total_Att,
-    recalEveryShift = TRUE,
-    plotChart = FALSE
+    establish_every_shift = TRUE,
+    plot_chart = FALSE
   )
   
   result <- result_data %>%

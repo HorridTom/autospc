@@ -3,8 +3,8 @@ test_that("", {
   result_data <- autospc(
     ed_attendances_monthly,
     chart_type = "C'",
-    x = Month_Start,
-    y = Att_All,
+    x = month_start,
+    y = att_all,
     period_min = 21L,
     baseline_length = 63L,
     plot_chart = FALSE

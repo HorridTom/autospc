@@ -256,25 +256,25 @@ control limits.
 autospc(
   ed_attendances_monthly, 
   chart_type = "C'", 
-  x = Month_Start, 
-  y = Att_All
+  x = month_start, 
+  y = att_all
 )
    
 #Using a P' chart to track changes in the percentage admitted within 4 hours
 autospc(
   ed_attendances_monthly, 
   chart_type = "P'", 
-  x = Month_Start, 
-  y = Within_4h, 
-  n = Att_All
+  x = month_start, 
+  y = within_4h, 
+  n = att_all
 )
 
 #using a shift_rule_threshold of 7 when tracking monthly attendance
 autospc(
   ed_attendances_monthly, 
   chart_type = "C'", 
-  x = Month_Start, 
-  y = Att_All,
+  x = month_start, 
+  y = att_all,
   shift_rule_threshold = 7
 )
 

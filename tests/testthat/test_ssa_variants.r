@@ -106,8 +106,8 @@ test_that("warning is issued if incompatible variant requested", {
     autospc(
       ed_attendances_monthly, 
       chart_type = "C'", 
-      x = Month_Start, 
-      y = Att_All,
+      x = month_start, 
+      y = att_all,
       no_regrets = TRUE,
       overhanging_reversions = FALSE
     ),

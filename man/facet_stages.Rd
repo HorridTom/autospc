@@ -43,8 +43,8 @@ facet_stages(
   ed_attendances_monthly,
   split_rows = c(30L, 60L, 90L),
   chart_type = "C'",
-  x = Month_Start,
-  y = Att_All, 
+  x = month_start,
+  y = att_all, 
   x_break = 365
 )
 

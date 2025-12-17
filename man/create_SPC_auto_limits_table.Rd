@@ -104,8 +104,8 @@ recalculation of control limits.
 # Calculate limts for a C' chart for count of monthly attendances
 
 df <- ed_attendances_monthly \%>\%
-        dplyr::rename(x = Month_Start,
-                      y = Att_All)
+        dplyr::rename(x = month_start,
+                      y = att_all)
 
 limits_table <- create_SPC_auto_limits_table(
   df,

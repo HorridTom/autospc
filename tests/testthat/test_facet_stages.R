@@ -6,16 +6,16 @@ test_that("facet_stages produces correct data output", {
     ed_attendances_monthly,
     split_rows = c(30L, 60L, 90L),
     chart_type = "C'",
-    x = Month_Start,
-    y = Att_All, 
+    x = month_start,
+    y = att_all, 
     plot_chart = FALSE
   )
   
   stage2 <- autospc(ed_attendances_monthly %>%
                       dplyr::filter(dplyr::row_number() <= 60L),
                     chart_type = "C'",
-                    x = Month_Start,
-                    y = Att_All, 
+                    x = month_start,
+                    y = att_all, 
                     plot_chart = FALSE)
   
   expect_equal(faceted_results %>%
@@ -80,8 +80,8 @@ test_that("", {
     ed_attendances_monthly,
     split_rows = c(30L, 60L, 90L),
     chart_type = "C'",
-    x = Month_Start,
-    y = Att_All, 
+    x = month_start,
+    y = att_all, 
     plot_chart = TRUE
   )
   

@@ -54,8 +54,8 @@ For example:
 ```
 autospc(ed_attendances_monthly,
                 chart_type = "C'",
-                x = Month_Start,
-                y = Att_All)
+                x = month_start,
+                y = att_all)
 ```
 
 For a **P or P'** chart the data must have the following columns:
@@ -76,9 +76,9 @@ For example:
 ```
 autospc(ed_attendances_monthly,
                 chart_type = "P'",
-                x = Month_Start,
-                y = Within_4h,
-                n = Att_All)
+                x = month_start,
+                y = within_4h,
+                n = att_all)
 ```
 
 The parameters of the Stable Shift Algorithm, and the appearance of the chart,
@@ -93,9 +93,9 @@ table format using `plot_chart = FALSE`, as follows:
 ```
 limits_table <- autospc(ed_attendances_monthly,
                               chart_type = "P'",
-                              x = Month_Start,
-                              y = Within_4h,
-                              n = Att_All,
+                              x = month_start,
+                              y = within_4h,
+                              n = att_all,
                               plot_chart = FALSE)
                               
 head(limits_table,

@@ -1,10 +1,10 @@
 #' Plot SPC charts with automated limit recalculation
 #' 
-#' `plot_auto_SPC()` creates a statistical process control chart from a
+#' `autospc()` creates a statistical process control chart from a
 #' dataframe, applying the Stable Shift Algorithm to automate recalculation of
 #' control limits.
 #' 
-#' @param df A data frame. For an XMR, C or C' chart, must have columns for:
+#' @param data A data frame. For an XMR, C or C' chart, must have columns for:
 #' \itemize{
 #'  \item the subgrouping variable, to be plotted on the horizontal axis, (x);
 #'  \item the variable of interest to be plotted on the vertical axis (y);
@@ -28,64 +28,64 @@
 #'  }
 #' @param n Name of column (passed using tidyselect semantics) to use as
 #' denominator for P and P' charts.
-#' @param chartType The type of chart you wish to plot. Available options are:
+#' @param chart_type The type of chart you wish to plot. Available options are:
 #' "XMR", "MR", "C", "C'", "P", "P'".
 #' 
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish
 #' control limits.
-#' @param periodMin The minimum number of points (subgroups) per period,
+#' @param period_min The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
-#' @param baseline Integer, overrides periodMin for the first calculation period
-#' only, if specified
-#' @param runRuleLength The minimum number of consecutive points above or below
-#' the centre line constituting a shift (or "rule 2") break.
-#' @param noRecals Boolean - if TRUE, do not recalculate control limits, instead
-#' extend limits calculated from the first periodMin points.
-#' @param recalEveryShift Boolean - whether to bypass the Stable Shift Algorithm
-#' and simply re-establish limits at every shift rule break (respecting
-#' periodMin)
-#' @param noRegrets Boolean signifying which version of the algorithm should be
+#' @param baseline_length Integer, overrides period_min for the first
+#' calculation period only, if specified
+#' @param shift_rule_threshold The minimum number of consecutive points above or
+#' below the centre line constituting a shift (or "rule 2") break.
+#' @param baseline_only Boolean - if TRUE, do not recalculate control limits,
+#' instead extend limits calculated from the first period_min points.
+#' @param establish_every_shift Boolean - whether to bypass the Stable Shift
+#' Algorithm and simply re-establish limits at every shift rule break
+#' (respecting period_min)
+#' @param no_regrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
-#' @param overhangingReversions Boolean determining whether rule breaks in the
+#' @param overhanging_reversions Boolean determining whether rule breaks in the
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
-#' calculation period. Set to FALSE only with noRegrets = FALSE.
+#' calculation period. Set to FALSE only with no_regrets = FALSE.
 #' 
 #' ## SPC Parameters
 #' Parameters that control how cetnre line and control limits are established
 #' for each period, and details of how SPC rules are applied
-#' @param maxNoOfExclusions The maximum number of extreme points to exclude from 
+#' @param max_exclusions The maximum number of extreme points to exclude from 
 #' limit calculations.
-#' @param highlightExclusions Boolean signifying whether excluded points are
+#' @param highlight_exclusions Boolean signifying whether excluded points are
 #' greyed out.
 #' @param mr_screen_max_loops Integer or Inf specifying maximum number of times
 #' to recursively ignore mr values above the upper range limit when calculating
 #' xmr limits. Note this does not affect the calculation of the upper range
 #' limit on the mr chart.
-#' @param rule2Tolerance Minimum difference between a point's vertical position
-#' and the centre line to count as "on the centre line" for the purposes of 
-#' shift rule breaks
-#' @param floatingMedian Whether to add a floating median line to the chart,
-#' calculated based on the final floatingMedian_n data points on the chart:
+#' @param centre_line_tolerance Minimum difference between a point's vertical
+#' position and the centre line to count as "on the centre line" for the
+#' purposes ofshift rule breaks
+#' @param floating_median Whether to add a floating median line to the chart,
+#' calculated based on the final floating_median_n data points on the chart:
 #' "no" - do not display a floating median,
 #' "yes" - display a floating median,
 #' "auto" - display a floating median if and only if there is at least one point
-#' that is part of a shift rule break in the final floatingMedian_n data points
+#' that is part of a shift rule break in the final floating_median_n data points
 #' on the chart.
-#' @param floatingMedian_n The number of points to use for calculation of the
+#' @param floating_median_n The number of points to use for calculation of the
 #' floating median, if present.
 
 #' ## Output Type
 #' Arguments that control how the result is outputted
-#' @param plotChart Boolean specifying whether to plot the chart. If not, the
+#' @param plot_chart Boolean specifying whether to plot the chart. If not, the
 #' data is returned with centre line, control limits and other analytic output
 #' appended as columns.
-#' @param showLimits Boolean controlling whether or not to display centre line
+#' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
-#' @param showMR Logical controlling whether the moving range chart is included
+#' @param show_mr Logical controlling whether the moving range chart is included
 #' in XMR chart
-#' @param writeTable Boolean specifying whether to save the data as a CSV 
+#' @param write_table Boolean specifying whether to save the data as a CSV 
 #' (useful for doing lots of charts at a time).
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
@@ -116,9 +116,9 @@
 #' @param point_size Size of plot points, defaults to 2. See
 #' \link[ggplot2]{aes_linetype_size_shape} for more details.
 #' @param line_width_sf Numeric scale factor for plot line widths. 
-#' @param includeAnnotations Boolean specifying whether to show centre line
+#' @param include_annotations Boolean specifying whether to show centre line
 #' labels
-#' @param basicAnnotations Boolean specifying whether to force use of basic
+#' @param basic_annotations Boolean specifying whether to force use of basic
 #' annotation positioning. When TRUE, suggested packages ggrepel
 #' and ggpp are not required, but annotation arrows are not supported. Defaults
 #' to TRUE for R versions prior to 4.3, FALSE otherwise.
@@ -142,97 +142,97 @@
 #'
 #' @examples 
 #' # Using a C' chart to track changes in the count of monthly attendance 
-#' plot_auto_SPC(
+#' autospc(
 #'   ed_attendances_monthly, 
-#'   chartType = "C'", 
-#'   x = Month_Start, 
-#'   y = Att_All
+#'   chart_type = "C'", 
+#'   x = month_start, 
+#'   y = att_all
 #' )
 #'    
 #' #Using a P' chart to track changes in the percentage admitted within 4 hours
-#' plot_auto_SPC(
+#' autospc(
 #'   ed_attendances_monthly, 
-#'   chartType = "P'", 
-#'   x = Month_Start, 
-#'   y = Within_4h, 
-#'   n = Att_All
+#'   chart_type = "P'", 
+#'   x = month_start, 
+#'   y = within_4h, 
+#'   n = att_all
 #' )
 #'
-#' #using a runRuleLength of 7 when tracking monthly attendance
-#' plot_auto_SPC(
+#' #using a shift_rule_threshold of 7 when tracking monthly attendance
+#' autospc(
 #'   ed_attendances_monthly, 
-#'   chartType = "C'", 
-#'   x = Month_Start, 
-#'   y = Att_All,
-#'   runRuleLength = 7
+#'   chart_type = "C'", 
+#'   x = month_start, 
+#'   y = att_all,
+#'   shift_rule_threshold = 7
 #' )
 #' 
 #' @export
-plot_auto_SPC <- function(df,
-                          x,
-                          y,
-                          n,
-                          chartType = NULL,
-                          ## Algorithm Parameters
-                          periodMin = 21,
-                          baseline = NULL,
-                          runRuleLength = 8,
-                          noRecals = FALSE,
-                          recalEveryShift = FALSE,
-                          noRegrets = TRUE,
-                          overhangingReversions = TRUE,
-                          ## SPC Parameters
-                          maxNoOfExclusions = 3,
-                          highlightExclusions = TRUE,
-                          mr_screen_max_loops = 1L,
-                          rule2Tolerance = 0,
-                          floatingMedian = "no",
-                          floatingMedian_n = 12L,
-                          ## Output Type
-                          plotChart = TRUE,
-                          showLimits = TRUE,
-                          showMR = TRUE,
-                          writeTable = FALSE,
-                          verbosity = 0L,
-                          log_file_path = NULL,
-                          ## Chart Appearance
-                          title = NULL,
-                          subtitle = NULL,
-                          use_caption = TRUE,
-                          override_x_title = NULL,
-                          override_y_title = NULL,
-                          override_y_lim = NULL,
-                          x_break = NULL,
-                          x_date_format = "%Y-%m-%d",
-                          x_pad_end = NULL,
-                          extend_limits_to = NULL,
-                          r1_col = "orange",
-                          r2_col = "steelblue3",
-                          point_size = 2,
-                          line_width_sf = 1,
-                          includeAnnotations = TRUE,
-                          basicAnnotations = getRversion() < '4.3.0',
-                          annotation_size = 3,
-                          align_labels = FALSE,
-                          flip_labels = FALSE,
-                          upper_annotation_sf = NULL,
-                          lower_annotation_sf = NULL,
-                          annotation_arrows = FALSE,
-                          annotation_arrow_curve = 0.3,
-                          override_annotation_dist = NULL,
-                          override_annotation_dist_P = NULL
+autospc <- function(data,
+                    x,
+                    y,
+                    n,
+                    chart_type = NULL,
+                    ## Algorithm Parameters
+                    period_min = 21,
+                    baseline_length = NULL,
+                    shift_rule_threshold = 8,
+                    baseline_only = FALSE,
+                    establish_every_shift = FALSE,
+                    no_regrets = TRUE,
+                    overhanging_reversions = TRUE,
+                    ## SPC Parameters
+                    max_exclusions = 3,
+                    highlight_exclusions = TRUE,
+                    mr_screen_max_loops = 1L,
+                    centre_line_tolerance = 0,
+                    floating_median = "no",
+                    floating_median_n = 12L,
+                    ## Output Type
+                    plot_chart = TRUE,
+                    show_limits = TRUE,
+                    show_mr = TRUE,
+                    write_table = FALSE,
+                    verbosity = 0L,
+                    log_file_path = NULL,
+                    ## Chart Appearance
+                    title = NULL,
+                    subtitle = NULL,
+                    use_caption = TRUE,
+                    override_x_title = NULL,
+                    override_y_title = NULL,
+                    override_y_lim = NULL,
+                    x_break = NULL,
+                    x_date_format = "%Y-%m-%d",
+                    x_pad_end = NULL,
+                    extend_limits_to = NULL,
+                    r1_col = "orange",
+                    r2_col = "steelblue3",
+                    point_size = 2,
+                    line_width_sf = 1,
+                    include_annotations = TRUE,
+                    basic_annotations = getRversion() < '4.3.0',
+                    annotation_size = 3,
+                    align_labels = FALSE,
+                    flip_labels = FALSE,
+                    upper_annotation_sf = NULL,
+                    lower_annotation_sf = NULL,
+                    annotation_arrows = FALSE,
+                    annotation_arrow_curve = 0.3,
+                    override_annotation_dist = NULL,
+                    override_annotation_dist_P = NULL
 ) { 
   
-  df_original <- df
+  df_original <- data
   
   # Rename columns if passed
-  df <- rename_columns(df = df,
-                       x = {{ x }}, y = {{ y }}, n = {{ n }})
+  data <- rename_columns(df = data,
+                         x = {{ x }}, y = {{ y }}, n = {{ n }})
   
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(
-    df = df,
-    chartType = chartType,
+    df = data,
+    chart_type = chart_type,
     title = title,
     subtitle = subtitle,
     upper_annotation_sf = upper_annotation_sf,
@@ -241,8 +241,8 @@ plot_auto_SPC <- function(df,
     override_annotation_dist_P = override_annotation_dist_P
   )
   
-  df                  <- preprocessed_vars$df
-  chartType           <- preprocessed_vars$chartType
+  data                <- preprocessed_vars$df
+  chart_type           <- preprocessed_vars$chart_type
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType
@@ -251,36 +251,36 @@ plot_auto_SPC <- function(df,
   
   
   # Get control limits
-  df <- create_SPC_auto_limits_table(
-    df,
-    chartType = chartType, 
-    periodMin = periodMin,
-    baseline = baseline,
-    runRuleLength = runRuleLength,
-    maxNoOfExclusions  = maxNoOfExclusions,
-    noRegrets = noRegrets,
+  data <- create_SPC_auto_limits_table(
+    data,
+    chart_type = chart_type, 
+    period_min = period_min,
+    baseline_length = baseline_length,
+    shift_rule_threshold = shift_rule_threshold,
+    max_exclusions  = max_exclusions,
+    no_regrets = no_regrets,
     verbosity = verbosity,
-    noRecals = noRecals,
-    recalEveryShift = recalEveryShift,
-    rule2Tolerance = rule2Tolerance,
-    showLimits = showLimits,
-    overhangingReversions = overhangingReversions,
+    baseline_only = baseline_only,
+    establish_every_shift = establish_every_shift,
+    centre_line_tolerance = centre_line_tolerance,
+    show_limits = show_limits,
+    overhanging_reversions = overhanging_reversions,
     mr_screen_max_loops = mr_screen_max_loops
   )
   
   # Output log data
-  log_output(df,
+  log_output(data,
              verbosity = verbosity,
-             chartType = chartType,
+             chart_type = chart_type,
              log_file_path = log_file_path)
   
   # Postprocess data
   
   postprocessing_vars <- postprocess(
-    df = df,
-    chartType = chartType,
-    periodMin = periodMin,
-    showLimits = showLimits,
+    df = data,
+    chart_type = chart_type,
+    period_min = period_min,
+    show_limits = show_limits,
     override_x_title = override_x_title,
     override_y_title = override_y_title,
     override_y_lim = override_y_lim,
@@ -289,7 +289,7 @@ plot_auto_SPC <- function(df,
     xType = xType
   )
   
-  df                 <- postprocessing_vars$df
+  data               <- postprocessing_vars$df
   override_x_title   <- postprocessing_vars$override_x_title
   override_y_title   <- postprocessing_vars$override_y_title
   num_non_missing_y  <- postprocessing_vars$num_non_missing_y
@@ -301,14 +301,14 @@ plot_auto_SPC <- function(df,
   
   
   # Check whether limits are to be displayed on chart
-  if(showLimits & num_non_missing_y >= periodMin){
+  if(show_limits & num_non_missing_y >= period_min){
     
-    df <- postprocess_spc(
-      df = df,
-      chartType = chartType,
-      highlightExclusions = highlightExclusions,
-      floatingMedian = floatingMedian,
-      floatingMedian_n = floatingMedian_n,
+    data <- postprocess_spc(
+      df = data,
+      chart_type = chart_type,
+      highlight_exclusions = highlight_exclusions,
+      floating_median = floating_median,
+      floating_median_n = floating_median_n,
       extend_limits_to = extend_limits_to,
       align_labels = align_labels,
       flip_labels = flip_labels,
@@ -319,24 +319,24 @@ plot_auto_SPC <- function(df,
       x_max = x_max
     )
     
-    if((chartType == "XMR") & showMR) {
+    if((chart_type == "XMR") & show_mr) {
       mc <- match.call()
-      mc[["chartType"]] <- "MR"
+      mc[["chart_type"]] <- "MR"
       if("title" %in% names(mc)) {mc[["title"]] <- NULL}
       if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
-      mc[["df"]] <- rlang::expr(df_original)
+      mc[["data"]] <- rlang::expr(df_original)
       
       p_mr <- eval(mc)
     } else {
       p_mr <- NA
     }
     
-    if(plotChart){
+    if(plot_chart){
       
       p <- create_spc_plot(
-        df = df,
+        df = data,
         p_mr = p_mr,
-        chartType = chartType,
+        chart_type = chart_type,
         xType = xType,
         start_x = start_x,
         end_x = end_x,
@@ -344,7 +344,7 @@ plot_auto_SPC <- function(df,
         ylimlow = ylimlow,
         ylimhigh = ylimhigh,
         num_non_missing_y = num_non_missing_y,
-        periodMin = periodMin,
+        period_min = period_min,
         title = title,
         subtitle = subtitle,
         use_caption = use_caption,
@@ -354,13 +354,13 @@ plot_auto_SPC <- function(df,
         r2_col = r2_col,
         point_size = point_size,
         line_width_sf = line_width_sf,
-        includeAnnotations = includeAnnotations,
-        basicAnnotations = basicAnnotations,
+        include_annotations = include_annotations,
+        basic_annotations = basic_annotations,
         annotation_size = annotation_size,
         annotation_arrows = annotation_arrows,
         annotation_curvature = annotation_arrow_curve,
-        floatingMedian_n = floatingMedian_n,
-        showMR = showMR,
+        floating_median_n = floating_median_n,
+        show_mr = show_mr,
         x_break = x_break,
         x_date_format = x_date_format
       )
@@ -369,8 +369,8 @@ plot_auto_SPC <- function(df,
         return(p) # Chart output
       )
       
-    } else if(writeTable) {
-      # (!plotChart)
+    } else if(write_table) {
+      # (!plot_chart)
       
       title <- gsub(":", "_",title)
       subtitle <- gsub(":","_", subtitle)
@@ -383,11 +383,11 @@ plot_auto_SPC <- function(df,
                 row.names = FALSE)
       
     } else {
-      # (!plotChart)
+      # (!plot_chart)
       
-      if(chartType == "XMR" & showMR) {
+      if(chart_type == "XMR" & show_mr) {
         
-        df <- df %>%
+        data <- data %>%
           dplyr::left_join(p_mr %>%
                              dplyr::select(x,
                                            mr = y,
@@ -400,16 +400,16 @@ plot_auto_SPC <- function(df,
                         dplyr::everything())
       }
       
-      df <- df %>%
+      data <- data %>%
         dplyr::filter(!is.na(x))
       
-      return(df)
+      return(data)
     }
     
   } else { # Plot only the time series, without limits
-    if(plotChart == TRUE) {
+    if(plot_chart == TRUE) {
       p <- create_timeseries_plot(
-        df = df,
+        df = data,
         title = title,
         subtitle = subtitle,
         override_x_title = override_x_title,
@@ -421,7 +421,7 @@ plot_auto_SPC <- function(df,
       
       return(p)
     } else {
-      return(df) # Table output
+      return(data) # Table output
     }
   }
 }

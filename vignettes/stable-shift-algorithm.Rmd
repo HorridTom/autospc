@@ -60,10 +60,10 @@ facet_stages(
   split_rows = c("Baseline" = 24L,
                  "Data added beyond baseline" = 28L,
                  "Further data added" = 32L),
-  x = Month_Start, 
-  y = Att_All,
-  chartType = "C'",
-  periodMin = 24,
+  x = month_start, 
+  y = att_all,
+  chart_type = "C'",
+  period_min = 24,
   use_caption = FALSE,
   x_break = 91.25,
   x_date_format = "%Y-%b",
@@ -107,10 +107,10 @@ figure shows a C-chart for the first 35 data points of the simulated
 section we shall interpret as daily values of a count measure of interest.
 
 ```{r example-1, fig.width=7, fig.height=5, fig.cap="Example 1"}
-plot_auto_SPC(example_series_2a %>%
+autospc(example_series_2a %>%
                 filter(row_number() <= 35L),
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               extend_limits_to = 47L)
 ```
 
@@ -132,13 +132,13 @@ onwards.
 
 ### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
-threshold for a shift rule break (`runRuleLength`), set to $8$ by default in
-`plot_auto_SPC()`. In \@ref(fig:example-1), there is a rule-breaking run of
+threshold for a shift rule break (`shift_rule_threshold`), set to $8$ by default in
+`autospc()`. In \@ref(fig:example-1), there is a rule-breaking run of
 length 10 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by `autospc`.
 
 Runs that are subsets of longer runs with the same end point count here, so for
-example with the default `runRuleLength = 8`, the run of length 10 in
+example with the default `shift_rule_threshold = 8`, the run of length 10 in
 \@ref(fig:example-1) actually comprises three rule-breaking runs, commencing at
 the first, second and third points in the length 10 run. In this example, the
 first rule-breaking run starts on day 22 and has length 10, the second starts on
@@ -158,11 +158,11 @@ break.
 In order to decide whether to re-establish control limits at a triggering rule
 break, the SSA requires consideration of the set of limits that _would_ be
 established. These are referred to as *candidate limits* until they are either
-rejected or accepted. Candidate limits are formed from the first `periodMin`
+rejected or accepted. Candidate limits are formed from the first `period_min`
 points starting at the first point of the triggering rule break, and this
 period is referred to as the *candidate calculation period*.
 
-In Figure \@ref(fig:example-1), there are fewer than `periodMin` (here 21)
+In Figure \@ref(fig:example-1), there are fewer than `period_min` (here 21)
 points on or after the start of the triggering rule break (day 22), so it is not
 possible to re-establish limits at day 22, and there are no candidate limits to
 consider.
@@ -174,17 +174,17 @@ Figure  \@ref(fig:example-3) shows candidate limits established at the start of
 the triggering rule break, i.e. day 22.
 
 ```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
-plot_auto_SPC(example_series_2a,
+autospc(example_series_2a,
               override_y_title = "Count",
-              chartType = "C",
-              noRecals = TRUE,
+              chart_type = "C",
+              baseline_only = TRUE,
               extend_limits_to = 47L)
 ```
 
 ```{r example-3, fig.width=7, fig.height=5, fig.cap="Example 3"}
-plot_auto_SPC(example_series_2a,
+autospc(example_series_2a,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               extend_limits_to = 47L)
 ```
 
@@ -204,33 +204,33 @@ triggering rule break, i.e. from day 22. There is an opposing rule break in
 Figure \@ref(fig:example-5), commencing on day 31.
 
 ```{r example-4, fig.width=7, fig.height=5, fig.cap="Example 4"}
-plot_auto_SPC(example_series_2b,
+autospc(example_series_2b,
               override_y_title = "Count",
-              chartType = "C",
-              noRecals = TRUE,
+              chart_type = "C",
+              baseline_only = TRUE,
               extend_limits_to = 47L)
 ```
 
 ```{r example-5, fig.width=7, fig.height=5, fig.cap="Example 5"}
-plot_auto_SPC(example_series_2b,
+autospc(example_series_2b,
               override_y_title = "Count",
-              chartType = "C",
-              recalEveryShift = TRUE,
+              chart_type = "C",
+              establish_every_shift = TRUE,
               extend_limits_to = 47L)
 ```
 
 
-If an opposing rule break only reaches the `runRuleLength` threshold after the
+If an opposing rule break only reaches the `shift_rule_threshold` threshold after the
 end of the candidate calculation period, it is referred to as an
 *overhanging reversion*. Figure \@ref(fig:example-6) shows another alternative 
 continuation of our example time series, this time showing an
 overhanging reversion commencing on day 40, against the candidate limits.
 
 ```{r example-6, fig.width=7, fig.height=5, fig.cap="Example 6"}
-plot_auto_SPC(example_series_2c,
+autospc(example_series_2c,
               override_y_title = "Count",
-              chartType = "C",
-              recalEveryShift = TRUE)
+              chart_type = "C",
+              establish_every_shift = TRUE)
 ```
 
 ### Minimum period length
@@ -241,7 +241,7 @@ implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
 with values ranging from 17 to 25 points.
 
-In `plot_auto_SPC()`, $n_{min}$ is specified by the `periodMin` argument,
+In `autospc()`, $n_{min}$ is specified by the `period_min` argument,
 defaulting to 21. This default is above the commonly recommended minimum values
 and represents a convenient choice for daily data, since it is a multiple of 7.
 This means that in the presence of weekly "seasonal" (periodic) variation over
@@ -317,15 +317,15 @@ given timeseries, there are two ways you can do this.
 ## Print log to console
 
 To print a log out to the console, set the `verbosity` argument of
-`plot_auto_SPC()` to either `1` (for basic log information) or `2` (for full
+`autospc()` to either `1` (for basic log information) or `2` (for full
 detail).
 
 ```{r 6.1, fig.width=7, fig.height=4.3}
-plot_auto_SPC(
+autospc(
   ed_attendances_monthly, 
-  chartType = "C'", 
-  x = Month_Start, 
-  y = Att_All,
+  chart_type = "C'", 
+  x = month_start, 
+  y = att_all,
   verbosity = 1,
   x_break = 365,
   x_date_format = "%Y-%b",
@@ -336,7 +336,7 @@ plot_auto_SPC(
 ## Save log to a file
 
 To save the log to a file, provide a file path using the `log_file_path`
-argument of `plot_auto_SPC()`. If the file path you provide ends `".rds"` the
+argument of `autospc()`. If the file path you provide ends `".rds"` the
 log will be saved to an rds file, if it ends `".csv"` the log will be saved to a
 csv file. 
 
@@ -344,9 +344,9 @@ The data frame that is saved has one row for each log entry, and contains the
 following columns:
 
  - `counter`        : the counter value (row number of the dataframe
- passed to the `df` argument of `plot_auto_SPC()`) that the log entry refers to
+ passed to the `data` argument of `autospc()`) that the log entry refers to
  - `x`              : the value of the `x` column at this counter value (the
- column passed as `x` to `plot_auto_SPC()`)
+ column passed as `x` to `autospc()`)
  - `log_entry`      : the log entry, recorded in shorthand (see below)
  - `interpretation` : text interpretation of the log entry
  

@@ -41,33 +41,33 @@ test_op_break6_data <- readRDS("testdata/test_oppositeRuleBreak_later.rds")
 test_that("Rule 2 break within candidate period in opposite direction identified correctly",{
   
   #should not recalc due to break in op direction
-  test_op_break1 <- plot_auto_SPC(test_op_break1_data,
-                                  chartType = "C'",
-                                  plotChart = F)
+  test_op_break1 <- autospc(test_op_break1_data,
+                                  chart_type = "C'",
+                                  plot_chart = F)
   test_op_break1_break_pos <- which(test_op_break1$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break1_break_pos, integer(0))
   
   #should not recalc due to break in op direction
-  test_op_break2 <- plot_auto_SPC(test_op_break2_data, chartType = "C'", plotChart = F)
+  test_op_break2 <- autospc(test_op_break2_data, chart_type = "C'", plot_chart = F)
   test_op_break2_break_pos <- which(test_op_break2$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break2_break_pos, integer(0))
   
   #should not recalc due to break in op direction
-  test_op_break3 <- plot_auto_SPC(test_op_break3_data, chartType = "C'", plotChart = F)
+  test_op_break3 <- autospc(test_op_break3_data, chart_type = "C'", plot_chart = F)
   test_op_break3_break_pos <- which(test_op_break3$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break3_break_pos, integer(0))
   
   #should recalc
-  test_op_break4 <- plot_auto_SPC(test_op_break4_data, chartType = "C'", plotChart = F)
+  test_op_break4 <- autospc(test_op_break4_data, chart_type = "C'", plot_chart = F)
   test_op_break4_break_pos <- which(test_op_break4$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break4_break_pos, 22)
   
   #should recalc
-  test_op_break5 <- plot_auto_SPC(test_op_break5_data, chartType = "C'", plotChart = F)
+  test_op_break5 <- autospc(test_op_break5_data, chart_type = "C'", plot_chart = F)
   test_op_break5_break_pos <- which(test_op_break5$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break5_break_pos, 22)
@@ -77,10 +77,10 @@ test_that("Rule 2 break within candidate period in opposite direction identified
 
 test_that("Opposite rule break after candidate calc period doesn't prevent recalculation",{
   #should recalc
-  test_op_break6 <- plot_auto_SPC(test_op_break6_data,
-                                  noRegrets = TRUE,
-                                  chartType = "C'",
-                                  plotChart = FALSE)
+  test_op_break6 <- autospc(test_op_break6_data,
+                                  no_regrets = TRUE,
+                                  chart_type = "C'",
+                                  plot_chart = FALSE)
   
   test_op_break6_break_pos <- which(test_op_break6$breakPoint == TRUE)
   

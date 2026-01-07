@@ -10,13 +10,13 @@ test_data <- structure(list(x = 1:21,
                        row.names = c(NA, -21L))
 
 test_that("Limit extension works correctly for C chart", {
-  results_nex <- plot_auto_SPC(test_data,
-                               chartType = "C",
-                               plotChart = FALSE)
+  results_nex <- autospc(test_data,
+                               chart_type = "C",
+                               plot_chart = FALSE)
   
-  results_ext <- plot_auto_SPC(test_data,
-                               chartType = "C",
-                               plotChart = FALSE,
+  results_ext <- autospc(test_data,
+                               chart_type = "C",
+                               plot_chart = FALSE,
                                extend_limits_to = 35L)
   
   # Get the correct values for the centre line and limits (since this is a C
@@ -54,13 +54,13 @@ test_that("Limit extension works correctly for C chart", {
 
 
 test_that("Limit extension works correctly for P chart", {
-  results_nex <- plot_auto_SPC(test_data,
-                               chartType = "P",
-                               plotChart = FALSE)
+  results_nex <- autospc(test_data,
+                               chart_type = "P",
+                               plot_chart = FALSE)
   
-  results_ext <- plot_auto_SPC(test_data,
-                               chartType = "P",
-                               plotChart = FALSE,
+  results_ext <- autospc(test_data,
+                               chart_type = "P",
+                               plot_chart = FALSE,
                                extend_limits_to = 35L)
   
   # Get the correct values for the centre line and limits
@@ -116,9 +116,9 @@ test_extend_limits_pp_answer <- readRDS(
 
 test_that("Limit extension works correctly for P-prime chart (regression)", {
   
-  results_ext <- plot_auto_SPC(test_data,
-                               chartType = "P'",
-                               plotChart = FALSE,
+  results_ext <- autospc(test_data,
+                               chart_type = "P'",
+                               plot_chart = FALSE,
                                extend_limits_to = 35L) %>%
     dplyr::select(x,
                   y,

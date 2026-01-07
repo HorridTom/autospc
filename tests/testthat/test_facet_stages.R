@@ -5,18 +5,18 @@ test_that("facet_stages produces correct data output", {
   faceted_results <- facet_stages(
     ed_attendances_monthly,
     split_rows = c(30L, 60L, 90L),
-    chartType = "C'",
-    x = Month_Start,
-    y = Att_All, 
-    plotChart = FALSE
+    chart_type = "C'",
+    x = month_start,
+    y = att_all, 
+    plot_chart = FALSE
   )
   
-  stage2 <- plot_auto_SPC(ed_attendances_monthly %>%
-                            dplyr::filter(dplyr::row_number() <= 60L),
-                          chartType = "C'",
-                          x = Month_Start,
-                          y = Att_All, 
-                          plotChart = FALSE)
+  stage2 <- autospc(ed_attendances_monthly %>%
+                      dplyr::filter(dplyr::row_number() <= 60L),
+                    chart_type = "C'",
+                    x = month_start,
+                    y = att_all, 
+                    plot_chart = FALSE)
   
   expect_equal(faceted_results %>%
                  dplyr::group_by(stage) %>%
@@ -79,10 +79,10 @@ test_that("", {
   faceted_plot <- facet_stages(
     ed_attendances_monthly,
     split_rows = c(30L, 60L, 90L),
-    chartType = "C'",
-    x = Month_Start,
-    y = Att_All, 
-    plotChart = TRUE
+    chart_type = "C'",
+    x = month_start,
+    y = att_all, 
+    plot_chart = TRUE
   )
   
   faceted_build <- ggplot2::ggplot_build(faceted_plot)
@@ -93,15 +93,15 @@ test_that("", {
 })
 
 
-test_that("facet_stages works when relying on x,y columns in df", {
+test_that("facet_stages works when relying on x,y columns in data", {
   
   set.seed(1234L)
   
-  result <- facet_stages(df = tibble::tibble(x = 1L:100L,
-                                             y = rnorm(n = 100L)),
+  result <- facet_stages(tibble::tibble(x = 1L:100L,
+                                        y = rnorm(n = 100L)),
                          split_rows = c(30L, 60L),
-                         chartType = "XMR",
-                         plotChart = FALSE)
+                         chart_type = "XMR",
+                         plot_chart = FALSE)
   
   result_lengths <- result %>%
     dplyr::group_by(stage) %>%

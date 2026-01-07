@@ -4,9 +4,9 @@
 # are to be displayed
 postprocess <- function(
     df,
-    chartType = NULL,
-    periodMin = 21,
-    showLimits = TRUE,
+    chart_type = NULL,
+    period_min = 21,
+    show_limits = TRUE,
     override_x_title = NULL,
     override_y_title = NULL,
     override_y_lim = NULL,
@@ -19,7 +19,7 @@ postprocess <- function(
     dplyr::filter(!is.na(y)) %>%
     nrow()
   
-  if(chartType == "MR") {
+  if(chart_type == "MR") {
     num_non_missing_y <- num_non_missing_y + 1L
   }
   
@@ -32,10 +32,10 @@ postprocess <- function(
   end_x <- max(x_max, x_pad_end)
   
   # Chart y limit
-  if(num_non_missing_y < periodMin) {
+  if(num_non_missing_y < period_min) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
-  } else if(chartType != "XMR") {
+  } else if(chart_type != "XMR") {
     ylimlow <- 0
   } else {
     ylimlow <- min(df$lcl,
@@ -49,15 +49,15 @@ postprocess <- function(
     }
   }
   
-  if(num_non_missing_y < periodMin) {
+  if(num_non_missing_y < period_min) {
     ylimhigh <- max(df$y,
                     na.rm = TRUE)
-  } else if(chartType == "C" | chartType == "C'") {
+  } else if(chart_type == "C" | chart_type == "C'") {
     ylimhigh <- max(df$ucl,
                     df$y,
                     na.rm = TRUE) + max(df$ucl,
                                         na.rm = TRUE)/10 + 10
-  } else if (chartType == "XMR" | chartType == "MR") {
+  } else if (chart_type == "XMR" | chart_type == "MR") {
     ylimhigh <- max(df$ucl,
                     df$y,
                     na.rm = TRUE)*1.1
@@ -71,7 +71,7 @@ postprocess <- function(
   }
   
   # Ensure axis titles available
-  ytitle <- switch(chartType,
+  ytitle <- switch(chart_type,
                    C = "Number",
                    `C'` = "Number",
                    P = "Percentage",
@@ -110,10 +110,10 @@ postprocess <- function(
 # be displayed
 postprocess_spc <- function(
     df,
-    chartType,
-    highlightExclusions,
-    floatingMedian,
-    floatingMedian_n,
+    chart_type,
+    highlight_exclusions,
+    floating_median,
+    floating_median_n,
     extend_limits_to,
     align_labels,
     flip_labels,
@@ -133,7 +133,7 @@ postprocess_spc <- function(
   # ??NEEDED?? Store break points as vector
   breakPoints <- which(df$breakPoint)
   
-  if(highlightExclusions) {
+  if(highlight_exclusions) {
     # Show exclusions on chart
     df <- df %>% dplyr::mutate(
       highlight = ifelse(excluded & !is.na(excluded),
@@ -144,12 +144,12 @@ postprocess_spc <- function(
   
   # add floating median column if needed
   df <- floating_median_column(df = df,
-                               floatingMedian = floatingMedian,
-                               floatingMedian_n = floatingMedian_n)
+                               floating_median = floating_median,
+                               floating_median_n = floating_median_n)
   
   # add annotation information
   df <- add_annotation_data(df = df,
-                            chartType = chartType,
+                            chart_type = chart_type,
                             ylimhigh = ylimhigh,
                             align_labels = align_labels,
                             flip_labels = flip_labels,
@@ -174,7 +174,7 @@ postprocess_spc <- function(
   
   # Extend display limits
   df <- extend_limits(df = df,
-                      chartType = chartType,
+                      chart_type = chart_type,
                       extend_limits_to = extend_limits_to,
                       x_max = x_max)
   

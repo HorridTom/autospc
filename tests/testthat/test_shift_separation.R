@@ -1,10 +1,10 @@
 test_that("Consecutive opposite shifts are considered distinct",{
   
-  result_df <- plot_auto_SPC(ed_attendances_monthly,
-                          x = Month_Start,
-                          y = Within_4h,
-                          chartType = "C'",
-                          plotChart = FALSE)
+  result_df <- autospc(ed_attendances_monthly,
+                          x = month_start,
+                          y = within_4h,
+                          chart_type = "C'",
+                          plot_chart = FALSE)
   
   result <- result_df %>% 
     dplyr::group_by(plotPeriod) %>%

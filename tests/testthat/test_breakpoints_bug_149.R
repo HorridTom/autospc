@@ -4,9 +4,9 @@ bug_148_data <- readRDS(file.path("testdata", "bug_148_data.rds"))
 test_that(paste0("break points are inserted even with no change in centre line",
                  "(bug 149 fixed)"), {
                    
-                   result <- plot_auto_SPC(bug_148_data,
-                                           chartType = "C",
-                                           plotChart = FALSE)
+                   result <- autospc(bug_148_data,
+                                           chart_type = "C",
+                                           plot_chart = FALSE)
                    
                    num_breakpoints = sum(result %>%
                                            dplyr::filter(dplyr::row_number()

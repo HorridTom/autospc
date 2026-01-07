@@ -2,20 +2,8 @@
 #'
 #' `create_SPC_auto_limits_table` applies the Stable Shift Algorithm to automate
 #' recalculation of control limits.
-#'
-#' @param data A data frame. For an XMR, C or C' chart, must have columns:
-#' \itemize{
-#'  \item x, the subgrouping variable, to be plotted on the horizontal axis;
-#'  \item y, the variable of interest to be plotted on the vertical axis;
-#' } \cr
-#' For a P or P' chart, must have columns:
-#' \itemize{
-#'  \item x, the subgrouping variable, to be plotted on the horizontal axis;
-#'  \item n, the total count or denominator;
-#'  \item y, the count meeting criteria, or numerator;
-#' }
 #' 
-#' @inheritParams plot_auto_SPC
+#' @inheritParams autospc
 #'
 #' @return data frame with limits, rule breaks and additional info needed for
 #'   plotting
@@ -24,23 +12,23 @@
 #' # Calculate limts for a C' chart for count of monthly attendances
 #'
 #' df <- ed_attendances_monthly %>%
-#'         dplyr::rename(x = Month_Start,
-#'                       y = Att_All)
+#'         dplyr::rename(x = month_start,
+#'                       y = att_all)
 #'
 #' limits_table <- create_SPC_auto_limits_table(
 #'   df,
-#'   chartType = "C'",
-#'   periodMin = 21,
-#'   baseline = NULL,
-#'   runRuleLength = 8,
-#'   maxNoOfExclusions = 3,
-#'   noRegrets = TRUE,
+#'   chart_type = "C'",
+#'   period_min = 21,
+#'   baseline_length = NULL,
+#'   shift_rule_threshold = 8,
+#'   max_exclusions = 3,
+#'   no_regrets = TRUE,
 #'   verbosity = 1L,
-#'   noRecals = FALSE,
-#'   recalEveryShift = FALSE,
-#'   rule2Tolerance = 0,
-#'   showLimits = TRUE,
-#'   overhangingReversions = TRUE,
+#'   baseline_only = FALSE,
+#'   establish_every_shift = FALSE,
+#'   centre_line_tolerance = 0,
+#'   show_limits = TRUE,
+#'   overhanging_reversions = TRUE,
 #'   mr_screen_max_loops = 1L
 #' )
 #'
@@ -48,32 +36,32 @@
 #'
 #' @export
 create_SPC_auto_limits_table <- function(data, 
-                                         chartType,
-                                         periodMin,
-                                         baseline,
-                                         runRuleLength,
-                                         maxNoOfExclusions,
-                                         noRegrets,
+                                         chart_type,
+                                         period_min,
+                                         baseline_length,
+                                         shift_rule_threshold,
+                                         max_exclusions,
+                                         no_regrets,
                                          verbosity,
-                                         noRecals,
-                                         recalEveryShift,
-                                         rule2Tolerance,
-                                         showLimits,
-                                         overhangingReversions,
+                                         baseline_only,
+                                         establish_every_shift,
+                                         centre_line_tolerance,
+                                         show_limits,
+                                         overhanging_reversions,
                                          mr_screen_max_loops
 ) {
   
-  if(noRegrets & !overhangingReversions) {
-    warning(paste0("Setting noRegrets = TRUE and overhangingReversions = ",
-                   "FALSE does not make sense, since noRegrets requires ",
+  if(no_regrets & !overhanging_reversions) {
+    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
+                   "FALSE does not make sense, since no_regrets requires ",
                    "consideration of overhanging reversions. Changing ",
-                   "overhangingReversions to TRUE."))
-    overhangingReversions <- TRUE
+                   "overhanging_reversions to TRUE."))
+    overhanging_reversions <- TRUE
   }
   
   # add y column of percentages for P and P' charts. This is to avoid issues
   # with joins later 
-  if(chartType == "P" | chartType == "P'"){
+  if(chart_type == "P" | chart_type == "P'"){
     data <- data %>% 
       dplyr::mutate(y_numerator = y) %>%
       dplyr::mutate(y = y * 100 / n) %>%
@@ -91,16 +79,16 @@ create_SPC_auto_limits_table <- function(data,
                            entry = "0100")
   # Check whether there are enough data points to form one period
   if(!enough_data_for_new_period(data = data,
-                                 periodMin = periodMin,
-                                 baseline = baseline,
+                                 period_min = period_min,
+                                 baseline_length = baseline_length,
                                  counter = counter,
-                                 chartType = chartType)){
+                                 chart_type = chart_type)){
     
     data <- record_log_entry(df = data,
                              counter = counter,
                              entry = "0210")
     
-    if(showLimits == TRUE){
+    if(show_limits == TRUE){
       warning(paste("The input data has fewer than the minimum number of",
                     "points needed to calculate one period. Timeseries data",
                     "without limits has been displayed."))
@@ -113,13 +101,13 @@ create_SPC_auto_limits_table <- function(data,
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
       data = data, 
-      periodMin = periodMin,
-      baseline = baseline,
+      period_min = period_min,
+      baseline_length = baseline_length,
       counter_at_period_start = counter, 
-      chartType = chartType, 
-      maxNoOfExclusions  = maxNoOfExclusions, 
-      rule2Tolerance = rule2Tolerance,
-      runRuleLength = runRuleLength,
+      chart_type = chart_type, 
+      max_exclusions  = max_exclusions, 
+      centre_line_tolerance = centre_line_tolerance,
+      shift_rule_threshold = shift_rule_threshold,
       mr_screen_max_loops = mr_screen_max_loops)
     
     limits_table <- record_log_entry(df = limits_table,
@@ -127,13 +115,13 @@ create_SPC_auto_limits_table <- function(data,
                                      entry = "0200")
     
     # Set counter to first point after end of first period
-    if(counter == 1L & !is.null(baseline)) {
-      counter <- counter + baseline
+    if(counter == 1L & !is.null(baseline_length)) {
+      counter <- counter + baseline_length
     } else {
-      counter <- counter + periodMin
+      counter <- counter + period_min
     }
     
-    if(!noRecals){
+    if(!baseline_only){
       # [3] Algorithm loop starts - unless user specified no recalculations
       limits_table <- record_log_entry(df = limits_table,
                                        counter = counter,
@@ -143,10 +131,10 @@ create_SPC_auto_limits_table <- function(data,
         
         # [4] Check whether enough points after the counter to form new period
         if(!enough_data_for_new_period(data = limits_table,
-                                       periodMin = periodMin,
-                                       baseline = baseline,
+                                       period_min = period_min,
+                                       baseline_length = baseline_length,
                                        counter = counter,
-                                       chartType = chartType)) {        
+                                       chart_type = chart_type)) {        
           
           limits_table <- record_log_entry(df = limits_table,
                                            counter = counter,
@@ -161,10 +149,11 @@ create_SPC_auto_limits_table <- function(data,
           
           # Identify the next rule break to consider as a triggering rule break:
           # Check whether counter is part way through a rule 2 break already,
-          # with at least [runRuleLength] rule 2 break points following.
+          # with at least [shift_rule_threshold] rule 2 break points following.
           if(counter_at_rule_break(df = limits_table,
                                    counter = counter,
-                                   runRuleLength = runRuleLength)){
+                                   shift_rule_threshold = shift_rule_threshold)
+          ) {
             # If so, set next rule break position to the counter. 
             rule2_break_positions <- NA
             rule2_break_position <- counter
@@ -178,8 +167,8 @@ create_SPC_auto_limits_table <- function(data,
             
           } else {
             # If not, i.e. if either the counter is not within a rule 2 break,
-            # or it is but there are fewer than [runRuleLength] points of the
-            # run following, then scan for start of next rule 2 break.
+            # or it is but there are fewer than [shift_rule_threshold] points of
+            # the run following, then scan for start of next rule 2 break.
             rule2_break_positions <- rule2_break_start_positions(
               limits_table = limits_table,
               counter = counter)
@@ -226,10 +215,10 @@ create_SPC_auto_limits_table <- function(data,
             # form a new period
             
             if(!enough_data_for_new_period(data = limits_table,
-                                           periodMin = periodMin,
-                                           baseline = baseline,
+                                           period_min = period_min,
+                                           baseline_length = baseline_length,
                                            counter = counter,
-                                           chartType = chartType)){
+                                           chart_type = chart_type)){
               
               limits_table <- record_log_entry(df = limits_table,
                                                counter = counter,
@@ -240,18 +229,18 @@ create_SPC_auto_limits_table <- function(data,
             } else {
               
               # [6a] There are sufficient points. Establish candidate limits
-              # using the first periodMin points from the counter as calculation
-              # period
+              # using the first period_min points from the counter as
+              # calculation period
               
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
-                periodMin = periodMin,
-                baseline = baseline,
+                period_min = period_min,
+                baseline_length = baseline_length,
                 counter_at_period_start = counter,
-                chartType = chartType,
-                maxNoOfExclusions = maxNoOfExclusions,
-                rule2Tolerance = rule2Tolerance,
-                runRuleLength = runRuleLength,
+                chart_type = chart_type,
+                max_exclusions = max_exclusions,
+                centre_line_tolerance = centre_line_tolerance,
+                shift_rule_threshold = shift_rule_threshold,
                 mr_screen_max_loops = mr_screen_max_loops)
               
               # Establish whether there is a rule break in the opposite
@@ -260,11 +249,11 @@ create_SPC_auto_limits_table <- function(data,
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
                 counter,
-                periodMin,
+                period_min,
                 triggering_rule_break_direction,
-                rule2Tolerance = rule2Tolerance,
-                runRuleLength = runRuleLength,
-                overhangingReversions = overhangingReversions)[[1]]
+                centre_line_tolerance = centre_line_tolerance,
+                shift_rule_threshold = shift_rule_threshold,
+                overhanging_reversions = overhanging_reversions)[[1]]
               
               # Establish whether (for no regrets) the final run in the
               # candidate calculation period prevents re-establishment of limits
@@ -287,12 +276,12 @@ create_SPC_auto_limits_table <- function(data,
               # Check whether either we recalculate at every shift OR:
               # 1) There is no opposing rule break AND
               # 2) Either:
-              #     a) noRegrets is FALSE OR
+              #     a) no_regrets is FALSE OR
               #     b) the final run does not prevent re-establishment of limits
-              if(recalEveryShift |
+              if(establish_every_shift |
                  (!opposite_rule_break &
-                  ((noRegrets == TRUE & !final_run_prevents) |
-                   noRegrets == FALSE))){
+                  ((no_regrets == TRUE & !final_run_prevents) |
+                   no_regrets == FALSE))){
                 # [7a] If so, re-establish limits at the counter, confirming the
                 # candidate limits
                 
@@ -304,7 +293,7 @@ create_SPC_auto_limits_table <- function(data,
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
-                counter <- counter + periodMin
+                counter <- counter + period_min
                 
               } else {
                 # [7b] If not (i.e. there is an opposing rule break, or the
@@ -320,10 +309,11 @@ create_SPC_auto_limits_table <- function(data,
                 # Check whether:
                 # 1) no further rule breaks have been identified OR
                 # 2) counter is part way through a rule 2 break with at least
-                # [runRuleLength] points of the run following
+                # [shift_rule_threshold] points of the run following
                 if(is.na(rule2_break_positions[2]) | 
                    all(
-                     limits_table$rule2[counter:(counter + runRuleLength - 1)]
+                     limits_table$rule2[counter:(counter + shift_rule_threshold 
+                                                 - 1)]
                    )){
                   
                   # If so, advance the counter by 1
@@ -338,7 +328,7 @@ create_SPC_auto_limits_table <- function(data,
           } # end of [5a], [6] there are rule breaks to consider 
         } # end of: [4a] enough points remaining after the counter
       } # end of: algorithm loop
-    } # end of: [3] !noRecals
+    } # end of: [3] !baseline_only
     
     
     #update NAs in limit columns

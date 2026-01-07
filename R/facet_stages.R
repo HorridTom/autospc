@@ -1,11 +1,11 @@
 
 #' facet_stages
-#' @inheritParams plot_auto_SPC
+#' @inheritParams autospc
 #' @param split_rows A vector of row numbers specifying the stages to display
 #' results at. Names specify facet strip labels.
-#' @param ... Arguments passed to [autospc::plot_auto_SPC()]
+#' @param ... Arguments passed to [autospc::autospc()]
 #'
-#' @returns Faceted plot showing results of [autospc::plot_auto_SPC()] at
+#' @returns Faceted plot showing results of [autospc::autospc()] at
 #' different stages as specified by split_rows
 #'
 #' @examples
@@ -13,40 +13,40 @@
 #' facet_stages(
 #'   ed_attendances_monthly,
 #'   split_rows = c(30L, 60L, 90L),
-#'   chartType = "C'",
-#'   x = Month_Start,
-#'   y = Att_All, 
+#'   chart_type = "C'",
+#'   x = month_start,
+#'   y = att_all, 
 #'   x_break = 365
 #' )
 #' 
 #' @export  
-facet_stages <- function(df,
+facet_stages <- function(data,
                          split_rows,
-                         plotChart = TRUE,
+                         plot_chart = TRUE,
                          ...) {
   
   dots_exprs <- rlang::exprs(...)
   
-  if(dots_exprs$chartType == "XMR") {
-    if(!("showMR" %in% names(dots_exprs))) {
+  if(dots_exprs$chart_type == "XMR") {
+    if(!("show_mr" %in% names(dots_exprs))) {
       
-      dots_exprs$showMR <- FALSE
+      dots_exprs$show_mr <- FALSE
       
-    } else if (dots_exprs$showMR) {
-      warning(paste("`facet_stages()` does not support `showMR = TRUE`.",
-                    "Setting `showMR` to `FALSE`. To facet an MR chart by",
-                    "stages use `facet_stages()` with `chartType = MR`."))
+    } else if (dots_exprs$show_mr) {
+      warning(paste("`facet_stages()` does not support `show_mr = TRUE`.",
+                    "Setting `show_mr` to `FALSE`. To facet an MR chart by",
+                    "stages use `facet_stages()` with `chart_type = MR`."))
       
-      dots_exprs$showMR <- FALSE
+      dots_exprs$show_mr <- FALSE
     }
   }
   
-  dots_exprs$plotChart <- FALSE
+  dots_exprs$plot_chart <- FALSE
   
   xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
   
   df_rn <- eval(rlang::call2("rename_columns",
-                             df = df,
+                             df = data,
                              !!!xyn_exprs))
   
   preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
@@ -57,7 +57,7 @@ facet_stages <- function(df,
                                          df = df_rn,
                                          !!!ppi_args))
   
-  chartType           <- preprocessed_vars$chartType
+  chart_type           <- preprocessed_vars$chart_type
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType
@@ -67,20 +67,20 @@ facet_stages <- function(df,
   split_rows <- sort(split_rows)
   
   # Ensure the last split row is the end of the data
-  if(split_rows[length(split_rows)] != nrow(df)) {
+  if(split_rows[length(split_rows)] != nrow(data)) {
     split_rows <- c(split_rows,
-                    nrow(df))
+                    nrow(data))
   }
   
   
-  data_splits_list <- create_splits_list(df = df,
+  data_splits_list <- create_splits_list(df = data,
                                          split_rows = split_rows)
   
   results_splits_list <- lapply(
     data_splits_list,
     function(x) {
-      eval(rlang::call2("plot_auto_SPC",
-                        df = x,
+      eval(rlang::call2("autospc",
+                        data = x,
                         !!!dots_exprs))
     }
   )
@@ -90,7 +90,7 @@ facet_stages <- function(df,
     .id = "stage"
   )
   
-  if(!plotChart) {
+  if(!plot_chart) {
     return(results_data)
   }
   

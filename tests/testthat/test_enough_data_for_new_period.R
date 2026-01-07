@@ -5,24 +5,24 @@ test_that("Determines correctly whether there are enough data point to form a ne
   
   #case when counter is 1
   result1 <- enough_data_for_new_period(data = test_data,
-                                        periodMin = 21,
-                                        baseline = NULL,
+                                        period_min = 21,
+                                        baseline_length = NULL,
                                         counter = 1,
-                                        chartType = "C")
+                                        chart_type = "C")
   
   #case when counter is much less than nrow(data)
   result2 <- enough_data_for_new_period(data = test_data,
-                                        periodMin = 21,
-                                        baseline = NULL,
+                                        period_min = 21,
+                                        baseline_length = NULL,
                                         counter = 54,
-                                        chartType = "C")
+                                        chart_type = "C")
   
   #case when counter is close to end 
   result3 <- enough_data_for_new_period(data = test_data,
-                                        periodMin = 21,
-                                        baseline = NULL,
+                                        period_min = 21,
+                                        baseline_length = NULL,
                                         counter = 140,
-                                        chartType = "C")
+                                        chart_type = "C")
   
   results <- c(result1,
                result2,

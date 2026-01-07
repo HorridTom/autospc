@@ -106,7 +106,7 @@ interpret_log_entry <- function(entry,
                                        1L,
                                        1L) == "1") {
               eis <- paste("Insufficient remaining data for further",
-                            "re-establishment of limits.")
+                           "re-establishment of limits.")
             } else {
               eis <- "Undefined branch at step 04."
             }
@@ -153,10 +153,10 @@ interpret_log_entry <- function(entry,
                 eis <- ""
               }
               eis <- paste(eis,
-                            "Forming candidate limits.")
+                           "Forming candidate limits.")
             } else if(branch == "10") {
               eis <- paste("Insufficient remaining data for further",
-                            "re-establishment of limits.")
+                           "re-establishment of limits.")
             } else {
               eis <- "Undefined branch at step 06."
             }
@@ -266,13 +266,13 @@ interpret_log <- function(df,
 
 log_output <- function(df,
                        verbosity,
-                       chartType ,
+                       chart_type ,
                        log_file_path) {
   if(verbosity > 0){
     log_text <- interpret_log(df,
                               verbosity = verbosity)
     cat(paste0("\n",
-               chartType,
+               chart_type,
                ":\n\n"))
     cat(log_text)
     cat("\n\n")

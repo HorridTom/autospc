@@ -1,13 +1,13 @@
 test_that("", {
   
-  result_data <- plot_auto_SPC(
+  result_data <- autospc(
     ed_attendances_monthly,
-    chartType = "C'",
-    x = Month_Start,
-    y = Att_All,
-    periodMin = 21L,
-    baseline = 63L,
-    plotChart = FALSE
+    chart_type = "C'",
+    x = month_start,
+    y = att_all,
+    period_min = 21L,
+    baseline_length = 63L,
+    plot_chart = FALSE
   )
   
   result <- result_data %>%

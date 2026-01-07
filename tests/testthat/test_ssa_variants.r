@@ -1,4 +1,4 @@
-# Tests for variants of SSA selected using overhangingReversions and noRegrets
+# Tests for variants of SSA selected using overhanging_reversions and no_regrets
 
 calc_period_starts <- function(df) {
   
@@ -19,23 +19,23 @@ calc_period_starts <- function(df) {
 test_that(
   "SSA variants perform correctly on first 96 points of example_series_1", {
     
-    result_ssa <- plot_auto_SPC(df = example_series_1[1:96,],
-                                chartType = "XMR",
-                                plotChart = FALSE,
-                                noRegrets = TRUE,
-                                overhangingReversions = TRUE)
+    result_ssa <- autospc(example_series_1[1:96,],
+                          chart_type = "XMR",
+                          plot_chart = FALSE,
+                          no_regrets = TRUE,
+                          overhanging_reversions = TRUE)
     
-    result_nRF_oRT <- plot_auto_SPC(df = example_series_1[1:96,],
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = TRUE)
+    result_nRF_oRT <- autospc(example_series_1[1:96,],
+                              chart_type = "XMR",
+                              plot_chart = FALSE,
+                              no_regrets = FALSE,
+                              overhanging_reversions = TRUE)
     
-    result_nRF_oRF <- plot_auto_SPC(df = example_series_1[1:96,],
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = FALSE)
+    result_nRF_oRF <- autospc(example_series_1[1:96,],
+                              chart_type = "XMR",
+                              plot_chart = FALSE,
+                              no_regrets = FALSE,
+                              overhanging_reversions = FALSE)
     
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
@@ -61,23 +61,23 @@ test_that(
 test_that(
   "SSA variants perform correctly on full example_series_1", {
     
-    result_ssa <- plot_auto_SPC(df = example_series_1,
-                                chartType = "XMR",
-                                plotChart = FALSE,
-                                noRegrets = TRUE,
-                                overhangingReversions = TRUE)
+    result_ssa <- autospc(example_series_1,
+                          chart_type = "XMR",
+                          plot_chart = FALSE,
+                          no_regrets = TRUE,
+                          overhanging_reversions = TRUE)
     
-    result_nRF_oRT <- plot_auto_SPC(df = example_series_1,
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = TRUE)
+    result_nRF_oRT <- autospc(example_series_1,
+                              chart_type = "XMR",
+                              plot_chart = FALSE,
+                              no_regrets = FALSE,
+                              overhanging_reversions = TRUE)
     
-    result_nRF_oRF <- plot_auto_SPC(df = example_series_1,
-                                    chartType = "XMR",
-                                    plotChart = FALSE,
-                                    noRegrets = FALSE,
-                                    overhangingReversions = FALSE)
+    result_nRF_oRF <- autospc(example_series_1,
+                              chart_type = "XMR",
+                              plot_chart = FALSE,
+                              no_regrets = FALSE,
+                              overhanging_reversions = FALSE)
     
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
@@ -103,14 +103,14 @@ test_that(
 test_that("warning is issued if incompatible variant requested", {
   
   expect_warning(
-    plot_auto_SPC(
+    autospc(
       ed_attendances_monthly, 
-      chartType = "C'", 
-      x = Month_Start, 
-      y = Att_All,
-      noRegrets = TRUE,
-      overhangingReversions = FALSE
+      chart_type = "C'", 
+      x = month_start, 
+      y = att_all,
+      no_regrets = TRUE,
+      overhanging_reversions = FALSE
     ),
-    "noRegrets requires consideration of overhanging reversions")
+    "no_regrets requires consideration of overhanging reversions")
   
 })

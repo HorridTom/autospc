@@ -4,10 +4,10 @@
 \alias{facet_stages}
 \title{facet_stages}
 \usage{
-facet_stages(df, split_rows, plotChart = TRUE, ...)
+facet_stages(data, split_rows, plot_chart = TRUE, ...)
 }
 \arguments{
-\item{df}{A data frame. For an XMR, C or C' chart, must have columns for:
+\item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
 \itemize{
 \item the subgrouping variable, to be plotted on the horizontal axis, (x);
 \item the variable of interest to be plotted on the vertical axis (y);
@@ -24,14 +24,14 @@ For a P or P' chart, must have columns for:
 \item{split_rows}{A vector of row numbers specifying the stages to display
 results at. Names specify facet strip labels.}
 
-\item{plotChart}{Boolean specifying whether to plot the chart. If not, the
+\item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
 data is returned with centre line, control limits and other analytic output
 appended as columns.}
 
-\item{...}{Arguments passed to \code{\link[=plot_auto_SPC]{plot_auto_SPC()}}}
+\item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
 }
 \value{
-Faceted plot showing results of \code{\link[=plot_auto_SPC]{plot_auto_SPC()}} at
+Faceted plot showing results of \code{\link[=autospc]{autospc()}} at
 different stages as specified by split_rows
 }
 \description{
@@ -42,9 +42,9 @@ facet_stages
 facet_stages(
   ed_attendances_monthly,
   split_rows = c(30L, 60L, 90L),
-  chartType = "C'",
-  x = Month_Start,
-  y = Att_All, 
+  chart_type = "C'",
+  x = month_start,
+  y = att_all, 
   x_break = 365
 )
 

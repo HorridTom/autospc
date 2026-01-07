@@ -1,7 +1,7 @@
 
 preprocess_inputs <- function(
     df,
-    chartType,
+    chart_type,
     title = NULL,
     subtitle = NULL,
     upper_annotation_sf = NULL,
@@ -26,22 +26,22 @@ preprocess_inputs <- function(
      all(xType != "numeric") & 
      all(xType != "integer")) {
     warning(paste("Please make sure that your x column is a",
-                 "'Date', 'POSIXct', 'numeric' or 'integer' type."))
+                  "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
   
   #decide whether the chart is C or P depending on data format if not specified 
-  if(is.null(chartType)) {
+  if(is.null(chart_type)) {
     
     lifecycle::deprecate_warn(
       when = "0.0.0.9008",
-      what = I("chartType  = NULL"),
+      what = I("chart_type  = NULL"),
       details = I("Please explicitly pass the desired chart type")
     )
     
     if(all(c("x", "y") %in% colnames(df))) {
-      chartType <- "C'"
+      chart_type <- "C'"
     } else if(all(c("x", "n", "y") %in% colnames(df))) {
-      chartType <- "P'"
+      chart_type <- "P'"
     } else {
       print(paste0("The data you have input is not in the correct format. ",
                    "For C charts, data must contain at least columns 'x' and ",
@@ -50,7 +50,7 @@ preprocess_inputs <- function(
     }
   }
   
-  if(chartType == "MR") {
+  if(chart_type == "MR") {
     mrs <- get_mrs(y = df$y)
     df <- df %>% dplyr::mutate(y = mrs)
   }
@@ -61,9 +61,9 @@ preprocess_inputs <- function(
     
     lifecycle::deprecate_warn(
       when = "0.0.0.9010",
-      what = I(paste0("plot_auto_SPC(override_annotation_dist,",
+      what = I(paste0("autospc(override_annotation_dist,",
                       "override_annotation_dist_P)")),
-      details = I(paste0("Please use `plot_auto_SPC(upper_annotation_sf, ",
+      details = I(paste0("Please use `autospc(upper_annotation_sf, ",
                          "lower_annotation_sf)` instead. ",
                          "Note that equivalent new arguments can be obtained ",
                          "from the old by transforming as follows: 1+1/x. ",
@@ -71,7 +71,7 @@ preprocess_inputs <- function(
                          "equivalent to upper_annotation_sf = 1.1."))
     )
     
-    if(!is.null(override_annotation_dist_P) & startsWith(chartType, "P")) {
+    if(!is.null(override_annotation_dist_P) & startsWith(chart_type, "P")) {
       oad <- override_annotation_dist_P
     } else {
       oad <- override_annotation_dist
@@ -88,7 +88,7 @@ preprocess_inputs <- function(
   }
   
   if(is.null(upper_annotation_sf)) {
-    upper_annotation_sf <- ifelse(startsWith(chartType, "P"),
+    upper_annotation_sf <- ifelse(startsWith(chart_type, "P"),
                                   1.04,
                                   1.1)
   }
@@ -100,7 +100,7 @@ preprocess_inputs <- function(
   
   return(list(
     df = df,
-    chartType = chartType,
+    chart_type = chart_type,
     title = title,
     subtitle = subtitle,
     xType = xType,
@@ -109,3 +109,44 @@ preprocess_inputs <- function(
   ))
   
 }
+
+
+# Function to rename columns
+rename_columns <- function(df, x, y, n) {
+  
+  data_colnames <- colnames(df)
+  
+  x <- rlang::enquo(x)
+  y <- rlang::enquo(y)
+  n <- rlang::enquo(n)
+  
+  # Rename columns to standard names
+  if(!rlang::quo_is_missing(x)) {
+    if("x" %in% data_colnames) {
+      warning("x is present in the data and specified as an argument.
+The column specified in the argument x will be used.")
+    }
+    df <- df %>% dplyr::rename(x = !!x)
+  }
+  
+  if(!rlang::quo_is_missing(y)) {
+    if("y" %in% data_colnames) {
+      warning("y is present in the data and specified as an argument.
+The column specified in the argument y will be used.")
+    }
+    df <- df %>% dplyr::rename(y = !!y)
+  }
+  
+  if(!rlang::quo_is_missing(n)) {
+    if("n" %in% data_colnames) {
+      warning("n is present in the data and specified as an argument.
+The column specified in the argument n will be used.")
+    }
+    df <- df %>% dplyr::rename(n = !!n)
+  }
+  
+  return(df)
+  
+}
+
+

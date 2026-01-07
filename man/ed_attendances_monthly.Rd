@@ -7,13 +7,13 @@
 \format{
 A data frame with 109 rows and 9 columns
 \describe{
-\item{Month_Start}{First date of the month in question}
-\item{Att_All}{Total emergency attendances in the month in question}
-\item{Within_4h}{Total attendances that were < 4 hours}
-\item{Over_4h}{Total attendances that were > 4 hours}
-\item{Percent_in_4h}{Percentage of attendances within 4 hours}
-\item{E_Adm_Via_ED}{Total emergency admissions via emergency department}
-\item{E_Adm_Over_4h}{Total > 4 hours from decision to admit to admission}
+\item{month_start}{First date of the month in question}
+\item{att_all}{Total emergency attendances in the month in question}
+\item{within_4h}{Total attendances that were < 4 hours}
+\item{over_4h}{Total attendances that were > 4 hours}
+\item{percent_in_4h}{Percentage of attendances within 4 hours}
+\item{e_adm_via_ed}{Total emergency admissions via emergency department}
+\item{e_adm_over_4h}{Total > 4 hours from decision to admit to admission}
 }
 }
 \source{

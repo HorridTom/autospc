@@ -6,35 +6,37 @@
 \usage{
 create_SPC_auto_limits_table(
   data,
-  chartType,
-  periodMin,
-  baseline,
-  runRuleLength,
-  maxNoOfExclusions,
-  noRegrets,
+  chart_type,
+  period_min,
+  baseline_length,
+  shift_rule_threshold,
+  max_exclusions,
+  no_regrets,
   verbosity,
-  noRecals,
-  recalEveryShift,
-  rule2Tolerance,
-  showLimits,
-  overhangingReversions,
+  baseline_only,
+  establish_every_shift,
+  centre_line_tolerance,
+  show_limits,
+  overhanging_reversions,
   mr_screen_max_loops
 )
 }
 \arguments{
-\item{data}{A data frame. For an XMR, C or C' chart, must have columns:
+\item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
 \itemize{
-\item x, the subgrouping variable, to be plotted on the horizontal axis;
-\item y, the variable of interest to be plotted on the vertical axis;
+\item the subgrouping variable, to be plotted on the horizontal axis, (x);
+\item the variable of interest to be plotted on the vertical axis (y);
+\item and optionally, a title and subtitle for the plot.
 } \cr
-For a P or P' chart, must have columns:
+For a P or P' chart, must have columns for:
 \itemize{
-\item x, the subgrouping variable, to be plotted on the horizontal axis;
-\item n, the total count or denominator;
-\item y, the count meeting criteria, or numerator;
+\item the subgrouping variable, to be plotted on the horizontal axis, (x);
+\item the total count or denominator (n);
+\item the count meeting criteria, or numerator (y);
+\item and optionally, a title and subtitle for the plot.
 }}
 
-\item{chartType}{The type of chart you wish to plot. Available options are:
+\item{chart_type}{The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
@@ -42,43 +44,43 @@ Parameters that control behaviour of the algorithm used to re-establish
 control limits.
 }}
 
-\item{periodMin}{The minimum number of points (subgroups) per period,
+\item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline}{Integer, overrides periodMin for the first calculation period
-only, if specified}
+\item{baseline_length}{Integer, overrides period_min for the first
+calculation period only, if specified}
 
-\item{runRuleLength}{The minimum number of consecutive points above or below
-the centre line constituting a shift (or "rule 2") break.}
+\item{shift_rule_threshold}{The minimum number of consecutive points above or
+below the centre line constituting a shift (or "rule 2") break.}
 
-\item{maxNoOfExclusions}{The maximum number of extreme points to exclude from
+\item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations.}
 
-\item{noRegrets}{Boolean signifying which version of the algorithm should be
+\item{no_regrets}{Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
 standard output log; the higher the number the more information is provided,
 none if 0.}
 
-\item{noRecals}{Boolean - if TRUE, do not recalculate control limits, instead
-extend limits calculated from the first periodMin points.}
+\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits,
+instead extend limits calculated from the first period_min points.}
 
-\item{recalEveryShift}{Boolean - whether to bypass the Stable Shift Algorithm
-and simply re-establish limits at every shift rule break (respecting
-periodMin)}
+\item{establish_every_shift}{Boolean - whether to bypass the Stable Shift
+Algorithm and simply re-establish limits at every shift rule break
+(respecting period_min)}
 
-\item{rule2Tolerance}{Minimum difference between a point's vertical position
-and the centre line to count as "on the centre line" for the purposes of
-shift rule breaks}
+\item{centre_line_tolerance}{Minimum difference between a point's vertical
+position and the centre line to count as "on the centre line" for the
+purposes ofshift rule breaks}
 
-\item{showLimits}{Boolean controlling whether or not to display centre line
+\item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
 
-\item{overhangingReversions}{Boolean determining whether rule breaks in the
+\item{overhanging_reversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.
+calculation period. Set to FALSE only with no_regrets = FALSE.
 \subsection{SPC Parameters}{
 
 Parameters that control how cetnre line and control limits are established
@@ -102,23 +104,23 @@ recalculation of control limits.
 # Calculate limts for a C' chart for count of monthly attendances
 
 df <- ed_attendances_monthly \%>\%
-        dplyr::rename(x = Month_Start,
-                      y = Att_All)
+        dplyr::rename(x = month_start,
+                      y = att_all)
 
 limits_table <- create_SPC_auto_limits_table(
   df,
-  chartType = "C'",
-  periodMin = 21,
-  baseline = NULL,
-  runRuleLength = 8,
-  maxNoOfExclusions = 3,
-  noRegrets = TRUE,
+  chart_type = "C'",
+  period_min = 21,
+  baseline_length = NULL,
+  shift_rule_threshold = 8,
+  max_exclusions = 3,
+  no_regrets = TRUE,
   verbosity = 1L,
-  noRecals = FALSE,
-  recalEveryShift = FALSE,
-  rule2Tolerance = 0,
-  showLimits = TRUE,
-  overhangingReversions = TRUE,
+  baseline_only = FALSE,
+  establish_every_shift = FALSE,
+  centre_line_tolerance = 0,
+  show_limits = TRUE,
+  overhanging_reversions = TRUE,
   mr_screen_max_loops = 1L
 )
 

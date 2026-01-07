@@ -45,18 +45,18 @@ recalculation of control limits.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">create_SPC_auto_limits_table</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
-<span>  <span class="va">chartType</span>,</span>
-<span>  <span class="va">periodMin</span>,</span>
-<span>  <span class="va">baseline</span>,</span>
-<span>  <span class="va">runRuleLength</span>,</span>
-<span>  <span class="va">maxNoOfExclusions</span>,</span>
-<span>  <span class="va">noRegrets</span>,</span>
+<span>  <span class="va">chart_type</span>,</span>
+<span>  <span class="va">period_min</span>,</span>
+<span>  <span class="va">baseline_length</span>,</span>
+<span>  <span class="va">shift_rule_threshold</span>,</span>
+<span>  <span class="va">max_exclusions</span>,</span>
+<span>  <span class="va">no_regrets</span>,</span>
 <span>  <span class="va">verbosity</span>,</span>
-<span>  <span class="va">noRecals</span>,</span>
-<span>  <span class="va">recalEveryShift</span>,</span>
-<span>  <span class="va">rule2Tolerance</span>,</span>
-<span>  <span class="va">showLimits</span>,</span>
-<span>  <span class="va">overhangingReversions</span>,</span>
+<span>  <span class="va">baseline_only</span>,</span>
+<span>  <span class="va">establish_every_shift</span>,</span>
+<span>  <span class="va">centre_line_tolerance</span>,</span>
+<span>  <span class="va">show_limits</span>,</span>
+<span>  <span class="va">overhanging_reversions</span>,</span>
 <span>  <span class="va">mr_screen_max_loops</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -66,16 +66,18 @@ recalculation of control limits.</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>A data frame. For an XMR, C or C' chart, must have columns:</p><ul><li><p>x, the subgrouping variable, to be plotted on the horizontal axis;</p></li>
-<li><p>y, the variable of interest to be plotted on the vertical axis;</p></li>
+<dd><p>A data frame. For an XMR, C or C' chart, must have columns for:</p><ul><li><p>the subgrouping variable, to be plotted on the horizontal axis, (x);</p></li>
+<li><p>the variable of interest to be plotted on the vertical axis (y);</p></li>
+<li><p>and optionally, a title and subtitle for the plot.</p></li>
 </ul><p><br>
-For a P or P' chart, must have columns:</p><ul><li><p>x, the subgrouping variable, to be plotted on the horizontal axis;</p></li>
-<li><p>n, the total count or denominator;</p></li>
-<li><p>y, the count meeting criteria, or numerator;</p></li>
+For a P or P' chart, must have columns for:</p><ul><li><p>the subgrouping variable, to be plotted on the horizontal axis, (x);</p></li>
+<li><p>the total count or denominator (n);</p></li>
+<li><p>the count meeting criteria, or numerator (y);</p></li>
+<li><p>and optionally, a title and subtitle for the plot.</p></li>
 </ul></dd>
 
 
-<dt id="arg-charttype">chartType<a class="anchor" aria-label="anchor" href="#arg-charttype"></a></dt>
+<dt id="arg-chart-type">chart_type<a class="anchor" aria-label="anchor" href="#arg-chart-type"></a></dt>
 <dd><p>The type of chart you wish to plot. Available options are:
 "XMR", "MR", "C", "C'", "P", "P'".</p><div class="section">
 <h3 id="algorithm-parameters">Algorithm Parameters<a class="anchor" aria-label="anchor" href="#algorithm-parameters"></a></h3>
@@ -86,27 +88,27 @@ control limits.</p>
 </div></dd>
 
 
-<dt id="arg-periodmin">periodMin<a class="anchor" aria-label="anchor" href="#arg-periodmin"></a></dt>
+<dt id="arg-period-min">period_min<a class="anchor" aria-label="anchor" href="#arg-period-min"></a></dt>
 <dd><p>The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.</p></dd>
 
 
-<dt id="arg-baseline">baseline<a class="anchor" aria-label="anchor" href="#arg-baseline"></a></dt>
-<dd><p>Integer, overrides periodMin for the first calculation period
-only, if specified</p></dd>
+<dt id="arg-baseline-length">baseline_length<a class="anchor" aria-label="anchor" href="#arg-baseline-length"></a></dt>
+<dd><p>Integer, overrides period_min for the first
+calculation period only, if specified</p></dd>
 
 
-<dt id="arg-runrulelength">runRuleLength<a class="anchor" aria-label="anchor" href="#arg-runrulelength"></a></dt>
-<dd><p>The minimum number of consecutive points above or below
-the centre line constituting a shift (or "rule 2") break.</p></dd>
+<dt id="arg-shift-rule-threshold">shift_rule_threshold<a class="anchor" aria-label="anchor" href="#arg-shift-rule-threshold"></a></dt>
+<dd><p>The minimum number of consecutive points above or
+below the centre line constituting a shift (or "rule 2") break.</p></dd>
 
 
-<dt id="arg-maxnoofexclusions">maxNoOfExclusions<a class="anchor" aria-label="anchor" href="#arg-maxnoofexclusions"></a></dt>
+<dt id="arg-max-exclusions">max_exclusions<a class="anchor" aria-label="anchor" href="#arg-max-exclusions"></a></dt>
 <dd><p>The maximum number of extreme points to exclude from
 limit calculations.</p></dd>
 
 
-<dt id="arg-noregrets">noRegrets<a class="anchor" aria-label="anchor" href="#arg-noregrets"></a></dt>
+<dt id="arg-no-regrets">no_regrets<a class="anchor" aria-label="anchor" href="#arg-no-regrets"></a></dt>
 <dd><p>Boolean signifying which version of the algorithm should be
 used. Defines whether limits can change as more data is added or not.</p></dd>
 
@@ -117,33 +119,33 @@ standard output log; the higher the number the more information is provided,
 none if 0.</p></dd>
 
 
-<dt id="arg-norecals">noRecals<a class="anchor" aria-label="anchor" href="#arg-norecals"></a></dt>
-<dd><p>Boolean - if TRUE, do not recalculate control limits, instead
-extend limits calculated from the first periodMin points.</p></dd>
+<dt id="arg-baseline-only">baseline_only<a class="anchor" aria-label="anchor" href="#arg-baseline-only"></a></dt>
+<dd><p>Boolean - if TRUE, do not recalculate control limits,
+instead extend limits calculated from the first period_min points.</p></dd>
 
 
-<dt id="arg-recaleveryshift">recalEveryShift<a class="anchor" aria-label="anchor" href="#arg-recaleveryshift"></a></dt>
-<dd><p>Boolean - whether to bypass the Stable Shift Algorithm
-and simply re-establish limits at every shift rule break (respecting
-periodMin)</p></dd>
+<dt id="arg-establish-every-shift">establish_every_shift<a class="anchor" aria-label="anchor" href="#arg-establish-every-shift"></a></dt>
+<dd><p>Boolean - whether to bypass the Stable Shift
+Algorithm and simply re-establish limits at every shift rule break
+(respecting period_min)</p></dd>
 
 
-<dt id="arg-rule-tolerance">rule2Tolerance<a class="anchor" aria-label="anchor" href="#arg-rule-tolerance"></a></dt>
-<dd><p>Minimum difference between a point's vertical position
-and the centre line to count as "on the centre line" for the purposes of
-shift rule breaks</p></dd>
+<dt id="arg-centre-line-tolerance">centre_line_tolerance<a class="anchor" aria-label="anchor" href="#arg-centre-line-tolerance"></a></dt>
+<dd><p>Minimum difference between a point's vertical
+position and the centre line to count as "on the centre line" for the
+purposes ofshift rule breaks</p></dd>
 
 
-<dt id="arg-showlimits">showLimits<a class="anchor" aria-label="anchor" href="#arg-showlimits"></a></dt>
+<dt id="arg-show-limits">show_limits<a class="anchor" aria-label="anchor" href="#arg-show-limits"></a></dt>
 <dd><p>Boolean controlling whether or not to display centre line
 and control limits</p></dd>
 
 
-<dt id="arg-overhangingreversions">overhangingReversions<a class="anchor" aria-label="anchor" href="#arg-overhangingreversions"></a></dt>
+<dt id="arg-overhanging-reversions">overhanging_reversions<a class="anchor" aria-label="anchor" href="#arg-overhanging-reversions"></a></dt>
 <dd><p>Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate recalculation
 prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with noRegrets = FALSE.</p><div class="section">
+calculation period. Set to FALSE only with no_regrets = FALSE.</p><div class="section">
 <h3 id="spc-parameters">SPC Parameters<a class="anchor" aria-label="anchor" href="#spc-parameters"></a></h3>
 
 
@@ -170,23 +172,23 @@ plotting</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Calculate limts for a C' chart for count of monthly attendances</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">ed_attendances_monthly</span> <span class="op"><a href="pipe.html">%&gt;%</a></span></span></span>
-<span class="r-in"><span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Month_Start</span>,</span></span>
-<span class="r-in"><span>                      y <span class="op">=</span> <span class="va">Att_All</span><span class="op">)</span></span></span>
+<span class="r-in"><span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">month_start</span>,</span></span>
+<span class="r-in"><span>                      y <span class="op">=</span> <span class="va">att_all</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">limits_table</span> <span class="op">&lt;-</span> <span class="fu">create_SPC_auto_limits_table</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">df</span>,</span></span>
-<span class="r-in"><span>  chartType <span class="op">=</span> <span class="st">"C'"</span>,</span></span>
-<span class="r-in"><span>  periodMin <span class="op">=</span> <span class="fl">21</span>,</span></span>
-<span class="r-in"><span>  baseline <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>  runRuleLength <span class="op">=</span> <span class="fl">8</span>,</span></span>
-<span class="r-in"><span>  maxNoOfExclusions <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>  noRegrets <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span></span>
+<span class="r-in"><span>  period_min <span class="op">=</span> <span class="fl">21</span>,</span></span>
+<span class="r-in"><span>  baseline_length <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>  shift_rule_threshold <span class="op">=</span> <span class="fl">8</span>,</span></span>
+<span class="r-in"><span>  max_exclusions <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  no_regrets <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  verbosity <span class="op">=</span> <span class="fl">1L</span>,</span></span>
-<span class="r-in"><span>  noRecals <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  recalEveryShift <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  rule2Tolerance <span class="op">=</span> <span class="fl">0</span>,</span></span>
-<span class="r-in"><span>  showLimits <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  overhangingReversions <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  baseline_only <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  establish_every_shift <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  centre_line_tolerance <span class="op">=</span> <span class="fl">0</span>,</span></span>
+<span class="r-in"><span>  show_limits <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  overhanging_reversions <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  mr_screen_max_loops <span class="op">=</span> <span class="fl">1L</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

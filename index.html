@@ -67,7 +67,7 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>autospc provides a rigorous and consistent means of re-establishing limits on Shewhart charts (also known as control charts), using the <em>Stable Shift Algorithm</em>.</p>
-<p>The main function is <code><a href="reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>, which plots Shewhart charts of various types appropriate for different types of data, with limits established using the algorithm.</p>
+<p>The main function is <code><a href="reference/autospc.html">autospc()</a></code>, which plots Shewhart charts of various types appropriate for different types of data, with limits established using the algorithm.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -87,37 +87,37 @@
 <p>The example dataset <code>ed_attendances_monthly</code>, provided with autospc, is typical of the time series data that the Stable Shift Algorithm is designed for. The example code below uses this dataset, and can be executed once autospc is loaded.</p>
 <p>For a <strong>C, C’ or XmR</strong> chart the data must have the following columns:</p>
 <ul>
-<li><p>Your x-axis variable: date, POSIXct, numeric or integer type. The name of this column can be specified in the <code>x</code> argument of <code><a href="reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>.</p></li>
-<li><p>Your y-axis variable : numeric or integer type. The name of this column can be specified in the <code>y</code> argument of the <code><a href="reference/plot_auto_SPC.html">plot_auto_SPC()</a></code> function.</p></li>
+<li><p>Your x-axis variable: date, POSIXct, numeric or integer type. The name of this column can be specified in the <code>x</code> argument of <code><a href="reference/autospc.html">autospc()</a></code>.</p></li>
+<li><p>Your y-axis variable : numeric or integer type. The name of this column can be specified in the <code>y</code> argument of the <code><a href="reference/autospc.html">autospc()</a></code> function.</p></li>
 </ul>
 <p>For example:</p>
-<pre><code><span><span class="fu"><a href="reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
-<span>                chartType <span class="op">=</span> <span class="st">"C'"</span>,</span>
-<span>                x <span class="op">=</span> <span class="va">Month_Start</span>,</span>
-<span>                y <span class="op">=</span> <span class="va">Att_All</span><span class="op">)</span></span></code></pre>
+<pre><code><span><span class="fu"><a href="reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
+<span>                chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
+<span>                x <span class="op">=</span> <span class="va">month_start</span>,</span>
+<span>                y <span class="op">=</span> <span class="va">att_all</span><span class="op">)</span></span></code></pre>
 <p>For a <strong>P or P’</strong> chart the data must have the following columns:</p>
 <ul>
-<li><p>Your x-axis variable: date, POSIXct, numeric or integer type. The name of this column can be specified in the <code>x</code> argument of <code><a href="reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>.</p></li>
-<li><p>The denominator or total count (e.g. number of ED attendances): numeric or integer type. The name of this column can be specified in the <code>n</code> argument of <code><a href="reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>.</p></li>
-<li><p>The numerator (e.g. number of ED attendances less than 4 hours in duration): numeric or integer type. The name of this column can be specified in the <code>y</code> argument of <code><a href="reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>.</p></li>
+<li><p>Your x-axis variable: date, POSIXct, numeric or integer type. The name of this column can be specified in the <code>x</code> argument of <code><a href="reference/autospc.html">autospc()</a></code>.</p></li>
+<li><p>The denominator or total count (e.g. number of ED attendances): numeric or integer type. The name of this column can be specified in the <code>n</code> argument of <code><a href="reference/autospc.html">autospc()</a></code>.</p></li>
+<li><p>The numerator (e.g. number of ED attendances less than 4 hours in duration): numeric or integer type. The name of this column can be specified in the <code>y</code> argument of <code><a href="reference/autospc.html">autospc()</a></code>.</p></li>
 </ul>
 <p>For example:</p>
-<pre><code><span><span class="fu"><a href="reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
-<span>                chartType <span class="op">=</span> <span class="st">"P'"</span>,</span>
-<span>                x <span class="op">=</span> <span class="va">Month_Start</span>,</span>
-<span>                y <span class="op">=</span> <span class="va">Within_4h</span>,</span>
-<span>                n <span class="op">=</span> <span class="va">Att_All</span><span class="op">)</span></span></code></pre>
-<p>The parameters of the Stable Shift Algorithm, and the appearance of the chart, can be configured through various arguments. Use <code><a href="reference/plot_auto_SPC.html">?autospc::plot_auto_SPC</a></code> to find out more.</p>
+<pre><code><span><span class="fu"><a href="reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
+<span>                chart_type <span class="op">=</span> <span class="st">"P'"</span>,</span>
+<span>                x <span class="op">=</span> <span class="va">month_start</span>,</span>
+<span>                y <span class="op">=</span> <span class="va">within_4h</span>,</span>
+<span>                n <span class="op">=</span> <span class="va">att_all</span><span class="op">)</span></span></code></pre>
+<p>The parameters of the Stable Shift Algorithm, and the appearance of the chart, can be configured through various arguments. Use <code><a href="reference/autospc.html">?autospc::autospc</a></code> to find out more.</p>
 <div class="section level3">
 <h3 id="analysis-output-as-a-table">Analysis output as a table<a class="anchor" aria-label="anchor" href="#analysis-output-as-a-table"></a>
 </h3>
-<p>In addition to the default plot output, analysis results can be obtained in table format using <code>plotChart = FALSE</code>, as follows:</p>
-<pre><code><span><span class="va">limits_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
-<span>                              chartType <span class="op">=</span> <span class="st">"P'"</span>,</span>
-<span>                              x <span class="op">=</span> <span class="va">Month_Start</span>,</span>
-<span>                              y <span class="op">=</span> <span class="va">Within_4h</span>,</span>
-<span>                              n <span class="op">=</span> <span class="va">Att_All</span>,</span>
-<span>                              plotChart <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<p>In addition to the default plot output, analysis results can be obtained in table format using <code>plot_chart = FALSE</code>, as follows:</p>
+<pre><code><span><span class="va">limits_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
+<span>                              chart_type <span class="op">=</span> <span class="st">"P'"</span>,</span>
+<span>                              x <span class="op">=</span> <span class="va">month_start</span>,</span>
+<span>                              y <span class="op">=</span> <span class="va">within_4h</span>,</span>
+<span>                              n <span class="op">=</span> <span class="va">att_all</span>,</span>
+<span>                              plot_chart <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">limits_table</span>,</span>
 <span>      n <span class="op">=</span> <span class="fl">5L</span><span class="op">)</span></span></code></pre>

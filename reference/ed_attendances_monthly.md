@@ -13,31 +13,31 @@ ed_attendances_monthly
 
 A data frame with 109 rows and 9 columns
 
-- Month_Start:
+- month_start:
 
   First date of the month in question
 
-- Att_All:
+- att_all:
 
   Total emergency attendances in the month in question
 
-- Within_4h:
+- within_4h:
 
   Total attendances that were \< 4 hours
 
-- Over_4h:
+- over_4h:
 
   Total attendances that were \> 4 hours
 
-- Percent_in_4h:
+- percent_in_4h:
 
   Percentage of attendances within 4 hours
 
-- E_Adm_Via_ED:
+- e_adm_via_ed:
 
   Total emergency admissions via emergency department
 
-- E_Adm_Over_4h:
+- e_adm_over_4h:
 
   Total \> 4 hours from decision to admit to admission
 

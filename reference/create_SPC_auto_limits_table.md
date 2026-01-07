@@ -8,18 +8,18 @@ automate recalculation of control limits.
 ``` r
 create_SPC_auto_limits_table(
   data,
-  chartType,
-  periodMin,
-  baseline,
-  runRuleLength,
-  maxNoOfExclusions,
-  noRegrets,
+  chart_type,
+  period_min,
+  baseline_length,
+  shift_rule_threshold,
+  max_exclusions,
+  no_regrets,
   verbosity,
-  noRecals,
-  recalEveryShift,
-  rule2Tolerance,
-  showLimits,
-  overhangingReversions,
+  baseline_only,
+  establish_every_shift,
+  centre_line_tolerance,
+  show_limits,
+  overhanging_reversions,
   mr_screen_max_loops
 )
 ```
@@ -28,22 +28,26 @@ create_SPC_auto_limits_table(
 
 - data:
 
-  A data frame. For an XMR, C or C' chart, must have columns:
+  A data frame. For an XMR, C or C' chart, must have columns for:
 
-  - x, the subgrouping variable, to be plotted on the horizontal axis;
+  - the subgrouping variable, to be plotted on the horizontal axis, (x);
 
-  - y, the variable of interest to be plotted on the vertical axis;
+  - the variable of interest to be plotted on the vertical axis (y);
+
+  - and optionally, a title and subtitle for the plot.
 
     
-  For a P or P' chart, must have columns:
+  For a P or P' chart, must have columns for:
 
-  - x, the subgrouping variable, to be plotted on the horizontal axis;
+  - the subgrouping variable, to be plotted on the horizontal axis, (x);
 
-  - n, the total count or denominator;
+  - the total count or denominator (n);
 
-  - y, the count meeting criteria, or numerator;
+  - the count meeting criteria, or numerator (y);
 
-- chartType:
+  - and optionally, a title and subtitle for the plot.
+
+- chart_type:
 
   The type of chart you wish to plot. Available options are: "XMR",
   "MR", "C", "C'", "P", "P'".
@@ -53,27 +57,27 @@ create_SPC_auto_limits_table(
   Parameters that control behaviour of the algorithm used to
   re-establish control limits.
 
-- periodMin:
+- period_min:
 
   The minimum number of points (subgroups) per period, i.e. the minimum
   number of points required to form control limits.
 
-- baseline:
+- baseline_length:
 
-  Integer, overrides periodMin for the first calculation period only, if
-  specified
+  Integer, overrides period_min for the first calculation period only,
+  if specified
 
-- runRuleLength:
+- shift_rule_threshold:
 
   The minimum number of consecutive points above or below the centre
   line constituting a shift (or "rule 2") break.
 
-- maxNoOfExclusions:
+- max_exclusions:
 
   The maximum number of extreme points to exclude from limit
   calculations.
 
-- noRegrets:
+- no_regrets:
 
   Boolean signifying which version of the algorithm should be used.
   Defines whether limits can change as more data is added or not.
@@ -84,33 +88,33 @@ create_SPC_auto_limits_table(
   output log; the higher the number the more information is provided,
   none if 0.
 
-- noRecals:
+- baseline_only:
 
   Boolean - if TRUE, do not recalculate control limits, instead extend
-  limits calculated from the first periodMin points.
+  limits calculated from the first period_min points.
 
-- recalEveryShift:
+- establish_every_shift:
 
   Boolean - whether to bypass the Stable Shift Algorithm and simply
-  re-establish limits at every shift rule break (respecting periodMin)
+  re-establish limits at every shift rule break (respecting period_min)
 
-- rule2Tolerance:
+- centre_line_tolerance:
 
   Minimum difference between a point's vertical position and the centre
-  line to count as "on the centre line" for the purposes of shift rule
+  line to count as "on the centre line" for the purposes ofshift rule
   breaks
 
-- showLimits:
+- show_limits:
 
   Boolean controlling whether or not to display centre line and control
   limits
 
-- overhangingReversions:
+- overhanging_reversions:
 
   Boolean determining whether rule breaks in the opposite direction to a
   rule break triggering a candidate recalculation prevent recalculation
   even if they overhang the end of the candidate calculation period. Set
-  to FALSE only with noRegrets = FALSE.
+  to FALSE only with no_regrets = FALSE.
 
   ### SPC Parameters
 
@@ -135,23 +139,23 @@ plotting
 # Calculate limts for a C' chart for count of monthly attendances
 
 df <- ed_attendances_monthly %>%
-        dplyr::rename(x = Month_Start,
-                      y = Att_All)
+        dplyr::rename(x = month_start,
+                      y = att_all)
 
 limits_table <- create_SPC_auto_limits_table(
   df,
-  chartType = "C'",
-  periodMin = 21,
-  baseline = NULL,
-  runRuleLength = 8,
-  maxNoOfExclusions = 3,
-  noRegrets = TRUE,
+  chart_type = "C'",
+  period_min = 21,
+  baseline_length = NULL,
+  shift_rule_threshold = 8,
+  max_exclusions = 3,
+  no_regrets = TRUE,
   verbosity = 1L,
-  noRecals = FALSE,
-  recalEveryShift = FALSE,
-  rule2Tolerance = 0,
-  showLimits = TRUE,
-  overhangingReversions = TRUE,
+  baseline_only = FALSE,
+  establish_every_shift = FALSE,
+  centre_line_tolerance = 0,
+  show_limits = TRUE,
+  overhanging_reversions = TRUE,
   mr_screen_max_loops = 1L
 )
 

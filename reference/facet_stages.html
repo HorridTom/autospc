@@ -40,14 +40,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">facet_stages</span><span class="op">(</span><span class="va">df</span>, <span class="va">split_rows</span>, plotChart <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">facet_stages</span><span class="op">(</span><span class="va">data</span>, <span class="va">split_rows</span>, plot_chart <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-df">df<a class="anchor" aria-label="anchor" href="#arg-df"></a></dt>
+<dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A data frame. For an XMR, C or C' chart, must have columns for:</p><ul><li><p>the subgrouping variable, to be plotted on the horizontal axis, (x);</p></li>
 <li><p>the variable of interest to be plotted on the vertical axis (y);</p></li>
 <li><p>and optionally, a title and subtitle for the plot.</p></li>
@@ -64,19 +64,19 @@ For a P or P' chart, must have columns for:</p><ul><li><p>the subgrouping variab
 results at. Names specify facet strip labels.</p></dd>
 
 
-<dt id="arg-plotchart">plotChart<a class="anchor" aria-label="anchor" href="#arg-plotchart"></a></dt>
+<dt id="arg-plot-chart">plot_chart<a class="anchor" aria-label="anchor" href="#arg-plot-chart"></a></dt>
 <dd><p>Boolean specifying whether to plot the chart. If not, the
 data is returned with centre line, control limits and other analytic output
 appended as columns.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Arguments passed to <code><a href="plot_auto_SPC.html">plot_auto_SPC()</a></code></p></dd>
+<dd><p>Arguments passed to <code><a href="autospc.html">autospc()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Faceted plot showing results of <code><a href="plot_auto_SPC.html">plot_auto_SPC()</a></code> at
+    <p>Faceted plot showing results of <code><a href="autospc.html">autospc()</a></code> at
 different stages as specified by split_rows</p>
     </div>
 
@@ -86,15 +86,11 @@ different stages as specified by split_rows</p>
 <span class="r-in"><span><span class="fu">facet_stages</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">ed_attendances_monthly</span>,</span></span>
 <span class="r-in"><span>  split_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30L</span>, <span class="fl">60L</span>, <span class="fl">90L</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  chartType <span class="op">=</span> <span class="st">"C'"</span>,</span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="va">Month_Start</span>,</span></span>
-<span class="r-in"><span>  y <span class="op">=</span> <span class="va">Att_All</span>, </span></span>
+<span class="r-in"><span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">month_start</span>,</span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="va">att_all</span>, </span></span>
 <span class="r-in"><span>  x_break <span class="op">=</span> <span class="fl">365</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Registered S3 methods overwritten by 'ggpp':</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   method                  from   </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   heightDetails.titleGrob ggplot2</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   widthDetails.titleGrob  ggplot2</span>
 <span class="r-plt img"><img src="facet_stages-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

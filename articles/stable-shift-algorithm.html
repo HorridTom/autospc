@@ -114,10 +114,10 @@ on this dataset see <code><a href="../reference/ed_attendances_monthly.html">?ed
 <span>  split_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Baseline"</span> <span class="op">=</span> <span class="fl">24L</span>,</span>
 <span>                 <span class="st">"Data added beyond baseline"</span> <span class="op">=</span> <span class="fl">28L</span>,</span>
 <span>                 <span class="st">"Further data added"</span> <span class="op">=</span> <span class="fl">32L</span><span class="op">)</span>,</span>
-<span>  x <span class="op">=</span> <span class="va">Month_Start</span>, </span>
-<span>  y <span class="op">=</span> <span class="va">Att_All</span>,</span>
-<span>  chartType <span class="op">=</span> <span class="st">"C'"</span>,</span>
-<span>  periodMin <span class="op">=</span> <span class="fl">24</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">month_start</span>, </span>
+<span>  y <span class="op">=</span> <span class="va">att_all</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
+<span>  period_min <span class="op">=</span> <span class="fl">24</span>,</span>
 <span>  use_caption <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_break <span class="op">=</span> <span class="fl">91.25</span>,</span>
 <span>  x_date_format <span class="op">=</span> <span class="st">"%Y-%b"</span>,</span>
@@ -169,10 +169,10 @@ figure shows a C-chart for the first 35 data points of the simulated
 <code>example_series_2a</code> data included with <code>autospc</code>, which for the purpose of this
 section we shall interpret as daily values of a count measure of interest.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2a</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>                <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">35L</span><span class="op">)</span>,</span>
 <span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
 <span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-1"></span>
@@ -200,12 +200,12 @@ onwards.</p>
 <span class="header-section-number">3.2.2</span> Rule-breaking run<a class="anchor" aria-label="anchor" href="#rule-breaking-run"></a>
 </h4>
 <p>A <em>rule-breaking run</em> is a run whose length is greater than or equal to the
-threshold for a shift rule break (<code>runRuleLength</code>), set to <span class="math inline">\(8\)</span> by default in
-<code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>. In <a href="#fig:example-1">3.1</a>, there is a rule-breaking run of
+threshold for a shift rule break (<code>shift_rule_threshold</code>), set to <span class="math inline">\(8\)</span> by default in
+<code><a href="../reference/autospc.html">autospc()</a></code>. In <a href="#fig:example-1">3.1</a>, there is a rule-breaking run of
 length 10 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by <code>autospc</code>.</p>
 <p>Runs that are subsets of longer runs with the same end point count here, so for
-example with the default <code>runRuleLength = 8</code>, the run of length 10 in
+example with the default <code>shift_rule_threshold = 8</code>, the run of length 10 in
 <a href="#fig:example-1">3.1</a> actually comprises three rule-breaking runs, commencing at
 the first, second and third points in the length 10 run. In this example, the
 first rule-breaking run starts on day 22 and has length 10, the second starts on
@@ -230,10 +230,10 @@ break.</p>
 <p>In order to decide whether to re-establish control limits at a triggering rule
 break, the SSA requires consideration of the set of limits that <em>would</em> be
 established. These are referred to as <em>candidate limits</em> until they are either
-rejected or accepted. Candidate limits are formed from the first <code>periodMin</code>
+rejected or accepted. Candidate limits are formed from the first <code>period_min</code>
 points starting at the first point of the triggering rule break, and this
 period is referred to as the <em>candidate calculation period</em>.</p>
-<p>In Figure <a href="#fig:example-1">3.1</a>, there are fewer than <code>periodMin</code> (here 21)
+<p>In Figure <a href="#fig:example-1">3.1</a>, there are fewer than <code>period_min</code> (here 21)
 points on or after the start of the triggering rule break (day 22), so it is not
 possible to re-establish limits at day 22, and there are no candidate limits to
 consider.</p>
@@ -243,10 +243,10 @@ more data to add to the chart in <a href="#fig:example-1">3.1</a>. Figure
 Figure <a href="#fig:example-3">3.3</a> shows candidate limits established at the start of
 the triggering rule break, i.e. day 22.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
 <span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              noRecals <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              baseline_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-2"></span>
@@ -255,9 +255,9 @@ Figure 3.2: Example 2
 </p>
 </div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
 <span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
 <span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-3"></span>
@@ -283,10 +283,10 @@ a triggering rule break against the baseline limits commencing at day 22. Figure
 triggering rule break, i.e. from day 22. There is an opposing rule break in
 Figure <a href="#fig:example-5">3.5</a>, commencing on day 31.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
 <span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              noRecals <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              baseline_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-4"></span>
@@ -295,10 +295,10 @@ Figure 3.4: Example 4
 </p>
 </div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
 <span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              recalEveryShift <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-5"></span>
@@ -306,16 +306,16 @@ Figure 3.4: Example 4
 Figure 3.5: Example 5
 </p>
 </div>
-<p>If an opposing rule break only reaches the <code>runRuleLength</code> threshold after the
+<p>If an opposing rule break only reaches the <code>shift_rule_threshold</code> threshold after the
 end of the candidate calculation period, it is referred to as an
 <em>overhanging reversion</em>. Figure <a href="#fig:example-6">3.6</a> shows another alternative
 continuation of our example time series, this time showing an
 overhanging reversion commencing on day 40, against the candidate limits.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span><span class="va">example_series_2c</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2c</span>,</span>
 <span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chartType <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              recalEveryShift <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>              establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-6"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-6-1.png" alt="Example 6"><p class="caption">
@@ -333,7 +333,7 @@ may not often make such a minimum explicit, in a way it is always there
 implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
 with values ranging from 17 to 25 points.</p>
-<p>In <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>, <span class="math inline">\(n_{min}\)</span> is specified by the <code>periodMin</code> argument,
+<p>In <code><a href="../reference/autospc.html">autospc()</a></code>, <span class="math inline">\(n_{min}\)</span> is specified by the <code>period_min</code> argument,
 defaulting to 21. This default is above the commonly recommended minimum values
 and represents a convenient choice for daily data, since it is a multiple of 7.
 This means that in the presence of weekly “seasonal” (periodic) variation over
@@ -411,14 +411,14 @@ given timeseries, there are two ways you can do this.</p>
 <span class="header-section-number">4.1</span> Print log to console<a class="anchor" aria-label="anchor" href="#print-log-to-console"></a>
 </h3>
 <p>To print a log out to the console, set the <code>verbosity</code> argument of
-<code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code> to either <code>1</code> (for basic log information) or <code>2</code> (for full
+<code><a href="../reference/autospc.html">autospc()</a></code> to either <code>1</code> (for basic log information) or <code>2</code> (for full
 detail).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_auto_SPC.html">plot_auto_SPC</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span></span>
 <span>  <span class="va">ed_attendances_monthly</span>, </span>
-<span>  chartType <span class="op">=</span> <span class="st">"C'"</span>, </span>
-<span>  x <span class="op">=</span> <span class="va">Month_Start</span>, </span>
-<span>  y <span class="op">=</span> <span class="va">Att_All</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>, </span>
+<span>  x <span class="op">=</span> <span class="va">month_start</span>, </span>
+<span>  y <span class="op">=</span> <span class="va">att_all</span>,</span>
 <span>  verbosity <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  x_break <span class="op">=</span> <span class="fl">365</span>,</span>
 <span>  x_date_format <span class="op">=</span> <span class="st">"%Y-%b"</span>,</span>
@@ -472,7 +472,7 @@ detail).</p>
 <span class="header-section-number">4.2</span> Save log to a file<a class="anchor" aria-label="anchor" href="#save-log-to-a-file"></a>
 </h3>
 <p>To save the log to a file, provide a file path using the <code>log_file_path</code>
-argument of <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>. If the file path you provide ends <code>".rds"</code> the
+argument of <code><a href="../reference/autospc.html">autospc()</a></code>. If the file path you provide ends <code>".rds"</code> the
 log will be saved to an rds file, if it ends <code>".csv"</code> the log will be saved to a
 csv file.</p>
 <p>The data frame that is saved has one row for each log entry, and contains the
@@ -480,10 +480,10 @@ following columns:</p>
 <ul>
 <li>
 <code>counter</code> : the counter value (row number of the dataframe
-passed to the <code>df</code> argument of <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>) that the log entry refers to</li>
+passed to the <code>data</code> argument of <code><a href="../reference/autospc.html">autospc()</a></code>) that the log entry refers to</li>
 <li>
 <code>x</code> : the value of the <code>x</code> column at this counter value (the
-column passed as <code>x</code> to <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code>)</li>
+column passed as <code>x</code> to <code><a href="../reference/autospc.html">autospc()</a></code>)</li>
 <li>
 <code>log_entry</code> : the log entry, recorded in shorthand (see below)</li>
 <li>

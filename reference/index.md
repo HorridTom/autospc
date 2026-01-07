@@ -2,6 +2,8 @@
 
 ## All functions
 
+- [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+  : Plot SPC charts with automated limit recalculation
 - [`create_SPC_auto_limits_table()`](https://horridtom.github.io/autospc/reference/create_SPC_auto_limits_table.md)
   : Automatically recalculate SPC control limits
 - [`ed_attendances_monthly`](https://horridtom.github.io/autospc/reference/ed_attendances_monthly.md)
@@ -16,5 +18,3 @@
   : Example Time Series 2c
 - [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
   : facet_stages
-- [`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md)
-  : Plot SPC charts with automated limit recalculation

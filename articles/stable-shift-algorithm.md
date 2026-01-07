@@ -49,10 +49,10 @@ facet_stages(
   split_rows = c("Baseline" = 24L,
                  "Data added beyond baseline" = 28L,
                  "Further data added" = 32L),
-  x = Month_Start, 
-  y = Att_All,
-  chartType = "C'",
-  periodMin = 24,
+  x = month_start, 
+  y = att_all,
+  chart_type = "C'",
+  period_min = 24,
   use_caption = FALSE,
   x_break = 91.25,
   x_date_format = "%Y-%b",
@@ -107,10 +107,10 @@ for the purpose of this section we shall interpret as daily values of a
 count measure of interest.
 
 ``` r
-plot_auto_SPC(example_series_2a %>%
+autospc(example_series_2a %>%
                 filter(row_number() <= 35L),
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               extend_limits_to = 47L)
 ```
 
@@ -138,22 +138,22 @@ display period covering day 22 onwards.
 #### 3.2.2 Rule-breaking run
 
 A *rule-breaking run* is a run whose length is greater than or equal to
-the threshold for a shift rule break (`runRuleLength`), set to \\8\\ by
-default in
-[`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md).
+the threshold for a shift rule break (`shift_rule_threshold`), set to
+\\8\\ by default in
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md).
 In [3.1](#fig:example-1), there is a rule-breaking run of length 10
 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by `autospc`.
 
 Runs that are subsets of longer runs with the same end point count here,
-so for example with the default `runRuleLength = 8`, the run of length
-10 in [3.1](#fig:example-1) actually comprises three rule-breaking runs,
-commencing at the first, second and third points in the length 10 run.
-In this example, the first rule-breaking run starts on day 22 and has
-length 10, the second starts on day 23 and has length 9, and the third
-starts on day 24 and has length 8. The run that commences on day 25, the
-fourth point of the length 10 run, is not rule-breaking, since it is of
-length 7 only.
+so for example with the default `shift_rule_threshold = 8`, the run of
+length 10 in [3.1](#fig:example-1) actually comprises three
+rule-breaking runs, commencing at the first, second and third points in
+the length 10 run. In this example, the first rule-breaking run starts
+on day 22 and has length 10, the second starts on day 23 and has length
+9, and the third starts on day 24 and has length 8. The run that
+commences on day 25, the fourth point of the length 10 run, is not
+rule-breaking, since it is of length 7 only.
 
 #### 3.2.3 Triggering rule break
 
@@ -170,11 +170,11 @@ In order to decide whether to re-establish control limits at a
 triggering rule break, the SSA requires consideration of the set of
 limits that *would* be established. These are referred to as *candidate
 limits* until they are either rejected or accepted. Candidate limits are
-formed from the first `periodMin` points starting at the first point of
+formed from the first `period_min` points starting at the first point of
 the triggering rule break, and this period is referred to as the
 *candidate calculation period*.
 
-In Figure [3.1](#fig:example-1), there are fewer than `periodMin` (here
+In Figure [3.1](#fig:example-1), there are fewer than `period_min` (here
 21) points on or after the start of the triggering rule break (day 22),
 so it is not possible to re-establish limits at day 22, and there are no
 candidate limits to consider.
@@ -186,10 +186,10 @@ limits. Figure [3.3](#fig:example-3) shows candidate limits established
 at the start of the triggering rule break, i.e. day 22.
 
 ``` r
-plot_auto_SPC(example_series_2a,
+autospc(example_series_2a,
               override_y_title = "Count",
-              chartType = "C",
-              noRecals = TRUE,
+              chart_type = "C",
+              baseline_only = TRUE,
               extend_limits_to = 47L)
 ```
 
@@ -198,9 +198,9 @@ plot_auto_SPC(example_series_2a,
 Figure 3.2: Example 2
 
 ``` r
-plot_auto_SPC(example_series_2a,
+autospc(example_series_2a,
               override_y_title = "Count",
-              chartType = "C",
+              chart_type = "C",
               extend_limits_to = 47L)
 ```
 
@@ -227,10 +227,10 @@ break, i.e. from day 22. There is an opposing rule break in Figure
 [3.5](#fig:example-5), commencing on day 31.
 
 ``` r
-plot_auto_SPC(example_series_2b,
+autospc(example_series_2b,
               override_y_title = "Count",
-              chartType = "C",
-              noRecals = TRUE,
+              chart_type = "C",
+              baseline_only = TRUE,
               extend_limits_to = 47L)
 ```
 
@@ -239,10 +239,10 @@ plot_auto_SPC(example_series_2b,
 Figure 3.4: Example 4
 
 ``` r
-plot_auto_SPC(example_series_2b,
+autospc(example_series_2b,
               override_y_title = "Count",
-              chartType = "C",
-              recalEveryShift = TRUE,
+              chart_type = "C",
+              establish_every_shift = TRUE,
               extend_limits_to = 47L)
 ```
 
@@ -250,18 +250,18 @@ plot_auto_SPC(example_series_2b,
 
 Figure 3.5: Example 5
 
-If an opposing rule break only reaches the `runRuleLength` threshold
-after the end of the candidate calculation period, it is referred to as
-an *overhanging reversion*. Figure [3.6](#fig:example-6) shows another
-alternative continuation of our example time series, this time showing
-an overhanging reversion commencing on day 40, against the candidate
-limits.
+If an opposing rule break only reaches the `shift_rule_threshold`
+threshold after the end of the candidate calculation period, it is
+referred to as an *overhanging reversion*. Figure [3.6](#fig:example-6)
+shows another alternative continuation of our example time series, this
+time showing an overhanging reversion commencing on day 40, against the
+candidate limits.
 
 ``` r
-plot_auto_SPC(example_series_2c,
+autospc(example_series_2c,
               override_y_title = "Count",
-              chartType = "C",
-              recalEveryShift = TRUE)
+              chart_type = "C",
+              establish_every_shift = TRUE)
 ```
 
 ![Example 6](stable-shift-algorithm_files/figure-html/example-6-1.png)
@@ -278,9 +278,9 @@ two data points would they? In fact, various authors offer guidance on
 what such a minimum should be, with values ranging from 17 to 25 points.
 
 In
-[`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md),
-\\n\_{min}\\ is specified by the `periodMin` argument, defaulting to 21.
-This default is above the commonly recommended minimum values and
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md),
+\\n\_{min}\\ is specified by the `period_min` argument, defaulting to
+21. This default is above the commonly recommended minimum values and
 represents a convenient choice for daily data, since it is a multiple of
 7. This means that in the presence of weekly “seasonal” (periodic)
 variation over the 7 day period the limits are not unduly affected by
@@ -362,15 +362,15 @@ above for a given timeseries, there are two ways you can do this.
 ### 4.1 Print log to console
 
 To print a log out to the console, set the `verbosity` argument of
-[`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md)
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
 to either `1` (for basic log information) or `2` (for full detail).
 
 ``` r
-plot_auto_SPC(
+autospc(
   ed_attendances_monthly, 
-  chartType = "C'", 
-  x = Month_Start, 
-  y = Att_All,
+  chart_type = "C'", 
+  x = month_start, 
+  y = att_all,
   verbosity = 1,
   x_break = 365,
   x_date_format = "%Y-%b",
@@ -425,7 +425,7 @@ plot_auto_SPC(
 
 To save the log to a file, provide a file path using the `log_file_path`
 argument of
-[`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md).
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md).
 If the file path you provide ends `".rds"` the log will be saved to an
 rds file, if it ends `".csv"` the log will be saved to a csv file.
 
@@ -433,12 +433,12 @@ The data frame that is saved has one row for each log entry, and
 contains the following columns:
 
 - `counter` : the counter value (row number of the dataframe passed to
-  the `df` argument of
-  [`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md))
+  the `data` argument of
+  [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md))
   that the log entry refers to
 - `x` : the value of the `x` column at this counter value (the column
   passed as `x` to
-  [`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md))
+  [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md))
 - `log_entry` : the log entry, recorded in shorthand (see below)
 - `interpretation` : text interpretation of the log entry
 

@@ -149,14 +149,17 @@
 #'
 #' @examples 
 #' # Using a C' chart to track changes in the count of monthly attendance 
+#' \dontrun{
 #' plot_auto_SPC(
 #'   ed_attendances_monthly, 
 #'   chartType = "C'", 
 #'   x = Month_Start, 
 #'   y = Att_All
 #' )
+#' }
 #'    
 #' #Using a P' chart to track changes in the percentage admitted within 4 hours
+#' \dontrun{
 #' plot_auto_SPC(
 #'   ed_attendances_monthly, 
 #'   chartType = "P'", 
@@ -164,8 +167,10 @@
 #'   y = Within_4h, 
 #'   n = Att_All
 #' )
+#' }
 #'
 #' #using a runRuleLength of 7 when tracking monthly attendance
+#' \dontrun{
 #' plot_auto_SPC(
 #'   ed_attendances_monthly, 
 #'   chartType = "C'", 
@@ -173,6 +178,7 @@
 #'   y = Att_All,
 #'   runRuleLength = 7
 #' )
+#' }
 #' 
 #' @export
 plot_auto_SPC <- function(df,

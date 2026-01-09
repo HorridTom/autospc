@@ -61,5 +61,6 @@ plot_auto_SPC(
 }
 \details{
 This function was renamed. Please use \code{\link[=autospc]{autospc()}}, plot_auto_SPC()
-is deprecated.
+is deprecated. See the 'autospc 0.0.0.9040' entry in NEWS.md for details of
+these changes, including all changes in the argument names.
 }

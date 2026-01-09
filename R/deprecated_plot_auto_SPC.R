@@ -3,7 +3,8 @@
 #' `plot_auto_SPC()` 
 #' 
 #' This function was renamed. Please use [autospc::autospc()], plot_auto_SPC()
-#' is deprecated.
+#' is deprecated. See the 'autospc 0.0.0.9040' entry in NEWS.md for details of
+#' these changes, including all changes in the argument names.
 #' 
 #' @export
 plot_auto_SPC <- function(df,
@@ -61,6 +62,11 @@ plot_auto_SPC <- function(df,
                           override_annotation_dist_P = NULL
 ) {
   
-  lifecycle::deprecate_stop("0.0.0.9040", "plot_auto_SPC()", "autospc()")
+  lifecycle::deprecate_stop("0.0.0.9040",
+                            "plot_auto_SPC()",
+                            "autospc()",
+                            details = paste("See the 'autospc 0.0.0.9040'",
+                            "entry in NEWS.md for details of these changes,",
+                            "including all changes in the argument names."))
   
 }

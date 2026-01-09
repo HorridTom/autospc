@@ -18,3 +18,5 @@
   : Example Time Series 2c
 - [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
   : facet_stages
+- [`plot_auto_SPC()`](https://horridtom.github.io/autospc/reference/plot_auto_SPC.md)
+  : Deprecated

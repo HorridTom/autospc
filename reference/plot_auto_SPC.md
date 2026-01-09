@@ -1,8 +1,6 @@
-# Plot SPC charts with automated limit recalculation
+# Deprecated
 
-`plot_auto_SPC()` creates a statistical process control chart from a
-dataframe, applying the Stable Shift Algorithm to automate recalculation
-of control limits.
+`plot_auto_SPC()`
 
 ## Usage
 
@@ -351,35 +349,46 @@ plot_auto_SPC(
 
 An SPC ggplot or corresponding data
 
+## Details
+
+This function was renamed. Please use
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md),
+plot_auto_SPC() is deprecated. See the 'autospc 0.0.0.9040' entry in
+NEWS.md for details of these changes, including all changes in the
+argument names. Plot SPC charts with automated limit recalculation
+
+Creates a statistical process control chart from a dataframe, applying
+the Stable Shift Algorithm to automate recalculation of control limits.
+
 ## Examples
 
 ``` r
 # Using a C' chart to track changes in the count of monthly attendance 
-plot_auto_SPC(
+if (FALSE) plot_auto_SPC(
   ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All
 )
-
+ # \dontrun{}
    
 #Using a P' chart to track changes in the percentage admitted within 4 hours
-plot_auto_SPC(
+if (FALSE) plot_auto_SPC(
   ed_attendances_monthly, 
   chartType = "P'", 
   x = Month_Start, 
   y = Within_4h, 
   n = Att_All
 )
-
+ # \dontrun{}
 
 #using a runRuleLength of 7 when tracking monthly attendance
-plot_auto_SPC(
+if (FALSE) plot_auto_SPC(
   ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All,
   runRuleLength = 7
 )
-
+ # \dontrun{}
 ```

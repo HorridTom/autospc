@@ -261,29 +261,32 @@ control limits.
 }
 \examples{
 # Using a C' chart to track changes in the count of monthly attendance 
-plot_auto_SPC(
+\dontrun{plot_auto_SPC(
   ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All
 )
+}
    
 #Using a P' chart to track changes in the percentage admitted within 4 hours
-plot_auto_SPC(
+\dontrun{plot_auto_SPC(
   ed_attendances_monthly, 
   chartType = "P'", 
   x = Month_Start, 
   y = Within_4h, 
   n = Att_All
 )
+}
 
 #using a runRuleLength of 7 when tracking monthly attendance
-plot_auto_SPC(
+\dontrun{plot_auto_SPC(
   ed_attendances_monthly, 
   chartType = "C'", 
   x = Month_Start, 
   y = Att_All,
   runRuleLength = 7
 )
+}
 
 }

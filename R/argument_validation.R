@@ -1,3 +1,17 @@
+
+#' Validate chart_type argument
+#'
+#' Checks that `chart_type` is a single, non-NULL character string corresponding
+#' to a supported SPC chart type. Intended for internal use only.
+#'
+#' @param chart_type Character scalar specifying chart type.
+#'
+#' @return Invisibly returns TRUE if valid; otherwise errors.
+#'
+#' @keywords internal
+#' @noRd
+
+
 validate_chart_type <- function(chart_type) {
   
   allowed_chart_types <- c("XMR", "MR", "C", "C'", "P", "P'")

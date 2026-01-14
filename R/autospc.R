@@ -28,8 +28,8 @@
 #'  }
 #' @param n Name of column (passed using tidyselect semantics) to use as
 #' denominator for P and P' charts.
-#' @param chart_type The type of chart you wish to plot. Available options are:
-#' "XMR", "MR", "C", "C'", "P", "P'".
+#' @param chart_type The type of chart you wish to plot.Must be a single value.
+#' Available options are: "XMR", "MR", "C", "C'", "P", "P'".
 #' 
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish

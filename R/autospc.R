@@ -249,19 +249,8 @@ autospc <- function(data,
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
   
-  allowed_chart_types <- c("XMR", "MR", "C", "C'", "P", "P'")
-  
-  if (!chart_type %in% allowed_chart_types) {
-    stop(
-      sprintf(
-        "Invalid chart_type: '%s'. Available chart types are: %s.",
-        chart_type,
-        paste(allowed_chart_types, collapse = ", ")
-      ),
-      call. = FALSE
-    )
-  }
-  
+  validate_chart_type(chart_type)
+
   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,

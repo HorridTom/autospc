@@ -7,9 +7,6 @@
 #' @param chart_type Character scalar specifying chart type.
 #'
 #' @return Invisibly returns TRUE if valid; otherwise errors.
-#'
-#' @keywords internal
-#' @noRd
 
 
 validate_chart_type <- function(chart_type) {
@@ -29,7 +26,7 @@ validate_chart_type <- function(chart_type) {
   # Length check
   if (length(chart_type) != 1) {
     stop(
-      "chart_type must be a single value. ",
+      "chart_type must have length one.",
       "Available chart types are: ",
       paste(allowed_chart_types, collapse = ", "),
       ".",

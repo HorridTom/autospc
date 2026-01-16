@@ -36,8 +36,8 @@ For a P or P' chart, must have columns for:
 \item and optionally, a title and subtitle for the plot.
 }}
 
-\item{chart_type}{The type of chart you wish to plot. Available options are:
-"XMR", "MR", "C", "C'", "P", "P'".
+\item{chart_type}{The type of chart you wish to plot. Must must have length one.
+Available options are: "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
 Parameters that control behaviour of the algorithm used to re-establish

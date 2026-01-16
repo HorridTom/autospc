@@ -28,7 +28,7 @@
 #'  }
 #' @param n Name of column (passed using tidyselect semantics) to use as
 #' denominator for P and P' charts.
-#' @param chart_type The type of chart you wish to plot.Must be a single value.
+#' @param chart_type The type of chart you wish to plot. Must must have length one.
 #' Available options are: "XMR", "MR", "C", "C'", "P", "P'".
 #' 
 #' ## Algorithm Parameters
@@ -248,10 +248,8 @@ autospc <- function(data,
   xType               <- preprocessed_vars$xType
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
-  
-  validate_chart_type(chart_type)
-
-  # Get control limits
+ 
+   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,
     chart_type = chart_type, 

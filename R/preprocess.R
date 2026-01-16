@@ -9,6 +9,8 @@ preprocess_inputs <- function(
     override_annotation_dist = NULL,
     override_annotation_dist_P = NULL) {
   
+  validate_chart_type(chart_type)
+  
   #get title from data
   if(is.null(title) & "title" %in% colnames(df)) {
     title <- df$title[1]

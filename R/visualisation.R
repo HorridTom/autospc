@@ -264,7 +264,8 @@ format_SPC <- function(cht,
                                       linewidth = series),
                          na.rm = TRUE) + 
       ggplot2::geom_line(data = . %>% dplyr::filter(series %in% c("y")),
-                         ggplot2::aes(linewidth = series),
+                         ggplot2::aes(linetype = series,
+                                      linewidth = series),
                          show.legend = FALSE,
                          na.rm = TRUE) +
       ggplot2::geom_point(data = . %>% dplyr::filter(series == "y"),

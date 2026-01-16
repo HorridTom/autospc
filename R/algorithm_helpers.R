@@ -481,39 +481,6 @@ floating_median_column <- function(df,
 }
 
 
-# Add floating median line to the plot p
-add_floating_median <- function(df,
-                                p,
-                                floating_median_n) {
-  
-  p <- p +
-    ggplot2::geom_line(data = df, 
-                       ggplot2::aes(x, median),
-                       linetype = "75551555",
-                       colour = "gray50",
-                       linewidth = 0.5,
-                       show.legend = TRUE,
-                       na.rm = TRUE) +
-    ggplot2::annotate(
-      "text",
-      x = df %>%
-        dplyr::filter(dplyr::row_number() == nrow(df) -
-                        floating_median_n + 1L) %>%
-        dplyr::pull(x),
-      y = df %>%
-        dplyr::filter(dplyr::row_number() == nrow(df) -
-                        floating_median_n + 1L) %>%
-        dplyr::pull(median)*0.95,
-      label = "Median",
-      size = 3,
-      colour = "gray50",
-      na.rm = TRUE)
-  
-  return(p)
-  
-}
-
-
 sign_chr <- function(x) {
   y <- dplyr::case_when(
     x < 0 ~ "01",

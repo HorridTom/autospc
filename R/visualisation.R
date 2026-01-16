@@ -77,7 +77,7 @@ create_spc_plot <- function(df,
   
   if("median" %in% colnames(df)) {
     p <- add_floating_median(p = p,
-                             df = df,
+                             df = df_long,
                              floating_median_n = floating_median_n)
   }
   

@@ -29,9 +29,22 @@ create_spc_plot <- function(df,
                             x_date_format = "%Y-%m-%d",
                             split_rows = NULL) {
   
+  df_long <- df %>%
+    tidyr::pivot_longer(cols = c(y, cl, ucl, lcl),
+                        names_to = "series",
+                        values_to = "value")
+  
+  df_long <- df_long %>%
+    dplyr::select(x,
+                  series,
+                  value,
+                  everything())
+  
   # Create initial plot object without formatting
-  pct <- ggplot2::ggplot(df %>% dplyr::filter(!is.na(y)),
-                         ggplot2::aes(x,y))
+  pct <- ggplot2::ggplot(df_long %>%
+                           dplyr::filter(!is.na(value)),
+                         ggplot2::aes(x = x,
+                                      y = value))
   
   if(use_caption) {
     caption <- paste(chart_type,
@@ -47,7 +60,7 @@ create_spc_plot <- function(df,
   }
   
   p <- format_SPC(pct,
-                  df = df,
+                  df_long = df_long,
                   r1_col = r1_col,
                   r2_col = r2_col,
                   point_size = point_size,
@@ -71,7 +84,7 @@ create_spc_plot <- function(df,
   if(include_annotations == TRUE){
     
     p <- add_annotations_to_plot(p = p,
-                                 df = df,
+                                 df = df_long,
                                  basic_annotations = basic_annotations,
                                  annotation_size = annotation_size,
                                  annotation_arrows = annotation_arrows,
@@ -223,7 +236,7 @@ create_timeseries_plot <- function(df,
 
 
 format_SPC <- function(cht,
-                       df,
+                       df_long,
                        r1_col,
                        r2_col,
                        point_size,
@@ -237,7 +250,7 @@ format_SPC <- function(cht,
                      "Excluded from limits calculation" = "grey")
   
   #get exemplar calculation and display periods
-  plot_periods <- df$plotPeriod
+  plot_periods <- df_long$plotPeriod
   
   first_display_period <- plot_periods[grep("display",
                                             plot_periods)[1]]
@@ -245,34 +258,26 @@ format_SPC <- function(cht,
   
   suppressWarnings( # to avoid the warning about using alpha for discrete vars
     cht + 
-      ggplot2::geom_line(colour = "black",
-                         linewidth = 0.5*line_width_sf,
+      ggplot2::geom_line(data = . %>% dplyr::filter(series %in% c("cl", "ucl", "lcl")),
+                         ggplot2::aes(alpha = plotPeriod,
+                                      linetype = series,
+                                      linewidth = series),
                          na.rm = TRUE) + 
-      ggplot2::geom_line(data = df, 
-                         ggplot2::aes(x,cl,
-                                      alpha = plotPeriod),
-                         linetype = "solid",
-                         linewidth = 0.75*line_width_sf,
-                         na.rm = TRUE) +
-      ggplot2::geom_line(data = df, 
-                         ggplot2::aes(x,lcl,
-                                      alpha = plotPeriod),
-                         linetype = "42",
-                         linewidth = 0.5*line_width_sf,
+      ggplot2::geom_line(data = . %>% dplyr::filter(series %in% c("y")),
+                         ggplot2::aes(linewidth = series),
                          show.legend = FALSE,
                          na.rm = TRUE) +
-      ggplot2::geom_line(data = df, 
-                         ggplot2::aes(x,ucl,
-                                      alpha = plotPeriod),
-                         linetype = "42",
-                         linewidth = 0.5*line_width_sf,
-                         show.legend = FALSE,
-                         na.rm = TRUE) +
-      ggplot2::geom_point(ggplot2::aes(colour = highlight),
+      ggplot2::geom_point(data = . %>% dplyr::filter(series == "y"),
+                          ggplot2::aes(colour = highlight),
                           size = point_size,
                           na.rm = TRUE) +
       ggplot2::scale_color_manual(rule_title,
                                   values = point_colours) + 
+      ggplot2::scale_linetype_manual(values = c("solid", "42", "42", "solid"),
+                                     guide = "none") +
+      ggplot2::scale_linewidth_manual(values =
+                                        c(0.75, 0.5, 0.5, 0.5)*line_width_sf,
+                                      guide = "none") +
       ggplot2::scale_alpha_discrete("Period Type",
                                     labels = if(!is.na(first_display_period)) {
                                       c("Calculation", "Display")

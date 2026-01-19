@@ -249,6 +249,9 @@ format_SPC <- function(cht,
                      "None" = "black",
                      "Excluded from limits calculation" = "grey")
   
+  line_colours <- c("Calculation" = "black",
+                    "Display" = "grey50")
+  
   #get exemplar calculation and display periods
   plot_periods <- df_long$plotPeriod
   
@@ -256,77 +259,74 @@ format_SPC <- function(cht,
                                             plot_periods)[1]]
   first_calc_period <- plot_periods[1]
   
-  suppressWarnings( # to avoid the warning about using alpha for discrete vars
-    cht + 
-      ggplot2::geom_line(data = . %>% dplyr::filter(series %in% c("cl", "ucl", "lcl")),
-                         ggplot2::aes(alpha = plotPeriod,
-                                      linetype = series,
-                                      linewidth = series),
-                         na.rm = TRUE) + 
-      ggplot2::geom_line(data = . %>% dplyr::filter(series %in% c("y")),
-                         ggplot2::aes(linetype = series,
-                                      linewidth = series),
-                         show.legend = FALSE,
-                         na.rm = TRUE) +
-      ggplot2::geom_point(data = . %>% dplyr::filter(series == "y"),
-                          ggplot2::aes(colour = highlight),
-                          size = point_size,
-                          na.rm = TRUE) +
-      ggplot2::scale_color_manual(rule_title,
-                                  values = point_colours) + 
-      ggplot2::scale_linetype_manual(values = c("solid", "42", "42", "solid"),
-                                     guide = "none") +
-      ggplot2::scale_linewidth_manual(values =
-                                        c(0.75, 0.5, 0.5, 0.5)*line_width_sf,
-                                      guide = "none") +
-      ggplot2::scale_alpha_discrete("Period Type",
-                                    labels = if(!is.na(first_display_period)) {
-                                      c("Calculation", "Display")
-                                    } else {
-                                      c("Calculation")
-                                    },
-                                    range = if(!is.na(first_display_period)) {
-                                      c(1, 0.4)
-                                    } else {
-                                      c(1, 1)
-                                    },
-                                    breaks = if(!is.na(first_display_period)) {
-                                      c(first_calc_period,
-                                        first_display_period)
-                                    } else {
-                                      c(first_calc_period)
-                                    },
-                                    guide = ggplot2::guide_legend(
-                                      override.aes = list(
-                                        alpha = if(
-                                          !is.na(first_display_period)
-                                        ) {
-                                          c(1, 0.4)
-                                        } else {
-                                          c(1)
-                                        }
-                                      )
-                                    )
-      ) +
-      ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                     panel.grid.major.x = ggplot2::element_line(
-                       colour = "grey80"
-                     ),
-                     panel.grid.minor = ggplot2::element_blank(),
-                     panel.background = ggplot2::element_blank(),
-                     axis.text.x = ggplot2::element_text(angle = 45,
-                                                         hjust = 1,
-                                                         vjust = 1.0,
-                                                         size = 14),
-                     axis.text.y = ggplot2::element_text(size = 14),
-                     axis.title = ggplot2::element_text(size = 14),
-                     plot.title = ggplot2::element_text(size = 20,
-                                                        hjust = 0),
-                     plot.subtitle = ggplot2::element_text(size = 16,
-                                                           face = "italic"),
-                     axis.line = ggplot2::element_line(colour = "grey60"),
-                     plot.caption = ggplot2::element_text(size = 10,
-                                                          hjust = 0.5)) 
-  )
+  list_of_plot_periods <- unique(plot_periods)
+  
+  linecolour_scale <- grepl("calculation",
+                            list_of_plot_periods) %>%
+    ifelse(line_colours["Calculation"],
+           line_colours["Display"])
+  
+  names(linecolour_scale) <- list_of_plot_periods
+  
+  cht <- cht + 
+    ggplot2::geom_line(data = . %>% dplyr::filter(
+      series %in% c("cl", "ucl", "lcl")),
+      ggplot2::aes(colour = plotPeriod,
+                   linetype = series,
+                   linewidth = series),
+      na.rm = TRUE) + 
+    ggplot2::geom_line(data = . %>% dplyr::filter(series %in% c("y")),
+                       ggplot2::aes(linetype = series,
+                                    linewidth = series),
+                       show.legend = FALSE,
+                       na.rm = TRUE) +
+    ggplot2::scale_colour_manual(
+      "Period Type",
+      values = linecolour_scale,
+      breaks = if(!is.na(first_display_period)) {
+        c(first_calc_period,
+          first_display_period)
+      } else {
+        c(first_calc_period)
+      },
+      labels = if(!is.na(first_display_period)) {
+        c("Calculation", "Display")
+      } else {
+        c("Calculation")
+      }
+    ) +
+    ggplot2::scale_linetype_manual(values = c("solid", "42", "42", "solid"),
+                                   guide = "none") +
+    ggplot2::scale_linewidth_manual(values =
+                                      c(0.75, 0.5, 0.5, 0.5)*line_width_sf,
+                                    guide = "none") +
+    ggnewscale::new_scale_colour() +
+    ggplot2::geom_point(data = . %>% dplyr::filter(series == "y"),
+                        ggplot2::aes(colour = highlight),
+                        size = point_size,
+                        na.rm = TRUE) +
+    ggplot2::scale_color_manual(rule_title,
+                                values = point_colours) + 
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_line(
+                     colour = "grey80"
+                   ),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.background = ggplot2::element_blank(),
+                   axis.text.x = ggplot2::element_text(angle = 45,
+                                                       hjust = 1,
+                                                       vjust = 1.0,
+                                                       size = 14),
+                   axis.text.y = ggplot2::element_text(size = 14),
+                   axis.title = ggplot2::element_text(size = 14),
+                   plot.title = ggplot2::element_text(size = 20,
+                                                      hjust = 0),
+                   plot.subtitle = ggplot2::element_text(size = 16,
+                                                         face = "italic"),
+                   axis.line = ggplot2::element_line(colour = "grey60"),
+                   plot.caption = ggplot2::element_text(size = 10,
+                                                        hjust = 0.5)) 
+  
+  return(cht)
 }
 

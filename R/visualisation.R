@@ -59,6 +59,7 @@ create_spc_plot <- function(df,
     rule_title <- "Rule triggered"
   }
   
+  # Apply autospc formatting
   p <- format_SPC(pct,
                   df_long = df_long,
                   r1_col = r1_col,
@@ -75,12 +76,14 @@ create_spc_plot <- function(df,
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::label_number(big.mark = ","))
   
+  # Add floating median to chart if needed
   if("median" %in% colnames(df)) {
     p <- add_floating_median(p = p,
                              df = df_long,
                              floating_median_n = floating_median_n)
   }
   
+  # Add annotations to chart if needed
   if(include_annotations == TRUE){
     
     p <- add_annotations_to_plot(p = p,
@@ -92,62 +95,14 @@ create_spc_plot <- function(df,
   }
   
   # Format x-axis depending on x type
-  if(any(xType == "Date")) {
-    if(is.null(x_break)) {
-      p <- p + 
-        ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
-                              breaks = scales::breaks_pretty(),
-                              limits = c(as.Date(start_x),
-                                         as.Date(end_x)))
-    } else {
-      p <- p + 
-        ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
-                              breaks = seq(as.Date(start_x),
-                                           as.Date(end_x),
-                                           x_break),
-                              limits = c(as.Date(start_x),
-                                         as.Date(end_x)))
-    }
-  } else if(any(xType == "integer")) {
-    if(is.null(x_break)) {
-      p <- p + 
-        ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
-                                    limits = c(start_x,
-                                               end_x))
-    } else {
-      p <- p + 
-        ggplot2::scale_x_continuous(breaks = seq(start_x,
-                                                 end_x,
-                                                 x_break),
-                                    limits = c(start_x,
-                                               end_x))
-    }
-  } else if(any(xType == "POSIXct")) {
-    if(is.null(x_break)) {
-      p <- p + 
-        ggplot2::scale_x_datetime(breaks = scales::breaks_pretty(),
-                                  limits = c(start_x, end_x))
-    } else {
-      if(any(class(x_break) != "difftime")) {
-        rlang::abort(paste("Please specify x_break as a difftime object when",
-                           "x is POSIXct."))
-      }
-      p <- p + 
-        ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
-                                  limits = c(start_x, end_x))
-    }
-  } else {
-    if(is.null(x_break)) {
-      p <- p + 
-        ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
-                                    limits = c(start_x, end_x))
-    } else {
-      p <- p + 
-        ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
-                                    limits = c(start_x, end_x))
-    }
-  }
+  p <- format_x_axis(p = p,
+                     xType = xType,
+                     x_break = x_break,
+                     x_date_format = x_date_format,
+                     start_x = start_x,
+                     end_x = end_x)
   
+  # Facet by stages if needed
   if(!is.null(split_rows)) {
     p <- p +
       ggplot2::facet_wrap(facets = ggplot2::vars(stage),
@@ -155,6 +110,7 @@ create_spc_plot <- function(df,
     
   }
   
+  # Combine X and MR charts if needed
   if((chart_type == "XMR") & show_mr) {
     p <- p + 
       ggplot2::labs(caption = NULL,
@@ -234,7 +190,7 @@ format_SPC <- function(cht,
   line_colours <- c("Calculation" = "black",
                     "Display" = "grey50")
   
-  #get exemplar calculation and display periods
+  # Prepare information on plot periods
   plot_periods <- df_long$plotPeriod
   
   first_display_period <- plot_periods[grep("display",
@@ -250,6 +206,7 @@ format_SPC <- function(cht,
   
   names(linecolour_scale) <- list_of_plot_periods
   
+  # Create spc plot components
   cht <- cht + 
     ggplot2::geom_line(data = . %>% dplyr::filter(
       series %in% c("cl", "ucl", "lcl")),
@@ -290,7 +247,6 @@ format_SPC <- function(cht,
     ggplot2::scale_color_manual(rule_title,
                                 values = point_colours) + 
     theme_autospc()
-    
   
   return(cht)
 }
@@ -299,25 +255,93 @@ format_SPC <- function(cht,
 theme_autospc <- function(){
   
   thm_aspc <- ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                 panel.grid.major.x = ggplot2::element_line(
-                   colour = "grey80"
-                 ),
-                 panel.grid.minor = ggplot2::element_blank(),
-                 panel.background = ggplot2::element_blank(),
-                 axis.text.x = ggplot2::element_text(angle = 45,
-                                                     hjust = 1,
-                                                     vjust = 1.0,
-                                                     size = 14),
-                 axis.text.y = ggplot2::element_text(size = 14),
-                 axis.title = ggplot2::element_text(size = 14),
-                 plot.title = ggplot2::element_text(size = 20,
-                                                    hjust = 0),
-                 plot.subtitle = ggplot2::element_text(size = 16,
-                                                       face = "italic"),
-                 axis.line = ggplot2::element_line(colour = "grey60"),
-                 plot.caption = ggplot2::element_text(size = 10,
-                                                      hjust = 0.5)) 
+                             panel.grid.major.x = ggplot2::element_line(
+                               colour = "grey80"
+                             ),
+                             panel.grid.minor = ggplot2::element_blank(),
+                             panel.background = ggplot2::element_blank(),
+                             axis.text.x = ggplot2::element_text(angle = 45,
+                                                                 hjust = 1,
+                                                                 vjust = 1.0,
+                                                                 size = 14),
+                             axis.text.y = ggplot2::element_text(size = 14),
+                             axis.title = ggplot2::element_text(size = 14),
+                             plot.title = ggplot2::element_text(size = 20,
+                                                                hjust = 0),
+                             plot.subtitle = ggplot2::element_text(size = 16,
+                                                                   face = "italic"),
+                             axis.line = ggplot2::element_line(colour = "grey60"),
+                             plot.caption = ggplot2::element_text(size = 10,
+                                                                  hjust = 0.5)) 
   
   return(thm_aspc)
   
-} 
+}
+
+
+format_x_axis <- function(p,
+                          xType,
+                          x_break,
+                          x_date_format,
+                          start_x,
+                          end_x) {
+  
+  if(any(xType == "Date")) {
+    if(is.null(x_break)) {
+      p <- p + 
+        ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
+                              breaks = scales::breaks_pretty(),
+                              limits = c(as.Date(start_x),
+                                         as.Date(end_x)))
+    } else {
+      p <- p + 
+        ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
+                              breaks = seq(as.Date(start_x),
+                                           as.Date(end_x),
+                                           x_break),
+                              limits = c(as.Date(start_x),
+                                         as.Date(end_x)))
+    }
+  } else if(any(xType == "integer")) {
+    if(is.null(x_break)) {
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
+                                    limits = c(start_x,
+                                               end_x))
+    } else {
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = seq(start_x,
+                                                 end_x,
+                                                 x_break),
+                                    limits = c(start_x,
+                                               end_x))
+    }
+  } else if(any(xType == "POSIXct")) {
+    if(is.null(x_break)) {
+      p <- p + 
+        ggplot2::scale_x_datetime(breaks = scales::breaks_pretty(),
+                                  limits = c(start_x, end_x))
+    } else {
+      if(any(class(x_break) != "difftime")) {
+        rlang::abort(paste("Please specify x_break as a difftime object when",
+                           "x is POSIXct."))
+      }
+      p <- p + 
+        ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
+                                  limits = c(start_x, end_x))
+    }
+  } else {
+    if(is.null(x_break)) {
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
+                                    limits = c(start_x, end_x))
+    } else {
+      p <- p + 
+        ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
+                                    limits = c(start_x, end_x))
+    }
+  }
+  
+  return(p)
+  
+}

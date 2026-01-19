@@ -203,25 +203,7 @@ create_timeseries_plot <- function(df,
     ggplot2::geom_line(colour = "black",
                        linewidth = 0.5*line_width_sf) +
     ggplot2::geom_point(colour = "black", size = point_size) +
-    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                   panel.grid.major.x = ggplot2::element_line(
-                     colour = "grey80"
-                   ),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   panel.background = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(angle = 45,
-                                                       hjust = 1,
-                                                       vjust = 1.0,
-                                                       size = 14),
-                   axis.text.y = ggplot2::element_text(size = 14),
-                   axis.title = ggplot2::element_text(size = 14),
-                   plot.title = ggplot2::element_text(size = 20,
-                                                      hjust = 0),
-                   plot.subtitle = ggplot2::element_text(size = 16,
-                                                         face = "italic"),
-                   axis.line = ggplot2::element_line(colour = "grey60"),
-                   plot.caption = ggplot2::element_text(size = 10,
-                                                        hjust = 0.5)) +
+    theme_autospc() +
     ggplot2::ggtitle(title,
                      subtitle = subtitle) +
     ggplot2::labs(x = override_x_title,
@@ -307,26 +289,35 @@ format_SPC <- function(cht,
                         na.rm = TRUE) +
     ggplot2::scale_color_manual(rule_title,
                                 values = point_colours) + 
-    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                   panel.grid.major.x = ggplot2::element_line(
-                     colour = "grey80"
-                   ),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   panel.background = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(angle = 45,
-                                                       hjust = 1,
-                                                       vjust = 1.0,
-                                                       size = 14),
-                   axis.text.y = ggplot2::element_text(size = 14),
-                   axis.title = ggplot2::element_text(size = 14),
-                   plot.title = ggplot2::element_text(size = 20,
-                                                      hjust = 0),
-                   plot.subtitle = ggplot2::element_text(size = 16,
-                                                         face = "italic"),
-                   axis.line = ggplot2::element_line(colour = "grey60"),
-                   plot.caption = ggplot2::element_text(size = 10,
-                                                        hjust = 0.5)) 
+    theme_autospc()
+    
   
   return(cht)
 }
 
+
+theme_autospc <- function(){
+  
+  thm_aspc <- ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                 panel.grid.major.x = ggplot2::element_line(
+                   colour = "grey80"
+                 ),
+                 panel.grid.minor = ggplot2::element_blank(),
+                 panel.background = ggplot2::element_blank(),
+                 axis.text.x = ggplot2::element_text(angle = 45,
+                                                     hjust = 1,
+                                                     vjust = 1.0,
+                                                     size = 14),
+                 axis.text.y = ggplot2::element_text(size = 14),
+                 axis.title = ggplot2::element_text(size = 14),
+                 plot.title = ggplot2::element_text(size = 20,
+                                                    hjust = 0),
+                 plot.subtitle = ggplot2::element_text(size = 16,
+                                                       face = "italic"),
+                 axis.line = ggplot2::element_line(colour = "grey60"),
+                 plot.caption = ggplot2::element_text(size = 10,
+                                                      hjust = 0.5)) 
+  
+  return(thm_aspc)
+  
+} 

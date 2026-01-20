@@ -1,6 +1,6 @@
 Package: autospc
 Title: Automatically Partitioned SPC Charts
-Version: 0.0.0.9040
+Version: 0.0.0.9041
 Authors@R: c(
     person("Thomas", "Woodcock", , "woodcock.thomas@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4735-4856")),
@@ -14,6 +14,7 @@ Imports:
     DiagrammeR,
     dplyr,
     fpCompare,
+    ggnewscale,
     ggplot2,
     lifecycle,
     magrittr,

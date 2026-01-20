@@ -16,12 +16,13 @@ test_that("the series of medians being plotted are correctly calculated when flo
   chart_result_data <- chart_result$data 
   
   # Extract all median values from the result data  
-  result_median <- chart_result_data %>% 
+  result_median <- chart_result_data %>%
+    dplyr::filter(series == "y") %>%
     dplyr::filter(!is.na(median)) %>% 
     dplyr::pull(median)
   
   # Test that the length of the test_median__n points matches the length of the median points calculated
-  expect_equal(length(result_median),test_median_n)
+  expect_equal(length(result_median), test_median_n)
   
   # Identify how many distinct values for the median are being calculated 
   unique_result_median <- unique(result_median)
@@ -31,14 +32,17 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Summarises the column of medians into a singular median value
   result_median <- chart_result_data %>% 
+    dplyr::filter(series == "y") %>%
     dplyr::filter(!is.na(median)) %>% 
     dplyr::summarise(medi = median(median)) %>%
     dplyr::pull(medi)
   
   # Calculates the correct median from the data
   correct_median <- chart_result_data %>%
+    dplyr::filter(series == "y") %>%
     dplyr::slice((dplyr::n() - test_median_n + 1):dplyr::n()) %>%
-    dplyr::summarise(med = median(y, na.rm = TRUE)) %>%
+    dplyr::summarise(med = median(value,
+                                  na.rm = TRUE)) %>%
     dplyr::pull(med)
   
   # Test that the median displayed is calculated correctly 
@@ -80,6 +84,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Extract all median values from the result data  
   auto_result_median <- auto_median_result_data %>% 
+    dplyr::filter(series == "y") %>%
     dplyr::filter(!is.na(median)) %>% 
     dplyr::pull(median)
   
@@ -94,14 +99,16 @@ test_that("the series of medians being plotted are correctly calculated when flo
   
   # Summarises the column of medians into a singular median value
   auto_result_median <- auto_median_result_data %>% 
+    dplyr::filter(series == "y") %>%
     dplyr::filter(!is.na(median)) %>% 
     dplyr::summarise(med = median(median)) %>%
     dplyr::pull(med)
   
   # Calculates the correct median from the data
   correct_median_auto <- auto_median_result_data %>%
+    dplyr::filter(series == "y") %>%
     dplyr::slice((dplyr::n() - test_median_n + 1L):dplyr::n()) %>%
-    dplyr::summarise(med = median(y, na.rm = TRUE)) %>%
+    dplyr::summarise(med = median(value, na.rm = TRUE)) %>%
     dplyr::pull(med)
   
   # Test that the median displayed is calculated correctly 
@@ -153,6 +160,7 @@ test_that("NAs do not prevent median from being plotted",{
   
   # Test it is not NA and has the correct value
   result_median <- chart_result_data %>% 
+    dplyr::filter(series == "y") %>%
     dplyr::filter(!is.na(median)) %>% 
     dplyr::summarise(medi = median(median)) %>%
     dplyr::pull(medi)

@@ -20,7 +20,7 @@ test_that("autospc errors when chart_type is NULL", {
       x = month_start,
       y = att_all
     ),
-    "must be provided"
+    "pass the desired chart type"
   )
 })
 

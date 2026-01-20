@@ -31,27 +31,6 @@ preprocess_inputs <- function(
                   "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
   
-  #decide whether the chart is C or P depending on data format if not specified 
-  if(is.null(chart_type)) {
-    
-    lifecycle::deprecate_warn(
-      when = "0.0.0.9008",
-      what = I("chart_type  = NULL"),
-      details = I("Please explicitly pass the desired chart type")
-    )
-    
-    if(all(c("x", "y") %in% colnames(df))) {
-      chart_type <- "C'"
-    } else if(all(c("x", "n", "y") %in% colnames(df))) {
-      chart_type <- "P'"
-    } else {
-      print(paste0("The data you have input is not in the correct format. ",
-                   "For C charts, data must contain at least columns 'x' and ",
-                   "'y'. For P charts data must contain at least 'x', 'n' and ",
-                   "'y' columns."))
-    }
-  }
-  
   if(chart_type == "MR") {
     mrs <- get_mrs(y = df$y)
     df <- df %>% dplyr::mutate(y = mrs)

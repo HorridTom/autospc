@@ -40,6 +40,8 @@ create_spc_plot <- function(df,
                   value,
                   everything())
   
+  df_long <- add_limit_connectors(df_long)
+  
   # Create initial plot object without formatting
   pct <- ggplot2::ggplot(df_long %>%
                            dplyr::filter(!is.na(value)),
@@ -345,3 +347,44 @@ format_x_axis <- function(p,
   return(p)
   
 }
+
+
+add_limit_connectors <- function(df_long) {
+  
+  x_sequence <- df_long %>%
+    dplyr::distinct(x) %>%
+    dplyr::arrange(x) %>%
+    dplyr::pull(x)
+  
+  display_periods <- df_long %>%
+    dplyr::filter(periodType == "display") %>%
+    dplyr::distinct(plotPeriod,
+                    x) %>%
+    dplyr::group_by(plotPeriod) %>%
+    dplyr::summarise(x = dplyr::first(x)) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(prev_x = x_sequence[which(x_sequence == x) - 1L]) %>%
+    dplyr::ungroup() %>%
+    dplyr::left_join(df_long %>%
+                       dplyr::distinct(x, series, value) %>%
+                       dplyr::rename(prev_value = value),
+                     by = c("prev_x" = "x")) 
+  
+  display_starts <- df_long %>%
+    dplyr::inner_join(display_periods %>%
+                        dplyr::select(-plotPeriod),
+                      by = c("x" = "x",
+                             "series" = "series")) %>%
+    dplyr::filter(series %in% c("cl", "ucl", "lcl")) %>%
+    dplyr::mutate(x = prev_x,
+                  value = prev_value) %>%
+    dplyr::select(-prev_x,
+                  -prev_value)
+  
+  df_long <- df_long %>% 
+    dplyr::bind_rows(display_starts)
+  
+  return(df_long)
+  
+}
+

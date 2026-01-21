@@ -128,12 +128,17 @@ add_annotations_to_plot_pp <- function(p,
   if(annotation_arrows) {
     
     p_annotated <- p + ggrepel::geom_text_repel(
+      data = . %>% dplyr::filter(series %in% c("cl"),
+                                 !is.na(annotation_level)),
       ggplot2::aes(x = x,
-                   y = cl,
+                   y = value,
                    label = cl_label),
-      position = ggpp::position_nudge_to(y = df %>%
-                                           dplyr::filter(!is.na(y)) %>%
-                                           dplyr::pull(annotation_level)),
+      position = ggpp::position_nudge_to(
+        y = df %>%
+          dplyr::filter(series %in% c("cl"),
+                        !is.na(value),
+                        !is.na(annotation_level)) %>%
+          dplyr::pull(annotation_level)),
       color = "grey40",
       size = annotation_size,
       fontface = "bold",
@@ -143,7 +148,9 @@ add_annotations_to_plot_pp <- function(p,
       hjust             = 0,
       segment.size      = 0.75,
       segment.curvature = df %>%
-        dplyr::filter(!is.na(y)) %>%
+        dplyr::filter(series %in% c("cl"),
+                      !is.na(value),
+                      !is.na(annotation_level)) %>%
         dplyr::pull(annotation_curvature),
       segment.ncp = 4,
       segment.inflect = FALSE,
@@ -153,12 +160,17 @@ add_annotations_to_plot_pp <- function(p,
       max.overlaps = Inf)
   } else {
     p_annotated <- p + ggrepel::geom_text_repel(
+      data = . %>% dplyr::filter(series %in% c("cl"),
+                                 !is.na(annotation_level)),
       ggplot2::aes(x = x,
-                   y = cl,
+                   y = value,
                    label = cl_label),
-      position = ggpp::position_nudge_to(y = df %>%
-                                           dplyr::filter(!is.na(y)) %>%
-                                           dplyr::pull(annotation_level)),
+      position = ggpp::position_nudge_to(
+        y = df %>%
+          dplyr::filter(series %in% c("cl"),
+                        !is.na(value),
+                        !is.na(annotation_level)) %>%
+          dplyr::pull(annotation_level)),
       color = "grey40",
       size = annotation_size,
       fontface = "bold",
@@ -184,14 +196,17 @@ add_annotations_to_plot_basic <- function(p,
   x_nudge <- x_range/25
   
   p_annotated <- p +
-    ggplot2::geom_text(mapping = ggplot2::aes(x = x,
-                                              y = annotation_level,
-                                              label = cl_label),
-                       nudge_x = x_nudge,
-                       na.rm = TRUE,
-                       color = "grey40",
-                       size = annotation_size,
-                       fontface = "bold")
+    ggplot2::geom_text(
+      data = . %>% dplyr::filter(series %in% c("cl"),
+                                 !is.na(annotation_level)),
+      mapping = ggplot2::aes(x = x,
+                             y = annotation_level,
+                             label = cl_label),
+      nudge_x = x_nudge,
+      na.rm = TRUE,
+      color = "grey40",
+      size = annotation_size,
+      fontface = "bold")
   
   return(p_annotated)
   

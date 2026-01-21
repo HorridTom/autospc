@@ -85,8 +85,8 @@ P' charts.
 \item{n}{Name of column (passed using tidyselect semantics) to use as
 denominator for P and P' charts.}
 
-\item{chart_type}{The type of chart you wish to plot. Available options are:
-"XMR", "MR", "C", "C'", "P", "P'".
+\item{chart_type}{The type of chart you wish to plot. Must must have length one.
+Available options are: "XMR", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
 Parameters that control behaviour of the algorithm used to re-establish

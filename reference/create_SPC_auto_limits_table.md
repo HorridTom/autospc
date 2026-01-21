@@ -49,8 +49,8 @@ create_SPC_auto_limits_table(
 
 - chart_type:
 
-  The type of chart you wish to plot. Available options are: "XMR",
-  "MR", "C", "C'", "P", "P'".
+  The type of chart you wish to plot. Must must have length one.
+  Available options are: "XMR", "MR", "C", "C'", "P", "P'".
 
   ### Algorithm Parameters
 

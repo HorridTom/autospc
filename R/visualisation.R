@@ -27,7 +27,8 @@ create_spc_plot <- function(df,
                             show_mr = TRUE,
                             x_break = NULL,
                             x_date_format = "%Y-%m-%d",
-                            split_rows = NULL) {
+                            split_rows = NULL,
+                            shift_rule_threshold = 8L) {
   
   df_long <- df %>%
     tidyr::pivot_longer(cols = c(y, cl, ucl, lcl),
@@ -49,10 +50,14 @@ create_spc_plot <- function(df,
   if(use_caption) {
     caption <- paste(chart_type,
                      "Shewhart Chart.",
-                     "\n*Shewhart chart rules apply \nRule 1: Any point",
-                     "outside the control limits \nRule 2: Eight or more",
-                     "consecutive points all above, or all below, the centre",
-                     "line")
+                     "\n*Shewhart chart rules apply",
+                     "\nRule 1: Any point outside the control limits", 
+                     paste( 
+                       "\nRule 2:",
+                       word_for_number(shift_rule_threshold),
+                       "or more consecutive points all above, or all below, the centre line"
+                       )
+    )
     rule_title <- "Rule triggered*"
   } else {
     caption <- NULL
@@ -345,3 +350,26 @@ format_x_axis <- function(p,
   return(p)
   
 }
+
+word_for_number <- function(n) {
+  stopifnot(
+    length(n) == 1,
+    is.numeric(n),
+    n == as.integer(n),
+    n > 0
+  )
+  
+  words <- c(
+    "One", "Two", "Three", "Four", "Five",
+    "Six", "Seven", "Eight", "Nine"
+  )
+  
+  if (n >= 1 && n <= 5) {
+    as.character(n)
+  } else if (n >= 6 && n <= 9) {
+    words[n]
+  } else {
+    as.character(n)
+  }
+}
+

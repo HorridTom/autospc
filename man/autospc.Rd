@@ -12,7 +12,7 @@ autospc(
   chart_type = NULL,
   period_min = 21,
   baseline_length = NULL,
-  shift_rule_threshold = 8,
+  shift_rule_threshold = 8L,
   baseline_only = FALSE,
   establish_every_shift = FALSE,
   no_regrets = TRUE,

@@ -176,7 +176,7 @@ autospc <- function(data,
                     ## Algorithm Parameters
                     period_min = 21,
                     baseline_length = NULL,
-                    shift_rule_threshold = 8,
+                    shift_rule_threshold = 8L,
                     baseline_only = FALSE,
                     establish_every_shift = FALSE,
                     no_regrets = TRUE,
@@ -221,7 +221,7 @@ autospc <- function(data,
                     annotation_arrow_curve = 0.3,
                     override_annotation_dist = NULL,
                     override_annotation_dist_P = NULL
-) { 
+                   ) { 
   
   df_original <- data
   
@@ -336,6 +336,7 @@ autospc <- function(data,
         df = data,
         p_mr = p_mr,
         chart_type = chart_type,
+        shift_rule_threshold = shift_rule_threshold,
         xType = xType,
         start_x = start_x,
         end_x = end_x,

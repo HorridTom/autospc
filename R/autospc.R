@@ -221,8 +221,7 @@ autospc <- function(data,
                     annotation_arrow_curve = 0.3,
                     override_annotation_dist = NULL,
                     override_annotation_dist_P = NULL
-                   
-) { 
+                   ) { 
   
   df_original <- data
   

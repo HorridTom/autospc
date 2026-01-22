@@ -132,7 +132,7 @@ onwards.
 
 ### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
-threshold for a shift rule break (`shift_rule_threshold`), set to $8$ by default in
+threshold for a shift rule break (`shift_rule_threshold`), set to \(8\) by default in
 `autospc()`. In \@ref(fig:example-1), there is a rule-breaking run of
 length 10 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by `autospc`.
@@ -235,19 +235,19 @@ autospc(example_series_2c,
 
 ### Minimum period length
 The SSA requires specification of a minimum number of data points to be used 
-for calculation of control limits, $n_{min}$. Whilst those using SPC in practice
+for calculation of control limits, \(n_{min}\). Whilst those using SPC in practice
 may not often make such a minimum explicit, in a way it is always there
 implicitly - nobody would compute control limits from two data points would
 they? In fact, various authors offer guidance on what such a minimum should be,
 with values ranging from 17 to 25 points.
 
-In `autospc()`, $n_{min}$ is specified by the `period_min` argument,
+In `autospc()`, \(n_{min}\) is specified by the `period_min` argument,
 defaulting to 21. This default is above the commonly recommended minimum values
 and represents a convenient choice for daily data, since it is a multiple of 7.
 This means that in the presence of weekly "seasonal" (periodic) variation over
 the 7 day period the limits are not unduly affected by which day of the week the
 limit calculation period begins on. When using monthly data, it is preferable to
-use $n_{min} = 24$, for the same reason.
+use \(n_{min} = 24\), for the same reason.
 
 ## Details of the algorithm
 
@@ -256,22 +256,22 @@ The steps of the algorithm are as follows:
 1. Algorithm counter initialised to the first data point.
 
 2. Check there is sufficient data to form at least one set of limits.
-If a time series has fewer points than $n_{min}$, then according to the SSA
-no control limits can be established. If a time series has length $n$ with
-$n_{min}\leq n < 2n_{min}$, then there are sufficient data points to form one
-period. The SSA establishes limits calculated from the first $n_{min}$ points,
+If a time series has fewer points than \(n_{min}\), then according to the SSA
+no control limits can be established. If a time series has length \(n\) with
+\(n_{min}\leq n < 2n_{min}\), then there are sufficient data points to form one
+period. The SSA establishes limits calculated from the first \(n_{min}\) points,
 with limits extended over the remainder of the data. However, in this case there
 are not sufficient data points to re-establish a second set of limits, so the
 SSA terminates after establishing this first set of limits.
 
 From here on, therefore, we assume that the number of data points in the time
-series to be analysed is $n \geq 2n_{min}$. After the first set of limits are
+series to be analysed is \(n \geq 2n_{min}\). After the first set of limits are
 established, the counter is set to the first point after the end of this first
 calculation period.
 
 3. Main algorithm loop begins
 
-4. If there are fewer than $n_{min}$ data points remaining from the counter,
+4. If there are fewer than \(n_{min}\) data points remaining from the counter,
 then there are insufficient data points to further re-establish limits, and the
 algorithm terminates.
 
@@ -280,7 +280,7 @@ there is at least one rule-breaking run, the algorithm sets the counter to the
 first data point of the first such run, now labelled the triggering run.
 
 6. Again check there is sufficient data remaining from the counter. If not,
-terminate. If so, candidate limits are formed from the first $n_{min}$ data
+terminate. If so, candidate limits are formed from the first \(n_{min}\) data
 points beginning at the counter.
 
 7. Decide whether to accept or reject the candidate limits:

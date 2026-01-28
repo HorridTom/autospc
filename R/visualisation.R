@@ -40,6 +40,8 @@ create_spc_plot <- function(df,
                   value,
                   everything())
   
+  df_long <- add_limit_connectors(df_long)
+  
   # Create initial plot object without formatting
   pct <- ggplot2::ggplot(df_long %>%
                            dplyr::filter(!is.na(value)),
@@ -343,5 +345,55 @@ format_x_axis <- function(p,
   }
   
   return(p)
+  
+}
+
+
+add_limit_connectors <- function(df_long) {
+  
+  x_sequence <- df_long %>%
+    dplyr::distinct(x) %>%
+    dplyr::arrange(x) %>%
+    dplyr::pull(x)
+  
+  # Dataframe listing each display period in the data, with information on
+  # first x value in period, and previous x value to that, along with series
+  # values for that previous point
+  display_periods <- df_long %>%
+    dplyr::filter(periodType == "display") %>%
+    dplyr::distinct(plotPeriod,
+                    x) %>%
+    dplyr::group_by(plotPeriod) %>%
+    dplyr::summarise(x = dplyr::first(x)) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(prev_x = x_sequence[which(x_sequence == x) - 1L]) %>%
+    dplyr::ungroup() %>%
+    dplyr::left_join(df_long %>%
+                       dplyr::distinct(x, series, value) %>%
+                       dplyr::rename(prev_value = value),
+                     by = c("prev_x" = "x")) 
+  
+  # Create additional rows to be added into df_long with series values at the 
+  # point immediately before the start of each display period. This has the
+  # effect of creating an additional point for the control limits and centre
+  # line to connect with the preceding calculation period limits and centre line
+  display_starts <- df_long %>%
+    dplyr::inner_join(display_periods %>%
+                        dplyr::select(-plotPeriod),
+                      by = c("x" = "x",
+                             "series" = "series")) %>%
+    dplyr::filter(series %in% c("cl", "ucl", "lcl")) %>%
+    dplyr::mutate(x = prev_x,
+                  value = prev_value) %>%
+    dplyr::select(-prev_x,
+                  -prev_value)
+  
+  # Add the extra rows into the data, and sort into x order
+  df_long <- df_long %>% 
+    dplyr::bind_rows(display_starts) %>%
+    dplyr::arrange(x,
+                   series)
+  
+  return(df_long)
   
 }

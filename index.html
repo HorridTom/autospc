@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9044</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9045</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,18 +67,19 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>autospc provides a rigorous and consistent means of re-establishing limits on Shewhart charts (also known as control charts), using the <em>Stable Shift Algorithm</em>.</p>
+<p>autospc provides a rigorous and consistent means of re-establishing limits on Shewhart charts (also known as control charts), using the <em>Stable Shift Algorithm</em>.<sup>1</sup></p>
 <p>The main function is <code><a href="reference/autospc.html">autospc()</a></code>, which plots Shewhart charts of various types appropriate for different types of data, with limits established using the algorithm.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>autospc can be installed using the <a href="https://cran.r-project.org/web/packages/devtools/index.html" class="external-link">devtools</a> package.</p>
-<p>Install devtools if you have not already done so</p>
-<p><code>install.packages("devtools")</code></p>
+<p>autospc can be installed using the <a href="https://pak.r-lib.org/" class="external-link">pak</a> package.</p>
+<p>Install pak if you have not already done so</p>
+<p><code>install.packages("pak")</code></p>
 <p>Then you can install autospc</p>
-<p><code>devtools::install_github("HorridTom/autospc")</code></p>
+<p><code>pak::pkg_install("HorridTom/autospc")</code></p>
 <p>This may then give you the option to install other packages that <code>autospc</code> is dependent on.</p>
+<p>Note that you may need to install the necessary toolchains for building R packages from source: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">RTools</a> for Windows, <a href="https://cran.r-project.org/bin/macosx/tools/" class="external-link">Xcode and a Fortran compiler</a> for Mac OS X.</p>
 <p>Once installed, you can load autospc as usual with</p>
 <p><code><a href="https://horridtom.github.io/autospc/">library(autospc)</a></code></p>
 </div>
@@ -128,6 +129,14 @@
 <h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
 <p>If you encounter a clear bug, please file an issue with a <a href="https://forum.posit.co/t/faq-how-to-do-a-minimal-reproducible-example-reprex-for-beginners/23061" class="external-link">minimal reproducible example</a> on <a href="https://github.com/HorridTom/autospc/issues" class="external-link">GitHub</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>Woodcock T, O’Connor I, Bell D. Re-establishing control limits in statistical process control analyses: the stable shift algorithm. <em>BMJ Quality &amp; Safety</em> Published Online First: 30 November 2025. doi: <a href="https://dx.doi.org/10.1136/bmjqs-2025-019263" class="external-link">10.1136/bmjqs-2025-019263</a>
+</li>
+</ol>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">

@@ -9,7 +9,7 @@
 
 autospc provides a rigorous and consistent means of re-establishing limits on
 Shewhart charts (also known as control charts), using the
-_Stable Shift Algorithm_.
+_Stable Shift Algorithm_.<sup>1</sup>
 
 The main function is `autospc()`, which plots Shewhart charts of various
 types appropriate for different types of data, with limits established using the
@@ -17,18 +17,24 @@ algorithm.
 
 ## Installation
 
-autospc can be installed using the [devtools](https://cran.r-project.org/web/packages/devtools/index.html) package.
+autospc can be installed using the [pak](https://pak.r-lib.org/) package.
 
-Install devtools if you have not already done so
+Install pak if you have not already done so
 
-`install.packages("devtools")`
+`install.packages("pak")`
 
 Then you can install autospc
 
-`devtools::install_github("HorridTom/autospc")`
+`pak::pkg_install("HorridTom/autospc")`
 
 This may then give you the option to install other packages that `autospc` is 
 dependent on.
+
+Note that you may need to install the necessary toolchains for building R
+packages from source: [RTools](https://cran.r-project.org/bin/windows/Rtools/)
+for Windows,
+[Xcode and a Fortran compiler](https://cran.r-project.org/bin/macosx/tools/) for
+Mac OS X.
 
 Once installed, you can load autospc as usual with
 
@@ -107,3 +113,11 @@ head(limits_table,
 If you encounter a clear bug, please file an issue with a [minimal reproducible
 example](https://forum.posit.co/t/faq-how-to-do-a-minimal-reproducible-example-reprex-for-beginners/23061)
 on [GitHub](https://github.com/HorridTom/autospc/issues).
+
+## References
+
+1. Woodcock T, O’Connor I, Bell D. Re-establishing control limits in statistical
+process control analyses: the stable shift algorithm. _BMJ Quality & Safety_
+Published Online First: 30 November 2025.
+doi: [10.1136/bmjqs-2025-019263](https://dx.doi.org/10.1136/bmjqs-2025-019263)
+

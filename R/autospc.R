@@ -221,7 +221,7 @@ autospc <- function(data,
                     annotation_arrow_curve = 0.3,
                     override_annotation_dist = NULL,
                     override_annotation_dist_P = NULL
-                   ) { 
+) { 
   
   df_original <- data
   
@@ -248,8 +248,8 @@ autospc <- function(data,
   xType               <- preprocessed_vars$xType
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
- 
-   # Get control limits
+  
+  # Get control limits
   data <- create_SPC_auto_limits_table(
     data,
     chart_type = chart_type, 

@@ -176,7 +176,7 @@ autospc <- function(data,
                     ## Algorithm Parameters
                     period_min = 21,
                     baseline_length = NULL,
-                    shift_rule_threshold = 8,
+                    shift_rule_threshold = 8L,
                     baseline_only = FALSE,
                     establish_every_shift = FALSE,
                     no_regrets = TRUE,
@@ -248,8 +248,8 @@ autospc <- function(data,
   xType               <- preprocessed_vars$xType
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
- 
-   # Get control limits
+  
+  # Get control limits
   data <- create_SPC_auto_limits_table(
     data,
     chart_type = chart_type, 
@@ -336,6 +336,7 @@ autospc <- function(data,
         df = data,
         p_mr = p_mr,
         chart_type = chart_type,
+        shift_rule_threshold = shift_rule_threshold,
         xType = xType,
         start_x = start_x,
         end_x = end_x,

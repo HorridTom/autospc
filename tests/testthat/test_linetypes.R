@@ -6,12 +6,15 @@ test_that("Linetypes are formed correctly", {
                       chart_type = "C'")
   
   # layer 1 holds the centre line and control limits
-  layer_1 <- ggplot2::layer_data(test_plt, 1) %>% dplyr::arrange(x)
+  layer_1 <- ggplot2::layer_data(test_plt, 1) %>%
+    dplyr::arrange(x)
   # layer 2 holds the data series
-  layer_2 <- ggplot2::layer_data(test_plt, 2) %>% dplyr::arrange(x)
+  layer_2 <- ggplot2::layer_data(test_plt, 2) %>%
+    dplyr::arrange(x)
   
-  # layer 1 has 3n rows, as it holds three series
-  expect_equal(nrow(layer_1), 450L)
+  # layer 1 has 3n rows, as it holds three series; then an additional 3*3 = 9
+  # rows for the additional limit connectors added for continuity of limit lines
+  expect_equal(nrow(layer_1), 450L + 9L)
   # layer 2 has n rows, as it holds one series
   expect_equal(nrow(layer_2), 150L)
   
@@ -19,9 +22,9 @@ test_that("Linetypes are formed correctly", {
   rle_layer_2 <- rle(layer_2$linetype)
   
   correct_answer_1 <- structure(list(lengths = rep(c(1L, 2L),
-                                                   150),
+                                                   153),
                                      values = rep(c("solid", "42"),
-                                                  150)),
+                                                  153)),
                                 class = "rle")
   correct_answer_2 <- structure(list(lengths = 150L,
                                      values = "solid"),

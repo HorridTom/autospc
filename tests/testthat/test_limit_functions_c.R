@@ -26,25 +26,6 @@ test_that("C chart limits the same as qicharts2 v.0.7.2",{
 
 
 # Correct answer created using:
-# test_p_limit_answer <- qicharts2::qic(x, y, n, data = test_data,
-#                                       chart = 'p', return.data = TRUE)
-# qicharts2 v.0.7.2
-test_p_limit_answer <- readRDS(file.path("testdata",
-                                         "test_p_limit_answer.rds"))
-
-test_that("P chart limits the same as qicharts2 v.0.7.2",{
-
-  results <- get_p_limits(y = test_data$y,
-                          n = test_data$n)
-  
-  expect_equal(results$cl, test_p_limit_answer$cl)
-  expect_equal(results$lcl, test_p_limit_answer$lcl)
-  expect_equal(results$ucl, test_p_limit_answer$ucl)
-  
-})
-
-
-# Correct answer created using:
 # test_cp_limit_answer <- qicharts2::qic(x, y, n = rep(1, nrow(test_data)),
 #                                         data = test_data, chart = 'up',
 #                                         return.data = TRUE)
@@ -61,23 +42,3 @@ test_that("C prime chart limits the same as qicharts2 v.0.7.2",{
   expect_equal(results$ucl, test_cp_limit_answer$ucl)
   
 })
-
-
-# Correct answer created using:
-# test_pp_limit_answer <- qicharts2::qic(x, y, n, data = test_data,
-#                                         chart = 'pp', multiply = 100,
-#                                         return.data = TRUE)
-# qicharts2 v.0.7.2
-test_pp_limit_answer <- readRDS(file.path("testdata",
-                                          "test_pp_limit_answer.rds"))
-
-test_that("P prime chart limits the same as qicharts2 v.0.7.2",{
-  
-  results <- get_pp_limits(y = test_data$y, n = test_data$n, multiply = 100)
-  
-  expect_equal(results$cl, test_pp_limit_answer$cl)
-  expect_equal(results$lcl, test_pp_limit_answer$lcl)
-  expect_equal(results$ucl, test_pp_limit_answer$ucl)
-  
-})
-

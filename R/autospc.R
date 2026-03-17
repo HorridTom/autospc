@@ -249,6 +249,12 @@ autospc <- function(data,
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
   
+  # Aggregate data
+  if(!(chart_type %in% c("XMR", "MR"))) {
+    data <- aggregate_data(df = data,
+                           chart_type = chart_type)
+  }
+  
   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,

@@ -131,3 +131,27 @@ The column specified in the argument n will be used.")
 }
 
 
+# Aggregate data
+aggregate_data <- function(df,
+                           chart_type) {
+  
+  switch(chart_type,
+         "P" =,
+         "P'" = {
+           if(!("n" %in% colnames(df))) {
+             df <- df %>%
+               dplyr::mutate(n = 1L)
+           }
+           df_agg <- df %>%
+             dplyr::group_by(x) %>%
+             dplyr::summarise(y = sum(y),
+                       n = sum(n))
+         },
+         {
+           df_agg <- df
+         })
+  
+  return(df_agg)
+}
+
+

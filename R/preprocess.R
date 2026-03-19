@@ -135,6 +135,17 @@ The column specified in the argument n will be used.")
 aggregate_data <- function(df,
                            chart_type) {
   
+  any_multiple_x <- df %>%
+    dplyr::group_by(x) %>%
+    dplyr::summarise(num_rows = dplyr::n()) %>%
+    dplyr::mutate(multiple_rows = num_rows > 1L) %>%
+    dplyr::pull(multiple_rows) %>%
+    any()
+  
+  if(!any_multiple_x) {
+    return(df)
+  }
+  
   switch(chart_type,
          "P" =,
          "P'" = {
@@ -145,7 +156,17 @@ aggregate_data <- function(df,
            df_agg <- df %>%
              dplyr::group_by(x) %>%
              dplyr::summarise(y = sum(y),
-                       n = sum(n))
+                              n = sum(n))
+         },
+         "C" =,
+         "C'" = {
+           if(!("y" %in% colnames(df))) {
+             df <- df %>%
+               dplyr::mutate(y = 1L)
+           }
+           df_agg <- df %>%
+             dplyr::group_by(x) %>%
+             dplyr::summarise(y = sum(y))
          },
          {
            df_agg <- df

@@ -18,7 +18,8 @@ correct_log <- structure(list(x = c(1L, 22L, 36L),
                               log = c("0100;0200", "0300;040136",
                                       "050010;0610")),
                          row.names = c(NA, -3L),
-                         class = "data.frame")
+                         class = "data.frame") %>%
+  tibble::as_tibble()
 
 correct_log_df <- structure(
   list(counter = c(1L, 1L, 2L, 2L, 3L, 3L),
@@ -57,7 +58,8 @@ invisible(capture.output(
 
 log_out <- df_out %>%
   dplyr::filter(!is.na(log)) %>%
-  dplyr::select(x, log)
+  dplyr::select(x, log) %>%
+  tibble::as_tibble()
 
 
 test_that("log is populated correctly (regression)", {

@@ -15,6 +15,26 @@
 # 
 # saveRDS(test_pchart_aggregation_data,
 #         file = "tests/testthat/testdata/test_pchart_aggregation_data.rds")
+#
+# 2. count data for c(')-charts
+#
+# set.seed(202603)
+# 
+# y <- rpois(42L,
+#            lambda = 50L)
+# 
+# x <- rep(c(1L:42L),
+#          times = y)
+# 
+# test_cchart_aggregation_data <- tibble::tibble(x = x)
+# 
+# saveRDS(test_cchart_aggregation_data,
+#         file = "tests/testthat/testdata/test_cchart_aggregation_data.rds")
+# 
+# test_cchart_aggregated_data <- tibble::tibble(x = c(1L:42L),
+#                                               y = y)
+# saveRDS(test_cchart_aggregated_data,
+#         file = "tests/testthat/testdata/test_cchart_aggregated_data.rds")
 
 test_pchart_aggregation_data <- readRDS(
   file.path("testdata",
@@ -24,6 +44,14 @@ test_pchart_aggregation_data <- readRDS(
 test_pchart_aggregated_data <- readRDS(
   file.path("testdata",
             "test_pchart_aggregated_data.rds"))
+
+test_cchart_aggregation_data <- readRDS(
+  file.path("testdata",
+            "test_cchart_aggregation_data.rds"))
+
+test_cchart_aggregated_data <- readRDS(
+  file.path("testdata",
+            "test_cchart_aggregated_data.rds"))
 
 test_that("binary aggregation works", {
   
@@ -38,3 +66,17 @@ test_that("binary aggregation works", {
                test_pchart_aggregated_data$n)
 
 })
+
+
+test_that("count aggregation works", {
+  
+  aggregated_data <- aggregate_data(df = test_cchart_aggregation_data,
+                                    chart_type = "C")
+  
+  expect_equal(aggregated_data$x,
+               test_cchart_aggregated_data$x)
+  expect_equal(aggregated_data$y,
+               test_cchart_aggregated_data$y)
+  
+})
+

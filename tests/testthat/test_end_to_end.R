@@ -13,7 +13,8 @@ test_data <- structure(list(x = 1:21,
                                   197L, 183L, 195L, 192L
                             )), 
                        class = "data.frame", 
-                       row.names = c(NA, -21L))
+                       row.names = c(NA, -21L)) %>%
+  tibble::as_tibble()
 
 correct_answer_C <- readRDS("testdata/test_data_end_to_end/correct_answer_C.rds")
 correct_answer_CP <- readRDS("testdata/test_data_end_to_end/correct_answer_CP.rds")

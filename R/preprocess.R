@@ -160,10 +160,6 @@ aggregate_data <- function(df,
          },
          "C" =,
          "C'" = {
-           if(!("y" %in% colnames(df))) {
-             df <- df %>%
-               dplyr::mutate(y = 1L)
-           }
            df_agg <- df %>%
              dplyr::group_by(x) %>%
              dplyr::summarise(y = sum(y))

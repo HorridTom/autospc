@@ -11,6 +11,9 @@ preprocess_inputs <- function(
   
   validate_chart_type(chart_type)
   
+  df <- validate_data_column_spec(df = df,
+                                  chart_type = chart_type)
+  
   #get title from data
   if(is.null(title) & "title" %in% colnames(df)) {
     title <- df$title[1]

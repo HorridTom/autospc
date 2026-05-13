@@ -1,0 +1,92 @@
+---
+title: "Data Requirements for <em>autospc</em> Analysis"
+output:
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+    toc: true
+    number_sections: true
+pkgdown:
+  as_is: true
+vignette: >
+  %\VignetteIndexEntry{Data Requirements for <em>autospc</em> Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=7,
+  fig.height=5
+)
+```
+
+```{r setup, message=FALSE}
+library(autospc)
+library(dplyr)
+```
+
+For each type of Statistical Process Control (SPC) chart supported by *autospc*,
+certain data columns must be specified, and those columns must meet certain
+requirements. This article sets out these requirements for each chart type.
+
+There are two factors influencing the nature of these requirements. First, the
+statistical theory behind SPC charts places restrictions on the type of data
+each chart supports. For instance, the theory behind C-charts draws on the
+Poisson distribution, which is a discrete distribution defined on the
+non-negative integers. Therefore the variable of interest for a C-chart must be
+a non-negative integer ( \(0, 1, 2, \dots\)). Second, the types of objects used
+to represent data in **R**. For instance, a non-negative integer is most
+naturally represented as an object of type "`integer`", but there may also be
+situations in which it is appropriate to use an object of type "`double`".
+
+The type requirements of *autospc* are intended to be a flexible as possible,
+whilst reflecting the natural usage of the **R**'s object types. For example,
+whilst technically an object of type "`integer`" can be coerced to type
+"`logical`", *autospc* does not allow "`integer`" data to be used in place of
+"`logical`" in observation-level data for a P-chart, since the risk of confusion
+with aggregated data is too great.
+
+Below is an example call to `autospc()`. Note that as is often the case, the
+first argument (`data`) is passed by position, and the rest are passed as named
+arguments. 
+
+```{r example-xmr, fig.cap="Example XMR chart", fig.show='hide', message=FALSE}
+autospc(
+  ed_attendances_monthly, 
+  chart_type = "C'", 
+  x = month_start, 
+  y = att_all
+)
+```
+
+In what follows, we shall refer to the columns of the passed data (in this
+example, the data `ed_attendances_monthly`) by the names of the arguments they
+are passed to. So in this example, in the sentence "The `y` column must be
+either an '`integer`' or '`double`'", what is really meant is "The `att_all`
+column must be either an '`integer`' or '`double`'".
+
+# The subgrouping variable, `x`
+
+The column specified as `x` will be used both in aggregating data into subgroups
+for plotting (where this is relevant), and as the variable plotted on the
+horizontal axis (i.e. ordering the data) on the chart. Object types that are
+currently supported for `x` are: "`Date`", "`POSIXct`", "`double`", and
+"`integer`".
+
+# XMR charts
+
+The data columns required for the XMR chart are as follows: 
+
+* The subgrouping variable, to be plotted on the horizontal axis, `x`
+* The variable of interest, to be plotted on the vertical axis, `y`. This must
+be of type "`integer`" or "`double`".
+
+
+
+
+
+
+

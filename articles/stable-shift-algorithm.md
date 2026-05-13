@@ -1,6 +1,7 @@
 # The Stable Shift Algorithm
 
 ``` r
+
 library(autospc)
 library(dplyr)
 #> 
@@ -43,6 +44,7 @@ information on this dataset see
 [`?ed_attendances_monthly`](https://horridtom.github.io/autospc/reference/ed_attendances_monthly.md).
 
 ``` r
+
 facet_stages(
   ed_attendances_monthly %>%
     filter(row_number() <= 32L),
@@ -107,6 +109,7 @@ for the purpose of this section we shall interpret as daily values of a
 count measure of interest.
 
 ``` r
+
 autospc(example_series_2a %>%
                 filter(row_number() <= 35L),
               override_y_title = "Count",
@@ -186,6 +189,7 @@ limits. Figure [3.3](#fig:example-3) shows candidate limits established
 at the start of the triggering rule break, i.e. day 22.
 
 ``` r
+
 autospc(example_series_2a,
               override_y_title = "Count",
               chart_type = "C",
@@ -198,6 +202,7 @@ autospc(example_series_2a,
 Figure 3.2: Example 2
 
 ``` r
+
 autospc(example_series_2a,
               override_y_title = "Count",
               chart_type = "C",
@@ -227,6 +232,7 @@ break, i.e. from day 22. There is an opposing rule break in Figure
 [3.5](#fig:example-5), commencing on day 31.
 
 ``` r
+
 autospc(example_series_2b,
               override_y_title = "Count",
               chart_type = "C",
@@ -239,6 +245,7 @@ autospc(example_series_2b,
 Figure 3.4: Example 4
 
 ``` r
+
 autospc(example_series_2b,
               override_y_title = "Count",
               chart_type = "C",
@@ -258,6 +265,7 @@ time showing an overhanging reversion commencing on day 40, against the
 candidate limits.
 
 ``` r
+
 autospc(example_series_2c,
               override_y_title = "Count",
               chart_type = "C",
@@ -349,6 +357,7 @@ the end of this first calculation period.
 The algorithm is visualised in the flow chart below.
 
 ``` r
+
 grViz(autospc:::algorithm_flow_chart_string)
 ```
 
@@ -366,6 +375,7 @@ To print a log out to the console, set the `verbosity` argument of
 to either `1` (for basic log information) or `2` (for full detail).
 
 ``` r
+
 autospc(
   ed_attendances_monthly, 
   chart_type = "C'", 
@@ -453,37 +463,39 @@ content of the `log_entry` column of the log dataframe exported to
 `log_file_path`.
 
 ``` r
+
 log_exp_tab <- autospc:::log_explanation_table
 ```
 
 ``` r
+
 log_exp_tab %>% 
   knitr::kable()
 ```
 
-| algorithm_step | shorthand | explanation                                                                                   |
-|:---------------|:----------|:----------------------------------------------------------------------------------------------|
-| 1              | 0100      | Initialise algorithm. Counter = 1.                                                            |
-| 2              | 02xx      | Check whether there are sufficient data to form at least one set of limits.                   |
-|                |           | x = 00: Yes                                                                                   |
-|                |           | x = 10: No                                                                                    |
-| 3              | 0300      | Main algorithm loop begins.                                                                   |
-| 4              | 04xxyy    | Check whether there are sufficient data to proceed (Yes/No), and find subsequent rule breaks. |
-|                |           | xx = 00: Yes - next rule break within current run                                             |
-|                |           | xx = 01: Yes - next rule break beyond current run                                             |
-|                |           | xx = 10: No                                                                                   |
-|                |           | yy = position of next rule break.                                                             |
-| 5              | 05xxyy    | Check whether there are any subsequent rule breaks.                                           |
-|                |           | xx = 00: Yes                                                                                  |
-|                |           | xx = 10: No                                                                                   |
-|                |           | yy = 01: Next rule break downwards                                                            |
-|                |           | yy = 10: Next rule break upwards                                                              |
-| 6              | 06xxyz    | Check whether there are sufficient data to proceed.                                           |
-|                |           | xx = 00: Yes                                                                                  |
-|                |           | xx =10: No                                                                                    |
-|                |           | Examine candidate limits.                                                                     |
-|                |           | y = 0: No opposing rule break                                                                 |
-|                |           | y = 1: At least one opposing rule break.                                                      |
-|                |           | z = 0: Final run does not prevent re-establishment of limits                                  |
-|                |           | z = 1: Final run prevents re-establishment of limits.                                         |
-| 7              | 07xx      | Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No.                             |
+| algorithm_step | shorthand | explanation |
+|:---|:---|:---|
+| 1 | 0100 | Initialise algorithm. Counter = 1. |
+| 2 | 02xx | Check whether there are sufficient data to form at least one set of limits. |
+|  |  | x = 00: Yes |
+|  |  | x = 10: No |
+| 3 | 0300 | Main algorithm loop begins. |
+| 4 | 04xxyy | Check whether there are sufficient data to proceed (Yes/No), and find subsequent rule breaks. |
+|  |  | xx = 00: Yes - next rule break within current run |
+|  |  | xx = 01: Yes - next rule break beyond current run |
+|  |  | xx = 10: No |
+|  |  | yy = position of next rule break. |
+| 5 | 05xxyy | Check whether there are any subsequent rule breaks. |
+|  |  | xx = 00: Yes |
+|  |  | xx = 10: No |
+|  |  | yy = 01: Next rule break downwards |
+|  |  | yy = 10: Next rule break upwards |
+| 6 | 06xxyz | Check whether there are sufficient data to proceed. |
+|  |  | xx = 00: Yes |
+|  |  | xx =10: No |
+|  |  | Examine candidate limits. |
+|  |  | y = 0: No opposing rule break |
+|  |  | y = 1: At least one opposing rule break. |
+|  |  | z = 0: Final run does not prevent re-establishment of limits |
+|  |  | z = 1: Final run prevents re-establishment of limits. |
+| 7 | 07xx | Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No. |

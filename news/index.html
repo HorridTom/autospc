@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9048</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9049</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,7 +24,8 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/stable-shift-algorithm.html">The Stable Shift Algorithm</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/data-requirements.html">Data Requirements for &lt;em&gt;autospc&lt;/em&gt; Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/stable-shift-algorithm.html">The Stable Shift Algorithm</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -51,227 +52,227 @@
 <h4 id="breaking-changes-0-0-0-9040">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-0-0-9040"></a></h4>
 <ul><li>
 <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code> has been renamed to <code><a href="../reference/autospc.html">autospc()</a></code>. Therefore <code><a href="../reference/plot_auto_SPC.html">plot_auto_SPC()</a></code> is now deprecated. Many of this function’s arguments have also been renamed, in line with the <a href="https://style.tidyverse.org/syntax.html#sec-objectnames" class="external-link">Tidyverse style guide</a>. The table below provides details of all name changes implemented in this change.</li>
-</ul><table class="table"><colgroup><col width="19%"><col width="36%"><col width="36%"><col width="8%"></colgroup><thead><tr class="header"><th>What</th>
+</ul><table class="table"><colgroup><col width="19%"><col width="36%"><col width="36%"><col width="8%"></colgroup><thead><tr><th>What</th>
 <th>Before</th>
 <th>After</th>
 <th>Change</th>
-</tr></thead><tbody><tr class="odd"><td>Version number</td>
+</tr></thead><tbody><tr><td>Version number</td>
 <td>0.0.0.9039</td>
 <td>0.0.0.9040</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Function</td>
+</tr><tr><td>Function</td>
 <td>plot_auto_SPC()</td>
 <td>autospc()</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>df</td>
 <td>data</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>x</td>
 <td>x</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>y</td>
 <td>y</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>n</td>
 <td>n</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>chartType</td>
 <td>chart_type</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument group</td>
+</tr><tr><td>Argument group</td>
 <td>## Algorithm Parameters</td>
 <td>## Algorithm Parameters</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>periodMin</td>
 <td>period_min</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>baseline</td>
 <td>baseline_length</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>runRuleLength</td>
 <td>shift_rule_threshold</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>noRecals</td>
 <td>baseline_only</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>recalEveryShift</td>
 <td>establish_every_shift</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>noRegrets</td>
 <td>no_regrets</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>overhangingReversions</td>
 <td>overhanging_reversions</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument group</td>
+</tr><tr><td>Argument group</td>
 <td>## SPC Parameters</td>
 <td>## SPC Parameters</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>maxNoOfExclusions</td>
 <td>max_exclusions</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>highlightExclusions</td>
 <td>highlight_exclusions</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>mr_screen_max_loops</td>
 <td>mr_screen_max_loops</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>rule2Tolerance</td>
 <td>centre_line_tolerance</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>floatingMedian</td>
 <td>floating_median</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>floatingMedian_n</td>
 <td>floating_median_n</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument group</td>
+</tr><tr><td>Argument group</td>
 <td>## Output Type</td>
 <td>## Output Type</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>plotChart</td>
 <td>plot_chart</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>showLimits</td>
 <td>show_limits</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>showMR</td>
 <td>show_mr</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>writeTable</td>
 <td>write_table</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>verbosity</td>
 <td>verbosity</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>log_file_path</td>
 <td>log_file_path</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument group</td>
+</tr><tr><td>Argument group</td>
 <td>## Chart Appearance</td>
 <td>## Chart Appearance</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>title</td>
 <td>title</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>subtitle</td>
 <td>subtitle</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>use_caption</td>
 <td>use_caption</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>override_x_title</td>
 <td>override_x_title</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>override_y_title</td>
 <td>override_y_title</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>override_y_lim</td>
 <td>override_y_lim</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>x_break</td>
 <td>x_break</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>x_date_format</td>
 <td>x_date_format</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>x_pad_end</td>
 <td>x_pad_end</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>extend_limits_to</td>
 <td>extend_limits_to</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>r1_col</td>
 <td>r1_col</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>r2_col</td>
 <td>r2_col</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>point_size</td>
 <td>point_size</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>line_width_sf</td>
 <td>line_width_sf</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>includeAnnotations</td>
 <td>include_annotations</td>
 <td>Yes</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>basicAnnotations</td>
 <td>basic_annotations</td>
 <td>Yes</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>annotation_size</td>
 <td>annotation_size</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>align_labels</td>
 <td>align_labels</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>flip_labels</td>
 <td>flip_labels</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>upper_annotation_sf</td>
 <td>upper_annotation_sf</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>lower_annotation_sf</td>
 <td>lower_annotation_sf</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>annotation_arrows</td>
 <td>annotation_arrows</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>annotation_arrow_curve</td>
 <td>annotation_arrow_curve</td>
 <td>No</td>
-</tr><tr class="even"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>override_annotation_dist</td>
 <td>override_annotation_dist</td>
 <td>No</td>
-</tr><tr class="odd"><td>Argument</td>
+</tr><tr><td>Argument</td>
 <td>override_annotation_dist_P</td>
 <td>override_annotation_dist_P</td>
 <td>No</td>

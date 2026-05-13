@@ -12,24 +12,8 @@ facet_stages(data, split_rows, plot_chart = TRUE, ...)
 
 - data:
 
-  A data frame. For an XMR, C or C' chart, must have columns for:
-
-  - the subgrouping variable, to be plotted on the horizontal axis, (x);
-
-  - the variable of interest to be plotted on the vertical axis (y);
-
-  - and optionally, a title and subtitle for the plot.
-
-    
-  For a P or P' chart, must have columns for:
-
-  - the subgrouping variable, to be plotted on the horizontal axis, (x);
-
-  - the total count or denominator (n);
-
-  - the count meeting criteria, or numerator (y);
-
-  - and optionally, a title and subtitle for the plot.
+  A data frame. For column requirements by chart type, see
+  [`vignette("data-requirements", package = "autospc")`](https://horridtom.github.io/autospc/articles/data-requirements.md).
 
 - split_rows:
 

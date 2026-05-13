@@ -2,6 +2,9 @@ test_rsr_data <- readRDS("testdata/test_rsr_data.rds")
 
 test_that("establish_every_shift works correctly", {
   
+  test_rsr_data <- test_rsr_data %>%
+    dplyr::mutate(Total_Att = round(Total_Att))
+  
   result_data <- autospc(
     test_rsr_data,
     chart_type = "C'",

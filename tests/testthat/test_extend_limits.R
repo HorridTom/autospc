@@ -7,7 +7,8 @@ test_data <- structure(list(x = 1:21,
                                   205L, 197L, 206L, 197L, 183L, 195L, 192L
                             )), 
                        class = "data.frame", 
-                       row.names = c(NA, -21L))
+                       row.names = c(NA, -21L)) %>%
+  tibble::as_tibble()
 
 test_that("Limit extension works correctly for C chart", {
   results_nex <- autospc(test_data,
@@ -81,8 +82,7 @@ test_that("Limit extension works correctly for P chart", {
   
   limit_values <- tibble::tibble_row(cl = pbar * 100,
                                      lcl = lcl * 100,
-                                     ucl = ucl * 100) %>% 
-    as.data.frame()
+                                     ucl = ucl * 100)
   
   # Limit extension should result in two additional rows in the result, marking
   # the start and end of the extension period, with the correct limits and cl

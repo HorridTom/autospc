@@ -11,6 +11,9 @@ preprocess_inputs <- function(
   
   validate_chart_type(chart_type)
   
+  df <- validate_data_column_spec(df = df,
+                                  chart_type = chart_type)
+  
   #get title from data
   if(is.null(title) & "title" %in% colnames(df)) {
     title <- df$title[1]
@@ -128,6 +131,47 @@ The column specified in the argument n will be used.")
   
   return(df)
   
+}
+
+
+# Aggregate data
+aggregate_data <- function(df,
+                           chart_type) {
+  
+  any_multiple_x <- df %>%
+    dplyr::group_by(x) %>%
+    dplyr::summarise(num_rows = dplyr::n()) %>%
+    dplyr::mutate(multiple_rows = num_rows > 1L) %>%
+    dplyr::pull(multiple_rows) %>%
+    any()
+  
+  if(!any_multiple_x) {
+    return(df)
+  }
+  
+  switch(chart_type,
+         "P" =,
+         "P'" = {
+           if(!("n" %in% colnames(df))) {
+             df <- df %>%
+               dplyr::mutate(n = 1L)
+           }
+           df_agg <- df %>%
+             dplyr::group_by(x) %>%
+             dplyr::summarise(y = sum(y),
+                              n = sum(n))
+         },
+         "C" =,
+         "C'" = {
+           df_agg <- df %>%
+             dplyr::group_by(x) %>%
+             dplyr::summarise(y = sum(y))
+         },
+         {
+           df_agg <- df
+         })
+  
+  return(df_agg)
 }
 
 

@@ -57,19 +57,8 @@ autospc(
 )
 }
 \arguments{
-\item{data}{A data frame. For an XMR, C or C' chart, must have columns for:
-\itemize{
-\item the subgrouping variable, to be plotted on the horizontal axis, (x);
-\item the variable of interest to be plotted on the vertical axis (y);
-\item and optionally, a title and subtitle for the plot.
-} \cr
-For a P or P' chart, must have columns for:
-\itemize{
-\item the subgrouping variable, to be plotted on the horizontal axis, (x);
-\item the total count or denominator (n);
-\item the count meeting criteria, or numerator (y);
-\item and optionally, a title and subtitle for the plot.
-}}
+\item{data}{A data frame. For column requirements by chart type, see
+\code{vignette("data-requirements", package = "autospc")}.}
 
 \item{x}{Name of column (passed using tidyselect semantics) to use as
 subgroups on the horizontal axis of the chart.}
@@ -80,10 +69,15 @@ subgroups on the horizontal axis of the chart.}
 \item count (plotted on the vertical axis) for C and C' charts,
 \item numerator of the proportion (plotted on the vertical axis) for P and
 P' charts.
-}}
+}
+See \code{vignette("data-requirements", package = "autospc")} for more
+details.}
 
 \item{n}{Name of column (passed using tidyselect semantics) to use as
-denominator for P and P' charts.}
+denominator for P and P' charts.
+\cr
+See \code{vignette("data-requirements", package = "autospc")} for more
+details.}
 
 \item{chart_type}{The type of chart you wish to plot. Must must have length one.
 Available options are: "XMR", "MR", "C", "C'", "P", "P'".

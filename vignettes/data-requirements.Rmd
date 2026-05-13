@@ -72,8 +72,8 @@ column must be either an `integer` or `double`".
 
 The column specified as `x` will be used both in aggregating data into subgroups
 for plotting (where this is relevant), and as the variable plotted on the
-horizontal axis (i.e. ordering the data) on the chart. Object types that are
-currently supported for `x` are: `Date`, `POSIXct`, `double`, and
+horizontal axis (i.e. ordering the data) on the chart. Object classes that are
+currently supported for `x` are: `Date`, `POSIXct`, `numeric`, and
 `integer`.
 
 # XMR charts
@@ -122,7 +122,8 @@ P and P' charts are for proportions. They require a numerator (the count meeting
 some criterion) and a denominator (the total count). *autospc* supports two ways
 of supplying this information, depending on the form in which the data are
 available: observation-level data using a `logical` `y` column, or aggregated
-data using numeric `y` and `n` columns.
+data using numeric `y` and `n` columns. In both cases the `x` column is required
+as for the above chart types.
 
 ## Observation-level data (no `n` specified)
 

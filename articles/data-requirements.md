@@ -1,4 +1,4 @@
-# Data Requirements for \<em\>autospc\</em\> Analysis
+# Data Requirements for \*autospc\* Analysis
 
 ``` r
 

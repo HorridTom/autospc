@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 library(autospc)
 library(dplyr)
 library(scales)
-library(DiagrammeR)
+# library(DiagrammeR)
 ```
 
 # Introduction
@@ -304,8 +304,12 @@ points beginning at the counter.
 
 The algorithm is visualised in the flow chart below.
 
-```{r 5.1, fig.width=7, fig.height=7}
-grViz(autospc:::algorithm_flow_chart_string)
+```{r 5.1, fig.width=5, fig.height=7, out.width="75%"}
+# grViz(autospc:::algorithm_flow_chart_string) %>%
+#   DiagrammeRsvg::export_svg() %>%
+#   charToRaw() %>%
+#   rsvg::rsvg_png("SSA_flowchart.png")
+knitr::include_graphics("SSA_flowchart.png")
 ```
 \
   

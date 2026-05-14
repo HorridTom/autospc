@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9049</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9050</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,7 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rich-iannone.github.io/DiagrammeR/" class="external-link">DiagrammeR</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># library(DiagrammeR)</span></span></code></pre></div>
 <div class="section level2" number="1">
 <h2 id="introduction">
 <span class="header-section-number">1</span> Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
@@ -403,9 +403,12 @@ algorithm continues from (3).</p></li>
 </ol>
 <p>The algorithm is visualised in the flow chart below.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rich-iannone.github.io/DiagrammeR/reference/grViz.html" class="external-link">grViz</a></span><span class="op">(</span><span class="fu">autospc</span><span class="fu">:::</span><span class="va">algorithm_flow_chart_string</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:672px;height:672px;"></div>
-<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"diagram":"\n      digraph {\n      \n  # graph attributes\n  graph [overlap = true]\n  rankdir=TB\n\n  # node attributes\n  node [shape = box,\n        fontname = Helvetica,\n        color = black]\n\n  # edge attributes\n  edge [color = black]\n\n  # node statements\n  A [label = \"(1) Initialise Algorithm\nCounter = 1\", width = 3, group = c];\n  B [shape = diamond, label = \"(2) Sufficient data for\nat least one period?\", width = 3, group = c];\n  C [label = \"End\", width = 1];\n  D [shape = diamond, label = \"(3) Loop while\nremaining data\", width = 3, group = c];\n  E [shape = diamond, label = \"(4) Sufficient data remaining\nto form a new period?\", width = 3, group = c];\n  F [label = \"Identify subsequent\nrule-breaking runs\", width = 3, group = c];\n  G [shape = diamond, label = \"(5) Is there at least\none subsequent rule break?\", width = 3, group = c];\n  H [label = \"Set counter to next rule break\nand record its direction\", width = 3, group = c];\n  I [shape = diamond, label = \"(6) Sufficient data remaining\nto form a new period?\", width = 3, group = c];\n  J [label = \"Establish candidate limits\", width = 3, group = c];\n  K [shape = diamond, label = \"(7) Is there an opposing rule break\nor does the final run prevent\nestablishment of new limits?\", width = 3, group = c];\n  L [label = \"Accept candidate limits:\nre-establish limits at the counter\", width = 3];\n  M [label = \"Reject candidate limits\", width = 3];\n  N [label = \"Set counter to next\nrule-breaking run\", width = 3]\n\n  # edge statements\n  A -> B;\n  B -> C [label = \"N (2b)\"]; B -> D [label = \"Y (2a)\"];\n  D -> C [label = \"N (3b)\"]; D -> E [label = \"Y (3a)\"];\n  E -> C [label = \"N (4b)\"]; E -> F [label = \"Y (4a)\"];\n  F -> G;\n  G -> C [label = \"N (5b)\"]; G -> H [label = \"Y (5a)\"];\n  H -> I;\n  I -> C [label = \"N (6b)\"]; I -> J [label = \"Y (6a)\"];\n  J -> K;\n  K -> L [label = \"N (7a)\"]; K -> M [label = \"Y (7b)\"];\n  L -> N;\n  M -> N;\n  N -> D\n  \n  {rank = same; L; M}\n  \n      }","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p><br></p>
+<code class="sourceCode R"><span><span class="co"># grViz(autospc:::algorithm_flow_chart_string) %&gt;%</span></span>
+<span><span class="co">#   DiagrammeRsvg::export_svg() %&gt;%</span></span>
+<span><span class="co">#   charToRaw() %&gt;%</span></span>
+<span><span class="co">#   rsvg::rsvg_png("SSA_flowchart.png")</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"SSA_flowchart.png"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="SSA_flowchart.png" alt="" width="75%"><br></p>
 </div>
 </div>
 <div class="section level2" number="4">

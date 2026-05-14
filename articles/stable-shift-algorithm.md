@@ -13,7 +13,7 @@ library(dplyr)
 #> 
 #>     intersect, setdiff, setequal, union
 library(scales)
-library(DiagrammeR)
+# library(DiagrammeR)
 ```
 
 ## 1 Introduction
@@ -358,10 +358,14 @@ The algorithm is visualised in the flow chart below.
 
 ``` r
 
-grViz(autospc:::algorithm_flow_chart_string)
+# grViz(autospc:::algorithm_flow_chart_string) %>%
+#   DiagrammeRsvg::export_svg() %>%
+#   charToRaw() %>%
+#   rsvg::rsvg_png("SSA_flowchart.png")
+knitr::include_graphics("SSA_flowchart.png")
 ```
 
-  
+![](SSA_flowchart.png)  
 
 ## 4 Using the algorithm log
 

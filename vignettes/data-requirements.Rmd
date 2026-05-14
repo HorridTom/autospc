@@ -1,5 +1,5 @@
 ---
-title: "Data Requirements for <em>autospc</em> Analysis"
+title: "Data Requirements for *autospc* Analysis"
 output:
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette
@@ -9,7 +9,7 @@ output:
 pkgdown:
   as_is: true
 vignette: >
-  %\VignetteIndexEntry{Data Requirements for <em>autospc</em> Analysis}
+  %\VignetteIndexEntry{Data Requirements for autospc Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

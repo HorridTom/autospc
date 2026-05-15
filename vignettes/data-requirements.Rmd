@@ -1,5 +1,5 @@
 ---
-title: "Data Requirements for *autospc* Analysis"
+title: "Data Requirements for autospc Analysis"
 output:
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette

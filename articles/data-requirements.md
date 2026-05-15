@@ -1,4 +1,4 @@
-# Data Requirements for \*autospc\* Analysis
+# Data Requirements for autospc Analysis
 
 ``` r
 

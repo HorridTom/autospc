@@ -8,7 +8,7 @@ new_autospc_chart <- function(x = list(),
   return(
     structure(x,
               class = c(class,
-                        "spc_chart"))
+                        "autospc_chart"))
   )
   
 }
@@ -16,7 +16,10 @@ new_autospc_chart <- function(x = list(),
 
 validate_autospc_chart <- function(x) {
   
-  base_list <- unclass(x)
+  if(!inherits(x, "autospc_chart")) {
+    stop("Not an autospc_chart object.", call. = FALSE)
+  }
+  
   element_names <- names(x)
   
   
@@ -59,18 +62,37 @@ autospc_chart_elements <- function() {
 autospc_chart <- function(data,
                           x,
                           y,
-                          period_min = 21L,
-                          baseline_length = NULL,
-                          shift_rule_threshold = 8L,
-                          baseline_only = FALSE,
-                          establish_every_shift = FALSE,
-                          no_regrets = TRUE,
-                          overhanging_reversions = TRUE,
-                          max_exclusions = 3L,
-                          mr_screen_max_loops = 1L,
-                          centre_line_tolerance = 0) {
+                          ...) {
   
-  autospc_chart_list <- list(
+  autospc_chart_l <- autospc_chart_list(data = data,
+                                        x = x,
+                                        y = y,
+                                        ...)
+  
+  autospc_chart_object <- new_autospc_chart(autospc_chart_l)
+  
+  autospc_chart_object <- validate_autospc_chart(autospc_chart_object)
+  
+  return(autospc_chart_object)
+  
+}
+
+
+autospc_chart_list <- function(data,
+                               x,
+                               y,
+                               period_min = 21L,
+                               baseline_length = NULL,
+                               shift_rule_threshold = 8L,
+                               baseline_only = FALSE,
+                               establish_every_shift = FALSE,
+                               no_regrets = TRUE,
+                               overhanging_reversions = TRUE,
+                               max_exclusions = 3L,
+                               mr_screen_max_loops = 1L,
+                               centre_line_tolerance = 0) {
+  
+  autospc_chart_l <- list(
     data = data,
     x = x,
     y = y,
@@ -86,11 +108,7 @@ autospc_chart <- function(data,
     centre_line_tolerance = centre_line_tolerance
   )
   
-  autospc_chart_object <- new_autospc_chart(autospc_chart_list)
-  
-  autospc_chart_object <- validate_autospc_chart(autospc_chart_object)
-  
-  return(autospc_chart_object)
+  return(autospc_chart_l)
   
 }
 

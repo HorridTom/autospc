@@ -59,6 +59,9 @@ validate_autospc_chart <- function(x) {
 #'
 #' These names are duplicated by `autospc_chart_list()`, which assembles
 #' exactly these elements - adding one means adding it in both places.
+#' 
+#' data_original is a derived field retaining (by convention only) a copy of the
+#' data passed by the user
 #'
 #' @return A character vector of element names.
 #' @noRd
@@ -77,7 +80,8 @@ autospc_chart_elements <- function() {
     "overhanging_reversions",
     "max_exclusions",
     "mr_screen_max_loops",
-    "centre_line_tolerance"
+    "centre_line_tolerance",
+    "data_original"
   )
   
   return(chart_elements)
@@ -148,7 +152,9 @@ autospc_chart_list <- function(data,
     overhanging_reversions = overhanging_reversions,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,
-    centre_line_tolerance = centre_line_tolerance
+    centre_line_tolerance = centre_line_tolerance,
+    # derived fields
+    data_original = data
   )
   
   return(autospc_chart_l)

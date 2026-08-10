@@ -50,6 +50,15 @@ test_that("defaults populated as expected", {
 })
 
 
+test_that("data_original is populated correctly", {
+  
+  chart <- test_chart_c()
+  
+  expect_identical(chart$data_original, test_data)
+  
+})
+
+
 test_that("arguments passed through ... reach the object", {
 
   chart <- test_chart_c(period_min = 30L,
@@ -67,6 +76,13 @@ test_that("an unrecognised argument name is rejected", {
 
   expect_error(test_chart_c(period_mn = 30L), "unused argument")
 
+})
+
+
+test_that("data_original cannot be set by the caller", {
+  
+  expect_error(test_chart_c(data_original = test_data), "unused argument")
+  
 })
 
 

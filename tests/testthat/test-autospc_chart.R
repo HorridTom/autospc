@@ -16,3 +16,12 @@ test_that("validate_autospc_chart rejects an object that is not an autospc_chart
                "Not an autospc_chart object")
 
 })
+
+
+test_that("y_axis_title has no method for a bare autospc_chart", {
+
+  bare_chart <- autospc_chart(data = test_data, x = "x", y = "y")
+
+  expect_error(y_axis_title(bare_chart), "no applicable method")
+
+})

@@ -109,3 +109,10 @@ test_that("internal defaults match autospc()", {
                    formals(autospc_chart_list)$max_exclusions)
 
 })
+
+
+test_that("y_axis_title returns the C chart axis title", {
+
+  expect_identical(y_axis_title(test_chart_c()), "Number")
+
+})

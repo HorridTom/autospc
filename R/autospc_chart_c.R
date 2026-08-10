@@ -57,3 +57,13 @@ autospc_chart_c <- function(data,
   
 }
 
+
+#' Retrieve default y axis label
+#'
+#' @return string
+#' @noRd
+y_axis_title.autospc_chart_c <- function(chart) {
+  return("Number")
+}
+
+

@@ -1,5 +1,9 @@
 # autospc_chart_c class
 
+#' Construct an autospc_chart_c object
+#'
+#' @return An object of class `c("autospc_chart_c", "autospc_chart")`.
+#' @noRd
 new_autospc_chart_c <- function(x) {
   
   return(
@@ -10,6 +14,12 @@ new_autospc_chart_c <- function(x) {
 }
 
 
+#' Validate an autospc_chart_c object
+#'
+#' See `validate_autospc_chart()` for the class contract.
+#'
+#' @return `x`, unchanged, if valid; otherwise an error.
+#' @noRd
 validate_autospc_chart_c <- function(x) {
   
   if(!inherits(x, "autospc_chart_c")) {
@@ -23,6 +33,12 @@ validate_autospc_chart_c <- function(x) {
 }
 
 
+#' Create an autospc_chart_c object
+#'
+#' Helper for C charts: assemble, construct, validate, return.
+#'
+#' @return An object of class `c("autospc_chart_c", "autospc_chart")`.
+#' @noRd
 autospc_chart_c <- function(data,
                             x,
                             y,

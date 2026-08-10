@@ -1,5 +1,9 @@
 # autospc_chart class
 
+#' Construct an autospc_chart object from an already-assembled list.
+#'
+#' @return An object of class `c(class, "autospc_chart")`.
+#' @noRd
 new_autospc_chart <- function(x = list(),
                               class = character()) {
   
@@ -14,6 +18,21 @@ new_autospc_chart <- function(x = list(),
 }
 
 
+#' Validate an autospc_chart object
+#'
+#' Checks internal consistency and returns the object unchanged. Called by each
+#' subclass validator, which runs its own checks first and then delegates here.
+#'
+#' **Class contract.** A validated `autospc_chart` object is guaranteed to be:
+#'
+#' - a list whose class vector is `c(<subclass>, "autospc_chart")`, in that
+#'   order
+#' - carrying every element named by `autospc_chart_elements()`.
+#'
+#' Additional elements are permitted - subclasses add their own
+#'
+#' @return `x`, unchanged, if valid; otherwise an error.
+#' @noRd
 validate_autospc_chart <- function(x) {
   
   if(!inherits(x, "autospc_chart")) {
@@ -36,6 +55,13 @@ validate_autospc_chart <- function(x) {
 }
 
 
+#' Elements common to all autospc_chart objects
+#'
+#' These names are duplicated by `autospc_chart_list()`, which assembles
+#' exactly these elements - adding one means adding it in both places.
+#'
+#' @return A character vector of element names.
+#' @noRd
 autospc_chart_elements <- function() {
   
   chart_elements <- c(
@@ -59,6 +85,12 @@ autospc_chart_elements <- function() {
 }
 
 
+#' Create an autospc_chart object
+#'
+#' Provisional
+#'
+#' @return An object of class `"autospc_chart"`.
+#' @noRd
 autospc_chart <- function(data,
                           x,
                           y,
@@ -78,6 +110,17 @@ autospc_chart <- function(data,
 }
 
 
+#' Assemble the elements common to all autospc_chart objects
+#'
+#' Assembles the shared elements and returns a plain, unclassed list, which each
+#' subclass helper then appends to, constructs from and validates. Defaults for
+#' the shared elements live here.
+#'
+#' The signature is deliberately **closed**
+#'
+#' @return A named list holding the elements given by
+#'   `autospc_chart_elements()`.
+#' @noRd
 autospc_chart_list <- function(data,
                                x,
                                y,

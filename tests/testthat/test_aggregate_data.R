@@ -55,7 +55,7 @@ test_cchart_aggregated_data <- readRDS(
 
 test_that("binary aggregation works", {
   
-  aggregated_data <- aggregate_data(df = test_pchart_aggregation_data,
+  aggregated_data <- aggregate_data_deprecated(df = test_pchart_aggregation_data,
                                     chart_type = "P")
   
   expect_equal(aggregated_data$x,
@@ -70,7 +70,7 @@ test_that("binary aggregation works", {
 
 test_that("count aggregation works", {
   
-  aggregated_data <- aggregate_data(df = test_cchart_aggregation_data,
+  aggregated_data <- aggregate_data_deprecated(df = test_cchart_aggregation_data,
                                     chart_type = "C")
   
   expect_equal(aggregated_data$x,

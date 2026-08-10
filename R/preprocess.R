@@ -135,7 +135,7 @@ The column specified in the argument n will be used.")
 
 
 # Aggregate data
-aggregate_data <- function(df,
+aggregate_data_deprecated <- function(df,
                            chart_type) {
   
   any_multiple_x <- df %>%

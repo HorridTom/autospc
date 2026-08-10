@@ -245,7 +245,7 @@ autospc <- function(data,
   
   # Aggregate data
   if(!(chart_type %in% c("XMR", "MR"))) {
-    data <- aggregate_data(df = data,
+    data <- aggregate_data_deprecated(df = data,
                            chart_type = chart_type)
   }
   

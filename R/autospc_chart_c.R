@@ -57,6 +57,26 @@ autospc_chart_c <- function(data,
   
 }
 
+# Methods
+
+#' Aggregate data for analysis
+#' 
+#' Sums y (count) over x (subgroup)
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+aggregate_data.autospc_chart_c <- function(chart) {
+  
+  df_agg <- chart$data %>%
+    dplyr::group_by(x) %>%
+    dplyr::summarise(y = sum(y))
+  
+  chart$data <- df_agg
+  
+  return(chart)
+  
+}
+
 
 #' Retrieve default y axis label
 #'

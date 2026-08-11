@@ -161,3 +161,21 @@ autospc_chart_list <- function(data,
   
 }
 
+
+# Methods
+
+#' Aggregate data for analysis
+#' 
+#' Returns the chart object unchanged, this reflects that the default behaviour
+#' is no aggregation, unless overridden by specific subclass methods
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+aggregate_data.autospc_chart <- function(chart) {
+  
+  return(chart)
+  
+}
+
+
+

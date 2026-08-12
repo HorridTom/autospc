@@ -90,7 +90,7 @@ autospc_chart_p <- function(data,
 }
 
 
-# Methods
+# Analysis methods
 
 #' Aggregate data for analysis
 #' 
@@ -157,6 +157,9 @@ calculate_limits.autospc_chart_p <- function(chart,
   
 }
 
+
+# Presentation methods
+
 #' Chart name
 #'
 #' @return string, name of chart for labels
@@ -173,4 +176,3 @@ chart_type_label.autospc_chart_p <- function(chart) {
 y_axis_title.autospc_chart_p <- function(chart) {
   return("Percentage")
 }
-

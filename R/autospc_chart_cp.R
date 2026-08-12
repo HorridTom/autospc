@@ -58,7 +58,7 @@ autospc_chart_cp <- function(data,
 }
 
 
-# Methods
+# Analysis methods
 
 #' Aggregate data for analysis
 #'
@@ -76,24 +76,6 @@ aggregate_data.autospc_chart_cp <- function(chart) {
 
   return(chart)
 
-}
-
-
-#' Retrieve default y axis label
-#'
-#' @return string
-#' @noRd
-y_axis_title.autospc_chart_cp <- function(chart) {
-  return("Number")
-}
-
-
-#' Chart name
-#'
-#' @return string, name of chart for labels
-#' @noRd
-chart_type_label.autospc_chart_cp <- function(chart) {
-  return("C'")
 }
 
 
@@ -115,4 +97,24 @@ calculate_limits.autospc_chart_cp <- function(chart,
 
   return(limits)
 
+}
+
+
+# Presentation methods
+
+#' Chart name
+#'
+#' @return string, name of chart for labels
+#' @noRd
+chart_type_label.autospc_chart_cp <- function(chart) {
+  return("C'")
+}
+
+
+#' Retrieve default y axis label
+#'
+#' @return string
+#' @noRd
+y_axis_title.autospc_chart_cp <- function(chart) {
+  return("Number")
 }

@@ -1,6 +1,3 @@
-test_data <- data.frame(x = 1:3, y = 1:3)
-
-
 test_that("new_autospc_chart rejects an object that is not a list", {
 
   expect_error(new_autospc_chart("not a list"), "is\\.list")

@@ -22,10 +22,12 @@ binary_degenerate_data <- data.frame(x = 1:5,
 # a calculation period as the algorithm builds it for P charts: y holds
 # percentages and y_numerator holds the counts, so a method reading the wrong
 # column produces a different answer rather than an error
-period_data <- data.frame(x = 1:5,
-                          y_numerator = c(3, 4, 2, 5, 3),
-                          n = rep(20, 5),
-                          y = c(3, 4, 2, 5, 3) * 100 / rep(20, 5))
+proportion_period_data <- data.frame(
+  x = 1:5,
+  y_numerator = c(3, 4, 2, 5, 3),
+  n = rep(20, 5),
+  y = c(3, 4, 2, 5, 3) * 100 / rep(20, 5)
+)
 
 chart_p <- function(data, ...) {
   autospc_chart_p(data = data, x = "x", y = "y", n = "n", ...)
@@ -213,9 +215,10 @@ test_that("aggregate_data returns a chart and leaves data_original untouched", {
 test_that("calculate_limits matches get_p_limits", {
 
   expect_identical(
-    calculate_limits(chart_p(pre_agg_data), period_data, exclusion_points = NULL),
-    get_p_limits(y = period_data$y_numerator,
-                 n = period_data$n,
+    calculate_limits(chart_p(pre_agg_data), proportion_period_data,
+                     exclusion_points = NULL),
+    get_p_limits(y = proportion_period_data$y_numerator,
+                 n = proportion_period_data$n,
                  exclusion_points = NULL,
                  multiply = 100)
   )
@@ -225,12 +228,14 @@ test_that("calculate_limits matches get_p_limits", {
 
 test_that("calculate_limits uses y_numerator, not the percentage column y", {
 
-  # period_data$y holds percentages; using it would give a centre line of 85
+  # the y column holds percentages; using it would give a centre line of 85
   # rather than the true 17%, with no error raised
-  limits <- calculate_limits(chart_p(pre_agg_data), period_data, NULL)
+  limits <- calculate_limits(chart_p(pre_agg_data),
+                             proportion_period_data, NULL)
 
   expect_equal(limits$cl[1],
-               sum(period_data$y_numerator) / sum(period_data$n) * 100)
+               sum(proportion_period_data$y_numerator) /
+                 sum(proportion_period_data$n) * 100)
 
 })
 
@@ -238,16 +243,21 @@ test_that("calculate_limits uses y_numerator, not the percentage column y", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(chart_p(pre_agg_data), period_data, exclusion_points = 4L),
-    get_p_limits(y = period_data$y_numerator,
-                 n = period_data$n,
+    calculate_limits(chart_p(pre_agg_data), proportion_period_data,
+                     exclusion_points = 4L),
+    get_p_limits(y = proportion_period_data$y_numerator,
+                 n = proportion_period_data$n,
                  exclusion_points = 4L,
                  multiply = 100)
   )
 
   # excluding the highest point must lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
-  expect_lt(calculate_limits(chart_p(pre_agg_data), period_data, 4L)$cl[1],
-            calculate_limits(chart_p(pre_agg_data), period_data, NULL)$cl[1])
+  with_excl <- calculate_limits(chart_p(pre_agg_data),
+                                proportion_period_data, 4L)
+  without   <- calculate_limits(chart_p(pre_agg_data),
+                                proportion_period_data, NULL)
+
+  expect_lt(with_excl$cl[1], without$cl[1])
 
 })

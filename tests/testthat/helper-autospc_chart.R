@@ -1,0 +1,21 @@
+# Fixtures shared by the autospc_chart class test files. Sourced by testthat
+# before any test runs.
+#
+# Only genuinely shared data belongs here. Fixtures that exist because a class
+# needs something the shared ones cannot express stay in their own file:
+# screening_data in test-autospc_chart_cp.R, and the P fixtures in
+# test-autospc_chart_p.R.
+
+# three rows, one per subgroup
+test_data <- data.frame(x = 1:3, y = 1:3)
+
+# two rows per subgroup, plus a column the aggregation is expected to drop
+dup_data <- data.frame(x = rep(1:3, each = 2),
+                       y = c(1, 2, 10, 20, 100, 200),
+                       site = "a")
+
+# a calculation period of counts with one obvious high point, so that excluding
+# it demonstrably moves the limits. Named for the count charts because the
+# proportion charts need a period carrying y_numerator and n as well.
+count_period_data <- data.frame(x = 1:10,
+                                y = c(12, 15, 11, 14, 13, 30, 12, 14, 13, 11))

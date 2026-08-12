@@ -1,10 +1,3 @@
-test_data <- data.frame(x = 1:3, y = 1:3)
-
-# two rows per subgroup, plus a column the aggregation is expected to drop
-dup_data <- data.frame(x = rep(1:3, each = 2),
-                       y = c(1, 2, 10, 20, 100, 200),
-                       site = "a")
-
 test_chart_c <- function(...) {
   autospc_chart_c(data = test_data, x = "x", y = "y", ...)
 }
@@ -189,17 +182,12 @@ test_that("chart_type_label returns the C chart label", {
 })
 
 
-# a calculation period with one obvious high point, so that excluding it
-# demonstrably moves the limits
-period_data <- data.frame(x = 1:10,
-                          y = c(12, 15, 11, 14, 13, 30, 12, 14, 13, 11))
-
-
 test_that("calculate_limits matches get_c_limits", {
 
   expect_identical(
-    calculate_limits(test_chart_c(), period_data, exclusion_points = NULL),
-    get_c_limits(y = period_data$y, exclusion_points = NULL)
+    calculate_limits(test_chart_c(), count_period_data,
+                     exclusion_points = NULL),
+    get_c_limits(y = count_period_data$y, exclusion_points = NULL)
   )
 
 })
@@ -208,13 +196,14 @@ test_that("calculate_limits matches get_c_limits", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(test_chart_c(), period_data, exclusion_points = 6L),
-    get_c_limits(y = period_data$y, exclusion_points = 6L)
+    calculate_limits(test_chart_c(), count_period_data,
+                     exclusion_points = 6L),
+    get_c_limits(y = count_period_data$y, exclusion_points = 6L)
   )
 
   # excluding the high point must actually lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
-  expect_lt(calculate_limits(test_chart_c(), period_data, 6L)$cl[1],
-            calculate_limits(test_chart_c(), period_data, NULL)$cl[1])
+  expect_lt(calculate_limits(test_chart_c(), count_period_data, 6L)$cl[1],
+            calculate_limits(test_chart_c(), count_period_data, NULL)$cl[1])
 
 })

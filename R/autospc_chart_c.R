@@ -78,6 +78,37 @@ aggregate_data.autospc_chart_c <- function(chart) {
 }
 
 
+#' Calculate control limits for a subset of C-chart data
+#' 
+#' Centre line and limits are established using standard formulae based on the
+#' Poisson distribution (see e.g. Provost and Murray) for non-excluded data
+#' points
+#'
+#' @return list of three vectors (cl, ucl, lcl), each the same length as period
+#' @noRd
+calculate_limits.autospc_chart_c <- function(chart,
+                                             period,
+                                             exclusion_points) {
+  
+  limits <- get_c_limits(y = period$y,
+                         exclusion_points = exclusion_points)
+  
+  return(limits)
+  
+}
+
+
+#' Chart name
+#'
+#' @return string, name of chart for labels
+#' @noRd
+chart_type_label.autospc_chart_c <- function(chart) {
+  
+  return("C")
+  
+}
+
+
 #' Retrieve default y axis label
 #'
 #' @return string

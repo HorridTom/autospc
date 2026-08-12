@@ -101,38 +101,12 @@ autospc_chart_p <- function(data,
 #' @return autospc_chart_p object
 #' @noRd
 aggregate_data.autospc_chart_p <- function(chart) {
-  
-  any_multiple_x <- chart$data %>%
-    dplyr::group_by(x) %>%
-    dplyr::summarise(num_rows = dplyr::n()) %>%
-    dplyr::mutate(multiple_rows = num_rows > 1L) %>%
-    dplyr::pull(multiple_rows) %>%
-    any()
-  
-  # Check if data fully pre-aggregated, return with the same column signature
-  # as the aggregated route if so
-  if(("n" %in% colnames(chart$data)) &&
-     is.numeric(chart$data$y) &&
-     !any_multiple_x) {
-    chart$data <- chart$data %>%
-      dplyr::select(x, y, n)
-    
-    return(chart)
-  }
-  
-  # Set up n for aggregation if data provided as individual binary observations
-  if(!("n" %in% colnames(chart$data)) && is.logical(chart$data$y)) {
-    chart$data <- chart$data %>%
-      dplyr::mutate(n = 1L)
-  }
-  
-  chart$data <- chart$data %>%
-    dplyr::group_by(x) %>%
-    dplyr::summarise(y = sum(y),
-                     n = sum(n))
-  
-  return(chart)
-  
+
+  return(
+    aggregate_ratios(chart,
+                     allow_individual_observations = TRUE)
+  )
+
 }
 
 

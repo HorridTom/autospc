@@ -33,14 +33,12 @@ enough_data_for_new_period <- function(data,
 # Function to find most extreme points outside of control limits and return
 # their positions
 find_extremes <- function(data,
-                          chart_type,
-                          chart = NULL,
+                          chart,
                           counter,
                           period_min,
                           max_exclusions,
                           centre_line_tolerance,
-                          shift_rule_threshold,
-                          mr_screen_max_loops){
+                          shift_rule_threshold){
   
   #initialise variables
   i <- 1
@@ -51,42 +49,10 @@ find_extremes <- function(data,
     
     calculation_period <- data[counter:(counter + period_min - 1),]
     
-    if(chart_type == "C"){
-      limits_list <- get_c_limits(y = calculation_period$y,
-                                  exclusion_points = exclusion_points)
-      
-    }else if(chart_type == "C'"){
-      limits_list <- get_cp_limits(y = calculation_period$y,
-                                   exclusion_points = exclusion_points,
-                                   mr_screen_max_loops = mr_screen_max_loops)
-      
-    }else if(chart_type == "P"){
-      limits_list <- get_p_limits(y = calculation_period$y_numerator,
-                                  n = calculation_period$n,
-                                  exclusion_points = exclusion_points,
-                                  multiply = 100)
-      
-    }else if(chart_type == "P'"){
-      limits_list <- get_pp_limits(y = calculation_period$y_numerator,
-                                   n = calculation_period$n,
-                                   exclusion_points = exclusion_points,
-                                   multiply = 100,
-                                   mr_screen_max_loops = mr_screen_max_loops)
-      
-    }else if(chart_type == "XMR"){
-      limits_list <- get_i_limits(y = calculation_period$y,
-                                  exclusion_points = exclusion_points,
-                                  mr_screen_max_loops = mr_screen_max_loops)
-      
-    }else if(chart_type == "MR"){
-      limits_list <- get_mr_limits(mr = calculation_period$y,
-                                   exclusion_points = exclusion_points,
-                                   mr_screen_max_loops = 0L)  
-      calculation_period$y <- get_mr_limits(mr = calculation_period$y,
-                                            exclusion_points = NULL,
-                                            mr_screen_max_loops = 0L)$mr
-    }
-    
+    limits_list <- calculate_limits(chart = chart,
+                                    period = calculation_period,
+                                    exclusion_points = exclusion_points)
+
     calculation_period$cl <- limits_list$cl
     calculation_period$ucl <- limits_list$ucl
     calculation_period$lcl <- limits_list$lcl

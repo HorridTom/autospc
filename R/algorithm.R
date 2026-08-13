@@ -133,8 +133,7 @@ create_SPC_auto_limits_table <- function(data,
       chart = chart, 
       max_exclusions  = max_exclusions, 
       centre_line_tolerance = centre_line_tolerance,
-      shift_rule_threshold = shift_rule_threshold,
-      mr_screen_max_loops = mr_screen_max_loops)
+      shift_rule_threshold = shift_rule_threshold)
     
     limits_table <- record_log_entry(df = limits_table,
                                      counter = counter,
@@ -267,8 +266,7 @@ create_SPC_auto_limits_table <- function(data,
                 chart = chart,
                 max_exclusions = max_exclusions,
                 centre_line_tolerance = centre_line_tolerance,
-                shift_rule_threshold = shift_rule_threshold,
-                mr_screen_max_loops = mr_screen_max_loops)
+                shift_rule_threshold = shift_rule_threshold)
               
               # Establish whether there is a rule break in the opposite
               # direction within this calculation period

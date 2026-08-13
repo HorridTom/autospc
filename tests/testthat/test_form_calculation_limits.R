@@ -1,9 +1,14 @@
 #load in test data
 test_data <- readRDS("testdata/test_data.rds")
 
+# form_calculation_limits() gets which limits to calculate from the chart
+# object, so one has to be supplied. These figures are C chart limits.
+test_chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
+
 test_that("Calculation period is formed correctly",{
   
   result_counter_one <- form_calculation_limits(test_data,
+                                                chart = test_chart,
                                                 counter = 1,
                                                 period_min = 21,
                                                 baseline_length = NULL,
@@ -14,6 +19,7 @@ test_that("Calculation period is formed correctly",{
   result_counter_one_lcl <- result_counter_one$lcl[1:21]
   
   result_counter_100 <- form_calculation_limits(result_counter_one,
+                                                chart = test_chart,
                                                 counter = 100,
                                                 period_min = 21,
                                                 baseline_length = NULL,

@@ -261,35 +261,3 @@ test_that("every chart type a user can pass can be built", {
   }
 
 })
-
-
-test_that("autospc() builds a chart object during a real run", {
-
-  # TEMPORARY - delete when autospc() starts using the chart object. See
-  # CLEAN UP #16 in the worklist.
-  #
-  # Nothing reads the chart object yet, so if chart_type_for_object() started
-  # returning NULL for everything, no object would ever be built and every
-  # other test would still pass. This is the only test that checks autospc()
-  # really does call autospc_chart(). Once the object is used, the end to end
-  # tests cover that and this one should go.
-  built <- autospc_chart
-
-  called <- NULL
-
-  testthat::local_mocked_bindings(
-    autospc_chart = function(chart_type, ...) {
-      called <<- chart_type
-      built(chart_type = chart_type, ...)
-    }
-  )
-
-  invisible(autospc(autospc::ed_attendances_monthly,
-                    chart_type = "C'",
-                    x = month_start,
-                    y = att_all,
-                    plot_chart = FALSE))
-
-  expect_identical(called, "C'")
-
-})

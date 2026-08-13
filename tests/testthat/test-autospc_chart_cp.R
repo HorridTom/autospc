@@ -1,10 +1,3 @@
-# a more extreme point, needed for the moving-range screening test: with a peak
-# of 30 the two large moving ranges (17, 18) fall just under the MR upper limit,
-# so screening changes nothing and the test could not tell whether
-# mr_screen_max_loops was read at all
-screening_data <- data.frame(x = 1:10,
-                             y = c(12, 15, 11, 14, 13, 60, 12, 14, 13, 11))
-
 test_chart_cp <- function(...) {
   autospc_chart_cp(data = test_data, x = "x", y = "y", ...)
 }

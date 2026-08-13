@@ -19,3 +19,12 @@ dup_data <- data.frame(x = rep(1:3, each = 2),
 # proportion charts need a period carrying y_numerator and n as well.
 count_period_data <- data.frame(x = 1:10,
                                 y = c(12, 15, 11, 14, 13, 30, 12, 14, 13, 11))
+
+# a calculation period with a peak extreme enough that moving-range screening
+# actually changes the limits. The count period above will not do: its peak of
+# 30 leaves the two large moving ranges just under the MR upper limit, so
+# screening is inert and a test using it cannot tell whether
+# mr_screen_max_loops was read at all. Verified to bite for both
+# get_cp_limits() and get_i_limits().
+screening_data <- data.frame(x = 1:10,
+                             y = c(12, 15, 11, 14, 13, 60, 12, 14, 13, 11))

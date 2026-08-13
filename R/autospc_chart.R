@@ -104,6 +104,27 @@ autospc_chart_types <- function() {
 }
 
 
+#' Is there an autospc_chart class for this chart_type?
+#'
+#' Scaffolding for the transition: lets `autospc()` build a chart object only
+#' where one can be built, leaving its error behaviour otherwise untouched.
+#' Delete once every chart type has a class and the factory call is
+#' unconditional.
+#'
+#' @return TRUE or FALSE.
+#' @noRd
+has_autospc_chart_class <- function(chart_type) {
+
+  if(!is.character(chart_type) || length(chart_type) != 1) {
+    return(FALSE)
+  }
+
+  # XMR needs two SSA runs and the plot object, so it has no class yet
+  return(chart_type %in% setdiff(autospc_chart_types(), "XMR"))
+
+}
+
+
 #' Create an autospc_chart object of the class given by chart_type
 #'
 #' `n` is evaluated only on the P and P' branches, so it may be missing for the

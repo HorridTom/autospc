@@ -218,7 +218,31 @@ autospc <- function(data,
 ) { 
   
   df_original <- data
-  
+
+  # Build the chart object, from the data exactly as passed. Nothing reads it
+  # yet - the pipeline below is unchanged.
+  if(has_autospc_chart_class(chart_type)) {
+
+    chart <- autospc_chart(
+      chart_type = chart_type,
+      data = data,
+      x = resolve_column_name(rlang::enquo(x), "x"),
+      y = resolve_column_name(rlang::enquo(y), "y"),
+      n = resolve_column_name(rlang::enquo(n), "n"),
+      period_min = period_min,
+      baseline_length = baseline_length,
+      shift_rule_threshold = shift_rule_threshold,
+      baseline_only = baseline_only,
+      establish_every_shift = establish_every_shift,
+      no_regrets = no_regrets,
+      overhanging_reversions = overhanging_reversions,
+      max_exclusions = max_exclusions,
+      mr_screen_max_loops = mr_screen_max_loops,
+      centre_line_tolerance = centre_line_tolerance
+    )
+
+  }
+
   # Rename columns if passed
   data <- rename_columns(df = data,
                          x = {{ x }}, y = {{ y }}, n = {{ n }})

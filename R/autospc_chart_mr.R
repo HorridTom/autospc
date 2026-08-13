@@ -49,6 +49,9 @@ autospc_chart_mr <- function(data,
                                            y = y,
                                            ...)
 
+  autospc_chart_mr_l <- normalise_columns(autospc_chart_mr_l,
+                                          fields = c("x", "y"))
+
   autospc_chart_mr_object <- new_autospc_chart_mr(autospc_chart_mr_l)
 
   autospc_chart_mr_object <- validate_autospc_chart_mr(autospc_chart_mr_object)

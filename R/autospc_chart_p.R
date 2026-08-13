@@ -81,6 +81,9 @@ autospc_chart_p <- function(data,
   autospc_chart_p_l <- c(autospc_chart_p_l,
                          list(n = n))
   
+  autospc_chart_p_l <- normalise_columns(autospc_chart_p_l,
+                                         fields = c("x", "y", "n"))
+
   autospc_chart_p_object <- new_autospc_chart_p(autospc_chart_p_l)
   
   autospc_chart_p_object <- validate_autospc_chart_p(autospc_chart_p_object)

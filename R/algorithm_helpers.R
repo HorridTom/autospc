@@ -34,6 +34,7 @@ enough_data_for_new_period <- function(data,
 # their positions
 find_extremes <- function(data,
                           chart_type,
+                          chart = NULL,
                           counter,
                           period_min,
                           max_exclusions,

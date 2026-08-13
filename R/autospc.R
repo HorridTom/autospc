@@ -223,7 +223,9 @@ autospc <- function(data,
   # yet - the pipeline below is unchanged.
   #
   # The if() is TEMPORARY and goes when every chart type has a class - see
-  # CLEAN UP #16 in the worklist.
+  # CLEAN UP #16 in the worklist. Until then chart stays NULL for XMR.
+  chart <- NULL
+
   if(has_autospc_chart_class(chart_type)) {
 
     chart <- autospc_chart(
@@ -279,7 +281,8 @@ autospc <- function(data,
   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,
-    chart_type = chart_type, 
+    chart_type = chart_type,
+    chart = chart,
     period_min = period_min,
     baseline_length = baseline_length,
     shift_rule_threshold = shift_rule_threshold,

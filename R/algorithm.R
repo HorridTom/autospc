@@ -4,6 +4,8 @@
 #' recalculation of control limits.
 #' 
 #' @inheritParams autospc
+#' @param chart Optional `autospc_chart` object. Built from the other arguments
+#'   if not supplied. Nothing reads it yet.
 #'
 #' @return data frame with limits, rule breaks and additional info needed for
 #'   plotting
@@ -37,6 +39,7 @@
 #' @export
 create_SPC_auto_limits_table <- function(data, 
                                          chart_type,
+                                         chart = NULL,
                                          period_min,
                                          baseline_length,
                                          shift_rule_threshold,
@@ -50,6 +53,26 @@ create_SPC_auto_limits_table <- function(data,
                                          overhanging_reversions,
                                          mr_screen_max_loops
 ) {
+  
+  # autospc() passes its own chart object in. Anything calling this directly
+  # gets one built here from the arguments it supplied. Nothing reads it yet.
+  if(is.null(chart) && has_autospc_chart_class(chart_type)) {
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = data,
+                           x = "x",
+                           y = "y",
+                           n = "n",
+                           period_min = period_min,
+                           baseline_length = baseline_length,
+                           shift_rule_threshold = shift_rule_threshold,
+                           baseline_only = baseline_only,
+                           establish_every_shift = establish_every_shift,
+                           no_regrets = no_regrets,
+                           overhanging_reversions = overhanging_reversions,
+                           max_exclusions = max_exclusions,
+                           mr_screen_max_loops = mr_screen_max_loops,
+                           centre_line_tolerance = centre_line_tolerance)
+  }
   
   if(no_regrets & !overhanging_reversions) {
     warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
@@ -105,6 +128,7 @@ create_SPC_auto_limits_table <- function(data,
       baseline_length = baseline_length,
       counter_at_period_start = counter, 
       chart_type = chart_type, 
+      chart = chart, 
       max_exclusions  = max_exclusions, 
       centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold,
@@ -238,6 +262,7 @@ create_SPC_auto_limits_table <- function(data,
                 baseline_length = baseline_length,
                 counter_at_period_start = counter,
                 chart_type = chart_type,
+                chart = chart,
                 max_exclusions = max_exclusions,
                 centre_line_tolerance = centre_line_tolerance,
                 shift_rule_threshold = shift_rule_threshold,

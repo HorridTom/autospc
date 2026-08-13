@@ -4,17 +4,14 @@ enough_data_for_new_period <- function(data,
                                        period_min,
                                        baseline_length,
                                        counter,
-                                       chart_type){
+                                       chart){
   
-  num_remaining_non_missing_data_points <- data %>%
-    dplyr::filter(dplyr::row_number() >= counter) %>%
-    dplyr::filter(!is.na(y)) %>%
-    nrow()
+  remaining_data <- data %>%
+    dplyr::filter(dplyr::row_number() >= counter)
   
-  if(chart_type == "MR") {
-    num_remaining_non_missing_data_points <-
-      num_remaining_non_missing_data_points + 1L
-  }
+  num_remaining_non_missing_data_points <- n_effective_points(
+    chart = chart,
+    data = remaining_data)
   
   if(counter == 1L & !is.null(baseline_length)) {
     

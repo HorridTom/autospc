@@ -173,3 +173,15 @@ test_that("calculate_limits ignores mr_screen_max_loops on the chart", {
   )
 
 })
+
+
+test_that("n_effective_points adds one to the moving ranges", {
+
+  # get_mrs() prepends NA, so an MR series has one fewer non-missing value than
+  # the series it came from, and the data-sufficiency checks are about that
+  # underlying series
+  counted <- data.frame(y = c(NA, 3, 6, 7))
+
+  expect_identical(n_effective_points(test_chart_mr(), counted), 4L)
+
+})

@@ -107,7 +107,7 @@ create_SPC_auto_limits_table <- function(data,
                                  period_min = period_min,
                                  baseline_length = baseline_length,
                                  counter = counter,
-                                 chart_type = chart_type)){
+                                 chart = chart)){
     
     data <- record_log_entry(df = data,
                              counter = counter,
@@ -159,7 +159,7 @@ create_SPC_auto_limits_table <- function(data,
                                        period_min = period_min,
                                        baseline_length = baseline_length,
                                        counter = counter,
-                                       chart_type = chart_type)) {        
+                                       chart = chart)) {        
           
           limits_table <- record_log_entry(df = limits_table,
                                            counter = counter,
@@ -243,7 +243,7 @@ create_SPC_auto_limits_table <- function(data,
                                            period_min = period_min,
                                            baseline_length = baseline_length,
                                            counter = counter,
-                                           chart_type = chart_type)){
+                                           chart = chart)){
               
               limits_table <- record_log_entry(df = limits_table,
                                                counter = counter,

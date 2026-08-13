@@ -238,6 +238,24 @@ aggregate_data.autospc_chart <- function(chart) {
 }
 
 
+#' Number of points available for analysis
+#'
+#' The non-missing values of `y`.
+#'
+#' @return integer
+#' @noRd
+n_effective_points.autospc_chart <- function(chart,
+                                             data) {
+
+  points <- data %>%
+    dplyr::filter(!is.na(y)) %>%
+    nrow()
+
+  return(points)
+
+}
+
+
 #' Columns the limits table carries in addition to the common ones
 #'
 #' None by default. Overridden by the classes whose limits are calculated from

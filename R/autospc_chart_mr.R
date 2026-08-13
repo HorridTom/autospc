@@ -66,6 +66,25 @@ autospc_chart_mr <- function(data,
 # No aggregate_data() method: MR charts plot one moving range per observation, so
 # the superclass default - return the chart unchanged - is the correct behaviour.
 
+#' Number of points available for analysis
+#'
+#' One more than the non-missing moving ranges. `get_mrs()` prepends `NA`, so an
+#' MR series always has exactly one fewer non-missing value than the series it
+#' was derived from, and the algorithm's data-sufficiency checks are about that
+#' underlying series.
+#'
+#' @return integer
+#' @noRd
+n_effective_points.autospc_chart_mr <- function(chart,
+                                                data) {
+
+  points <- NextMethod() + 1L
+
+  return(points)
+
+}
+
+
 #' Calculate control limits for a subset of MR-chart data
 #'
 #' Centre line is the mean moving range of the non-excluded points, with the

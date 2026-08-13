@@ -54,3 +54,22 @@ test_that("mr_screen_max_loops makes no difference to mr chart limits",{
   expect_equal(results_table_inf, results_table_0)
   
 })
+
+
+test_that("an MR chart gets limits from the same number of points as an X chart", {
+
+  # 21 values give 20 moving ranges, so without the +1 in
+  # n_effective_points.autospc_chart_mr() an MR chart would be refused limits
+  # at exactly period_min points while the X chart it came from is not
+  just_enough <- data.frame(x = 1:21, y = rep(c(4, 7, 5), 7))
+  one_short   <- data.frame(x = 1:20, y = rep(c(4, 7, 5, 6), 5))
+
+  expect_warning(autospc(just_enough, chart_type = "MR", plot_chart = FALSE,
+                         period_min = 21),
+                 regexp = NA)
+
+  expect_warning(autospc(one_short, chart_type = "MR", plot_chart = FALSE,
+                         period_min = 21),
+                 "fewer than the minimum")
+
+})

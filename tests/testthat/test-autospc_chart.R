@@ -187,6 +187,39 @@ test_that("autospc_chart keeps data_original as passed", {
 })
 
 
+# n_effective_points()
+
+test_that("n_effective_points counts the non-missing values of y", {
+
+  chart <- autospc_chart(chart_type = "C",
+                         data = factory_data,
+                         x = "x",
+                         y = "y")
+
+  expect_identical(n_effective_points(chart, data.frame(y = c(1, NA, 3, 4))),
+                   3L)
+
+})
+
+
+test_that("the classes other than MR count the rows as they are", {
+
+  counted <- data.frame(y = c(1, NA, 3, 4))
+
+  for(chart_type in c("C", "C'", "X")) {
+
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y")
+
+    expect_identical(n_effective_points(chart, counted), 3L, info = chart_type)
+
+  }
+
+})
+
+
 # limits_table_columns()
 
 test_that("limits_table_columns is empty by default", {

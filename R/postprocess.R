@@ -5,6 +5,7 @@
 postprocess <- function(
     df,
     chart_type = NULL,
+    chart,
     period_min = 21,
     show_limits = TRUE,
     override_x_title = NULL,
@@ -15,13 +16,7 @@ postprocess <- function(
     xType
 ) {
   
-  num_non_missing_y <- df %>%
-    dplyr::filter(!is.na(y)) %>%
-    nrow()
-  
-  if(chart_type == "MR") {
-    num_non_missing_y <- num_non_missing_y + 1L
-  }
+  num_non_missing_y <- n_effective_points(chart = chart, data = df)
   
   # Start and end dates
   if(!is.null(extend_limits_to) && is.null(x_pad_end)) {

@@ -9,6 +9,20 @@ aggregate_data <- function(chart) {
 }
 
 
+#' Number of points available for analysis
+#'
+#' Used to decide whether there is enough data to form a period.
+#'
+#' @param data a dataframe with a y column
+#'
+#' @return integer
+#' @noRd
+n_effective_points <- function(chart,
+                               data) {
+  UseMethod("n_effective_points")
+}
+
+
 #' Calculate control limits for a subset of the chart data
 #' 
 #' @param period a dataframe providing the subset of the data to use as

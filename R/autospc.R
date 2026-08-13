@@ -313,6 +313,7 @@ autospc <- function(data,
   postprocessing_vars <- postprocess(
     df = data,
     chart_type = chart_type,
+    chart = chart,
     period_min = period_min,
     show_limits = show_limits,
     override_x_title = override_x_title,

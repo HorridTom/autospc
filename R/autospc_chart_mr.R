@@ -66,6 +66,29 @@ autospc_chart_mr <- function(data,
 # No aggregate_data() method: MR charts plot one moving range per observation, so
 # the superclass default - return the chart unchanged - is the correct behaviour.
 
+#' Turn the aggregated data into the series the algorithm analyses
+#'
+#' An MR chart analyses the moving ranges, so `y` is replaced by them. Nothing
+#' downstream needs the original values, and `chart$data_original` keeps what
+#' the user supplied.
+#'
+#' `get_mrs()` prepends `NA`, so the series stays aligned with `x` and is one
+#' non-missing value shorter - see `n_effective_points()`.
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+prepare_data.autospc_chart_mr <- function(chart) {
+
+  mrs <- get_mrs(y = chart$data$y)
+
+  chart$data <- chart$data %>%
+    dplyr::mutate(y = mrs)
+
+  return(chart)
+
+}
+
+
 #' Number of points available for analysis
 #'
 #' One more than the non-missing moving ranges. `get_mrs()` prepends `NA`, so an
@@ -102,7 +125,7 @@ calculate_limits.autospc_chart_mr <- function(chart,
                                               period,
                                               exclusion_points) {
 
-  # period$y holds the moving ranges by this point in the pipeline
+  # period$y holds the moving ranges, put there by prepare_data()
   limits <- get_mr_limits(mr = period$y,
                           mr_screen_max_loops = 0L,
                           exclusion_points = exclusion_points)
@@ -110,7 +133,6 @@ calculate_limits.autospc_chart_mr <- function(chart,
   return(limits)
 
 }
-
 
 # Presentation methods
 

@@ -73,3 +73,21 @@ test_that("an MR chart gets limits from the same number of points as an X chart"
                  "fewer than the minimum")
 
 })
+
+
+test_that("an MR chart analyses the moving ranges, not the values passed in", {
+
+  # prepare_data.autospc_chart_mr() replaces y with the moving ranges. Without
+  # it the algorithm would run on the raw series and the returned y would be
+  # what was passed in.
+  values <- data.frame(x = 1:25, y = rep(c(10, 14, 11, 16, 12), 5))
+
+  result <- autospc(values, chart_type = "MR", plot_chart = FALSE,
+                    period_min = 21)
+
+  expect_identical(result$y, get_mrs(values$y))
+
+  # and the centre line is the mean moving range, not the mean value
+  expect_lt(result$cl[21], mean(values$y))
+
+})

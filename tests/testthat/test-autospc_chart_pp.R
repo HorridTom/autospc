@@ -366,3 +366,34 @@ test_that("extrapolate_limits leaves out the excluded points", {
   expect_lt(without_spike$cl, with_spike$cl)
 
 })
+
+
+test_that("prepare_data turns counts into percentages and keeps the count", {
+
+  counts <- data.frame(x = 1:4,
+                       y = c(10, 20, 30, 40),
+                       n = c(100, 200, 100, 200))
+
+  prepared <- prepare_data(autospc_chart_pp(data = counts, x = "x", y = "y", n = "n"))
+
+  expect_identical(prepared$data$y, c(10, 10, 30, 20))
+  expect_identical(prepared$data$y_numerator, counts$y)
+  expect_identical(prepared$data$n, counts$n)
+
+  expect_identical(prepared$data_original, counts)
+
+})
+
+
+test_that("prepare_data gives NA for a zero or missing denominator", {
+
+  # rather than NaN or Inf, which would propagate into the limits
+  counts <- data.frame(x = 1:3,
+                       y = c(10, 10, 10),
+                       n = c(100, 0, NA_real_))
+
+  prepared <- prepare_data(autospc_chart_pp(data = counts, x = "x", y = "y", n = "n"))
+
+  expect_identical(prepared$data$y, c(10, NA_real_, NA_real_))
+
+})

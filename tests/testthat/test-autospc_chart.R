@@ -187,6 +187,24 @@ test_that("autospc_chart keeps data_original as passed", {
 })
 
 
+# prepare_data()
+
+test_that("prepare_data returns the chart unchanged by default", {
+
+  for(chart_type in c("C", "C'", "X")) {
+
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y")
+
+    expect_identical(prepare_data(chart), chart, info = chart_type)
+
+  }
+
+})
+
+
 # n_effective_points()
 
 test_that("n_effective_points counts the non-missing values of y", {

@@ -34,11 +34,6 @@ preprocess_inputs <- function(
                   "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
   
-  if(chart_type == "MR") {
-    mrs <- get_mrs(y = df$y)
-    df <- df %>% dplyr::mutate(y = mrs)
-  }
-  
   # Check annotation arguments
   if(!is.null(override_annotation_dist) |
      !is.null(override_annotation_dist_P)) {

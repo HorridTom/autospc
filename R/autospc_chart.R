@@ -31,6 +31,13 @@ new_autospc_chart <- function(x = list(),
 #'
 #' Additional elements are permitted - subclasses add their own
 #'
+#' **`data` and `data_original`.** `data_original` is what the user supplied,
+#' untouched. `data` is prepared input: its columns are named `x`, `y` and,
+#' where the class has one, `n` from the moment the object exists, and after
+#' `prepare_data()` its `y` is *the series under analysis*, which is not always
+#' the column the user passed. For MR it holds the moving ranges; for P and P'
+#' it holds percentages, with the counts kept as `y_numerator`.
+#'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
 validate_autospc_chart <- function(x) {
@@ -224,6 +231,7 @@ autospc_chart_list <- function(data,
 
 # Methods
 
+
 #' Aggregate data for analysis
 #' 
 #' Returns the chart object unchanged, this reflects that the default behaviour
@@ -232,6 +240,20 @@ autospc_chart_list <- function(data,
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 aggregate_data.autospc_chart <- function(chart) {
+
+  return(chart)
+
+}
+
+
+#' Turn the aggregated data into the series the algorithm analyses
+#'
+#' Returns the chart unchanged. Overridden by the classes that analyse something
+#' other than the column the user supplied.
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+prepare_data.autospc_chart <- function(chart) {
 
   return(chart)
 
@@ -252,6 +274,20 @@ n_effective_points.autospc_chart <- function(chart,
     nrow()
 
   return(points)
+
+}
+
+
+#' Columns the limits table carries in addition to the common ones
+#'
+#' None by default. Overridden by the classes whose limits are calculated from
+#' something other than the plotted `y`.
+#'
+#' @return character vector, possibly empty
+#' @noRd
+limits_table_columns.autospc_chart <- function(chart) {
+
+  return(character(0))
 
 }
 
@@ -300,20 +336,4 @@ extrapolate_limits.autospc_chart <- function(chart,
   return(limits)
 
 }
-
-
-#' Columns the limits table carries in addition to the common ones
-#'
-#' None by default. Overridden by the classes whose limits are calculated from
-#' something other than the plotted `y`.
-#'
-#' @return character vector, possibly empty
-#' @noRd
-limits_table_columns.autospc_chart <- function(chart) {
-
-  return(character(0))
-
-}
-
-
 

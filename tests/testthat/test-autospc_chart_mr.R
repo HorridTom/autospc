@@ -185,3 +185,21 @@ test_that("n_effective_points adds one to the moving ranges", {
   expect_identical(n_effective_points(test_chart_mr(), counted), 4L)
 
 })
+
+
+test_that("prepare_data replaces y with the moving ranges", {
+
+  counts <- data.frame(x = 1:5, y = c(5, 8, 2, 9, 4))
+
+  chart <- autospc_chart_mr(data = counts, x = "x", y = "y")
+
+  prepared <- prepare_data(chart)
+
+  # get_mrs() prepends NA, so the series stays aligned with x
+  expect_identical(prepared$data$y, c(NA, 3, 6, 7, 5))
+  expect_identical(prepared$data$x, counts$x)
+
+  # and what the user supplied is untouched
+  expect_identical(prepared$data_original, counts)
+
+})

@@ -283,6 +283,16 @@ autospc <- function(data,
                            chart_type = chart_type)
   }
   
+  # Turn the aggregated data into the series the algorithm analyses.
+  #
+  # The object is not yet what carries the data through the pipeline - the
+  # aggregation above still works on a bare frame - so the aggregated data is
+  # put onto the chart, prepared, and taken off again. That shuffle goes when
+  # the pipeline reads chart$data throughout.
+  chart$data <- data
+  chart <- prepare_data(chart)
+  data <- chart$data
+  
   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,

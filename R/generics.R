@@ -9,6 +9,19 @@ aggregate_data <- function(chart) {
 }
 
 
+#' Turn the aggregated data into the series the algorithm analyses
+#'
+#' Runs after `aggregate_data()`, because the P and P' transform is computed
+#' from the aggregated numerator and denominator.
+#'
+#' @return autospc_chart object of the same class as chart, with `chart$data`
+#'   replaced
+#' @noRd
+prepare_data <- function(chart) {
+  UseMethod("prepare_data")
+}
+
+
 #' Number of points available for analysis
 #'
 #' Used to decide whether there is enough data to form a period.

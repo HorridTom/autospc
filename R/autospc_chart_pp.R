@@ -95,6 +95,7 @@ autospc_chart_pp <- function(data,
 
 # Analysis methods
 
+
 #' Aggregate data for analysis
 #'
 #' Sums y and n (counts) over x (subgroup) as needed for P'-chart analysis.
@@ -109,6 +110,28 @@ aggregate_data.autospc_chart_pp <- function(chart) {
     aggregate_ratios(chart,
                      allow_individual_observations = TRUE)
   )
+
+}
+
+
+#' Turn the aggregated data into the series the algorithm analyses
+#'
+#' A P' chart plots percentages, so `y` becomes the percentage and the count it
+#' was calculated from is kept as `y_numerator`. Division by a zero or missing
+#' denominator gives `NA` rather than `NaN` or `Inf`.
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+prepare_data.autospc_chart_pp <- function(chart) {
+
+  chart$data <- chart$data %>%
+    dplyr::mutate(y_numerator = y) %>%
+    dplyr::mutate(y = y * 100 / n) %>%
+    dplyr::mutate(y = dplyr::if_else(is.nan(y) | is.infinite(y),
+                                     as.numeric(NA),
+                                     y))
+
+  return(chart)
 
 }
 
@@ -136,7 +159,6 @@ calculate_limits.autospc_chart_pp <- function(chart,
 }
 
 
-
 #' Columns the limits table carries in addition to the common ones
 #'
 #' `y` holds percentages for this class, so the counts and denominators the
@@ -149,6 +171,7 @@ limits_table_columns.autospc_chart_pp <- function(chart) {
   return(c("n", "y_numerator"))
 
 }
+
 
 #' Extend the limits of the preceding calculation period over the display period
 #'
@@ -197,6 +220,7 @@ extend_display_limits.autospc_chart_pp <- function(chart,
 
 }
 
+
 #' Limits to use beyond the end of the data
 #'
 #' As for P, except that the denominators are left as they are and
@@ -224,7 +248,6 @@ extrapolate_limits.autospc_chart_pp <- function(chart,
   return(limits)
 
 }
-
 
 # Presentation methods
 

@@ -63,28 +63,15 @@ test_that("the limits table keeps n and y_numerator for P charts only", {
                                 y = rep(c(3, 4, 2, 5, 3, 4), 5),
                                 n = rep(20L, 30))
 
-  limits_args <- list(period_min = 21,
-                      baseline_length = NULL,
-                      shift_rule_threshold = 8L,
-                      max_exclusions = 3,
-                      no_regrets = TRUE,
-                      verbosity = 0L,
-                      baseline_only = FALSE,
-                      establish_every_shift = FALSE,
-                      centre_line_tolerance = 0,
-                      show_limits = TRUE,
-                      overhanging_reversions = TRUE,
-                      mr_screen_max_loops = 1L)
-
-  p_table <- do.call(create_SPC_auto_limits_table,
-                     c(list(data = proportion_data, chart_type = "P"),
-                       limits_args))
+  # through autospc(), because create_SPC_auto_limits_table() no longer
+  # converts counts to percentages - prepare_data() does, and it sits outside
+  p_table <- autospc(proportion_data, chart_type = "P",
+                     period_min = 21, plot_chart = FALSE)
 
   expect_true(all(c("n", "y_numerator") %in% names(p_table)))
 
-  c_table <- do.call(create_SPC_auto_limits_table,
-                     c(list(data = proportion_data, chart_type = "C"),
-                       limits_args))
+  c_table <- autospc(proportion_data, chart_type = "C",
+                     period_min = 21, plot_chart = FALSE)
 
   expect_false(any(c("n", "y_numerator") %in% names(c_table)))
 

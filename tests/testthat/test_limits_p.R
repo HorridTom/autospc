@@ -53,20 +53,15 @@ test_that("P chart display limits follow the denominator", {
                           y = rep(c(10, 12, 11, 13, 9, 10), 5),
                           n = c(rep(100L, 21), rep(c(25L, 400L), 4), 25L))
 
-  limits <- create_SPC_auto_limits_table(varying_n,
-                                         chart_type = "P",
-                                         period_min = 21,
-                                         baseline_length = NULL,
-                                         shift_rule_threshold = 8L,
-                                         max_exclusions = 3,
-                                         no_regrets = TRUE,
-                                         verbosity = 0L,
-                                         baseline_only = TRUE,
-                                         establish_every_shift = FALSE,
-                                         centre_line_tolerance = 0,
-                                         show_limits = TRUE,
-                                         overhanging_reversions = TRUE,
-                                         mr_screen_max_loops = 1L)
+  # through autospc(), because create_SPC_auto_limits_table() no longer
+  # converts counts to percentages - prepare_data() does, and it sits outside
+  # the columns are already named x, y and n, so they are not named again -
+  # doing so makes rename_columns() warn
+  limits <- autospc(varying_n,
+                    chart_type = "P",
+                    period_min = 21,
+                    baseline_only = TRUE,
+                    plot_chart = FALSE)
 
   display <- limits[limits$periodType == "display", ]
 

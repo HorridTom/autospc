@@ -84,17 +84,6 @@ create_SPC_auto_limits_table <- function(data,
     overhanging_reversions <- TRUE
   }
   
-  # add y column of percentages for P and P' charts. This is to avoid issues
-  # with joins later 
-  if(chart_type == "P" | chart_type == "P'"){
-    data <- data %>% 
-      dplyr::mutate(y_numerator = y) %>%
-      dplyr::mutate(y = y * 100 / n) %>%
-      dplyr::mutate(y = dplyr::if_else(is.nan(y) | is.infinite(y),
-                                       as.numeric(NA),
-                                       y))
-  }
-  
   #set counter to one
   counter <- 1
   

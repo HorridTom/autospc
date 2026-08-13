@@ -1,9 +1,13 @@
 #load in test data
 test_data <- readRDS("testdata/test_data_display_limits.rds")
 
+# form_display_limits() dispatches on the chart object, so one has to be
+# supplied. A C chart carries its limits forward unchanged.
+test_chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
+
 test_that("Display period is formed correctly for C chart",{
   
-  result <- form_display_limits(test_data, counter = 22)
+  result <- form_display_limits(test_data, counter = 22, chart = test_chart)
   result_ucl <- result$ucl[22:nrow(test_data)]
   result_cl <- result$cl[22:nrow(test_data)]
   result_lcl <- result$lcl[22:nrow(test_data)]

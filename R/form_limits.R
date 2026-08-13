@@ -104,56 +104,16 @@ form_calculation_limits <- function(data,
 
 
 # Function to form display limits (period extension)
-form_display_limits <- function(limits_table, counter, chart_type = "C'"){
+form_display_limits <- function(limits_table, counter, chart){
   
   if(counter > nrow(limits_table)) {
     # No display limits needed - no data beyond calculation period
     return(limits_table)
   }
   
-  if(chart_type == "C" | chart_type == "C'" | chart_type == "XMR" |
-     chart_type == "MR"){
-    limits_table[counter:nrow(limits_table), "ucl"] <-
-      limits_table[(counter - 1), "ucl"]
-    limits_table[counter:nrow(limits_table), "lcl"] <-
-      limits_table[(counter - 1), "lcl"]
-    limits_table[counter:nrow(limits_table), "cl"] <-
-      limits_table[(counter - 1), "cl"]
-    limits_table[counter:nrow(limits_table), "periodType"] <- "display"
-    
-  } else {
-    #constant from P' chart calc = (UCL - CL)sqrt(n)
-    constant <- (limits_table[(counter - 1), "ucl"] -
-                   limits_table[(counter - 1), "cl"]) *
-      sqrt(limits_table[(counter - 1), "n"])
-    pbar <- limits_table[(counter - 1), "cl"]
-    
-    limits_table[counter:nrow(limits_table), "cl"] <- 
-      limits_table[(counter - 1), "cl"]
-    limits_table[counter:nrow(limits_table), "periodType"] <- "display"
-    
-    #splits limits table to just the section that we want
-    limits_table_top <- limits_table[1:(counter - 1),]
-    limits_table_bottom <- limits_table[counter:nrow(limits_table),]
-    
-    limits_table_bottom <- limits_table_bottom %>%
-      dplyr::mutate(constant = as.numeric(constant)) %>%
-      dplyr::mutate(pbar = as.numeric(pbar)) %>%
-      dplyr::mutate(ucl_display = pbar + (constant/sqrt(n)) ) %>%
-      dplyr::mutate(lcl_display = pbar - (constant/sqrt(n)) ) %>%
-      dplyr::mutate(ucl = dplyr::if_else(periodType == "display",
-                                         ucl_display,
-                                         ucl)) %>%
-      dplyr::mutate(lcl = dplyr::if_else(periodType == "display",
-                                         lcl_display,
-                                         lcl)) %>%
-      dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl)) %>%
-      dplyr::mutate(lcl = dplyr::if_else(lcl <= 0, 0, lcl))
-    
-    limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
-    
-    
-  }
+  limits_table <- extend_display_limits(chart = chart,
+                                        limits_table = limits_table,
+                                        counter = counter)
   
   return(limits_table)
 }
@@ -166,8 +126,7 @@ form_calculation_and_display_limits <- function(
     period_min,
     baseline_length,
     counter_at_period_start, 
-    chart_type,
-    chart = NULL,
+    chart,
     max_exclusions,
     centre_line_tolerance,
     shift_rule_threshold){
@@ -195,7 +154,7 @@ form_calculation_and_display_limits <- function(
   limits_table <- form_display_limits(limits_table = limits_table, 
                                       counter = counter_at_period_start +
                                         periodLength,
-                                      chart_type = chart_type)
+                                      chart = chart)
   
   #add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(
@@ -209,7 +168,7 @@ form_calculation_and_display_limits <- function(
 
 
 extend_limits <- function(df,
-                          chart_type,
+                          chart,
                           extend_limits_to,
                           x_max) {
   
@@ -224,57 +183,11 @@ extend_limits <- function(df,
       dplyr::slice_tail(n = 1L) %>%
       dplyr::pull(plotPeriod)
     
-    # For extension, chart types whose limits may vary within a period due to
-    # varying denominators use limit values derived from the mean denominator 
-    # for the final period. Other chart types use the (constant) limits from the 
-    # final period.
-    switch(chart_type,
-           P = {
-             ext_calc_data <- df %>%
-               dplyr::filter(plotPeriod == last_calc_period) %>%
-               dplyr::mutate(y = (y/100)*n,
-                             n = dplyr::if_else(is.na(n),
-                                                NA_real_,
-                                                mean(n,
-                                                     na.rm = TRUE)))
-             
-             exclusion_points <- ext_calc_data %>%
-               dplyr::pull(excluded) %>%
-               which()
-             
-             ext_limits <- get_p_limits(y = ext_calc_data$y,
-                                        n = ext_calc_data$n,
-                                        exclusion_points = exclusion_points,
-                                        multiply = 100) %>%
-               lapply("[[", 1L)
-             
-           },
-           `P'` = {
-             ext_calc_data <- df %>%
-               dplyr::filter(plotPeriod == last_calc_period) %>%
-               dplyr::mutate(y = (y/100)*n)
-             
-             exclusion_points <- ext_calc_data %>%
-               dplyr::pull(excluded) %>%
-               which()
-             
-             ext_limits <- get_pp_limits(y = ext_calc_data$y,
-                                         n = ext_calc_data$n,
-                                         exclusion_points = exclusion_points,
-                                         multiply = 100,
-                                         use_nbar_for_stdev = TRUE) %>% 
-               lapply("[[", 1L)
-           },
-           {
-             ext_limits <- df %>% 
-               dplyr::filter(plotPeriod == last_calc_period) %>% 
-               dplyr::select(cl, lcl, ucl) %>% 
-               dplyr::summarise(dplyr::across(dplyr::everything(),
-                                              ~ mean(.x,
-                                                     na.rm = TRUE))) %>%
-               as.list()
-           }
-    )
+    final_period <- df %>%
+      dplyr::filter(plotPeriod == last_calc_period)
+    
+    ext_limits <- extrapolate_limits(chart = chart,
+                                     period = final_period)
     
     df_ext_first_row <- df %>%
       dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 

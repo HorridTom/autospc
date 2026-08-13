@@ -106,6 +106,7 @@ postprocess <- function(
 postprocess_spc <- function(
     df,
     chart_type,
+    chart,
     highlight_exclusions,
     floating_median,
     floating_median_n,
@@ -169,7 +170,7 @@ postprocess_spc <- function(
   
   # Extend display limits
   df <- extend_limits(df = df,
-                      chart_type = chart_type,
+                      chart = chart,
                       extend_limits_to = extend_limits_to,
                       x_max = x_max)
   

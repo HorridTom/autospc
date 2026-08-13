@@ -150,6 +150,82 @@ limits_table_columns.autospc_chart_pp <- function(chart) {
 
 }
 
+#' Extend the limits of the preceding calculation period over the display period
+#'
+#' The limits of a P' chart depend on the denominator, so they cannot simply be
+#' carried forward. The width of the last calculated period is expressed as a
+#' constant, and the display limits are recomputed from it at each point's own
+#' denominator. The centre line is carried forward unchanged.
+#'
+#' @return `limits_table`, with the display rows filled in
+#' @noRd
+extend_display_limits.autospc_chart_pp <- function(chart,
+                                                   limits_table,
+                                                   counter) {
+
+  #constant from P' chart calc = (UCL - CL)sqrt(n)
+  constant <- (limits_table[(counter - 1), "ucl"] -
+                 limits_table[(counter - 1), "cl"]) *
+    sqrt(limits_table[(counter - 1), "n"])
+  pbar <- limits_table[(counter - 1), "cl"]
+
+  limits_table[counter:nrow(limits_table), "cl"] <-
+    limits_table[(counter - 1), "cl"]
+  limits_table[counter:nrow(limits_table), "periodType"] <- "display"
+
+  #splits limits table to just the section that we want
+  limits_table_top <- limits_table[1:(counter - 1),]
+  limits_table_bottom <- limits_table[counter:nrow(limits_table),]
+
+  limits_table_bottom <- limits_table_bottom %>%
+    dplyr::mutate(constant = as.numeric(constant)) %>%
+    dplyr::mutate(pbar = as.numeric(pbar)) %>%
+    dplyr::mutate(ucl_display = pbar + (constant/sqrt(n)) ) %>%
+    dplyr::mutate(lcl_display = pbar - (constant/sqrt(n)) ) %>%
+    dplyr::mutate(ucl = dplyr::if_else(periodType == "display",
+                                       ucl_display,
+                                       ucl)) %>%
+    dplyr::mutate(lcl = dplyr::if_else(periodType == "display",
+                                       lcl_display,
+                                       lcl)) %>%
+    dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl)) %>%
+    dplyr::mutate(lcl = dplyr::if_else(lcl <= 0, 0, lcl))
+
+  limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
+
+  return(limits_table)
+
+}
+
+#' Limits to use beyond the end of the data
+#'
+#' As for P, except that the denominators are left as they are and
+#' `use_nbar_for_stdev` handles the averaging inside `get_pp_limits()`.
+#'
+#' @return list of single values, named cl, lcl and ucl
+#' @noRd
+extrapolate_limits.autospc_chart_pp <- function(chart,
+                                                period) {
+
+  ext_calc_data <- period %>%
+    dplyr::mutate(y = (y/100)*n)
+
+  exclusion_points <- ext_calc_data %>%
+    dplyr::pull(excluded) %>%
+    which()
+
+  limits <- get_pp_limits(y = ext_calc_data$y,
+                          n = ext_calc_data$n,
+                          exclusion_points = exclusion_points,
+                          multiply = 100,
+                          use_nbar_for_stdev = TRUE) %>%
+    lapply("[[", 1L)
+
+  return(limits)
+
+}
+
+
 # Presentation methods
 
 #' Chart name

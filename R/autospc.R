@@ -341,6 +341,7 @@ autospc <- function(data,
     data <- postprocess_spc(
       df = data,
       chart_type = chart_type,
+      chart = chart,
       highlight_exclusions = highlight_exclusions,
       floating_median = floating_median,
       floating_median_n = floating_median_n,

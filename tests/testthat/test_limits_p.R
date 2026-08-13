@@ -43,3 +43,40 @@ test_that("P prime chart limits the same as qicharts2 v.0.7.2",{
   expect_equal(results$ucl, test_pp_limit_answer$ucl)
   
 })
+
+
+test_that("P chart display limits follow the denominator", {
+
+  # The display limits of a P chart are recomputed at each point's own n, so
+  # with a varying denominator they must vary too.
+  varying_n <- data.frame(x = 1:30,
+                          y = rep(c(10, 12, 11, 13, 9, 10), 5),
+                          n = c(rep(100L, 21), rep(c(25L, 400L), 4), 25L))
+
+  limits <- create_SPC_auto_limits_table(varying_n,
+                                         chart_type = "P",
+                                         period_min = 21,
+                                         baseline_length = NULL,
+                                         shift_rule_threshold = 8L,
+                                         max_exclusions = 3,
+                                         no_regrets = TRUE,
+                                         verbosity = 0L,
+                                         baseline_only = TRUE,
+                                         establish_every_shift = FALSE,
+                                         centre_line_tolerance = 0,
+                                         show_limits = TRUE,
+                                         overhanging_reversions = TRUE,
+                                         mr_screen_max_loops = 1L)
+
+  display <- limits[limits$periodType == "display", ]
+
+  expect_gt(nrow(display), 0)
+  expect_gt(length(unique(display$ucl)), 1)
+
+  # a larger denominator gives narrower limits
+  expect_lt(display$ucl[display$n == 400][1], display$ucl[display$n == 25][1])
+
+  # and the centre line is carried forward unchanged
+  expect_identical(length(unique(display$cl)), 1L)
+
+})

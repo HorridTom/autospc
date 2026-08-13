@@ -256,6 +256,52 @@ n_effective_points.autospc_chart <- function(chart,
 }
 
 
+#' Extend the limits of the preceding calculation period over the display period
+#'
+#' Carries the last calculated centre line and limits forward unchanged.
+#' Overridden by the classes whose limits vary with the denominator.
+#'
+#' @return `limits_table`, with the display rows filled in
+#' @noRd
+extend_display_limits.autospc_chart <- function(chart,
+                                                limits_table,
+                                                counter) {
+
+  display_rows <- counter:nrow(limits_table)
+  last_calculated <- counter - 1
+
+  limits_table[display_rows, "ucl"] <- limits_table[last_calculated, "ucl"]
+  limits_table[display_rows, "lcl"] <- limits_table[last_calculated, "lcl"]
+  limits_table[display_rows, "cl"] <- limits_table[last_calculated, "cl"]
+  limits_table[display_rows, "periodType"] <- "display"
+
+  return(limits_table)
+
+}
+
+
+#' Limits to use beyond the end of the data
+#'
+#' The limits of the final calculation period, which are constant within it.
+#' Overridden by the classes whose limits vary with the denominator.
+#'
+#' @return list of single values, named cl, lcl and ucl
+#' @noRd
+extrapolate_limits.autospc_chart <- function(chart,
+                                             period) {
+
+  limits <- period %>%
+    dplyr::select(cl, lcl, ucl) %>%
+    dplyr::summarise(dplyr::across(dplyr::everything(),
+                                   ~ mean(.x,
+                                          na.rm = TRUE))) %>%
+    as.list()
+
+  return(limits)
+
+}
+
+
 #' Columns the limits table carries in addition to the common ones
 #'
 #' None by default. Overridden by the classes whose limits are calculated from

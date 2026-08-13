@@ -220,6 +220,148 @@ test_that("the classes other than MR count the rows as they are", {
 })
 
 
+# extend_display_limits()
+
+# a limits table as the algorithm builds it: three calculated rows, then three
+# rows waiting for display limits
+display_table <- data.frame(x = 1:6,
+                            y = c(10, 12, 11, 14, 9, 13),
+                            n = rep(20, 6),
+                            ucl = c(rep(18, 3), rep(NA_real_, 3)),
+                            lcl = c(rep(4, 3), rep(NA_real_, 3)),
+                            cl = c(rep(11, 3), rep(NA_real_, 3)),
+                            periodType = c(rep("calculation", 3),
+                                           rep(NA_character_, 3)))
+
+
+test_that("the default carries the last calculated limits forward", {
+
+  chart <- autospc_chart(chart_type = "C",
+                         data = factory_data,
+                         x = "x",
+                         y = "y")
+
+  extended <- extend_display_limits(chart, display_table, counter = 4)
+
+  expect_identical(extended$ucl, rep(18, 6))
+  expect_identical(extended$lcl, rep(4, 6))
+  expect_identical(extended$cl, rep(11, 6))
+  expect_identical(extended$periodType,
+                   c(rep("calculation", 3), rep("display", 3)))
+
+})
+
+
+test_that("the calculated rows are left alone", {
+
+  chart <- autospc_chart(chart_type = "C",
+                         data = factory_data,
+                         x = "x",
+                         y = "y")
+
+  extended <- extend_display_limits(chart, display_table, counter = 4)
+
+  expect_identical(extended[1:3, ], display_table[1:3, ])
+
+})
+
+
+test_that("the classes with no override inherit the carry-forward default", {
+
+  for(chart_type in c("C", "C'", "X", "MR")) {
+
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y")
+
+    extended <- extend_display_limits(chart, display_table, counter = 4)
+
+    expect_identical(extended$ucl, rep(18, 6), info = chart_type)
+
+  }
+
+})
+
+
+# extrapolate_limits()
+
+test_that("the default averages the final period's limits", {
+
+  # for the classes with constant limits within a period the mean is just that
+  # constant value, but a mean is what the original code took, so this pins it
+  final_period <- data.frame(cl = c(11, 11, 11),
+                             lcl = c(4, 4, 4),
+                             ucl = c(18, 18, 18))
+
+  chart <- autospc_chart(chart_type = "C",
+                         data = factory_data,
+                         x = "x",
+                         y = "y")
+
+  expect_identical(extrapolate_limits(chart, final_period),
+                   list(cl = 11, lcl = 4, ucl = 18))
+
+})
+
+
+test_that("the default ignores missing limit values", {
+
+  final_period <- data.frame(cl = c(11, NA, 11),
+                             lcl = c(4, NA, 4),
+                             ucl = c(18, NA, 18))
+
+  chart <- autospc_chart(chart_type = "C",
+                         data = factory_data,
+                         x = "x",
+                         y = "y")
+
+  expect_identical(extrapolate_limits(chart, final_period),
+                   list(cl = 11, lcl = 4, ucl = 18))
+
+})
+
+
+test_that("the default averages, rather than taking a single row", {
+
+  # cannot arise today - the limits of these classes are constant within a
+  # calculation period, so mean, first and last all agree. This pins the choice
+  # so that it stays deliberate if that ever changes.
+  final_period <- data.frame(cl = c(10, 20),
+                             lcl = c(2, 4),
+                             ucl = c(18, 36))
+
+  chart <- autospc_chart(chart_type = "C",
+                         data = factory_data,
+                         x = "x",
+                         y = "y")
+
+  expect_identical(extrapolate_limits(chart, final_period),
+                   list(cl = 15, lcl = 3, ucl = 27))
+
+})
+
+
+test_that("the classes with no override inherit the averaging default", {
+
+  final_period <- data.frame(cl = c(11, 11), lcl = c(4, 4), ucl = c(18, 18))
+
+  for(chart_type in c("C", "C'", "X", "MR")) {
+
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y")
+
+    expect_identical(extrapolate_limits(chart, final_period),
+                     list(cl = 11, lcl = 4, ucl = 18),
+                     info = chart_type)
+
+  }
+
+})
+
+
 # limits_table_columns()
 
 test_that("limits_table_columns is empty by default", {

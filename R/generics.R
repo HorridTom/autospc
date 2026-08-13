@@ -39,6 +39,37 @@ calculate_limits <- function(chart,
 }
 
 
+#' Extend the limits of the preceding calculation period over the display period
+#'
+#' Called with `counter` already known to be within the table.
+#'
+#' @param limits_table the limits table so far
+#' @param counter row number of the first display point
+#'
+#' @return `limits_table`, with the display rows filled in
+#' @noRd
+extend_display_limits <- function(chart,
+                                  limits_table,
+                                  counter) {
+  UseMethod("extend_display_limits")
+}
+
+
+#' Limits to use beyond the end of the data
+#'
+#' Used when `extend_limits_to` carries the final period's limits out past the
+#' last data point. One set of values for the whole extension.
+#'
+#' @param period the final calculation period
+#'
+#' @return list of single values, named cl, lcl and ucl
+#' @noRd
+extrapolate_limits <- function(chart,
+                               period) {
+  UseMethod("extrapolate_limits")
+}
+
+
 #' Columns the limits table carries in addition to the common ones
 #'
 #' The names are inserted between `y` and `ucl`, so the order matters.

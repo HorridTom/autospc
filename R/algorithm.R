@@ -56,8 +56,10 @@ create_SPC_auto_limits_table <- function(data,
   
   # autospc() passes its own chart object in. Anything calling this directly
   # gets one built here from the arguments it supplied. Nothing reads it yet.
-  if(is.null(chart) && has_autospc_chart_class(chart_type)) {
-    chart <- autospc_chart(chart_type = chart_type,
+  object_chart_type <- chart_type_for_object(chart_type)
+
+  if(is.null(chart) && !is.null(object_chart_type)) {
+    chart <- autospc_chart(chart_type = object_chart_type,
                            data = data,
                            x = "x",
                            y = "y",

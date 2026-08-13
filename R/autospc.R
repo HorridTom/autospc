@@ -222,14 +222,19 @@ autospc <- function(data,
   # Build the chart object, from the data exactly as passed. Nothing reads it
   # yet - the pipeline below is unchanged.
   #
-  # The if() is TEMPORARY and goes when every chart type has a class - see
-  # CLEAN UP #16 in the worklist. Until then chart stays NULL for XMR.
+  # For chart_type = "XMR" this is the X chart of the pair. The MR one is
+  # created by the chart_type = "MR" re-invocation below.
+  #
+  # The if() is TEMPORARY and goes once an object can be created for every chart
+  # type - see CLEAN UP #16 in the worklist.
+  object_chart_type <- chart_type_for_object(chart_type)
+
   chart <- NULL
 
-  if(has_autospc_chart_class(chart_type)) {
+  if(!is.null(object_chart_type)) {
 
     chart <- autospc_chart(
-      chart_type = chart_type,
+      chart_type = object_chart_type,
       data = data,
       x = resolve_column_name(rlang::enquo(x), "x"),
       y = resolve_column_name(rlang::enquo(y), "y"),

@@ -1,4 +1,4 @@
-# autospc_chart() and has_autospc_chart_class() each list the chart types
+# autospc_chart() and chart_type_for_object() each list the chart types
 # separately, so this mapping is written out once and used by both sets of
 # tests below
 factory_classes <- c("C"  = "autospc_chart_c",
@@ -143,9 +143,11 @@ test_that("an unknown chart type errors rather than returning NULL", {
 })
 
 
-test_that("XMR is an accepted chart type but has no class yet", {
+test_that("XMR is an accepted chart type but autospc_chart cannot build it", {
 
-  # so autospc_chart() cannot build one
+  # XMR asks for a pair of charts - an X and an MR - so no single object serves
+  # it, and there is no autospc_chart_xmr class waiting to be written. Unlike
+  # X, this does not change when the chart types are widened.
 
   expect_true("XMR" %in% autospc_chart_types())
 
@@ -185,74 +187,76 @@ test_that("autospc_chart keeps data_original as passed", {
 })
 
 
-# has_autospc_chart_class()
+# chart_type_for_object()
 
-test_that("has_autospc_chart_class is TRUE for accepted types with a class", {
+test_that("every chart type except XMR maps to itself", {
 
-  # X is excluded here and tested separately below - it has a class, but is not
-  # an accepted chart_type
-  for(chart_type in setdiff(names(factory_classes), "X")) {
+  for(chart_type in setdiff(autospc_chart_types(), "XMR")) {
 
-    expect_true(has_autospc_chart_class(chart_type), info = chart_type)
+    expect_identical(chart_type_for_object(chart_type), chart_type,
+                     info = chart_type)
 
   }
 
 })
 
 
-test_that("has_autospc_chart_class is FALSE for the two types at either edge", {
+test_that("XMR maps to X", {
 
-  # XMR and X both return FALSE, for opposite reasons, and both must go on
-  # doing so:
-  #
-  # XMR is an accepted chart_type that has no class - it needs two SSA runs and
-  # the plot object.
-  expect_true("XMR" %in% autospc_chart_types())
-  expect_false(has_autospc_chart_class("XMR"))
-
-  # X is the other way round: it has a class, and autospc_chart() will build
-  # one, but it is not an accepted chart_type because nothing later in
-  # autospc() can chart it - form_limits.R has no branch for X. So autospc()
-  # must not build one either.
-  expect_false("X" %in% autospc_chart_types())
-  expect_false(has_autospc_chart_class("X"))
+  # XMR asks for a pair of charts. The MR half is created by the
+  # chart_type = "MR" re-invocation in autospc(), so the X half is all that is
+  # needed here.
+  expect_identical(chart_type_for_object("XMR"), "X")
 
 })
 
 
-test_that("has_autospc_chart_class is FALSE for bad input, not an error", {
+test_that("X is not yet a chart type a user can pass", {
+
+  # X has a class and autospc_chart() will build one, but nothing later in
+  # autospc() can chart it - form_limits.R has no branch for X. This is
+  # temporary: X becomes user-passable later, which is what allows show_mr to
+  # be dropped. Update this test then.
+  expect_false("X" %in% autospc_chart_types())
+
+})
+
+
+test_that("chart_type_for_object returns NULL for bad input, not an error", {
 
   # autospc() calls this before chart_type has been checked, so whatever the
-  # user passed has to come back FALSE and leave validate_chart_type() to
+  # user passed has to come back NULL and leave validate_chart_type() to
   # produce the error message. The case that matters is a chart_type holding
   # two values: test-autospc-chart-type.R passes c("XMR", "MR") on purpose, and
   # in R 4.3 and later `&&` errors if either side is longer than one value.
-  expect_false(has_autospc_chart_class(NULL))
-  expect_false(has_autospc_chart_class(c("XMR", "MR")))
-  expect_false(has_autospc_chart_class(c("C", "P")))
-  expect_false(has_autospc_chart_class(character(0)))
-  expect_false(has_autospc_chart_class(5))
-  expect_false(has_autospc_chart_class(NA))
+  expect_null(chart_type_for_object(NULL))
+  expect_null(chart_type_for_object(c("XMR", "MR")))
+  expect_null(chart_type_for_object(c("C", "P")))
+  expect_null(chart_type_for_object(character(0)))
+  expect_null(chart_type_for_object(5))
+  expect_null(chart_type_for_object(NA))
+  expect_null(chart_type_for_object("Q"))
 
 })
 
 
-test_that("every chart type has_autospc_chart_class accepts can be built", {
+test_that("every chart type a user can pass can be built", {
 
-  # has_autospc_chart_class() takes its list from autospc_chart_types(), while
+  # chart_type_for_object() takes its list from autospc_chart_types(), while
   # autospc_chart() names each chart type in a separate branch. Nothing else
-  # checks that the two agree.
+  # checks that the two agree. Every accepted chart type must now map to
+  # something buildable - there is no longer one that maps to NULL.
   for(chart_type in autospc_chart_types()) {
 
-    if(has_autospc_chart_class(chart_type)) {
+    object_chart_type <- chart_type_for_object(chart_type)
 
-      expect_no_error(autospc_chart(chart_type = chart_type,
-                                    data = factory_data,
-                                    x = "x",
-                                    y = "y",
-                                    n = "n"))
+    expect_false(is.null(object_chart_type), info = chart_type)
 
-    }
+    expect_no_error(autospc_chart(chart_type = object_chart_type,
+                                  data = factory_data,
+                                  x = "x",
+                                  y = "y",
+                                  n = "n"))
 
   }
 
@@ -264,8 +268,8 @@ test_that("autospc() builds a chart object during a real run", {
   # TEMPORARY - delete when autospc() starts using the chart object. See
   # CLEAN UP #16 in the worklist.
   #
-  # Nothing reads the chart object yet, so if has_autospc_chart_class() started
-  # returning FALSE for everything, no object would ever be built and every
+  # Nothing reads the chart object yet, so if chart_type_for_object() started
+  # returning NULL for everything, no object would ever be built and every
   # other test would still pass. This is the only test that checks autospc()
   # really does call autospc_chart(). Once the object is used, the end to end
   # tests cover that and this one should go.

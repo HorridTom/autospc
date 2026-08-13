@@ -104,31 +104,39 @@ autospc_chart_types <- function() {
 }
 
 
-#' Is there an autospc_chart class for this chart_type?
+#' Which chart type's class serves this request?
 #'
-#' TEMPORARY - remove when `autospc()` starts using the chart object, along
-#' with the `if` around the `autospc_chart()` call in `autospc()`. See CLEAN UP
-#' #16 in the worklist.
+#' TEMPORARY - see CLEAN UP #16 in the worklist. Removed, along with the `if`
+#' around the `autospc_chart()` call in `autospc()`, once an object can be
+#' created for every chart type.
 #'
-#' It lets `autospc()` build a chart object only for the chart types that have
-#' a class, and leaves the errors it raises for anything else exactly as they
-#' were.
+#' `"XMR"` maps to `"X"`. It asks for a pair of charts, and the MR half is
+#' already created by the `chart_type = "MR"` re-invocation in `autospc()`, so
+#' the X half is all that is needed here. Every other chart type maps to
+#' itself.
 #'
 #' `chart_type` has not been checked at the point `autospc()` calls this, so it
 #' may be anything the user passed, including several values at once. Those
-#' return FALSE rather than erroring, so that `validate_chart_type()` still
+#' return NULL rather than erroring, so that `validate_chart_type()` still
 #' produces the error message.
 #'
-#' @return TRUE or FALSE.
+#' @return A character scalar, or NULL if no object can be created.
 #' @noRd
-has_autospc_chart_class <- function(chart_type) {
+chart_type_for_object <- function(chart_type) {
 
   if(!is.character(chart_type) || length(chart_type) != 1) {
-    return(FALSE)
+    return(NULL)
   }
 
-  # XMR needs two SSA runs and the plot object, so it has no class yet
-  return(chart_type %in% setdiff(autospc_chart_types(), "XMR"))
+  if(identical(chart_type, "XMR")) {
+    return("X")
+  }
+
+  if(chart_type %in% autospc_chart_types()) {
+    return(chart_type)
+  }
+
+  return(NULL)
 
 }
 

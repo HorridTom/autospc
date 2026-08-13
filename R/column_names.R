@@ -1,8 +1,9 @@
-# Getting from how the user identified a column to the canonical x, y and n.
+# Getting from the column names the user supplied to the names x, y and n that
+# the rest of the package expects.
 #
-# Two halves, in the order they run: resolve_column_name() at the autospc()
-# boundary, turning the argument into a name; then normalise_columns() inside
-# each construction helper, renaming the data to match.
+# Two functions, in the order they run. resolve_column_name() turns the x, y and
+# n arguments of autospc() into column names. normalise_columns() then renames
+# those columns in the data, inside each construction helper.
 
 #' Resolve a column argument to a column name
 #'

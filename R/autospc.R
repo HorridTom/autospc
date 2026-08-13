@@ -221,6 +221,9 @@ autospc <- function(data,
 
   # Build the chart object, from the data exactly as passed. Nothing reads it
   # yet - the pipeline below is unchanged.
+  #
+  # The if() is TEMPORARY and goes when every chart type has a class - see
+  # CLEAN UP #16 in the worklist.
   if(has_autospc_chart_class(chart_type)) {
 
     chart <- autospc_chart(

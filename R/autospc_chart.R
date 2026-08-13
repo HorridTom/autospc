@@ -106,10 +106,18 @@ autospc_chart_types <- function() {
 
 #' Is there an autospc_chart class for this chart_type?
 #'
-#' Scaffolding for the transition: lets `autospc()` build a chart object only
-#' where one can be built, leaving its error behaviour otherwise untouched.
-#' Delete once every chart type has a class and the factory call is
-#' unconditional.
+#' TEMPORARY - remove when `autospc()` starts using the chart object, along
+#' with the `if` around the `autospc_chart()` call in `autospc()`. See CLEAN UP
+#' #16 in the worklist.
+#'
+#' It lets `autospc()` build a chart object only for the chart types that have
+#' a class, and leaves the errors it raises for anything else exactly as they
+#' were.
+#'
+#' `chart_type` has not been checked at the point `autospc()` calls this, so it
+#' may be anything the user passed, including several values at once. Those
+#' return FALSE rather than erroring, so that `validate_chart_type()` still
+#' produces the error message.
 #'
 #' @return TRUE or FALSE.
 #' @noRd
@@ -127,8 +135,11 @@ has_autospc_chart_class <- function(chart_type) {
 
 #' Create an autospc_chart object of the class given by chart_type
 #'
-#' `n` is evaluated only on the P and P' branches, so it may be missing for the
-#' other chart types.
+#' Only the P and P' branches use `n`, and R does not evaluate an argument that
+#' nothing looks at, so `n` may be left out for the other chart types.
+#'
+#' The final `stop()` is the default branch. Without it a chart type with no
+#' matching branch would return NULL without printing anything.
 #'
 #' @return An object of a subclass of `"autospc_chart"`.
 #' @noRd

@@ -1,6 +1,38 @@
-# Every class test file constructs charts whose columns are already x/y/n, so
-# the normalisation is a no-op there. What is tested here is the case those
-# files cannot reach: data whose columns are named something else.
+# Tests for both functions in R/column_names.R, in the order they run:
+# resolve_column_name() on the arguments, then normalise_columns() on the data.
+#
+# For normalise_columns(), every class test file builds charts whose columns
+# are already named x, y and n, so no renaming happens there. What is tested
+# here is data whose columns are named something else.
+
+# resolve_column_name() takes a quosure, so it is called through a wrapper that
+# applies rlang::enquo() to its argument, as in autospc().
+resolve <- function(column, fallback = "x") {
+  resolve_column_name(rlang::enquo(column), fallback)
+}
+
+
+test_that("a bare symbol resolves to its name", {
+
+  expect_identical(resolve(month_start), "month_start")
+
+})
+
+
+test_that("a string resolves to itself", {
+
+  expect_identical(resolve("month_start"), "month_start")
+
+})
+
+
+test_that("a missing argument resolves to the fallback", {
+
+  expect_identical(resolve(), "x")
+  expect_identical(resolve(fallback = "n"), "n")
+
+})
+
 
 user_data <- data.frame(month_start = 1:3,
                         att_all = c(10, 20, 30),

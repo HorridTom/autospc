@@ -105,9 +105,9 @@ test_that("a missing n is caught on the constructor path", {
 test_that("validate_autospc_chart_pp rejects a bare autospc_chart object", {
 
   expect_error(
-    validate_autospc_chart_pp(autospc_chart(data = pp_pre_agg_data,
+    validate_autospc_chart_pp(new_autospc_chart(autospc_chart_list(data = pp_pre_agg_data,
                                             x = "x",
-                                            y = "y")),
+                                            y = "y"))),
     "Not an autospc_chart_pp object"
   )
 

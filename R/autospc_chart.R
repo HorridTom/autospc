@@ -89,28 +89,48 @@ autospc_chart_elements <- function() {
 }
 
 
-#' Create an autospc_chart object
+#' Chart types accepted by autospc()
 #'
-#' Provisional
+#' The single source of truth for the user-facing chart_type values.
 #'
-#' @return An object of class `"autospc_chart"`.
+#' @return A character vector of chart types.
 #' @noRd
-autospc_chart <- function(data,
+autospc_chart_types <- function() {
+
+  chart_types <- c("XMR", "MR", "C", "C'", "P", "P'")
+
+  return(chart_types)
+
+}
+
+
+#' Create an autospc_chart object of the class given by chart_type
+#'
+#' `n` is evaluated only on the P and P' branches, so it may be missing for the
+#' other chart types.
+#'
+#' @return An object of a subclass of `"autospc_chart"`.
+#' @noRd
+autospc_chart <- function(chart_type,
+                          data,
                           x,
                           y,
+                          n,
                           ...) {
-  
-  autospc_chart_l <- autospc_chart_list(data = data,
-                                        x = x,
-                                        y = y,
-                                        ...)
-  
-  autospc_chart_object <- new_autospc_chart(autospc_chart_l)
-  
-  autospc_chart_object <- validate_autospc_chart(autospc_chart_object)
-  
+
+  autospc_chart_object <- switch(
+    chart_type,
+    "C"  = autospc_chart_c(data = data, x = x, y = y, ...),
+    "C'" = autospc_chart_cp(data = data, x = x, y = y, ...),
+    "P"  = autospc_chart_p(data = data, x = x, y = y, n = n, ...),
+    "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
+    "X"  = autospc_chart_x(data = data, x = x, y = y, ...),
+    "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
+    stop("No autospc_chart class for chart_type: ", chart_type, call. = FALSE)
+  )
+
   return(autospc_chart_object)
-  
+
 }
 
 

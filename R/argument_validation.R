@@ -10,7 +10,7 @@
 #' @noRd
 validate_chart_type <- function(chart_type) {
   
-  allowed_chart_types <- c("XMR", "MR", "C", "C'", "P", "P'")
+  allowed_chart_types <- autospc_chart_types()
   
   # NULL check
   if (is.null(chart_type)) {

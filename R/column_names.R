@@ -1,4 +1,30 @@
-# Column normalisation for the construction helpers
+# Getting from how the user identified a column to the canonical x, y and n.
+#
+# Two halves, in the order they run: resolve_column_name() at the autospc()
+# boundary, turning the argument into a name; then normalise_columns() inside
+# each construction helper, renaming the data to match.
+
+#' Resolve a column argument to a column name
+#'
+#' Mirrors what `rename_columns()` accepts: a bare symbol or a string, with a
+#' missing argument meaning the column is already named `fallback`.
+#'
+#' @param column A quosure, as produced by `rlang::enquo()`.
+#' @param fallback Character scalar used when `column` is missing.
+#'
+#' @return A character scalar.
+#' @noRd
+resolve_column_name <- function(column,
+                                fallback) {
+
+  if(rlang::quo_is_missing(column)) {
+    return(fallback)
+  }
+
+  return(rlang::as_name(column))
+
+}
+
 
 #' Normalise the named columns of a chart's data
 #'

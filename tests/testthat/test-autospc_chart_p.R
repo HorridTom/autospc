@@ -261,3 +261,13 @@ test_that("calculate_limits passes exclusion_points through", {
   expect_lt(with_excl$cl[1], without$cl[1])
 
 })
+
+
+test_that("limits_table_columns keeps n and y_numerator", {
+
+  # y holds percentages for this class, so the counts and denominators the
+  # limits were calculated from have to survive into the limits table
+  expect_identical(limits_table_columns(chart_p(pre_agg_data)),
+                   c("n", "y_numerator"))
+
+})

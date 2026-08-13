@@ -51,3 +51,41 @@ test_that("Calculation period is formed correctly",{
   testthat::expect_equal(result_counter_100_lcl,correct_answer_counter_100_lcl)
   
 })
+
+
+test_that("the limits table keeps n and y_numerator for P charts only", {
+
+  # which columns survive is decided by limits_table_columns(), a method on the
+  # chart object. This is the behavioural end of that: the P table has to carry
+  # the counts and denominators the limits were calculated from, and the count
+  # charts must not gain columns they have no use for.
+  proportion_data <- data.frame(x = 1:30,
+                                y = rep(c(3, 4, 2, 5, 3, 4), 5),
+                                n = rep(20L, 30))
+
+  limits_args <- list(period_min = 21,
+                      baseline_length = NULL,
+                      shift_rule_threshold = 8L,
+                      max_exclusions = 3,
+                      no_regrets = TRUE,
+                      verbosity = 0L,
+                      baseline_only = FALSE,
+                      establish_every_shift = FALSE,
+                      centre_line_tolerance = 0,
+                      show_limits = TRUE,
+                      overhanging_reversions = TRUE,
+                      mr_screen_max_loops = 1L)
+
+  p_table <- do.call(create_SPC_auto_limits_table,
+                     c(list(data = proportion_data, chart_type = "P"),
+                       limits_args))
+
+  expect_true(all(c("n", "y_numerator") %in% names(p_table)))
+
+  c_table <- do.call(create_SPC_auto_limits_table,
+                     c(list(data = proportion_data, chart_type = "C"),
+                       limits_args))
+
+  expect_false(any(c("n", "y_numerator") %in% names(c_table)))
+
+})

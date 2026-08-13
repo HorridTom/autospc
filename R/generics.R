@@ -25,6 +25,17 @@ calculate_limits <- function(chart,
 }
 
 
+#' Columns the limits table carries in addition to the common ones
+#'
+#' The names are inserted between `y` and `ucl`, so the order matters.
+#'
+#' @return character vector, possibly empty
+#' @noRd
+limits_table_columns <- function(chart) {
+  UseMethod("limits_table_columns")
+}
+
+
 #' Chart name
 #'
 #' @return string, name of chart for labels

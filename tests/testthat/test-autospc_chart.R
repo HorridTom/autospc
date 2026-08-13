@@ -187,6 +187,38 @@ test_that("autospc_chart keeps data_original as passed", {
 })
 
 
+# limits_table_columns()
+
+test_that("limits_table_columns is empty by default", {
+
+  bare_chart <- new_autospc_chart(autospc_chart_list(data = test_data,
+                                                     x = "x",
+                                                     y = "y"))
+
+  expect_identical(limits_table_columns(bare_chart), character(0))
+
+})
+
+
+test_that("the classes with no override inherit the empty default", {
+
+  # only P and P' calculate limits from a column other than the plotted y, so
+  # only they need extra columns kept
+  for(chart_type in c("C", "C'", "X", "MR")) {
+
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y")
+
+    expect_identical(limits_table_columns(chart), character(0),
+                     info = chart_type)
+
+  }
+
+})
+
+
 # chart_type_for_object()
 
 test_that("every chart type except XMR maps to itself", {

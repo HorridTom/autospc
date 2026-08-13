@@ -136,6 +136,20 @@ calculate_limits.autospc_chart_pp <- function(chart,
 }
 
 
+
+#' Columns the limits table carries in addition to the common ones
+#'
+#' `y` holds percentages for this class, so the counts and denominators the
+#' limits were calculated from have to be kept as well.
+#'
+#' @return character vector
+#' @noRd
+limits_table_columns.autospc_chart_pp <- function(chart) {
+
+  return(c("n", "y_numerator"))
+
+}
+
 # Presentation methods
 
 #' Chart name

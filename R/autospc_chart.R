@@ -232,9 +232,23 @@ autospc_chart_list <- function(data,
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 aggregate_data.autospc_chart <- function(chart) {
-  
+
   return(chart)
-  
+
+}
+
+
+#' Columns the limits table carries in addition to the common ones
+#'
+#' None by default. Overridden by the classes whose limits are calculated from
+#' something other than the plotted `y`.
+#'
+#' @return character vector, possibly empty
+#' @noRd
+limits_table_columns.autospc_chart <- function(chart) {
+
+  return(character(0))
+
 }
 
 

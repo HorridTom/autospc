@@ -260,3 +260,11 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   expect_false(identical(unscreened, screened))
 
 })
+
+
+test_that("limits_table_columns keeps n and y_numerator", {
+
+  expect_identical(limits_table_columns(chart_pp(pp_pre_agg_data)),
+                   c("n", "y_numerator"))
+
+})

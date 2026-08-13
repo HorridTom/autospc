@@ -4,8 +4,7 @@ form_calculation_limits <- function(data,
                                     counter,
                                     period_min,
                                     baseline_length,
-                                    chart_type = "C",
-                                    chart = NULL,
+                                    chart,
                                     max_exclusions = 3,
                                     centre_line_tolerance,
                                     shift_rule_threshold){
@@ -44,6 +43,8 @@ form_calculation_limits <- function(data,
   calculation_period$ucl <- limits_list$ucl
   calculation_period$lcl <- limits_list$lcl
   
+  extra_columns <- limits_table_columns(chart)
+
   calculation_period <- calculation_period %>%
     dplyr::select(x, y, ucl,lcl, cl) %>%
     dplyr::mutate(periodType = "calculation") %>%
@@ -58,16 +59,10 @@ form_calculation_limits <- function(data,
       dplyr::left_join(calculation_period, by = "x") %>%
       dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) 
     
-    # Only selects n if P chart
-    if(chart_type == "P" | chart_type == "P'"){
-      limits_table <- limits_table %>%
-        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded,
-                      dplyr::any_of("log"))
-    } else {
-      limits_table <- limits_table %>%
-        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded,
-                      dplyr::any_of("log"))
-    }
+    limits_table <- limits_table %>%
+      dplyr::select(x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
+                    periodType, excluded,
+                    dplyr::any_of("log"))
     # Add the breakPoint column to keep track of break points as they are
     # added. For compatibility with (at least)
     # add_rule_breaks_respecting_periods, the first point is not classed as a 
@@ -93,26 +88,15 @@ form_calculation_limits <- function(data,
       dplyr::mutate(breakPoint = (breakPoint |
                                     dplyr::row_number() == counter))
     
-    #only selects n if P chart
-    if(chart_type == "P" | chart_type == "P'"){
-      limits_table <- limits_table %>%
-        dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, excluded, 
-                      dplyr::contains("breakPoint"),
-                      dplyr::contains("rule"),
-                      dplyr::contains("aboveOrBelow"),
-                      dplyr::contains("highlight"),
-                      dplyr::contains("run"),
-                      dplyr::any_of("log"))
-    } else {
-      limits_table <- limits_table %>%
-        dplyr::select(x, y, ucl, lcl, cl, periodType, excluded, 
-                      dplyr::contains("breakPoint"),
-                      dplyr::contains("rule"),
-                      dplyr::contains("aboveOrBelow"),
-                      dplyr::contains("highlight"),
-                      dplyr::contains("run"),
-                      dplyr::any_of("log"))
-    }
+    limits_table <- limits_table %>%
+      dplyr::select(x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
+                    periodType, excluded,
+                    dplyr::contains("breakPoint"),
+                    dplyr::contains("rule"),
+                    dplyr::contains("aboveOrBelow"),
+                    dplyr::contains("highlight"),
+                    dplyr::contains("run"),
+                    dplyr::any_of("log"))
   }
   
   return(limits_table)
@@ -194,7 +178,6 @@ form_calculation_and_display_limits <- function(
     period_min = period_min,
     baseline_length = baseline_length,
     counter = counter_at_period_start,
-    chart_type = chart_type,
     chart = chart,
     max_exclusions = max_exclusions,
     centre_line_tolerance = centre_line_tolerance,

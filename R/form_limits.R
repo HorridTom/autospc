@@ -2,12 +2,7 @@
 # data has columns x and y
 form_calculation_limits <- function(data,
                                     counter,
-                                    period_min,
-                                    baseline_length,
-                                    chart,
-                                    max_exclusions = 3,
-                                    centre_line_tolerance,
-                                    shift_rule_threshold){
+                                    chart){
   
   #force columns into the correct type
   if("y" %in% colnames(data)){
@@ -17,20 +12,17 @@ form_calculation_limits <- function(data,
     data$n <- as.double(data$n)
   }
   
-  if(counter == 1L & !is.null(baseline_length)) {
-    periodLength <- baseline_length
+  if(counter == 1L & !is.null(chart$baseline_length)) {
+    periodLength <- chart$baseline_length
   } else {
-    periodLength <- period_min
+    periodLength <- chart$period_min
   }
   
   exclusion_points <- find_extremes(
     data = data,
     chart = chart,
     counter = counter,
-    period_min = periodLength,
-    max_exclusions = max_exclusions,
-    centre_line_tolerance = centre_line_tolerance,
-    shift_rule_threshold = shift_rule_threshold)
+    period_length = periodLength)
   
   calculation_period <- data[counter:(counter + periodLength - 1),]
   
@@ -123,32 +115,22 @@ form_display_limits <- function(limits_table, counter, chart){
 # breaks
 form_calculation_and_display_limits <- function(
     data, 
-    period_min,
-    baseline_length,
     counter_at_period_start, 
-    chart,
-    max_exclusions,
-    centre_line_tolerance,
-    shift_rule_threshold){
+    chart){
   
   #form calculation limits for first period
   limits_table <- form_calculation_limits(
     data = data,
-    period_min = period_min,
-    baseline_length = baseline_length,
     counter = counter_at_period_start,
-    chart = chart,
-    max_exclusions = max_exclusions,
-    centre_line_tolerance = centre_line_tolerance,
-    shift_rule_threshold = shift_rule_threshold)
+    chart = chart)
   
   
   #extend display limits to end 
   
-  if(counter_at_period_start == 1L & !is.null(baseline_length)) {
-    periodLength <- baseline_length
+  if(counter_at_period_start == 1L & !is.null(chart$baseline_length)) {
+    periodLength <- chart$baseline_length
   } else {
-    periodLength <- period_min
+    periodLength <- chart$period_min
   }
   
   limits_table <- form_display_limits(limits_table = limits_table, 
@@ -160,8 +142,8 @@ form_calculation_and_display_limits <- function(
   limits_table <- add_rule_breaks_respecting_periods(
     limits_table = limits_table, 
     counter = counter_at_period_start,
-    centre_line_tolerance = centre_line_tolerance,
-    shift_rule_threshold = shift_rule_threshold)
+    centre_line_tolerance = chart$centre_line_tolerance,
+    shift_rule_threshold = chart$shift_rule_threshold)
   
   return(limits_table)
 }

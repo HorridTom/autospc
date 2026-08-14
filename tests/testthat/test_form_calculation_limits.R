@@ -1,30 +1,24 @@
 #load in test data
 test_data <- readRDS("testdata/test_data.rds")
 
-# form_calculation_limits() gets which limits to calculate from the chart
-# object, so one has to be supplied. These figures are C chart limits.
+# form_calculation_limits() takes its configuration from the chart object,
+# so the settings these figures were produced with live on the chart. They are
+# the defaults: period_min 21, no baseline_length, shift_rule_threshold 8,
+# centre_line_tolerance 0, max_exclusions 3.
 test_chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
 
 test_that("Calculation period is formed correctly",{
   
   result_counter_one <- form_calculation_limits(test_data,
                                                 chart = test_chart,
-                                                counter = 1,
-                                                period_min = 21,
-                                                baseline_length = NULL,
-                                                centre_line_tolerance = 0,
-                                                shift_rule_threshold = 8)
+                                                counter = 1)
   result_counter_one_ucl <- result_counter_one$ucl[1:21]
   result_counter_one_cl <- result_counter_one$cl[1:21]
   result_counter_one_lcl <- result_counter_one$lcl[1:21]
   
   result_counter_100 <- form_calculation_limits(result_counter_one,
                                                 chart = test_chart,
-                                                counter = 100,
-                                                period_min = 21,
-                                                baseline_length = NULL,
-                                                centre_line_tolerance = 0,
-                                                shift_rule_threshold = 8)
+                                                counter = 100)
   result_counter_100_ucl <- result_counter_100$ucl[100:120]
   result_counter_100_cl <- result_counter_100$cl[100:120]
   result_counter_100_lcl <- result_counter_100$lcl[100:120]

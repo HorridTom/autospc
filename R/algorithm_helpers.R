@@ -1,8 +1,6 @@
 # Function to determine whether there are enough data points left to form a new
 # period
 enough_data_for_new_period <- function(data,
-                                       period_min,
-                                       baseline_length,
                                        counter,
                                        chart){
   
@@ -13,13 +11,13 @@ enough_data_for_new_period <- function(data,
     chart = chart,
     data = remaining_data)
   
-  if(counter == 1L & !is.null(baseline_length)) {
+  if(counter == 1L & !is.null(chart$baseline_length)) {
     
-    enough_data <- num_remaining_non_missing_data_points >= baseline_length 
+    enough_data <- num_remaining_non_missing_data_points >= chart$baseline_length 
     
   } else {
     
-    enough_data <- num_remaining_non_missing_data_points >= period_min
+    enough_data <- num_remaining_non_missing_data_points >= chart$period_min
     
   }
   
@@ -29,22 +27,21 @@ enough_data_for_new_period <- function(data,
 
 # Function to find most extreme points outside of control limits and return
 # their positions
+# period_length is the length of *this* period, which is baseline_length for
+# the first one, so it is not chart$period_min and cannot be read off the chart.
 find_extremes <- function(data,
                           chart,
                           counter,
-                          period_min,
-                          max_exclusions,
-                          centre_line_tolerance,
-                          shift_rule_threshold){
+                          period_length){
   
   #initialise variables
   i <- 1
   exclusion_points <- NULL
   furthest_extremes <- NULL
   
-  while(i <= max_exclusions){
+  while(i <= chart$max_exclusions){
     
-    calculation_period <- data[counter:(counter + period_min - 1),]
+    calculation_period <- data[counter:(counter + period_length - 1),]
     
     limits_list <- calculate_limits(chart = chart,
                                     period = calculation_period,
@@ -59,8 +56,8 @@ find_extremes <- function(data,
     
     calculation_period <- add_rule_breaks(
       calculation_period,
-      centre_line_tolerance = centre_line_tolerance,
-      shift_rule_threshold = shift_rule_threshold)
+      centre_line_tolerance = chart$centre_line_tolerance,
+      shift_rule_threshold = chart$shift_rule_threshold)
     calculation_period <- calculation_period %>% 
       dplyr::mutate(aboveCl = ifelse(y > cl,
                                      TRUE,
@@ -96,8 +93,8 @@ find_extremes <- function(data,
   
   # Check whether there are more than 3 exclusion points (due to points with the
   # same values)
-  if(length(exclusion_points) > max_exclusions){
-    exclusion_points <- exclusion_points[1:max_exclusions]
+  if(length(exclusion_points) > chart$max_exclusions){
+    exclusion_points <- exclusion_points[1:chart$max_exclusions]
   }
   
   if(length(exclusion_points) == 0){

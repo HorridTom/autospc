@@ -93,8 +93,6 @@ create_SPC_auto_limits_table <- function(data,
                            entry = "0100")
   # Check whether there are enough data points to form one period
   if(!enough_data_for_new_period(data = data,
-                                 period_min = period_min,
-                                 baseline_length = baseline_length,
                                  counter = counter,
                                  chart = chart)){
     
@@ -115,13 +113,8 @@ create_SPC_auto_limits_table <- function(data,
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
       data = data, 
-      period_min = period_min,
-      baseline_length = baseline_length,
       counter_at_period_start = counter, 
-      chart = chart, 
-      max_exclusions  = max_exclusions, 
-      centre_line_tolerance = centre_line_tolerance,
-      shift_rule_threshold = shift_rule_threshold)
+      chart = chart)
     
     limits_table <- record_log_entry(df = limits_table,
                                      counter = counter,
@@ -144,8 +137,6 @@ create_SPC_auto_limits_table <- function(data,
         
         # [4] Check whether enough points after the counter to form new period
         if(!enough_data_for_new_period(data = limits_table,
-                                       period_min = period_min,
-                                       baseline_length = baseline_length,
                                        counter = counter,
                                        chart = chart)) {        
           
@@ -228,8 +219,6 @@ create_SPC_auto_limits_table <- function(data,
             # form a new period
             
             if(!enough_data_for_new_period(data = limits_table,
-                                           period_min = period_min,
-                                           baseline_length = baseline_length,
                                            counter = counter,
                                            chart = chart)){
               
@@ -247,13 +236,8 @@ create_SPC_auto_limits_table <- function(data,
               
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
-                period_min = period_min,
-                baseline_length = baseline_length,
                 counter_at_period_start = counter,
-                chart = chart,
-                max_exclusions = max_exclusions,
-                centre_line_tolerance = centre_line_tolerance,
-                shift_rule_threshold = shift_rule_threshold)
+                chart = chart)
               
               # Establish whether there is a rule break in the opposite
               # direction within this calculation period

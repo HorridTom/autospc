@@ -30,7 +30,7 @@ extreme_mr_data <- readRDS("testdata/test_mr_data.rds")
 test_mr_answer <- readRDS(file.path("testdata",
                                     "test_mr_answer.rds"))
 
-test_that("I chart limits the same as live qicharts2 v.0.7.2",{
+test_that("I chart limits with mr screening remove extreme moving ranges",{
   results <- get_i_limits(y = extreme_mr_data$y,
                           mr_screen_max_loops = 1)
   

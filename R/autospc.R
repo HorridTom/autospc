@@ -285,20 +285,25 @@ autospc <- function(data,
   
   # Turn the aggregated data into the series the algorithm analyses.
   #
-  # The object is not yet what carries the data through the pipeline - the
-  # aggregation above still works on a bare frame - so the aggregated data is
-  # put onto the chart, prepared, and taken off again. That shuffle goes when
-  # the pipeline reads chart$data throughout.
+  # The aggregation above still works on a bare frame, so the aggregated data is
+  # put onto the chart here. That line goes when aggregation reads chart$data
+  # too.
   chart$data <- data
   chart <- prepare_data(chart)
-  data <- chart$data
-  
+
   # Get control limits
-  data <- create_SPC_auto_limits_table(
-    data,
-    chart = chart,
-    show_limits = show_limits
-  )
+  chart <- run_limit_algorithm(chart)
+
+  data <- chart$result$table
+
+  # The algorithm returns a table with no limits columns when there were too few
+  # points to form a period. Warning here rather than inside the algorithm keeps
+  # show_limits, which is purely presentational, out of it.
+  if(show_limits && !("cl" %in% colnames(data))) {
+    warning(paste("The input data has fewer than the minimum number of",
+                  "points needed to calculate one period. Timeseries data",
+                  "without limits has been displayed."))
+  }
   
   # Output log data
   log_output(data,

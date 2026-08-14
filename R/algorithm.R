@@ -1,12 +1,14 @@
 #' Apply the Stable Shift Algorithm to a prepared series
 #'
-#' @return data frame with limits, rule breaks and additional info needed for
-#'   plotting
+#' Reads `chart$data` and returns the chart with `chart$result$table` set. When
+#' there are too few points to form a period the table has no limits columns.
+#'
+#' @return autospc_chart object
 #' @noRd
-create_SPC_auto_limits_table <- function(data,
-                                         chart,
-                                         show_limits) {
-  
+run_limit_algorithm <- function(chart) {
+
+  data <- chart$data
+
   #set counter to one
   counter <- 1
   
@@ -23,13 +25,9 @@ create_SPC_auto_limits_table <- function(data,
                              counter = counter,
                              entry = "0210")
     
-    if(show_limits == TRUE){
-      warning(paste("The input data has fewer than the minimum number of",
-                    "points needed to calculate one period. Timeseries data",
-                    "without limits has been displayed."))
-    }
-    
-    return(data)
+    chart$result$table <- data
+
+    return(chart)
     
   } else {
     
@@ -256,6 +254,8 @@ create_SPC_auto_limits_table <- function(data,
       dplyr::mutate(ucl = dplyr::if_else(is.na(y), as.numeric(NA), ucl)) %>%
       dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
     
-    return(limits_table)
+    chart$result$table <- limits_table
+
+    return(chart)
   } # end of: [2] enough data points to form one period
 }

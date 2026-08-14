@@ -296,20 +296,8 @@ autospc <- function(data,
   # Get control limits
   data <- create_SPC_auto_limits_table(
     data,
-    chart_type = chart_type,
     chart = chart,
-    period_min = period_min,
-    baseline_length = baseline_length,
-    shift_rule_threshold = shift_rule_threshold,
-    max_exclusions  = max_exclusions,
-    no_regrets = no_regrets,
-    verbosity = verbosity,
-    baseline_only = baseline_only,
-    establish_every_shift = establish_every_shift,
-    centre_line_tolerance = centre_line_tolerance,
-    show_limits = show_limits,
-    overhanging_reversions = overhanging_reversions,
-    mr_screen_max_loops = mr_screen_max_loops
+    show_limits = show_limits
   )
   
   # Output log data

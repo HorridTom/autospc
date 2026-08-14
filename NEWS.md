@@ -1,5 +1,25 @@
 # autospc (development version)
 
+## Lifecycle changes
+
+### Breaking changes
+
+* `create_SPC_auto_limits_table()` is no longer exported. It was an internal
+  step of `autospc()` that had been made public without a documented reason,
+  and holding it to a public interface was preventing the simplification of the
+  package's internals.
+
+  `autospc()` does the same work and is the supported way to do it. For the
+  results as data rather than a plot, use `autospc(plot_chart = FALSE)`, which
+  returns the same limits, rule breaks and period boundaries with the
+  additional columns needed for plotting.
+
+  If you were calling `create_SPC_auto_limits_table()` directly and
+  `autospc(plot_chart = FALSE)` does not meet your needs, please open an issue
+  at <https://github.com/HorridTom/autospc/issues> — we are happy to help you
+  move across.
+
+
 # autospc 0.0.0.9040
 
 ## Lifecycle changes

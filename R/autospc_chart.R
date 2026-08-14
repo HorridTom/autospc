@@ -163,16 +163,44 @@ autospc_chart <- function(chart_type,
                           x,
                           y,
                           n,
+                          no_regrets = TRUE,
+                          overhanging_reversions = TRUE,
                           ...) {
+
+  if(no_regrets & !overhanging_reversions) {
+    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
+                   "FALSE does not make sense, since no_regrets requires ",
+                   "consideration of overhanging reversions. Changing ",
+                   "overhanging_reversions to TRUE."))
+    overhanging_reversions <- TRUE
+  }
 
   autospc_chart_object <- switch(
     chart_type,
-    "C"  = autospc_chart_c(data = data, x = x, y = y, ...),
-    "C'" = autospc_chart_cp(data = data, x = x, y = y, ...),
-    "P"  = autospc_chart_p(data = data, x = x, y = y, n = n, ...),
-    "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
-    "X"  = autospc_chart_x(data = data, x = x, y = y, ...),
-    "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
+    "C"  = autospc_chart_c(data = data, x = x, y = y,
+                           no_regrets = no_regrets,
+                           overhanging_reversions = overhanging_reversions,
+                           ...),
+    "C'" = autospc_chart_cp(data = data, x = x, y = y,
+                            no_regrets = no_regrets,
+                            overhanging_reversions = overhanging_reversions,
+                            ...),
+    "P"  = autospc_chart_p(data = data, x = x, y = y, n = n,
+                           no_regrets = no_regrets,
+                           overhanging_reversions = overhanging_reversions,
+                           ...),
+    "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n,
+                            no_regrets = no_regrets,
+                            overhanging_reversions = overhanging_reversions,
+                            ...),
+    "X"  = autospc_chart_x(data = data, x = x, y = y,
+                           no_regrets = no_regrets,
+                           overhanging_reversions = overhanging_reversions,
+                           ...),
+    "MR" = autospc_chart_mr(data = data, x = x, y = y,
+                            no_regrets = no_regrets,
+                            overhanging_reversions = overhanging_reversions,
+                            ...),
     stop("No autospc_chart class for chart_type: ", chart_type, call. = FALSE)
   )
 

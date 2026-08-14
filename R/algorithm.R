@@ -1,88 +1,11 @@
-#' Automatically recalculate SPC control limits
-#'
-#' `create_SPC_auto_limits_table` applies the Stable Shift Algorithm to automate
-#' recalculation of control limits.
-#' 
-#' @inheritParams autospc
-#' @param chart Optional `autospc_chart` object. Built from the other arguments
-#'   if not supplied. Nothing reads it yet.
+#' Apply the Stable Shift Algorithm to a prepared series
 #'
 #' @return data frame with limits, rule breaks and additional info needed for
 #'   plotting
-#'
-#' @examples
-#' # Calculate limts for a C' chart for count of monthly attendances
-#'
-#' df <- ed_attendances_monthly %>%
-#'         dplyr::rename(x = month_start,
-#'                       y = att_all)
-#'
-#' limits_table <- create_SPC_auto_limits_table(
-#'   df,
-#'   chart_type = "C'",
-#'   period_min = 21,
-#'   baseline_length = NULL,
-#'   shift_rule_threshold = 8,
-#'   max_exclusions = 3,
-#'   no_regrets = TRUE,
-#'   verbosity = 1L,
-#'   baseline_only = FALSE,
-#'   establish_every_shift = FALSE,
-#'   centre_line_tolerance = 0,
-#'   show_limits = TRUE,
-#'   overhanging_reversions = TRUE,
-#'   mr_screen_max_loops = 1L
-#' )
-#'
-#' head(limits_table)
-#'
-#' @export
-create_SPC_auto_limits_table <- function(data, 
-                                         chart_type,
-                                         chart = NULL,
-                                         period_min,
-                                         baseline_length,
-                                         shift_rule_threshold,
-                                         max_exclusions,
-                                         no_regrets,
-                                         verbosity,
-                                         baseline_only,
-                                         establish_every_shift,
-                                         centre_line_tolerance,
-                                         show_limits,
-                                         overhanging_reversions,
-                                         mr_screen_max_loops
-) {
-  
-  # autospc() passes its own chart object in. Anything calling this directly
-  # gets one built here from the arguments it supplied. Nothing reads it yet.
-  object_chart_type <- chart_type_for_object(chart_type)
-
-  if(is.null(chart) && !is.null(object_chart_type)) {
-    chart <- autospc_chart(chart_type = object_chart_type,
-                           data = data,
-                           x = "x",
-                           y = "y",
-                           n = "n",
-                           period_min = period_min,
-                           baseline_length = baseline_length,
-                           shift_rule_threshold = shift_rule_threshold,
-                           baseline_only = baseline_only,
-                           establish_every_shift = establish_every_shift,
-                           no_regrets = no_regrets,
-                           overhanging_reversions = overhanging_reversions,
-                           max_exclusions = max_exclusions,
-                           mr_screen_max_loops = mr_screen_max_loops,
-                           centre_line_tolerance = centre_line_tolerance)
-  }
-  
-  if(no_regrets & !overhanging_reversions) {
-    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
-                   "FALSE does not make sense, since no_regrets requires ",
-                   "consideration of overhanging reversions. Changing ",
-                   "overhanging_reversions to TRUE."))
-    overhanging_reversions <- TRUE
-  }
+#' @noRd
+create_SPC_auto_limits_table <- function(data,
+                                         chart,
+                                         show_limits) {
   
   #set counter to one
   counter <- 1
@@ -121,13 +44,13 @@ create_SPC_auto_limits_table <- function(data,
                                      entry = "0200")
     
     # Set counter to first point after end of first period
-    if(counter == 1L & !is.null(baseline_length)) {
-      counter <- counter + baseline_length
+    if(counter == 1L & !is.null(chart$baseline_length)) {
+      counter <- counter + chart$baseline_length
     } else {
-      counter <- counter + period_min
+      counter <- counter + chart$period_min
     }
     
-    if(!baseline_only){
+    if(!chart$baseline_only){
       # [3] Algorithm loop starts - unless user specified no recalculations
       limits_table <- record_log_entry(df = limits_table,
                                        counter = counter,
@@ -156,7 +79,8 @@ create_SPC_auto_limits_table <- function(data,
           # with at least [shift_rule_threshold] rule 2 break points following.
           if(counter_at_rule_break(df = limits_table,
                                    counter = counter,
-                                   shift_rule_threshold = shift_rule_threshold)
+                                   shift_rule_threshold =
+                                     chart$shift_rule_threshold)
           ) {
             # If so, set next rule break position to the counter. 
             rule2_break_positions <- NA
@@ -245,11 +169,11 @@ create_SPC_auto_limits_table <- function(data,
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
                 counter,
-                period_min,
+                chart$period_min,
                 triggering_rule_break_direction,
-                centre_line_tolerance = centre_line_tolerance,
-                shift_rule_threshold = shift_rule_threshold,
-                overhanging_reversions = overhanging_reversions)[[1]]
+                centre_line_tolerance = chart$centre_line_tolerance,
+                shift_rule_threshold = chart$shift_rule_threshold,
+                overhanging_reversions = chart$overhanging_reversions)[[1]]
               
               # Establish whether (for no regrets) the final run in the
               # candidate calculation period prevents re-establishment of limits
@@ -274,10 +198,10 @@ create_SPC_auto_limits_table <- function(data,
               # 2) Either:
               #     a) no_regrets is FALSE OR
               #     b) the final run does not prevent re-establishment of limits
-              if(establish_every_shift |
+              if(chart$establish_every_shift |
                  (!opposite_rule_break &
-                  ((no_regrets == TRUE & !final_run_prevents) |
-                   no_regrets == FALSE))){
+                  ((chart$no_regrets == TRUE & !final_run_prevents) |
+                   chart$no_regrets == FALSE))){
                 # [7a] If so, re-establish limits at the counter, confirming the
                 # candidate limits
                 
@@ -289,7 +213,7 @@ create_SPC_auto_limits_table <- function(data,
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
-                counter <- counter + period_min
+                counter <- counter + chart$period_min
                 
               } else {
                 # [7b] If not (i.e. there is an opposing rule break, or the
@@ -308,7 +232,7 @@ create_SPC_auto_limits_table <- function(data,
                 # [shift_rule_threshold] points of the run following
                 if(is.na(rule2_break_positions[2]) | 
                    all(
-                     limits_table$rule2[counter:(counter + shift_rule_threshold 
+                     limits_table$rule2[counter:(counter + chart$shift_rule_threshold 
                                                  - 1)]
                    )){
                   

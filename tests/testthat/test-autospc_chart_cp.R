@@ -175,3 +175,11 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   )
 
 })
+
+
+test_that("the C' chart y axis leaves headroom above the upper limit", {
+
+  expect_identical(y_axis_range(test_chart_cp(), limits_data),
+                   list(low = 0, high = 18 + 18 / 10 + 10))
+
+})

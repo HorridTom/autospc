@@ -29,34 +29,13 @@ postprocess <- function(
   if(num_non_missing_y < chart$period_min) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
-  } else if(chart_type != "XMR") {
-    ylimlow <- 0
-  } else {
-    ylimlow <- min(df$lcl,
-                   df$y,
-                   na.rm = TRUE)
-    yll_sgn <- sign(ylimlow)
-    if(yll_sgn != -1) {
-      ylimlow <- ylimlow * 0.9
-    } else {
-      ylimlow <- ylimlow * 1.1
-    }
-  }
-  
-  if(num_non_missing_y < chart$period_min) {
     ylimhigh <- max(df$y,
                     na.rm = TRUE)
-  } else if(chart_type == "C" | chart_type == "C'") {
-    ylimhigh <- max(df$ucl,
-                    df$y,
-                    na.rm = TRUE) + max(df$ucl,
-                                        na.rm = TRUE)/10 + 10
-  } else if (chart_type == "XMR" | chart_type == "MR") {
-    ylimhigh <- max(df$ucl,
-                    df$y,
-                    na.rm = TRUE)*1.1
   } else {
-    ylimhigh <- 110
+    y_range <- y_axis_range(chart = chart,
+                            data = df)
+    ylimlow <- y_range$low
+    ylimhigh <- y_range$high
   }
   
   #Override y limit if specified
@@ -65,13 +44,7 @@ postprocess <- function(
   }
   
   # Ensure axis titles available
-  ytitle <- switch(chart_type,
-                   C = "Number",
-                   `C'` = "Number",
-                   P = "Percentage",
-                   `P'` = "Percentage",
-                   XMR = "X",
-                   MR = "MR")
+  ytitle <- y_axis_title(chart)
   
   if(is.null(override_x_title)) {
     override_x_title <- "Day"
@@ -145,6 +118,7 @@ postprocess_spc <- function(
   # add annotation information
   df <- add_annotation_data(df = df,
                             chart_type = chart_type,
+                            chart = chart,
                             ylimhigh = ylimhigh,
                             align_labels = align_labels,
                             flip_labels = flip_labels,

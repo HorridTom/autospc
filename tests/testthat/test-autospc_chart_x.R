@@ -167,3 +167,28 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   )
 
 })
+
+
+test_that("X chart labels are rounded to the scale of the axis", {
+
+  expect_identical(label_accuracy(test_chart_x(), ylimhigh = 1000), 0.1)
+
+})
+
+
+test_that("the X chart y axis follows the data below as well as above", {
+
+  expect_identical(y_axis_range(test_chart_x(), limits_data),
+                   list(low = 6 * 0.9, high = 18 * 1.1))
+
+})
+
+
+test_that("a negative X chart lower limit is padded downwards", {
+
+  below_zero <- limits_data
+  below_zero$lcl <- -4
+
+  expect_identical(y_axis_range(test_chart_x(), below_zero)$low, -4 * 1.1)
+
+})

@@ -260,6 +260,18 @@ chart_type_label.autospc_chart_pp <- function(chart) {
 }
 
 
+#' Rounding accuracy for centre line labels
+#'
+#' @return number, passed to scales::number(accuracy =)
+#' @noRd
+label_accuracy.autospc_chart_pp <- function(chart,
+                                            ylimhigh) {
+
+  return(0.1)
+
+}
+
+
 #' Retrieve default y axis label
 #'
 #' @return string

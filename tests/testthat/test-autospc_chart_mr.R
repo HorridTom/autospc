@@ -203,3 +203,25 @@ test_that("prepare_data replaces y with the moving ranges", {
   expect_identical(prepared$data_original, counts)
 
 })
+
+
+test_that("the first MR centre line label goes on row two", {
+
+  expect_identical(first_label_row(test_chart_mr()), 2L)
+
+})
+
+
+test_that("MR chart labels are rounded to the scale of the axis", {
+
+  expect_identical(label_accuracy(test_chart_mr(), ylimhigh = 1000), 0.1)
+
+})
+
+
+test_that("the MR chart y axis starts at zero", {
+
+  expect_identical(y_axis_range(test_chart_mr(), limits_data),
+                   list(low = 0, high = 18 * 1.1))
+
+})

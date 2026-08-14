@@ -397,3 +397,11 @@ test_that("prepare_data gives NA for a zero or missing denominator", {
   expect_identical(prepared$data$y, c(10, NA_real_, NA_real_))
 
 })
+
+
+test_that("P' chart labels are rounded to one decimal place", {
+
+  expect_identical(label_accuracy(chart_pp(pp_pre_agg_data), ylimhigh = 110),
+                   0.1)
+
+})

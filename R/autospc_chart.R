@@ -337,3 +337,46 @@ extrapolate_limits.autospc_chart <- function(chart,
 
 }
 
+
+# Presentation methods
+
+#' Row that carries the first centre line label
+#'
+#' @return integer, row number
+#' @noRd
+first_label_row.autospc_chart <- function(chart) {
+
+  return(1L)
+
+}
+
+
+#' Rounding accuracy for centre line labels
+#'
+#' Whole numbers by default. Overridden by the classes labelled as percentages
+#' and by those whose accuracy follows the scale of the data.
+#'
+#' @return number, passed to scales::number(accuracy =)
+#' @noRd
+label_accuracy.autospc_chart <- function(chart,
+                                         ylimhigh) {
+
+  return(1)
+
+}
+
+
+#' Lower and upper ends of the y axis
+#'
+#' Zero to 110, the range for a chart labelled as a percentage. Overridden by
+#' the classes whose axis follows the data.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+y_axis_range.autospc_chart <- function(chart,
+                                       data) {
+
+  return(list(low = 0,
+              high = 110))
+
+}

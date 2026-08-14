@@ -207,3 +207,11 @@ test_that("calculate_limits passes exclusion_points through", {
             calculate_limits(test_chart_c(), count_period_data, NULL)$cl[1])
 
 })
+
+
+test_that("the C chart y axis leaves headroom above the upper limit", {
+
+  expect_identical(y_axis_range(test_chart_c(), limits_data),
+                   list(low = 0, high = 18 + 18 / 10 + 10))
+
+})

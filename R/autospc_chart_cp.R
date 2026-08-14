@@ -114,6 +114,28 @@ chart_type_label.autospc_chart_cp <- function(chart) {
 }
 
 
+#' Lower and upper ends of the y axis
+#'
+#' Headroom above the highest point or limit, so the annotations have room.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+y_axis_range.autospc_chart_cp <- function(chart,
+                                          data) {
+
+  high <- max(data$ucl,
+              data$y,
+              na.rm = TRUE) +
+    max(data$ucl,
+        na.rm = TRUE) / 10 +
+    10
+
+  return(list(low = 0,
+              high = high))
+
+}
+
+
 #' Retrieve default y axis label
 #'
 #' @return string

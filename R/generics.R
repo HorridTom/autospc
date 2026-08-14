@@ -103,6 +103,38 @@ chart_type_label <- function(chart) {
 }
 
 
+#' Row that carries the first centre line label
+#'
+#' @return integer, row number
+#' @noRd
+first_label_row <- function(chart) {
+  UseMethod("first_label_row")
+}
+
+
+#' Rounding accuracy for centre line labels
+#'
+#' @param ylimhigh upper end of the y axis, used by the classes whose accuracy
+#'   depends on the scale of the data
+#' @return number, passed to scales::number(accuracy =)
+#' @noRd
+label_accuracy <- function(chart, ylimhigh) {
+  UseMethod("label_accuracy")
+}
+
+
+#' Lower and upper ends of the y axis
+#'
+#' Answers only the class-dependent question. The caller applies the
+#' short-series fallback and any user override.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+y_axis_range <- function(chart, data) {
+  UseMethod("y_axis_range")
+}
+
+
 #' Retrieve default y axis label
 #'
 #' @return string

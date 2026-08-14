@@ -486,3 +486,35 @@ test_that("every chart type a user can pass can be built", {
   }
 
 })
+
+
+# first_label_row(), label_accuracy(), y_axis_range()
+
+test_that("the first centre line label goes on row one by default", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+
+  expect_identical(first_label_row(chart), 1L)
+
+})
+
+
+test_that("centre line labels are rounded to whole numbers by default", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+
+  expect_identical(label_accuracy(chart, ylimhigh = 1000), 1)
+
+})
+
+
+test_that("the default y axis range is a percentage scale", {
+
+  bare_chart <- new_autospc_chart(autospc_chart_list(data = test_data,
+                                                     x = "x",
+                                                     y = "y"))
+
+  expect_identical(y_axis_range(bare_chart, limits_data),
+                   list(low = 0, high = 110))
+
+})

@@ -28,3 +28,11 @@ count_period_data <- data.frame(x = 1:10,
 # get_cp_limits() and get_i_limits().
 screening_data <- data.frame(x = 1:10,
                              y = c(12, 15, 11, 14, 13, 60, 12, 14, 13, 11))
+
+
+# a plotted series with limits, as the y axis methods see it
+limits_data <- data.frame(x = 1:5,
+                          y = c(10, 12, 11, 13, 14),
+                          cl = 12,
+                          lcl = 6,
+                          ucl = 18)

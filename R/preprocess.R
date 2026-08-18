@@ -5,9 +5,7 @@ preprocess_inputs <- function(
     title = NULL,
     subtitle = NULL,
     upper_annotation_sf = NULL,
-    lower_annotation_sf = NULL,
-    override_annotation_dist = NULL,
-    override_annotation_dist_P = NULL) {
+    lower_annotation_sf = NULL) {
   
   validate_chart_type(chart_type)
   
@@ -32,38 +30,6 @@ preprocess_inputs <- function(
      all(xType != "integer")) {
     warning(paste("Please make sure that your x column is a",
                   "'Date', 'POSIXct', 'numeric' or 'integer' type."))
-  }
-  
-  # Check annotation arguments
-  if(!is.null(override_annotation_dist) |
-     !is.null(override_annotation_dist_P)) {
-    
-    lifecycle::deprecate_warn(
-      when = "0.0.0.9010",
-      what = I(paste0("autospc(override_annotation_dist,",
-                      "override_annotation_dist_P)")),
-      details = I(paste0("Please use `autospc(upper_annotation_sf, ",
-                         "lower_annotation_sf)` instead. ",
-                         "Note that equivalent new arguments can be obtained ",
-                         "from the old by transforming as follows: 1+1/x. ",
-                         "For example, override_annotation_dist = 10 is ",
-                         "equivalent to upper_annotation_sf = 1.1."))
-    )
-    
-    if(!is.null(override_annotation_dist_P) & startsWith(chart_type, "P")) {
-      oad <- override_annotation_dist_P
-    } else {
-      oad <- override_annotation_dist
-    }
-    
-    if(is.null(upper_annotation_sf)) {
-      upper_annotation_sf <- 1 + 1/oad
-    }
-    
-    if(is.null(lower_annotation_sf)) {
-      lower_annotation_sf <- 1 - 1/oad
-    }
-    
   }
   
   if(is.null(upper_annotation_sf)) {
@@ -148,47 +114,6 @@ order_series <- function(chart) {
 
   return(chart)
 
-}
-
-
-# Aggregate data
-aggregate_data_deprecated <- function(df,
-                           chart_type) {
-  
-  any_multiple_x <- df %>%
-    dplyr::group_by(x) %>%
-    dplyr::summarise(num_rows = dplyr::n()) %>%
-    dplyr::mutate(multiple_rows = num_rows > 1L) %>%
-    dplyr::pull(multiple_rows) %>%
-    any()
-  
-  if(!any_multiple_x) {
-    return(df)
-  }
-  
-  switch(chart_type,
-         "P" =,
-         "P'" = {
-           if(!("n" %in% colnames(df))) {
-             df <- df %>%
-               dplyr::mutate(n = 1L)
-           }
-           df_agg <- df %>%
-             dplyr::group_by(x) %>%
-             dplyr::summarise(y = sum(y),
-                              n = sum(n))
-         },
-         "C" =,
-         "C'" = {
-           df_agg <- df %>%
-             dplyr::group_by(x) %>%
-             dplyr::summarise(y = sum(y))
-         },
-         {
-           df_agg <- df
-         })
-  
-  return(df_agg)
 }
 
 

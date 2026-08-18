@@ -52,8 +52,8 @@ autospc(
   lower_annotation_sf = NULL,
   annotation_arrows = FALSE,
   annotation_arrow_curve = 0.3,
-  override_annotation_dist = NULL,
-  override_annotation_dist_P = NULL
+  override_annotation_dist = deprecated(),
+  override_annotation_dist_P = deprecated()
 )
 }
 \arguments{
@@ -235,9 +235,14 @@ connecting centre line labels to the centre line they refer to}
 
 \item{annotation_arrow_curve}{Numeric curvature of the annotation arrows}
 
-\item{override_annotation_dist}{Deprecated}
+\item{override_annotation_dist}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{upper_annotation_sf} and \code{lower_annotation_sf} instead. The equivalent
+scale factor is \code{1 + 1/override_annotation_dist}, so
+\code{override_annotation_dist = 10} becomes \code{upper_annotation_sf = 1.1}.}
 
-\item{override_annotation_dist_P}{Deprecated}
+\item{override_annotation_dist_P}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{upper_annotation_sf} and \code{lower_annotation_sf} instead. These apply to
+every chart type, so a P or P' chart no longer needs an argument of its own.}
 }
 \value{
 An SPC ggplot or corresponding data

@@ -25,9 +25,10 @@
 # 
 # x <- rep(c(1L:42L),
 #          times = y)
-# 
-# test_cchart_aggregation_data <- tibble::tibble(x = x)
-# 
+#
+# test_cchart_aggregation_data <- tibble::tibble(x = x,
+#                                                y = 1L)
+#
 # saveRDS(test_cchart_aggregation_data,
 #         file = "tests/testthat/testdata/test_cchart_aggregation_data.rds")
 # 
@@ -53,11 +54,21 @@ test_cchart_aggregated_data <- readRDS(
   file.path("testdata",
             "test_cchart_aggregated_data.rds"))
 
+# The expected values come from an Excel pivot table rather than from this
+# package, so these two tests check the arithmetic against an independent
+# oracle at realistic scale. The class test files check the object plumbing -
+# that dispatch happens, that the class survives, that data_original is left
+# alone - which these cannot, and neither set replaces the other.
+
 test_that("binary aggregation works", {
-  
-  aggregated_data <- aggregate_data_deprecated(df = test_pchart_aggregation_data,
-                                    chart_type = "P")
-  
+
+  chart <- autospc_chart_p(data = test_pchart_aggregation_data,
+                           x = "x",
+                           y = "y",
+                           n = "n")
+
+  aggregated_data <- aggregate_data(chart)$data
+
   expect_equal(aggregated_data$x,
                test_pchart_aggregated_data$x)
   expect_equal(aggregated_data$y,
@@ -69,14 +80,17 @@ test_that("binary aggregation works", {
 
 
 test_that("count aggregation works", {
-  
-  aggregated_data <- aggregate_data_deprecated(df = test_cchart_aggregation_data,
-                                    chart_type = "C")
-  
+
+  chart <- autospc_chart_c(data = test_cchart_aggregation_data,
+                           x = "x",
+                           y = "y")
+
+  aggregated_data <- aggregate_data(chart)$data
+
   expect_equal(aggregated_data$x,
                test_cchart_aggregated_data$x)
   expect_equal(aggregated_data$y,
                test_cchart_aggregated_data$y)
-  
+
 })
 

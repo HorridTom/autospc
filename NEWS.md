@@ -4,6 +4,18 @@
 
 ### Breaking changes
 
+* `autospc(override_annotation_dist)` and `autospc(override_annotation_dist_P)`
+  are now defunct. They have warned since 0.0.0.9010; supplying either is now an
+  error. Use `upper_annotation_sf` and `lower_annotation_sf` instead — the
+  equivalent scale factor is `1 + 1/x`, so `override_annotation_dist = 10`
+  becomes `upper_annotation_sf = 1.1`, and `lower_annotation_sf` defaults to its
+  mirror image, `2 - upper_annotation_sf`. The two arguments remain in the
+  signature so that the error can name their replacement, and will be removed in
+  a later release.
+
+  `upper_annotation_sf` and `lower_annotation_sf` apply to every chart type, so
+  there is no replacement specific to P and P′ charts.
+
 * `create_SPC_auto_limits_table()` is no longer exported. It was an internal
   step of `autospc()` that had been made public without a documented reason,
   and holding it to a public interface was preventing the simplification of the
@@ -18,6 +30,13 @@
   `autospc(plot_chart = FALSE)` does not meet your needs, please open an issue
   at <https://github.com/HorridTom/autospc/issues> — we are happy to help you
   move across.
+
+### Other changes
+
+* Columns other than those a chart uses are now dropped consistently. Previously
+  the aggregation step was skipped entirely when no `x` value was repeated, so
+  extra columns survived into the output for a series with one row per subgroup
+  and were dropped for one without. They are now dropped in both cases.
 
 ## Bug fixes
 

@@ -131,8 +131,13 @@
 #' @param annotation_arrows Boolean specifying whether or not to display arrows
 #' connecting centre line labels to the centre line they refer to
 #' @param annotation_arrow_curve Numeric curvature of the annotation arrows
-#' @param override_annotation_dist Deprecated
-#' @param override_annotation_dist_P Deprecated
+#' @param override_annotation_dist `r lifecycle::badge("deprecated")` Use
+#' `upper_annotation_sf` and `lower_annotation_sf` instead. The equivalent
+#' scale factor is `1 + 1/override_annotation_dist`, so
+#' `override_annotation_dist = 10` becomes `upper_annotation_sf = 1.1`.
+#' @param override_annotation_dist_P `r lifecycle::badge("deprecated")` Use
+#' `upper_annotation_sf` and `lower_annotation_sf` instead. These apply to
+#' every chart type, so a P or P' chart no longer needs an argument of its own.
 #'
 #' @return An SPC ggplot or corresponding data 
 #'
@@ -215,10 +220,34 @@ autospc <- function(data,
                     lower_annotation_sf = NULL,
                     annotation_arrows = FALSE,
                     annotation_arrow_curve = 0.3,
-                    override_annotation_dist = NULL,
-                    override_annotation_dist_P = NULL
-) { 
-  
+                    override_annotation_dist = deprecated(),
+                    override_annotation_dist_P = deprecated()
+) {
+
+  if(lifecycle::is_present(override_annotation_dist)) {
+    lifecycle::deprecate_stop(
+      when = "0.0.0.9010",
+      what = "autospc(override_annotation_dist)",
+      with = "autospc(upper_annotation_sf)",
+      details = paste("The equivalent scale factor is 1 + 1/x, so",
+                      "override_annotation_dist = 10 becomes",
+                      "upper_annotation_sf = 1.1. lower_annotation_sf",
+                      "defaults to its mirror image, 2 - upper_annotation_sf.")
+    )
+  }
+
+  if(lifecycle::is_present(override_annotation_dist_P)) {
+    lifecycle::deprecate_stop(
+      when = "0.0.0.9010",
+      what = "autospc(override_annotation_dist_P)",
+      with = "autospc(upper_annotation_sf)",
+      details = paste("upper_annotation_sf and lower_annotation_sf apply to",
+                      "every chart type, so a P or P' chart no longer needs an",
+                      "argument of its own. The equivalent scale factor is",
+                      "1 + 1/x.")
+    )
+  }
+
   df_original <- data
 
   # autospc_chart() has no branch for a chart type outside
@@ -256,9 +285,7 @@ autospc <- function(data,
     title = title,
     subtitle = subtitle,
     upper_annotation_sf = upper_annotation_sf,
-    lower_annotation_sf = lower_annotation_sf,
-    override_annotation_dist = override_annotation_dist,
-    override_annotation_dist_P = override_annotation_dist_P
+    lower_annotation_sf = lower_annotation_sf
   )
 
   chart$data          <- preprocessed_vars$df

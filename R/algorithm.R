@@ -43,10 +43,13 @@ run_limit_algorithm <- function(chart) {
     
     # Set counter to first point after end of first period
     if(counter == 1L & !is.null(chart$baseline_length)) {
+      chart$history$baseline <- list(length = chart$baseline_length,
+                                     rows = 1:chart$baseline_length)
       counter <- counter + chart$baseline_length
     } else {
       counter <- counter + chart$period_min
     }
+    chart <- record_counter_move(chart, 1L, counter, "first period established")
     
     if(!chart$baseline_only){
       # [3] Algorithm loop starts - unless user specified no recalculations
@@ -125,6 +128,8 @@ run_limit_algorithm <- function(chart) {
             
             # [5a] Set counter to the next rule break position and record the
             # direction of the rule break
+            chart <- record_counter_move(chart, counter, rule2_break_position,
+                                         "moved to shift rule break")
             counter <- rule2_break_position
             triggering_rule_break_direction <-
               limits_table$aboveOrBelowCl[counter]
@@ -237,6 +242,9 @@ run_limit_algorithm <- function(chart) {
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
+                chart <- record_counter_move(chart, counter,
+                                             counter + chart$period_min,
+                                             "limits re-established")
                 counter <- counter + chart$period_min
                 
               } else {
@@ -261,10 +269,15 @@ run_limit_algorithm <- function(chart) {
                    )){
                   
                   # If so, advance the counter by 1
+                  chart <- record_counter_move(chart, counter, counter + 1,
+                                               "candidate rejected")
                   counter <- counter + 1
                   
                 } else {
                   # If not, move counter to the start of the next rule 2 break 
+                  chart <- record_counter_move(chart, counter,
+                                               rule2_break_positions[2],
+                                               "candidate rejected")
                   counter <- rule2_break_positions[2]
                 }
               } # end of: [7b] candidate limits rejected
@@ -281,6 +294,8 @@ run_limit_algorithm <- function(chart) {
       dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
     
     chart$result$table <- limits_table
+    chart$result$re_establish_rows <- which(limits_table$breakPoint)
+    chart$result$exclusions <- which(limits_table$excluded)
 
     return(chart)
   } # end of: [2] enough data points to form one period

@@ -62,3 +62,66 @@ test_that("prevailing limits are those in force at the row before", {
   expect_identical(candidates[[1]]$period_rows[1], candidates[[1]]$counter)
 
 })
+
+
+# counter path, baseline, and the result summaries
+
+
+test_that("the counter's path is recorded, without non-moves", {
+
+  path <- fitted_2a()$history$counter_path
+
+  expect_s3_class(path, "data.frame")
+  expect_identical(colnames(path), c("from", "to", "reason"))
+  expect_true(all(path$from != path$to))
+
+  expect_identical(path$reason[1], "first period established")
+  expect_identical(path$from[1], 1L)
+
+  expect_identical(path$reason[nrow(path)], "limits re-established")
+
+})
+
+
+test_that("baseline extent is recorded only when baseline_length is set", {
+
+  expect_null(fitted_2a()$history$baseline)
+
+  chart <- autospc_chart(chart_type = "C\'",
+                         data = example_series_2a,
+                         x = "x",
+                         y = "y",
+                         baseline_length = 25L)
+  fitted <- run_limit_algorithm(prepare_data(chart))
+
+  expect_identical(fitted$history$baseline$length, 25L)
+  expect_identical(fitted$history$baseline$rows, 1:25)
+
+})
+
+
+test_that("the result summarises where limits changed and what was excluded", {
+
+  fitted <- fitted_2a()
+
+  # row 1 establishes limits rather than re-establishing them, so it is not here
+  expect_identical(fitted$result$re_establish_rows,
+                   vapply(Filter(function(k) k$accepted,
+                                 fitted$history$candidates),
+                          function(k) k$counter, integer(1)))
+
+})
+
+
+test_that("the result lists the points excluded as extremes", {
+
+  ed <- data.frame(x = ed_attendances_monthly$month_start,
+                   y = ed_attendances_monthly$att_all)
+  chart <- autospc_chart(chart_type = "C\'", data = ed, x = "x", y = "y")
+  fitted <- run_limit_algorithm(prepare_data(chart))
+
+  expect_identical(fitted$result$exclusions,
+                   c(1L, 2L, 3L, 33L, 38L, 58L, 59L, 60L, 81L))
+  expect_identical(fitted$result$re_establish_rows, c(23L, 46L, 71L))
+
+})

@@ -1,9 +1,9 @@
-#' Apply the Stable Shift Algorithm to a prepared series
+#' Set control limits over a prepared series
 #'
-#' Reads `chart$data` and returns the chart with `chart$result$table` set. When
-#' there are too few points to form a period the table has no limits columns.
+#' Reads `chart$data`. When there are too few points to form a period the table
+#' has no limits columns.
 #'
-#' @return autospc_chart object
+#' @return autospc_chart object, with `chart$result$table` set
 #' @noRd
 run_limit_algorithm <- function(chart) {
 

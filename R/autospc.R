@@ -284,10 +284,7 @@ autospc <- function(data,
   }
   
   # Turn the aggregated data into the series the algorithm analyses.
-  #
-  # The aggregation above still works on a bare frame, so the aggregated data is
-  # put onto the chart here. That line goes when aggregation reads chart$data
-  # too.
+  # TEMPORARY - aggregation above still returns a bare frame.
   chart$data <- data
   chart <- prepare_data(chart)
 
@@ -296,9 +293,7 @@ autospc <- function(data,
 
   data <- chart$result$table
 
-  # The algorithm returns a table with no limits columns when there were too few
-  # points to form a period. Warning here rather than inside the algorithm keeps
-  # show_limits, which is purely presentational, out of it.
+  # No limits columns means too few points to form a period
   if(show_limits && !("cl" %in% colnames(data))) {
     warning(paste("The input data has fewer than the minimum number of",
                   "points needed to calculate one period. Timeseries data",

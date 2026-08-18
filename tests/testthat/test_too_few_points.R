@@ -20,7 +20,9 @@ test_that("Charts with fewer points than min period error handle",{
   result_C <- suppressWarnings(autospc(test_data, plot_chart = FALSE, chart_type = "C", period_min = 21))
   result_P <- suppressWarnings(autospc(test_data, plot_chart = FALSE, chart_type = "P", period_min = 21))
 
-  testthat::expect_equal(ncol(result_C), 4)
+  # x, y and log. aggregate_data() summarises to the columns the class
+  # analyses, so a C chart drops n
+  testthat::expect_equal(ncol(result_C), 3)
   testthat::expect_equal(ncol(result_P), 5)
   testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C"))
   testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "P"))

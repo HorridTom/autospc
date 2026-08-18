@@ -221,49 +221,37 @@ autospc <- function(data,
   
   df_original <- data
 
-  # Build the chart object, from the data exactly as passed.
+  # autospc_chart() has no branch for a chart type outside
+  # autospc_chart_types(), so chart_type has to be valid before the object is
+  # built. preprocess_inputs() checks it again.
+  validate_chart_type(chart_type)
+
+  # Build the chart object, from the data exactly as passed. The construction
+  # helper renames the analysed columns to x, y and n.
   #
   # For chart_type = "XMR" this is the X chart of the pair. The MR one is
   # created by the chart_type = "MR" re-invocation below.
-  #
-  # An object can be created for every valid chart type, so the only case left
-  # in which chart_type_for_object() returns NULL is invalid input. chart_type
-  # is not validated until preprocess_inputs() below, and the if() leaves that
-  # error to validate_chart_type() rather than autospc_chart(). The if() goes
-  # once the object is built after validation - see CLEAN UP #26.
-  object_chart_type <- chart_type_for_object(chart_type)
+  chart <- autospc_chart(
+    chart_type = chart_type_for_object(chart_type),
+    data = data,
+    x = resolve_column_name(rlang::enquo(x), "x"),
+    y = resolve_column_name(rlang::enquo(y), "y"),
+    n = resolve_column_name(rlang::enquo(n), "n"),
+    period_min = period_min,
+    baseline_length = baseline_length,
+    shift_rule_threshold = shift_rule_threshold,
+    baseline_only = baseline_only,
+    establish_every_shift = establish_every_shift,
+    no_regrets = no_regrets,
+    overhanging_reversions = overhanging_reversions,
+    max_exclusions = max_exclusions,
+    mr_screen_max_loops = mr_screen_max_loops,
+    centre_line_tolerance = centre_line_tolerance
+  )
 
-  chart <- NULL
-
-  if(!is.null(object_chart_type)) {
-
-    chart <- autospc_chart(
-      chart_type = object_chart_type,
-      data = data,
-      x = resolve_column_name(rlang::enquo(x), "x"),
-      y = resolve_column_name(rlang::enquo(y), "y"),
-      n = resolve_column_name(rlang::enquo(n), "n"),
-      period_min = period_min,
-      baseline_length = baseline_length,
-      shift_rule_threshold = shift_rule_threshold,
-      baseline_only = baseline_only,
-      establish_every_shift = establish_every_shift,
-      no_regrets = no_regrets,
-      overhanging_reversions = overhanging_reversions,
-      max_exclusions = max_exclusions,
-      mr_screen_max_loops = mr_screen_max_loops,
-      centre_line_tolerance = centre_line_tolerance
-    )
-
-  }
-
-  # Rename columns if passed
-  data <- rename_columns(df = data,
-                         x = {{ x }}, y = {{ y }}, n = {{ n }})
-  
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(
-    df = data,
+    df = chart$data,
     chart_type = chart_type,
     title = title,
     subtitle = subtitle,
@@ -272,24 +260,22 @@ autospc <- function(data,
     override_annotation_dist = override_annotation_dist,
     override_annotation_dist_P = override_annotation_dist_P
   )
-  
-  data                <- preprocessed_vars$df
-  chart_type           <- preprocessed_vars$chart_type
+
+  chart$data          <- preprocessed_vars$df
+  chart_type          <- preprocessed_vars$chart_type
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
-  
-  # Aggregate data
-  if(!(chart_type %in% c("XMR", "MR"))) {
-    data <- aggregate_data_deprecated(df = data,
-                           chart_type = chart_type)
-  }
-  
-  # Turn the aggregated data into the series the algorithm analyses.
-  # TEMPORARY - aggregation above still returns a bare frame.
-  chart$data <- data
+
+  # Aggregate the series over x, then turn it into the series the algorithm
+  # analyses. The X and MR classes have no aggregate_data() method, so for those
+  # the first call returns the chart untouched.
+  #
+  # Aggregating orders the rows by x.
+  # Nothing orders the rows of a chart type that skips aggregation - CLEAN UP #7
+  chart <- aggregate_data(chart)
   chart <- prepare_data(chart)
 
   # Get control limits

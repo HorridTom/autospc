@@ -58,9 +58,9 @@ normalise_columns <- function(chart_list,
 #' individual binary observations: no denominator column is supplied, `n` falls
 #' back to `"n"`, and there is no column to rename. A blind rename would error.
 #'
-#' Renaming is silent. `rename_columns()` warns when the data already holds a
-#' column of the target name *and* the argument was supplied; that warning stays
-#' there until it retires, to avoid users seeing it twice.
+#' Renaming is silent, and a target name already in the data fails here with
+#' `dplyr::rename()`'s "Names must be unique" error. `rename_columns()` warns
+#' first, but only `facet_stages()` still calls it - CLEAN UP #15.
 #'
 #' @return `df`, with the source column renamed to target
 #' @noRd

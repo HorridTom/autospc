@@ -447,35 +447,14 @@ test_that("X is not yet a chart type a user can pass", {
 })
 
 
-test_that("chart_type_for_object returns NULL for bad input, not an error", {
-
-  # autospc() calls this before chart_type has been checked, so whatever the
-  # user passed has to come back NULL and leave validate_chart_type() to
-  # produce the error message. The case that matters is a chart_type holding
-  # two values: test-autospc-chart-type.R passes c("XMR", "MR") on purpose, and
-  # in R 4.3 and later `&&` errors if either side is longer than one value.
-  expect_null(chart_type_for_object(NULL))
-  expect_null(chart_type_for_object(c("XMR", "MR")))
-  expect_null(chart_type_for_object(c("C", "P")))
-  expect_null(chart_type_for_object(character(0)))
-  expect_null(chart_type_for_object(5))
-  expect_null(chart_type_for_object(NA))
-  expect_null(chart_type_for_object("Q"))
-
-})
-
-
 test_that("every chart type a user can pass can be built", {
 
   # chart_type_for_object() takes its list from autospc_chart_types(), while
   # autospc_chart() names each chart type in a separate branch. Nothing else
-  # checks that the two agree. Every accepted chart type must now map to
-  # something buildable - there is no longer one that maps to NULL.
+  # checks that the two agree.
   for(chart_type in autospc_chart_types()) {
 
     object_chart_type <- chart_type_for_object(chart_type)
-
-    expect_false(is.null(object_chart_type), info = chart_type)
 
     expect_no_error(autospc_chart(chart_type = object_chart_type,
                                   data = factory_data,

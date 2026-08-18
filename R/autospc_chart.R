@@ -116,38 +116,26 @@ autospc_chart_types <- function() {
 
 #' Which chart type's class serves this request?
 #'
-#' TEMPORARY. The `"XMR"` mapping goes with the XMR split (Decided §5 in the
-#' worklist), and the NULL return goes with the `if` around the
-#' `autospc_chart()` call in `autospc()` (CLEAN UP #26). Nothing is left of the
-#' function once both have gone.
+#' TEMPORARY - the whole function goes with the XMR split, Decided §5 in the
+#' worklist.
 #'
 #' `"XMR"` maps to `"X"`. It asks for a pair of charts, and the MR half is
 #' already created by the `chart_type = "MR"` re-invocation in `autospc()`, so
 #' the X half is all that is needed here. Every other chart type maps to
 #' itself.
 #'
-#' `chart_type` has not been checked at the point `autospc()` calls this, so it
-#' may be anything the user passed, including several values at once. Those
-#' return NULL rather than erroring, so that `validate_chart_type()` still
-#' produces the error message.
+#' Callers pass a `chart_type` that `validate_chart_type()` has already
+#' accepted, so anything reaching here is one of `autospc_chart_types()`.
 #'
-#' @return A character scalar, or NULL if no object can be created.
+#' @return A character scalar.
 #' @noRd
 chart_type_for_object <- function(chart_type) {
-
-  if(!is.character(chart_type) || length(chart_type) != 1) {
-    return(NULL)
-  }
 
   if(identical(chart_type, "XMR")) {
     return("X")
   }
 
-  if(chart_type %in% autospc_chart_types()) {
-    return(chart_type)
-  }
-
-  return(NULL)
+  return(chart_type)
 
 }
 

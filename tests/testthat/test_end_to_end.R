@@ -70,3 +70,39 @@ test_that("P prime chart process works end to end",{
 })
 
 
+
+
+test_that("P chart works with one binary observation per subgroup", {
+
+  # Individual binary observations need n materialising as 1 and y coercing to
+  # a count, both of which happen inside aggregation. Every proportion is 0% or
+  # 100%, so the chart is degenerate - whether it deserves a chart or an
+  # explanatory error is CLEAN UP #6.
+  binary_data <- data.frame(
+    subgroup = 1:30,
+    outcome = c(FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE,
+                TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE,
+                TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE)
+  )
+
+  results <- autospc(binary_data,
+                     chart_type = "P",
+                     x = subgroup,
+                     y = outcome,
+                     period_min = 21L,
+                     plot_chart = FALSE)
+
+  expect_equal(results$y[1:5],
+               c(0, 0, 100, 100, 0))
+
+  expect_equal(results$n,
+               rep(1L, 30))
+
+  expect_equal(results$y_numerator[1:5],
+               c(0L, 0L, 1L, 1L, 0L))
+
+  # 14 of the first 21 observations are TRUE, and none is excluded
+  expect_equal(results$cl[1],
+               100 * 14 / 21)
+
+})

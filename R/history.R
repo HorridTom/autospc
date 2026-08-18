@@ -41,3 +41,37 @@ record_stop <- function(chart,
   return(chart)
 
 }
+
+
+#' Record a triggering shift rule break the algorithm identified
+#'
+#' The break is against the prevailing limits, which are the ones in
+#' `limits_table` at the time. The `cl`, `ucl` and `lcl` recorded are those in
+#' force at `position`. A candidate's opposing break is a different thing, is
+#' against that candidate's own limits, and is recorded on the candidate.
+#'
+#' @param already_at_break was the counter already inside this break
+#' @return autospc_chart object
+#' @noRd
+record_break <- function(chart,
+                         counter,
+                         position,
+                         already_at_break,
+                         limits_table) {
+
+  position <- as.integer(position)
+
+  chart$history$breaks <- rbind(
+    chart$history$breaks,
+    data.frame(counter = as.integer(counter),
+               position = position,
+               direction = if(is.na(position)) NA_integer_ else
+                 limits_table$aboveOrBelowCl[position],
+               already_at_break = already_at_break,
+               cl = if(is.na(position)) NA_real_ else limits_table$cl[position],
+               ucl = if(is.na(position)) NA_real_ else limits_table$ucl[position],
+               lcl = if(is.na(position)) NA_real_ else limits_table$lcl[position]))
+
+  return(chart)
+
+}

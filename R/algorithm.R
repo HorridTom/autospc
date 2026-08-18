@@ -89,6 +89,10 @@ run_limit_algorithm <- function(chart) {
             rule2_break_positions <- NA
             rule2_break_position <- counter
             
+            chart <- record_break(chart, counter, rule2_break_position,
+                                  already_at_break = TRUE,
+                                  limits_table = limits_table)
+
             log_entry <- paste0("0400",
                                 rule2_break_position)
             
@@ -106,6 +110,10 @@ run_limit_algorithm <- function(chart) {
             
             rule2_break_position <- rule2_break_positions[1]
             
+            chart <- record_break(chart, counter, rule2_break_position,
+                                  already_at_break = FALSE,
+                                  limits_table = limits_table)
+
             log_entry <- paste0("0401",
                                 rule2_break_position)
             

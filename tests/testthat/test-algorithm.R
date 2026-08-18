@@ -167,3 +167,40 @@ test_that("the stop is recorded at the counter the run reached", {
   expect_identical(fitted$history$stopped$counter, 33L)
 
 })
+
+
+# shift rule breaks the algorithm identified
+
+
+test_that("every identified break is recorded, with where it was found", {
+
+  chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
+                         x = "x", y = "y")
+  breaks <- run_limit_algorithm(prepare_data(chart))$history$breaks
+
+  expect_identical(breaks$counter, c(22L, 23L, 24L, 25L))
+  expect_identical(breaks$position, c(22L, 23L, 24L, 33L))
+
+  # the counter was already inside the break for the middle two
+  expect_identical(breaks$already_at_break, c(FALSE, TRUE, TRUE, FALSE))
+
+})
+
+
+test_that("a break is against the prevailing limits, not a candidate's", {
+
+  chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
+                         x = "x", y = "y")
+  fitted <- run_limit_algorithm(prepare_data(chart))
+  breaks <- fitted$history$breaks
+  rejected <- fitted$history$candidates[[1]]
+
+  # the limits recorded with the break are the ones in force in the result
+  expect_equal(breaks$cl, fitted$result$table$cl[breaks$position])
+
+  # and are not the rejected candidate's own, which differ
+  expect_equal(breaks$cl[1], rejected$prevailing$cl)
+  expect_false(isTRUE(all.equal(rejected$table$cl[rejected$counter],
+                                breaks$cl[1])))
+
+})

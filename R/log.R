@@ -313,3 +313,101 @@ log_output <- function(df,
   
 }
 
+
+
+#' Build the log column from the chart's history
+#'
+#' Produces what `record_log_entry()` accumulates during the run, from
+#' `chart$history` and `chart$result` instead.
+#'
+#' @return character vector, one element per row of the table, NA where the
+#'   algorithm recorded nothing
+#' @noRd
+render_log <- function(chart) {
+
+  spc_table <- chart$result$table
+  n_rows <- nrow(spc_table)
+
+  rows <- integer(0)
+  codes <- character(0)
+  add <- function(row, code) {
+    rows <<- c(rows, as.integer(row))
+    codes <<- c(codes, code)
+  }
+
+  add(1L, "0100")
+
+  if(!("cl" %in% colnames(spc_table))) {
+    add(1L, "0210")
+    return(collect_log_entries(rows, codes, n_rows))
+  }
+
+  add(1L, "0200")
+
+  stopped <- chart$history$stopped
+  if(identical(stopped$reason, "baseline only")) {
+    return(collect_log_entries(rows, codes, n_rows))
+  }
+
+  add(chart$history$counter_path$to[1], "0300")
+
+  breaks <- chart$history$breaks
+  candidates <- chart$history$candidates
+
+  for(i in seq_len(nrow(breaks))) {
+
+    add(breaks$counter[i],
+        paste0(if(breaks$already_at_break[i]) "0400" else "0401",
+               breaks$position[i]))
+
+    if(is.na(breaks$position[i])) {
+      next
+    }
+
+    add(breaks$position[i], paste0("0500", sign_chr(breaks$direction[i])))
+
+    if(i <= length(candidates)) {
+      candidate <- candidates[[i]]
+      add(candidate$counter,
+          paste0("0600",
+                 as.integer(candidate$opposite_break),
+                 as.integer(candidate$final_run_prevents)))
+      add(candidate$counter, if(candidate$accepted) "0700" else "0710")
+    }
+
+  }
+
+  stop_code <- switch(stopped$reason,
+                      "not enough data for a further period" = "0410",
+                      "no further shift rule breaks" = "0510",
+                      "too few points after the shift rule break" = "0610",
+                      NULL)
+  if(!is.null(stop_code)) {
+    add(stopped$counter, stop_code)
+  }
+
+  return(collect_log_entries(rows, codes, n_rows))
+
+}
+
+
+#' Join log entries into one column, in the order they were recorded
+#'
+#' @return character vector of length n_rows
+#' @noRd
+collect_log_entries <- function(rows, codes, n_rows) {
+
+  # entries past the end of the table are held at the last row, as
+  # record_log_entry() does
+  overflow <- rows > n_rows
+  codes[overflow] <- paste0("co@", rows[overflow], "|", codes[overflow])
+  rows[overflow] <- n_rows
+
+  log_column <- rep(NA_character_, n_rows)
+  for(row in unique(rows)) {
+    log_column[row] <- paste(codes[rows == row], collapse = ";")
+  }
+
+  return(log_column)
+
+}

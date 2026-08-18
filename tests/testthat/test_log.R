@@ -134,3 +134,49 @@ test_that("specific log entries are interpreted correctly", {
   
 })
 
+
+# The log rendered from chart$history must match the one accumulated during the
+# run by record_log_entry(). While both exist, this is what holds them together.
+
+test_that("the log rendered from the history matches the one recorded", {
+
+  fit <- function(data, chart_type = "C\'", ...) {
+    args <- list(chart_type = chart_type, data = data, x = "x", y = "y", ...)
+    if(chart_type %in% c("P", "P\'")) args$n <- "n"
+    suppressWarnings(
+      run_limit_algorithm(prepare_data(do.call(autospc_chart, args))))
+  }
+
+  ed <- data.frame(x = ed_attendances_monthly$month_start,
+                   y = ed_attendances_monthly$att_all)
+
+  # a step change then a long stable stretch, so no further breaks are found
+  stable_after_step <- data.frame(
+    x = 1:80,
+    y = c(rep(c(10L, 12L, 11L, 13L, 9L), 5),
+          rep(c(30L, 32L, 31L, 33L, 29L), 11)))
+
+  # too few points to form even one period
+  too_short <- data.frame(x = 1:10,
+                          y = c(10, 14, 11, 16, 12, 13, 15, 11, 14, 12))
+
+  proportions <- data.frame(x = 1:60,
+                            y = rep(c(10, 12, 11, 13, 9, 10), 10),
+                            n = rep(100L, 60))
+
+  fitted <- list(fit(example_series_2a),
+                 fit(example_series_2b),
+                 fit(example_series_2c),
+                 fit(ed, baseline_length = 63L),
+                 fit(ed, baseline_only = TRUE),
+                 fit(ed, establish_every_shift = TRUE),
+                 fit(stable_after_step),
+                 fit(too_short),
+                 fit(proportions, chart_type = "P"),
+                 fit(ed, chart_type = "MR"))
+
+  for(chart in fitted) {
+    expect_identical(render_log(chart), chart$result$table$log)
+  }
+
+})

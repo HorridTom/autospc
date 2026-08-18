@@ -125,3 +125,45 @@ test_that("the result lists the points excluded as extremes", {
   expect_identical(fitted$result$re_establish_rows, c(23L, 46L, 71L))
 
 })
+
+
+# why the run ended
+
+
+test_that("the run records why it stopped looking for further periods", {
+
+  fit <- function(d, ...) {
+    chart <- autospc_chart(chart_type = "C\'", data = d, x = "x", y = "y", ...)
+    run_limit_algorithm(prepare_data(chart))
+  }
+
+  expect_identical(fit(example_series_2a)$history$stopped$reason,
+                   "reached the end of the series")
+  expect_identical(fit(example_series_2b)$history$stopped$reason,
+                   "not enough data for a further period")
+  expect_identical(fit(example_series_2c)$history$stopped$reason,
+                   "too few points after the shift rule break")
+  expect_identical(fit(example_series_2a, baseline_only = TRUE)$history$stopped$reason,
+                   "baseline only")
+
+  # a step change followed by a stable stretch leaves no further breaks to find
+  stable_after_step <- data.frame(
+    x = 1:80,
+    y = c(rep(c(10L, 12L, 11L, 13L, 9L), 5),
+          rep(c(30L, 32L, 31L, 33L, 29L), 11)))
+
+  expect_identical(fit(stable_after_step)$history$stopped$reason,
+                   "no further shift rule breaks")
+
+})
+
+
+test_that("the stop is recorded at the counter the run reached", {
+
+  chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
+                         x = "x", y = "y")
+  fitted <- run_limit_algorithm(prepare_data(chart))
+
+  expect_identical(fitted$history$stopped$counter, 33L)
+
+})

@@ -67,6 +67,8 @@ run_limit_algorithm <- function(chart) {
           limits_table <- record_log_entry(df = limits_table,
                                            counter = counter,
                                            entry = "0410")
+          chart <- record_stop(chart, counter,
+                               "not enough data for a further period")
           
           break
           
@@ -119,6 +121,8 @@ run_limit_algorithm <- function(chart) {
             limits_table <- record_log_entry(df = limits_table,
                                              counter = counter,
                                              entry = "0510")
+            chart <- record_stop(chart, counter,
+                                 "no further shift rule breaks")
             
             break
             
@@ -152,6 +156,8 @@ run_limit_algorithm <- function(chart) {
               limits_table <- record_log_entry(df = limits_table,
                                                counter = counter,
                                                entry = "0610")
+              chart <- record_stop(chart, counter,
+                                   "too few points after the shift rule break")
               
               break
               
@@ -285,6 +291,16 @@ run_limit_algorithm <- function(chart) {
           } # end of [5a], [6] there are rule breaks to consider 
         } # end of: [4a] enough points remaining after the counter
       } # end of: algorithm loop
+
+      # the loop can also end by its own condition, having reached the series
+      if(is.null(chart$history$stopped)) {
+        chart <- record_stop(chart, counter, "reached the end of the series")
+      }
+
+    } else {
+
+      chart <- record_stop(chart, counter, "baseline only")
+
     } # end of: [3] !baseline_only
     
     

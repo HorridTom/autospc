@@ -191,15 +191,41 @@ run_limit_algorithm <- function(chart) {
                 counter = counter,
                 entry = log_entry)
               
-              # Check whether either we recalculate at every shift OR:
+              # Check whether either we re-establish at every shift OR:
               # 1) There is no opposing rule break AND
               # 2) Either:
               #     a) no_regrets is FALSE OR
               #     b) the final run does not prevent re-establishment of limits
-              if(chart$establish_every_shift |
-                 (!opposite_rule_break &
-                  ((chart$no_regrets == TRUE & !final_run_prevents) |
-                   chart$no_regrets == FALSE))){
+              re_establish <- chart$establish_every_shift |
+                (!opposite_rule_break &
+                 ((chart$no_regrets == TRUE & !final_run_prevents) |
+                  chart$no_regrets == FALSE))
+
+              # Record the candidate. Rejected candidates are not retained
+              # anywhere else.
+              period_end <- min(counter + chart$period_min - 1L,
+                                nrow(limits_table))
+              prevailing_row <- if(counter > 1L) as.integer(counter) - 1L else
+                NA_integer_
+
+              chart$history$candidates <- c(
+                chart$history$candidates,
+                list(list(
+                  counter            = as.integer(counter),
+                  period_rows        = counter:period_end,
+                  trigger_direction  = triggering_rule_break_direction,
+                  table              = candidate_limits_table,
+                  prevailing         = list(
+                    last_row = prevailing_row,
+                    cl       = limits_table$cl[prevailing_row],
+                    ucl      = limits_table$ucl[prevailing_row],
+                    lcl      = limits_table$lcl[prevailing_row]),
+                  opposite_break     = opposite_rule_break,
+                  final_run_prevents = final_run_prevents,
+                  accepted           = re_establish
+                )))
+
+              if(re_establish){
                 # [7a] If so, re-establish limits at the counter, confirming the
                 # candidate limits
                 

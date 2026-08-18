@@ -88,7 +88,10 @@ autospc_chart_elements <- function() {
     "max_exclusions",
     "mr_screen_max_loops",
     "centre_line_tolerance",
-    "data_original"
+    "data_original",
+    # fit
+    "result",
+    "history"
   )
   
   return(chart_elements)
@@ -249,7 +252,10 @@ autospc_chart_list <- function(data,
     mr_screen_max_loops = mr_screen_max_loops,
     centre_line_tolerance = centre_line_tolerance,
     # derived fields
-    data_original = data
+    data_original = data,
+    # fit, empty until the algorithm runs
+    result = list(),
+    history = list()
   )
   
   return(autospc_chart_l)

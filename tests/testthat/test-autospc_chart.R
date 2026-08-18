@@ -518,3 +518,28 @@ test_that("the default y axis range is a percentage scale", {
                    list(low = 0, high = 110))
 
 })
+
+
+# the fit slots
+
+
+test_that("a new chart has empty result and history slots", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+
+  expect_true(all(c("result", "history") %in% autospc_chart_elements()))
+  expect_identical(chart$result, list())
+  expect_identical(chart$history, list())
+
+})
+
+
+test_that("validate_autospc_chart requires the fit slots", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+  chart$result <- NULL
+
+  expect_error(validate_autospc_chart(chart),
+               "element\\(s\\) not present: result")
+
+})

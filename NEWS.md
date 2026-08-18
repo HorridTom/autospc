@@ -19,6 +19,22 @@
   at <https://github.com/HorridTom/autospc/issues> — we are happy to help you
   move across.
 
+## Bug fixes
+
+* The series is now sorted by `x` before limits are calculated. The algorithm
+  works through the points in order, so data supplied out of `x` order produced
+  different limits from the same data supplied in order, and was plotted against
+  a scrambled series. Charts that aggregate over `x` — C, C′, P and P′ — were
+  usually protected by the aggregation step, which sorts as a side effect; X and
+  MR charts were affected whatever the data. Results will change for any series
+  that was not already in `x` order.
+
+* P and P′ charts accepting individual binary observations no longer fail when
+  every subgroup holds exactly one observation. The run stopped with
+  `object 'n' not found`, because the denominator is materialised during
+  aggregation and aggregation was skipped when no `x` value was repeated.
+  Note that such a series is degenerate — every proportion is 0% or 100%.
+
 
 # autospc 0.0.0.9040
 

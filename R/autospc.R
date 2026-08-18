@@ -269,13 +269,12 @@ autospc <- function(data,
   upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
   lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
 
-  # Aggregate the series over x, then turn it into the series the algorithm
-  # analyses. The X and MR classes have no aggregate_data() method, so for those
-  # the first call returns the chart untouched.
-  #
-  # Aggregating orders the rows by x.
-  # Nothing orders the rows of a chart type that skips aggregation - CLEAN UP #7
+  # Aggregate the series over x, put it in x order, then turn it into the
+  # series the algorithm analyses. The X and MR classes have no
+  # aggregate_data() method, so for those the first call returns the chart
+  # untouched.
   chart <- aggregate_data(chart)
+  chart <- order_series(chart)
   chart <- prepare_data(chart)
 
   # Get control limits

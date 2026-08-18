@@ -123,9 +123,31 @@ The column specified in the argument n will be used.")
     }
     df <- df %>% dplyr::rename(n = !!n)
   }
-  
+
   return(df)
-  
+
+}
+
+
+#' Order a chart's series by x
+#'
+#' The algorithm walks the data in row order, so the rows have to be in x order
+#' before it runs, and before `prepare_data()` derives anything from their
+#' order - an MR chart's moving ranges are differences between neighbouring
+#' rows.
+#'
+#' `dplyr::arrange()` is stable, so rows sharing an x keep the order they
+#' arrived in. Missing x values sort to the end.
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+order_series <- function(chart) {
+
+  chart$data <- chart$data %>%
+    dplyr::arrange(x)
+
+  return(chart)
+
 }
 
 

@@ -116,9 +116,10 @@ autospc_chart_types <- function() {
 
 #' Which chart type's class serves this request?
 #'
-#' TEMPORARY - see CLEAN UP #16 in the worklist. Removed, along with the `if`
-#' around the `autospc_chart()` call in `autospc()`, once an object can be
-#' created for every chart type.
+#' TEMPORARY. The `"XMR"` mapping goes with the XMR split (Decided §5 in the
+#' worklist), and the NULL return goes with the `if` around the
+#' `autospc_chart()` call in `autospc()` (CLEAN UP #26). Nothing is left of the
+#' function once both have gone.
 #'
 #' `"XMR"` maps to `"X"`. It asks for a pair of charts, and the MR half is
 #' already created by the `chart_type = "MR"` re-invocation in `autospc()`, so

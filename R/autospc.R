@@ -221,14 +221,16 @@ autospc <- function(data,
   
   df_original <- data
 
-  # Build the chart object, from the data exactly as passed. Nothing reads it
-  # yet - the pipeline below is unchanged.
+  # Build the chart object, from the data exactly as passed.
   #
   # For chart_type = "XMR" this is the X chart of the pair. The MR one is
   # created by the chart_type = "MR" re-invocation below.
   #
-  # The if() is TEMPORARY and goes once an object can be created for every chart
-  # type - see CLEAN UP #16 in the worklist.
+  # An object can be created for every valid chart type, so the only case left
+  # in which chart_type_for_object() returns NULL is invalid input. chart_type
+  # is not validated until preprocess_inputs() below, and the if() leaves that
+  # error to validate_chart_type() rather than autospc_chart(). The if() goes
+  # once the object is built after validation - see CLEAN UP #26.
   object_chart_type <- chart_type_for_object(chart_type)
 
   chart <- NULL

@@ -90,14 +90,16 @@ control limits.
 \item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline_length}{Integer, overrides period_min for the first
-calculation period only, if specified}
+\item{baseline_length}{Integer, the number of points used to form the first
+calculation period. Defaults to period_min. Where the series has fewer points
+than this, all of them are used. period_min remains the minimum number of
+points needed to form limits.}
 
 \item{shift_rule_threshold}{The minimum number of consecutive points above or
 below the centre line constituting a shift (or "rule 2") break.}
 
-\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits,
-instead extend limits calculated from the first period_min points.}
+\item{baseline_only}{Boolean - if TRUE, do not re-establish control limits,
+instead extend the limits calculated from the first calculation period.}
 
 \item{establish_every_shift}{Boolean - whether to bypass the Stable Shift
 Algorithm and simply re-establish limits at every shift rule break

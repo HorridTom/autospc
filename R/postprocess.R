@@ -6,7 +6,6 @@ postprocess <- function(
     df,
     chart_type = NULL,
     chart,
-    show_limits = TRUE,
     override_x_title = NULL,
     override_y_title = NULL,
     override_y_lim = NULL,

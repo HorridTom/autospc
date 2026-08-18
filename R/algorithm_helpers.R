@@ -11,15 +11,7 @@ enough_data_for_new_period <- function(data,
     chart = chart,
     data = remaining_data)
   
-  if(counter == 1L & !is.null(chart$baseline_length)) {
-    
-    enough_data <- num_remaining_non_missing_data_points >= chart$baseline_length 
-    
-  } else {
-    
-    enough_data <- num_remaining_non_missing_data_points >= chart$period_min
-    
-  }
+  enough_data <- num_remaining_non_missing_data_points >= chart$period_min
   
   return(enough_data)
 }
@@ -480,4 +472,18 @@ counter_at_rule_break <- function(df,
   
   return(result)
   
+}
+
+
+#' Length of the first calculation period when a baseline is set
+#'
+#' `baseline_length`, or everything available when the series is shorter.
+#'
+#' @return number of rows
+#' @noRd
+baseline_period_length <- function(chart,
+                                   data) {
+
+  return(min(chart$baseline_length, nrow(data)))
+
 }

@@ -33,9 +33,10 @@ run_limit_algorithm <- function(chart) {
     
     # Set counter to first point after end of first period
     if(counter == 1L & !is.null(chart$baseline_length)) {
-      chart$history$baseline <- list(length = chart$baseline_length,
-                                     rows = 1:chart$baseline_length)
-      counter <- counter + chart$baseline_length
+      baseline_rows <- baseline_period_length(chart, data)
+      chart$history$baseline <- list(length = baseline_rows,
+                                     rows = 1:baseline_rows)
+      counter <- counter + baseline_rows
     } else {
       counter <- counter + chart$period_min
     }

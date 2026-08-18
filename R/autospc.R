@@ -30,12 +30,14 @@
 #' control limits.
 #' @param period_min The minimum number of points (subgroups) per period,
 #' i.e. the minimum number of points required to form control limits. 
-#' @param baseline_length Integer, overrides period_min for the first
-#' calculation period only, if specified
+#' @param baseline_length Integer, the number of points used to form the first
+#' calculation period. Defaults to period_min. Where the series has fewer points
+#' than this, all of them are used. period_min remains the minimum number of
+#' points needed to form limits.
 #' @param shift_rule_threshold The minimum number of consecutive points above or
 #' below the centre line constituting a shift (or "rule 2") break.
-#' @param baseline_only Boolean - if TRUE, do not recalculate control limits,
-#' instead extend limits calculated from the first period_min points.
+#' @param baseline_only Boolean - if TRUE, do not re-establish control limits,
+#' instead extend the limits calculated from the first calculation period.
 #' @param establish_every_shift Boolean - whether to bypass the Stable Shift
 #' Algorithm and simply re-establish limits at every shift rule break
 #' (respecting period_min)
@@ -312,7 +314,6 @@ autospc <- function(data,
     df = data,
     chart_type = chart_type,
     chart = chart,
-    show_limits = show_limits,
     override_x_title = override_x_title,
     override_y_title = override_y_title,
     override_y_lim = override_y_lim,

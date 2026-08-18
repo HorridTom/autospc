@@ -100,7 +100,8 @@ chart_type_label.autospc_chart_x <- function(chart) {
 
 #' Rounding accuracy for centre line labels
 #'
-#' Four significant figures at the scale of the axis.
+#' Four significant figures at the scale of the axis, because the values are in
+#' the units of the measure rather than percentages.
 #'
 #' @return number, passed to scales::number(accuracy =)
 #' @noRd

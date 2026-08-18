@@ -13,19 +13,13 @@ run_limit_algorithm <- function(chart) {
   counter <- 1
   
   # [1] Counter initialised
-  data <- record_log_entry(df = data,
-                           counter = counter,
-                           entry = "0100")
   # Check whether there are enough data points to form one period
   if(!enough_data_for_new_period(data = data,
                                  counter = counter,
                                  chart = chart)){
     
-    data <- record_log_entry(df = data,
-                             counter = counter,
-                             entry = "0210")
-    
     chart$result$table <- data
+    chart$result$table$log <- render_log(chart)
 
     return(chart)
     
@@ -36,10 +30,6 @@ run_limit_algorithm <- function(chart) {
       data = data, 
       counter_at_period_start = counter, 
       chart = chart)
-    
-    limits_table <- record_log_entry(df = limits_table,
-                                     counter = counter,
-                                     entry = "0200")
     
     # Set counter to first point after end of first period
     if(counter == 1L & !is.null(chart$baseline_length)) {
@@ -53,10 +43,6 @@ run_limit_algorithm <- function(chart) {
     
     if(!chart$baseline_only){
       # [3] Algorithm loop starts - unless user specified no recalculations
-      limits_table <- record_log_entry(df = limits_table,
-                                       counter = counter,
-                                       entry = "0300")
-      
       while(counter < nrow(data)){
         
         # [4] Check whether enough points after the counter to form new period
@@ -64,9 +50,6 @@ run_limit_algorithm <- function(chart) {
                                        counter = counter,
                                        chart = chart)) {        
           
-          limits_table <- record_log_entry(df = limits_table,
-                                           counter = counter,
-                                           entry = "0410")
           chart <- record_stop(chart, counter,
                                "not enough data for a further period")
           
@@ -93,13 +76,6 @@ run_limit_algorithm <- function(chart) {
                                   already_at_break = TRUE,
                                   limits_table = limits_table)
 
-            log_entry <- paste0("0400",
-                                rule2_break_position)
-            
-            limits_table <- record_log_entry(df = limits_table,
-                                             counter = counter,
-                                             entry = log_entry)
-            
           } else {
             # If not, i.e. if either the counter is not within a rule 2 break,
             # or it is but there are fewer than [shift_rule_threshold] points of
@@ -114,21 +90,11 @@ run_limit_algorithm <- function(chart) {
                                   already_at_break = FALSE,
                                   limits_table = limits_table)
 
-            log_entry <- paste0("0401",
-                                rule2_break_position)
-            
-            limits_table <- record_log_entry(df = limits_table,
-                                             counter = counter,
-                                             entry = log_entry)
-            
           }
           
           # [5] Check whether there are any further rule 2 breaks
           if(is.na(rule2_break_position) | rule2_break_position >= nrow(data)){
             # [5b] If not, then there can be no more additional periods
-            limits_table <- record_log_entry(df = limits_table,
-                                             counter = counter,
-                                             entry = "0510")
             chart <- record_stop(chart, counter,
                                  "no further shift rule breaks")
             
@@ -146,13 +112,6 @@ run_limit_algorithm <- function(chart) {
             triggering_rule_break_direction <-
               limits_table$aboveOrBelowCl[counter]
             
-            log_entry <- paste0("0500",
-                                sign_chr(triggering_rule_break_direction))
-            
-            limits_table <- record_log_entry(df = limits_table,
-                                             counter = counter,
-                                             entry = log_entry)
-            
             
             # [6] Check whether there are enough points after the counter to
             # form a new period
@@ -161,9 +120,6 @@ run_limit_algorithm <- function(chart) {
                                            counter = counter,
                                            chart = chart)){
               
-              limits_table <- record_log_entry(df = limits_table,
-                                               counter = counter,
-                                               entry = "0610")
               chart <- record_stop(chart, counter,
                                    "too few points after the shift rule break")
               
@@ -197,18 +153,6 @@ run_limit_algorithm <- function(chart) {
               final_run_prevents <- final_run_of_calc_period_prevents_recalc(
                 candidate_limits_table,
                 triggering_rule_break_direction)
-              
-              log_entry <- paste0("0600",
-                                  as.integer(opposite_rule_break),
-                                  as.integer(final_run_prevents))
-              
-              limits_table <- record_log_entry(df = limits_table,
-                                               counter = counter,
-                                               entry = log_entry)
-              candidate_limits_table <- record_log_entry(
-                df = candidate_limits_table,
-                counter = counter,
-                entry = log_entry)
               
               # Check whether either we re-establish at every shift OR:
               # 1) There is no opposing rule break AND
@@ -250,10 +194,6 @@ run_limit_algorithm <- function(chart) {
                 
                 limits_table <- candidate_limits_table
                 
-                limits_table <- record_log_entry(df = limits_table,
-                                                 counter = counter,
-                                                 entry = "0700")
-                
                 # and set the counter to the first point after the end of the
                 # new calculation period
                 chart <- record_counter_move(chart, counter,
@@ -267,10 +207,6 @@ run_limit_algorithm <- function(chart) {
                 # re-established, the candidate limits are rejected, and the
                 # algorithm proceeds to the next point that could potentially
                 # be the start of a new period.
-                
-                limits_table <- record_log_entry(df = limits_table,
-                                                 counter = counter,
-                                                 entry = "0710")
                 
                 # Check whether:
                 # 1) no further rule breaks have been identified OR
@@ -320,6 +256,7 @@ run_limit_algorithm <- function(chart) {
     chart$result$table <- limits_table
     chart$result$re_establish_rows <- which(limits_table$breakPoint)
     chart$result$exclusions <- which(limits_table$excluded)
+    chart$result$table$log <- render_log(chart)
 
     return(chart)
   } # end of: [2] enough data points to form one period

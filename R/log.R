@@ -1,58 +1,5 @@
 # Functions to populate and interpret algorithm log
 
-record_log_entry <- function(df,
-                             counter,
-                             entry){
-  
-  if(!("log" %in% colnames(df))){
-    df <- df %>%
-      dplyr::mutate(log = NA_character_)
-  }
-  
-  counter_overflow <- FALSE
-  if(counter > nrow(df)) {
-    counter_arg <- counter
-    counter <- nrow(df)
-    counter_overflow <- TRUE
-  }
-  
-  existing_log_entry <- df %>%
-    dplyr::filter(dplyr::row_number() == counter) %>%
-    dplyr::pull(log)
-  
-  if(is.na(existing_log_entry)) {
-    if(counter_overflow) {
-      entry <- paste0("co@",
-                      counter_arg,
-                      "|",
-                      entry)
-    }
-    updated_log_entry <- as.character(entry)
-  } else {
-    if(counter_overflow) {
-      existing_log_entry <- paste0(existing_log_entry,
-                                   "co@",
-                                   counter_arg,
-                                   "|")
-    }
-    updated_log_entry <- paste(existing_log_entry,
-                               as.character(entry),
-                               sep = ";")
-  }
-  
-  df <- df %>%
-    #dplyr::rowwise() %>%
-    dplyr::mutate(log = dplyr::if_else(dplyr::row_number() == counter,
-                                       updated_log_entry,
-                                       log)) #%>%
-  #dplyr::ungroup()
-  
-  
-  return(df)
-  
-}
-
-
 interpret_log_entry <- function(entry,
                                 verbosity) {
   
@@ -317,8 +264,8 @@ log_output <- function(df,
 
 #' Build the log column from the chart's history
 #'
-#' Produces what `record_log_entry()` accumulates during the run, from
-#' `chart$history` and `chart$result` instead.
+#' Entries past the end of the table are held at the last row, prefixed
+#' `co@N|` with the row they belong to.
 #'
 #' @return character vector, one element per row of the table, NA where the
 #'   algorithm recorded nothing
@@ -354,7 +301,7 @@ render_log <- function(chart) {
   breaks <- chart$history$breaks
   candidates <- chart$history$candidates
 
-  for(i in seq_len(nrow(breaks))) {
+  for(i in seq_len(NROW(breaks))) {
 
     add(breaks$counter[i],
         paste0(if(breaks$already_at_break[i]) "0400" else "0401",
@@ -397,8 +344,7 @@ render_log <- function(chart) {
 #' @noRd
 collect_log_entries <- function(rows, codes, n_rows) {
 
-  # entries past the end of the table are held at the last row, as
-  # record_log_entry() does
+  # entries past the end of the table are held at the last row
   overflow <- rows > n_rows
   codes[overflow] <- paste0("co@", rows[overflow], "|", codes[overflow])
   rows[overflow] <- n_rows

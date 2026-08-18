@@ -135,48 +135,92 @@ test_that("specific log entries are interpreted correctly", {
 })
 
 
-# The log rendered from chart$history must match the one accumulated during the
-# run by record_log_entry(). While both exist, this is what holds them together.
+# The log column is built by render_log() from the chart's history. Until
+# 2026-08-14 it was accumulated during the run by record_log_entry(), and these
+# entries are that function's output, recorded before it was removed.
 
-test_that("the log rendered from the history matches the one recorded", {
+test_that("the log records the algorithm's decisions", {
 
-  fit <- function(data, chart_type = "C\'", ...) {
-    args <- list(chart_type = chart_type, data = data, x = "x", y = "y", ...)
-    if(chart_type %in% c("P", "P\'")) args$n <- "n"
-    suppressWarnings(
-      run_limit_algorithm(prepare_data(do.call(autospc_chart, args))))
+  fit <- function(data, ...) {
+    suppressWarnings(run_limit_algorithm(prepare_data(
+      autospc_chart(chart_type = "C\'", data = data, x = "x", y = "y", ...))))
   }
 
-  ed <- data.frame(x = ed_attendances_monthly$month_start,
-                   y = ed_attendances_monthly$att_all)
+  entries <- function(chart) {
+    log_column <- chart$result$table$log
+    stats::setNames(log_column[!is.na(log_column)], which(!is.na(log_column)))
+  }
 
-  # a step change then a long stable stretch, so no further breaks are found
-  stable_after_step <- data.frame(
-    x = 1:80,
-    y = c(rep(c(10L, 12L, 11L, 13L, 9L), 5),
-          rep(c(30L, 32L, 31L, 33L, 29L), 11)))
+  expect_identical(
+    entries(fit(example_series_2a)),
+    c("1" = "0100;0200",
+      "22" = "0300;040122;050010;060001;0710",
+      "23" = "040023;050010;060000;0700"))
+
+  expect_identical(
+    entries(fit(example_series_2c)),
+    c("1" = "0100;0200",
+      "22" = "0300;040122;050010;060011;0710",
+      "23" = "040023;050010;060011;0710",
+      "24" = "040024;050010;060011;0710",
+      "25" = "040133",
+      "33" = "050010;0610"))
 
   # too few points to form even one period
   too_short <- data.frame(x = 1:10,
                           y = c(10, 14, 11, 16, 12, 13, 15, 11, 14, 12))
 
+  expect_identical(entries(fit(too_short)), c("1" = "0100;0210"))
+
+})
+
+
+test_that("the log covers the other chart types", {
+
+  entries <- function(chart) {
+    log_column <- chart$result$table$log
+    stats::setNames(log_column[!is.na(log_column)], which(!is.na(log_column)))
+  }
+
+  # a scan that finds no break records the position as NA
   proportions <- data.frame(x = 1:60,
                             y = rep(c(10, 12, 11, 13, 9, 10), 10),
                             n = rep(100L, 60))
+  fitted_p <- run_limit_algorithm(prepare_data(
+    autospc_chart(chart_type = "P", data = proportions,
+                  x = "x", y = "y", n = "n")))
 
-  fitted <- list(fit(example_series_2a),
-                 fit(example_series_2b),
-                 fit(example_series_2c),
-                 fit(ed, baseline_length = 63L),
-                 fit(ed, baseline_only = TRUE),
-                 fit(ed, establish_every_shift = TRUE),
-                 fit(stable_after_step),
-                 fit(too_short),
-                 fit(proportions, chart_type = "P"),
-                 fit(ed, chart_type = "MR"))
+  expect_identical(entries(fitted_p),
+                   c("1" = "0100;0200", "22" = "0300;0401NA;0510"))
 
-  for(chart in fitted) {
-    expect_identical(render_log(chart), chart$result$table$log)
-  }
+  # 050001 is a break below the centre line, 050010 above
+  ed <- data.frame(x = ed_attendances_monthly$month_start,
+                   y = ed_attendances_monthly$att_all)
+  fitted_mr <- run_limit_algorithm(prepare_data(
+    autospc_chart(chart_type = "MR", data = ed, x = "x", y = "y")))
+
+  expect_identical(entries(fitted_mr),
+                   c("1" = "0100;0200",
+                     "22" = "0300;040157",
+                     "57" = "050010;060010;0710",
+                     "58" = "040058;050010;060010;0710",
+                     "59" = "040197",
+                     "97" = "050001;0610"))
+
+})
+
+
+test_that("an entry past the end of the table is held at the last row", {
+
+  # exactly period_min points, so the counter runs one past the end
+  exact <- data.frame(x = 1:21,
+                      y = c(10, 12, 11, 13, 9, 10, 12, 11, 13, 9, 10,
+                            12, 11, 13, 9, 10, 12, 11, 13, 9, 10))
+
+  fitted <- suppressWarnings(run_limit_algorithm(prepare_data(
+    autospc_chart(chart_type = "C\'", data = exact, x = "x", y = "y",
+                  period_min = 21L))))
+
+  expect_identical(fitted$result$table$log[21], "co@22|0300")
 
 })

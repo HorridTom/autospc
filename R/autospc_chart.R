@@ -363,6 +363,7 @@ extrapolate_limits.autospc_chart <- function(chart,
 
 # Presentation methods
 
+
 #' Row that carries the first centre line label
 #'
 #' @return integer, row number
@@ -385,6 +386,21 @@ label_accuracy.autospc_chart <- function(chart,
                                          ylimhigh) {
 
   return(1)
+
+}
+
+
+#' Default vertical position of centre line labels
+#'
+#' Labels sit a tenth above the upper control limit. The proportion charts
+#' override this: their limits are percentages, so a tenth of one is a wide gap
+#' in the units of the axis.
+#'
+#' @return number, the scale factor applied to the upper control limit
+#' @noRd
+upper_annotation_sf_default.autospc_chart <- function(chart) {
+
+  return(1.1)
 
 }
 

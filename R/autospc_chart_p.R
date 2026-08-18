@@ -255,6 +255,7 @@ extrapolate_limits.autospc_chart_p <- function(chart,
 
 # Presentation methods
 
+
 #' Chart name
 #'
 #' @return string, name of chart for labels
@@ -272,6 +273,21 @@ label_accuracy.autospc_chart_p <- function(chart,
                                            ylimhigh) {
 
   return(0.1)
+
+}
+
+
+#' Default vertical position of centre line labels
+#'
+#' A P chart plots percentages, so the axis runs on a scale of 0 to 100 whatever
+#' the measure is, and the superclass's tenth would put the label far above the
+#' limit it belongs to.
+#'
+#' @return number, the scale factor applied to the upper control limit
+#' @noRd
+upper_annotation_sf_default.autospc_chart_p <- function(chart) {
+
+  return(1.04)
 
 }
 

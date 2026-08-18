@@ -123,6 +123,18 @@ label_accuracy <- function(chart, ylimhigh) {
 }
 
 
+#' Default vertical position of centre line labels
+#'
+#' Answers only the class-dependent question. The caller applies any user
+#' override, and derives the lower scale factor from the upper.
+#'
+#' @return number, the scale factor applied to the upper control limit
+#' @noRd
+upper_annotation_sf_default <- function(chart) {
+  UseMethod("upper_annotation_sf_default")
+}
+
+
 #' Lower and upper ends of the y axis
 #'
 #' Answers only the class-dependent question. The caller applies the

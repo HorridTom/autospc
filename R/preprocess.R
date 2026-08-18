@@ -3,9 +3,7 @@ preprocess_inputs <- function(
     df,
     chart_type,
     title = NULL,
-    subtitle = NULL,
-    upper_annotation_sf = NULL,
-    lower_annotation_sf = NULL) {
+    subtitle = NULL) {
   
   validate_chart_type(chart_type)
   
@@ -32,27 +30,14 @@ preprocess_inputs <- function(
                   "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
   
-  if(is.null(upper_annotation_sf)) {
-    upper_annotation_sf <- ifelse(startsWith(chart_type, "P"),
-                                  1.04,
-                                  1.1)
-  }
-  
-  if(is.null(lower_annotation_sf)) {
-    lower_annotation_sf <- 2 - upper_annotation_sf
-  }
-  
-  
   return(list(
     df = df,
     chart_type = chart_type,
     title = title,
     subtitle = subtitle,
-    xType = xType,
-    upper_annotation_sf = upper_annotation_sf,
-    lower_annotation_sf = lower_annotation_sf
+    xType = xType
   ))
-  
+
 }
 
 

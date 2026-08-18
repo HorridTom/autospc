@@ -61,9 +61,7 @@ facet_stages <- function(data,
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType
-  upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
-  lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
-  
+
   split_rows <- sort(split_rows)
   
   # Ensure the last split row is the end of the data

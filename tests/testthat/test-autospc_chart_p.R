@@ -402,6 +402,14 @@ test_that("prepare_data gives NA for a zero or missing denominator", {
 })
 
 
+test_that("P chart labels sit closer to the upper limit than the default", {
+
+  # the axis is a percentage scale, so the superclass's tenth is a wide gap
+  expect_identical(upper_annotation_sf_default(chart_p(pre_agg_data)), 1.04)
+
+})
+
+
 test_that("P chart labels are rounded to one decimal place", {
 
   expect_identical(label_accuracy(chart_p(pre_agg_data), ylimhigh = 110), 0.1)

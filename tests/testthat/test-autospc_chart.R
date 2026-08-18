@@ -467,6 +467,17 @@ test_that("every chart type a user can pass can be built", {
 })
 
 
+# upper_annotation_sf_default()
+
+test_that("centre line labels sit a tenth above the upper limit by default", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+
+  expect_identical(upper_annotation_sf_default(chart), 1.1)
+
+})
+
+
 # first_label_row(), label_accuracy(), y_axis_range()
 
 test_that("the first centre line label goes on row one by default", {

@@ -283,9 +283,7 @@ autospc <- function(data,
     df = chart$data,
     chart_type = chart_type,
     title = title,
-    subtitle = subtitle,
-    upper_annotation_sf = upper_annotation_sf,
-    lower_annotation_sf = lower_annotation_sf
+    subtitle = subtitle
   )
 
   chart$data          <- preprocessed_vars$df
@@ -293,8 +291,18 @@ autospc <- function(data,
   title               <- preprocessed_vars$title
   subtitle            <- preprocessed_vars$subtitle
   xType               <- preprocessed_vars$xType
-  upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
-  lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
+
+  # Centre line labels sit a scale factor above the upper control limit, and
+  # the lower factor is its mirror image about 1. Only the upper default asks
+  # what kind of chart this is, so only that is a method. A value the caller
+  # passed wins over both.
+  if(is.null(upper_annotation_sf)) {
+    upper_annotation_sf <- upper_annotation_sf_default(chart)
+  }
+
+  if(is.null(lower_annotation_sf)) {
+    lower_annotation_sf <- 2 - upper_annotation_sf
+  }
 
   # Aggregate the series over x, put it in x order, then turn it into the
   # series the algorithm analyses. The X and MR classes have no

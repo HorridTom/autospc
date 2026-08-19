@@ -80,7 +80,7 @@ See \code{vignette("data-requirements", package = "autospc")} for more
 details.}
 
 \item{chart_type}{The type of chart you wish to plot. Must must have length one.
-Available options are: "XMR", "MR", "C", "C'", "P", "P'".
+Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
 Parameters that control behaviour of the algorithm used to re-establish

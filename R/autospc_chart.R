@@ -107,7 +107,7 @@ autospc_chart_elements <- function() {
 #' @noRd
 autospc_chart_types <- function() {
 
-  chart_types <- c("XMR", "MR", "C", "C'", "P", "P'")
+  chart_types <- c("XMR", "X", "MR", "C", "C'", "P", "P'")
 
   return(chart_types)
 

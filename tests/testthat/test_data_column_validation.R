@@ -15,7 +15,7 @@ data_column_validation_expected_conditions_y <- readRDS(
             "data_column_validation_expected_conditions_y.rds"))
 
 chart_types_yn <- c("P", "P'")
-chart_types_y <- c("XMR", "MR", "C", "C'")
+chart_types_y <- c("XMR", "X", "MR", "C", "C'")
 
 for (chart_type in chart_types_yn) {
   for (i in seq_along(data_column_validation_data_yn)) {

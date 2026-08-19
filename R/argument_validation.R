@@ -203,10 +203,11 @@ validate_data_column_spec <- function(df,
            }
          },
          "MR" =,
+         "X" =,
          "XMR" = {
            
            if(!y_present) {
-             stop(paste("y not specified. For XMR charts, y must be",
+             stop(paste("y not specified. For X, MR and XMR charts, y must be",
                         "specified."),
                   call. = FALSE)
            }
@@ -214,7 +215,8 @@ validate_data_column_spec <- function(df,
            if(!(y_type %in% c("integer", "double"))) {
              stop(
                paste(
-                 "For an XMR chart, y must be of type integer or double."),
+                 "For X, MR and XMR charts, y must be of type integer or",
+                 "double."),
                call. = FALSE
              )
            } else {

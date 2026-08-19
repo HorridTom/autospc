@@ -436,13 +436,9 @@ test_that("XMR maps to X", {
 })
 
 
-test_that("X is not yet a chart type a user can pass", {
+test_that("X is a chart type a user can pass", {
 
-  # X has a class and autospc_chart() will build one, but nothing later in
-  # autospc() can chart it - form_limits.R has no branch for X. This is
-  # temporary: X becomes user-passable later, which is what allows show_mr to
-  # be dropped. Update this test then.
-  expect_false("X" %in% autospc_chart_types())
+  expect_true("X" %in% autospc_chart_types())
 
 })
 

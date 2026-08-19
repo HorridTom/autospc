@@ -2,7 +2,7 @@
 #
 # An autospc_plot IS a ggplot: its class vector is c("autospc_plot", "gg",
 # "ggplot"), so printing, ggsave() and adding ggplot2 layers all keep working.
-# What it adds is the fitted chart or charts it was drawn from, and how it was
+# What it adds is the analysed chart or charts it was drawn from, and how it was
 # drawn - the presentation parameters passed, and the values derived from them.
 #
 # Everything in the package that depends on a ggplot being an S3 list lives in
@@ -16,7 +16,7 @@
 #'
 #' `charts` is a list even when it holds one chart. An XmR plot holds two, and a
 #' faceted plot holds one per facet - in both cases one ggplot, drawn from
-#' several fitted charts.
+#' several analysed charts.
 #'
 #' The class is prepended rather than replaced, so the object remains a ggplot
 #' to everything that dispatches on `"gg"` or `"ggplot"`.
@@ -284,11 +284,15 @@ autospc_plot_derived <- function(plot,
 }
 
 
-#' The analysis results behind an autospc_plot
+#' The analysis behind an autospc_plot
 #'
-#' The analysis results of each chart the plot holds, bound into one frame.
-#' Where the plot holds more than one chart, `chart` identifies which each row
-#' came from.
+#' The result of each chart the plot holds, bound into one frame. Where
+#' the plot holds more than one chart, `chart` identifies which each row came
+#' from.
+#'
+#' This is the analytic result, not the frame `autospc(plot_chart = FALSE)`
+#' returns: it carries the columns the algorithm produced, and not the columns
+#' `postprocess_spc()` adds for drawing.
 #'
 #' @param x An `autospc_plot`.
 #' @param ... Ignored, for consistency with the generic.

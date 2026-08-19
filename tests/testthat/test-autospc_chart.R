@@ -506,7 +506,7 @@ test_that("the default y axis range is a percentage scale", {
 })
 
 
-# the fit slots
+# the analysis slots
 
 
 test_that("a new chart has empty result and history slots", {
@@ -520,7 +520,7 @@ test_that("a new chart has empty result and history slots", {
 })
 
 
-test_that("validate_autospc_chart requires the fit slots", {
+test_that("validate_autospc_chart requires the analysis slots", {
 
   chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
   chart$result <- NULL

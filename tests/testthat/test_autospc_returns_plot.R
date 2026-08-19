@@ -32,7 +32,7 @@ test_that("what autospc returns is still a ggplot", {
 })
 
 
-test_that("the returned plot carries the fitted chart", {
+test_that("the returned plot carries the analysed chart", {
 
   charts <- autospc_plot_charts(run_returns())
 
@@ -43,7 +43,7 @@ test_that("the returned plot carries the fitted chart", {
 })
 
 
-test_that("the chart it carries has been fitted, not just built", {
+test_that("the chart it carries has been analysed, not just built", {
 
   chart <- autospc_plot_charts(run_returns())[[1]]
 
@@ -104,7 +104,7 @@ test_that("show_limits = FALSE is still an autospc_plot", {
 
 test_that("an XMR run returns an autospc_plot", {
 
-  # the pair is drawn, but only the X chart is carried: the MR chart is fitted
+  # the pair is drawn, but only the X chart is carried: the MR chart is analysed
   # inside the chart_type = "MR" re-invocation, which returns a plot rather
   # than a chart
   plot <- suppressWarnings(

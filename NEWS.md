@@ -39,7 +39,7 @@
 
 * `autospc()` returns a plot object that is still a ggplot — printing, `ggsave()`
   and adding ggplot2 layers all work as before — and additionally carries the
-  fitted chart it was drawn from. `as.data.frame()` on it returns the analysis.
+  analysed chart it was drawn from. `as.data.frame()` on it returns the analysis.
 
 * `autospc(plot_chart = FALSE, show_limits = FALSE)` now returns the four
   columns describing the periods — `limitChange`, `periodStart`, `plotPeriod`

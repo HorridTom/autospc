@@ -7,7 +7,7 @@ print_data <- data.frame(
         rep(c(20, 22, 21, 23, 19, 24, 20, 21, 22, 23), 3))
 )
 
-fitted_print_chart <- function(...) {
+analysed_print_chart <- function(...) {
 
   plot <- suppressWarnings(
     autospc(print_data, chart_type = "C", period_min = 21L, ...)
@@ -20,7 +20,7 @@ fitted_print_chart <- function(...) {
 
 test_that("print names the class, the chart type and the size", {
 
-  expect_output(print(fitted_print_chart()),
+  expect_output(print(analysed_print_chart()),
                 "<autospc_chart_c> C chart, 60 points, period_min = 21",
                 fixed = TRUE)
 
@@ -29,7 +29,7 @@ test_that("print names the class, the chart type and the size", {
 
 test_that("print lists the calculation periods with their centre lines", {
 
-  chart <- fitted_print_chart()
+  chart <- analysed_print_chart()
 
   first_cl <- format(signif(chart$result$table$cl[1], 6))
 
@@ -42,7 +42,7 @@ test_that("print lists the calculation periods with their centre lines", {
 
 test_that("print reports where limits were re-established", {
 
-  chart <- fitted_print_chart()
+  chart <- analysed_print_chart()
 
   expect_output(print(chart),
                 paste("Limits re-established at",
@@ -53,7 +53,7 @@ test_that("print reports where limits were re-established", {
 
 test_that("print reports the candidates, singular when there is one", {
 
-  expect_output(print(fitted_print_chart()),
+  expect_output(print(analysed_print_chart()),
                 "1 candidate period considered, 1 accepted",
                 fixed = TRUE)
 
@@ -62,7 +62,7 @@ test_that("print reports the candidates, singular when there is one", {
 
 test_that("print omits the exclusions line when nothing was excluded", {
 
-  chart <- fitted_print_chart()
+  chart <- analysed_print_chart()
 
   expect_length(chart$result$exclusions, 0L)
 
@@ -94,7 +94,7 @@ test_that("print reports exclusions and candidates in the plural", {
 
 test_that("print reports why the run stopped", {
 
-  chart <- fitted_print_chart()
+  chart <- analysed_print_chart()
 
   expect_output(print(chart),
                 paste0("Stopped at row ", chart$history$stopped$counter, ": ",
@@ -103,14 +103,14 @@ test_that("print reports why the run stopped", {
 })
 
 
-test_that("print says so when the chart has not been fitted", {
+test_that("print says so when the chart has not been analysed", {
 
-  unfitted <- autospc_chart(chart_type = "C",
-                            data = print_data,
-                            x = "x",
-                            y = "y")
+  unanalysed <- autospc_chart(chart_type = "C",
+                              data = print_data,
+                              x = "x",
+                              y = "y")
 
-  expect_output(print(unfitted), "Not fitted", fixed = TRUE)
+  expect_output(print(unanalysed), "Not analysed", fixed = TRUE)
 
 })
 
@@ -130,7 +130,7 @@ test_that("print says so when there were too few points for limits", {
 
 test_that("print returns the chart invisibly", {
 
-  chart <- fitted_print_chart()
+  chart <- analysed_print_chart()
 
   expect_output(returned <- print(chart))
 

@@ -304,69 +304,8 @@ autospc <- function(data,
     lower_annotation_sf <- 2 - upper_annotation_sf
   }
 
-  # Aggregate the series over x, put it in x order, then turn it into the
-  # series the algorithm analyses. The X and MR classes have no
-  # aggregate_data() method, so for those the first call returns the chart
-  # untouched.
-  chart <- aggregate_data(chart)
-  chart <- order_series(chart)
-  chart <- prepare_data(chart)
-
-  # Get control limits
-  chart <- run_limit_algorithm(chart)
-
-  data <- chart$result$table
-
-  # No limits columns means too few points to form a period
-  if(show_limits && !centre_line_present(data)) {
-    warning(paste("The input data has fewer than the minimum number of",
-                  "points needed to calculate one period. Timeseries data",
-                  "without limits has been displayed."))
-  }
-  
-  # Output log data
-  log_output(data,
-             verbosity = verbosity,
-             chart_type = chart_type,
-             log_file_path = log_file_path)
-  
-  # Postprocess data
-  
-  postprocessing_vars <- postprocess(
-    df = data,
-    chart_type = chart_type,
-    chart = chart,
-    override_x_title = override_x_title,
-    override_y_title = override_y_title,
-    override_y_lim = override_y_lim,
-    x_pad_end = x_pad_end,
-    extend_limits_to = extend_limits_to,
-    xType = xType
-  )
-  
-  data               <- postprocessing_vars$df
-  override_x_title   <- postprocessing_vars$override_x_title
-  override_y_title   <- postprocessing_vars$override_y_title
-  start_x            <- postprocessing_vars$start_x
-  x_max              <- postprocessing_vars$x_max
-  end_x              <- postprocessing_vars$end_x
-  ylimhigh           <- postprocessing_vars$ylimhigh
-  ylimlow            <- postprocessing_vars$ylimlow
-  
-  
-  # The axis extents postprocess() worked out, recorded as used rather than
-  # left to be recomputed.
-  derived <- list(
-    start_x = start_x,
-    x_max = x_max,
-    end_x = end_x,
-    ylimlow = ylimlow,
-    ylimhigh = ylimhigh
-  )
-
-  # The presentation parameters, as the plot is drawn with them: title and the
-  # axis titles are the resolved values rather than what the caller passed,
-  # which may have been NULL.
+  # The presentation parameters. The axis titles go in as the caller gave them
+  # and come back resolved.
   passed <- list(
     show_limits = show_limits,
     title = title,
@@ -394,26 +333,43 @@ autospc <- function(data,
     annotation_arrow_curve = annotation_arrow_curve
   )
 
+  prepared <- run_analysis(chart = chart,
+                           chart_type = chart_type,
+                           xType = xType,
+                           passed = passed,
+                           extend_limits_to = extend_limits_to,
+                           floating_median = floating_median,
+                           floating_median_n = floating_median_n)
+
+  chart   <- prepared$chart
+  data    <- prepared$data
+  derived <- prepared$derived
+  passed  <- prepared$passed
+
+  override_x_title <- passed$override_x_title
+  override_y_title <- passed$override_y_title
+  start_x          <- derived$start_x
+  x_max            <- derived$x_max
+  end_x            <- derived$end_x
+  ylimhigh         <- derived$ylimhigh
+  ylimlow          <- derived$ylimlow
+
+  # No limits columns means too few points to form a period
+  if(show_limits && !centre_line_present(data)) {
+    warning(paste("The input data has fewer than the minimum number of",
+                  "points needed to calculate one period. Timeseries data",
+                  "without limits has been displayed."))
+  }
+
+  # Output log data
+  log_output(chart$result$table,
+             verbosity = verbosity,
+             chart_type = chart_type,
+             log_file_path = log_file_path)
+
   # Check whether limits are to be displayed on chart
   if(show_limits && centre_line_present(data)){
-    
-    data <- postprocess_spc(
-      df = data,
-      chart_type = chart_type,
-      chart = chart,
-      highlight_exclusions = highlight_exclusions,
-      floating_median = floating_median,
-      floating_median_n = floating_median_n,
-      extend_limits_to = extend_limits_to,
-      align_labels = align_labels,
-      flip_labels = flip_labels,
-      upper_annotation_sf = upper_annotation_sf,
-      lower_annotation_sf = lower_annotation_sf,
-      annotation_arrow_curve = annotation_arrow_curve,
-      ylimhigh = ylimhigh,
-      x_max = x_max
-    )
-    
+
     if((chart_type == "XMR") & show_mr) {
       mc <- match.call()
       mc[["chart_type"]] <- "MR"
@@ -461,7 +417,7 @@ autospc <- function(data,
       )
       
       # For chart_type = "XMR" the pair is drawn but only the X chart is
-      # carried: the MR chart is fitted inside the re-invocation above, which
+      # carried: the MR chart is analysed inside the re-invocation above, which
       # returns a plot rather than a chart.
       suppressWarnings(
         return(autospc_plot(plot = p,

@@ -16,7 +16,7 @@ test_that("X is accepted by autospc", {
 })
 
 
-test_that("an X run fits an autospc_chart_x", {
+test_that("an X run gives an autospc_chart_x", {
 
   plot <- autospc(x_type_data, chart_type = "X", period_min = 21L)
 

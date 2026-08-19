@@ -89,7 +89,7 @@ autospc_chart_elements <- function() {
     "mr_screen_max_loops",
     "centre_line_tolerance",
     "data_original",
-    # fit
+    # the analysis
     "result",
     "history"
   )
@@ -242,7 +242,7 @@ autospc_chart_list <- function(data,
     centre_line_tolerance = centre_line_tolerance,
     # derived fields
     data_original = data,
-    # fit, empty until the algorithm runs
+    # the analysis, empty until the algorithm runs
     result = list(),
     history = list()
   )
@@ -442,7 +442,7 @@ print.autospc_chart <- function(x, ...) {
               x$period_min))
 
   if(length(x$result) == 0L) {
-    cat("\nNot fitted.\n")
+    cat("\nNot analysed.\n")
     return(invisible(x))
   }
 

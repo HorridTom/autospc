@@ -139,7 +139,7 @@ test_that("specific log entries are interpreted correctly", {
 
 test_that("the log records the algorithm's decisions", {
 
-  fit <- function(data, ...) {
+  analyse <- function(data, ...) {
     suppressWarnings(run_limit_algorithm(prepare_data(
       autospc_chart(chart_type = "C\'", data = data, x = "x", y = "y", ...))))
   }
@@ -150,13 +150,13 @@ test_that("the log records the algorithm's decisions", {
   }
 
   expect_identical(
-    entries(fit(example_series_2a)),
+    entries(analyse(example_series_2a)),
     c("1" = "0100;0200",
       "22" = "0300;040122;050010;060001;0710",
       "23" = "040023;050010;060000;0700"))
 
   expect_identical(
-    entries(fit(example_series_2c)),
+    entries(analyse(example_series_2c)),
     c("1" = "0100;0200",
       "22" = "0300;040122;050010;060011;0710",
       "23" = "040023;050010;060011;0710",
@@ -168,7 +168,7 @@ test_that("the log records the algorithm's decisions", {
   too_short <- data.frame(x = 1:10,
                           y = c(10, 14, 11, 16, 12, 13, 15, 11, 14, 12))
 
-  expect_identical(entries(fit(too_short)), c("1" = "0100;0210"))
+  expect_identical(entries(analyse(too_short)), c("1" = "0100;0210"))
 
 })
 
@@ -215,10 +215,10 @@ test_that("an entry past the end of the table is held at the last row", {
                       y = c(10, 12, 11, 13, 9, 10, 12, 11, 13, 9, 10,
                             12, 11, 13, 9, 10, 12, 11, 13, 9, 10))
 
-  fitted <- suppressWarnings(run_limit_algorithm(prepare_data(
+  analysed <- suppressWarnings(run_limit_algorithm(prepare_data(
     autospc_chart(chart_type = "C\'", data = exact, x = "x", y = "y",
                   period_min = 21L))))
 
-  expect_identical(fitted$result$table$log[21], "co@22|0300")
+  expect_identical(analysed$result$table$log[21], "co@22|0300")
 
 })

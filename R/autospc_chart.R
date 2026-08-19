@@ -419,3 +419,104 @@ y_axis_range.autospc_chart <- function(chart,
               high = 110))
 
 }
+
+
+#' Print a summary of the analysis
+#'
+#' An `autospc_chart` is the analysis, not the drawing, so printing one
+#' summarises what the algorithm did: the calculation periods it formed, where
+#' it re-established limits, which points it excluded, and why it stopped.
+#' `autospc()` returns an `autospc_plot`, which draws.
+#'
+#' @param x An `autospc_chart`.
+#' @param ... Ignored, for consistency with the generic.
+#'
+#' @return `x`, invisibly.
+#' @export
+print.autospc_chart <- function(x, ...) {
+
+  cat(sprintf("<%s> %s chart, %d points, period_min = %d\n",
+              class(x)[1],
+              chart_type_label(x),
+              nrow(x$data),
+              x$period_min))
+
+  if(length(x$result) == 0L) {
+    cat("\nNot fitted.\n")
+    return(invisible(x))
+  }
+
+  if(!centre_line_present(x$result$table)) {
+    cat("\nNo limits: too few points to form a calculation period.\n")
+    return(invisible(x))
+  }
+
+  cat("\nCalculation periods\n")
+  cat(format_calculation_periods(x$result$table), sep = "\n")
+
+  if(length(x$result$re_establish_rows) > 0L) {
+    cat(sprintf("\nLimits re-established at %s\n",
+                paste(x$result$re_establish_rows, collapse = ", ")))
+  }
+
+  if(length(x$result$exclusions) > 0L) {
+    cat(sprintf("%d point%s excluded from the limit calculations\n",
+                length(x$result$exclusions),
+                if(length(x$result$exclusions) == 1L) "" else "s"))
+  }
+
+  candidates <- x$history$candidates
+  if(length(candidates) > 0L) {
+    accepted <- sum(vapply(candidates,
+                           function(candidate) isTRUE(candidate$accepted),
+                           logical(1)))
+    cat(sprintf("%d candidate period%s considered, %d accepted\n",
+                length(candidates),
+                if(length(candidates) == 1L) "" else "s",
+                accepted))
+  }
+
+  if(!is.null(x$history$stopped)) {
+    cat(sprintf("Stopped at row %d: %s\n",
+                x$history$stopped$counter,
+                x$history$stopped$reason))
+  }
+
+  return(invisible(x))
+
+}
+
+
+#' One line per calculation period, for `print.autospc_chart()`
+#'
+#' Long analyses are truncated, because a chart with many periods would
+#' otherwise fill the console.
+#'
+#' @return A character vector of lines.
+#' @noRd
+format_calculation_periods <- function(table,
+                                       max_shown = 10L) {
+
+  periods <- unique(table$plotPeriod[table$periodType == "calculation"])
+
+  lines <- vapply(periods, function(period) {
+
+    rows <- which(table$plotPeriod == period)
+
+    sprintf("  rows %4d-%4d   cl = %s",
+            min(rows),
+            max(rows),
+            format(signif(table$cl[rows[1]], 6)))
+
+  }, character(1))
+
+  if(length(lines) > max_shown) {
+
+    lines <- c(lines[seq_len(max_shown)],
+               sprintf("  ... and %d more", length(lines) - max_shown))
+
+  }
+
+  return(unname(lines))
+
+}

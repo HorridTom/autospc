@@ -286,9 +286,12 @@ autospc_plot_derived <- function(plot,
 
 #' The analysis behind an autospc_plot
 #'
-#' The result of each chart the plot holds, bound into one frame. Where
-#' the plot holds more than one chart, `chart` identifies which each row came
-#' from.
+#' The result of each chart the plot holds, in one frame.
+#'
+#' An XmR pair is one analysis of one series shown as two charts, so it goes
+#' out wide: the moving range and its limits join the X columns as `mr`, `amr`,
+#' `url` and `lrl`. Several charts of the same type are separate analyses, so
+#' they stack long, with `chart` identifying which each row came from.
 #'
 #' This is the analytic result, not the frame `autospc(plot_chart = FALSE)`
 #' returns: it carries the columns the algorithm produced, and not the columns
@@ -301,11 +304,18 @@ autospc_plot_derived <- function(plot,
 #' @export
 as.data.frame.autospc_plot <- function(x, ...) {
 
-  results <- lapply(autospc_plot_charts(x),
+  charts <- autospc_plot_charts(x)
+
+  results <- lapply(charts,
                     function(chart) chart$result$table)
 
   if(length(results) == 1L) {
     return(as.data.frame(results[[1]]))
+  }
+
+  if(is_xmr_pair(charts)) {
+    return(as.data.frame(join_mr_columns(x_table = results[[1]],
+                                         mr_table = results[[2]])))
   }
 
   return(as.data.frame(dplyr::bind_rows(results, .id = "chart")))

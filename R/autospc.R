@@ -248,24 +248,25 @@ autospc <- function(data,
     )
   }
 
-  df_original <- data
-
   # autospc_chart() has no branch for a chart type outside
   # autospc_chart_types(), so chart_type has to be valid before the object is
   # built. preprocess_inputs() checks it again.
   validate_chart_type(chart_type)
 
+  x_name <- resolve_column_name(rlang::enquo(x), "x")
+  y_name <- resolve_column_name(rlang::enquo(y), "y")
+  n_name <- resolve_column_name(rlang::enquo(n), "n")
+
   # Build the chart object, from the data exactly as passed. The construction
   # helper renames the analysed columns to x, y and n.
   #
-  # For chart_type = "XMR" this is the X chart of the pair. The MR one is
-  # created by the chart_type = "MR" re-invocation below.
+  # For chart_type = "XMR" this is the X chart of the pair.
   chart <- autospc_chart(
     chart_type = chart_type_for_object(chart_type),
     data = data,
-    x = resolve_column_name(rlang::enquo(x), "x"),
-    y = resolve_column_name(rlang::enquo(y), "y"),
-    n = resolve_column_name(rlang::enquo(n), "n"),
+    x = x_name,
+    y = y_name,
+    n = n_name,
     period_min = period_min,
     baseline_length = baseline_length,
     shift_rule_threshold = shift_rule_threshold,
@@ -277,6 +278,30 @@ autospc <- function(data,
     mr_screen_max_loops = mr_screen_max_loops,
     centre_line_tolerance = centre_line_tolerance
   )
+
+  # The other half of an XmR pair, built from the same data as passed:
+  # prepare_data.autospc_chart_mr() derives the moving ranges from y.
+  if(chart_type == "XMR") {
+
+    chart_mr <- autospc_chart(
+      chart_type = "MR",
+      data = data,
+      x = x_name,
+      y = y_name,
+      n = n_name,
+      period_min = period_min,
+      baseline_length = baseline_length,
+      shift_rule_threshold = shift_rule_threshold,
+      baseline_only = baseline_only,
+      establish_every_shift = establish_every_shift,
+      no_regrets = no_regrets,
+      overhanging_reversions = overhanging_reversions,
+      max_exclusions = max_exclusions,
+      mr_screen_max_loops = mr_screen_max_loops,
+      centre_line_tolerance = centre_line_tolerance
+    )
+
+  }
 
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(
@@ -333,6 +358,10 @@ autospc <- function(data,
     annotation_arrow_curve = annotation_arrow_curve
   )
 
+  # run_analysis() fills in the axis titles it resolves, so the MR half of a
+  # pair needs the list as the caller gave it: its y axis title is its own.
+  passed_as_given <- passed
+
   prepared <- run_analysis(chart = chart,
                            chart_type = chart_type,
                            xType = xType,
@@ -370,20 +399,45 @@ autospc <- function(data,
   # Check whether limits are to be displayed on chart
   if(show_limits && centre_line_present(data)){
 
+    charts <- list(chart)
+
     if((chart_type == "XMR") & show_mr) {
-      mc <- match.call()
-      mc[["chart_type"]] <- "MR"
-      if("title" %in% names(mc)) {mc[["title"]] <- NULL}
-      if("subtitle" %in% names(mc)) {mc[["subtitle"]] <- NULL}
-      mc[["data"]] <- rlang::expr(df_original)
-      
-      p_mr <- eval(mc)
-    } else {
-      p_mr <- NA
+
+      mr <- run_analysis(chart = chart_mr,
+                         chart_type = "MR",
+                         xType = xType,
+                         passed = passed_as_given,
+                         extend_limits_to = extend_limits_to,
+                         floating_median = floating_median,
+                         floating_median_n = floating_median_n)
+
+      if(!centre_line_present(mr$data)) {
+        warning(paste("The input data has fewer than the minimum number of",
+                      "points needed to calculate one period. Timeseries data",
+                      "without limits has been displayed."))
+      }
+
+      log_output(mr$chart$result$table,
+                 verbosity = verbosity,
+                 chart_type = "MR",
+                 log_file_path = log_file_path)
+
+      charts <- list(chart, mr$chart)
+
     }
-    
+
     if(plot_chart){
-      
+
+      if(length(charts) > 1L) {
+        p_mr <- draw_mr_panel(analysis = mr,
+                              xType = xType,
+                              period_min = period_min,
+                              shift_rule_threshold = shift_rule_threshold,
+                              floating_median_n = floating_median_n)
+      } else {
+        p_mr <- NA
+      }
+
       p <- create_spc_plot(
         df = data,
         p_mr = p_mr,
@@ -416,12 +470,9 @@ autospc <- function(data,
         x_date_format = x_date_format
       )
       
-      # For chart_type = "XMR" the pair is drawn but only the X chart is
-      # carried: the MR chart is analysed inside the re-invocation above, which
-      # returns a plot rather than a chart.
       suppressWarnings(
         return(autospc_plot(plot = p,
-                            charts = list(chart),
+                            charts = charts,
                             passed = passed,
                             derived = derived)) # Chart output
       )
@@ -443,20 +494,11 @@ autospc <- function(data,
       # (!plot_chart)
       
       if(chart_type == "XMR" & show_mr) {
-        
-        data <- data %>%
-          dplyr::left_join(p_mr %>%
-                             dplyr::select(x,
-                                           mr = y,
-                                           amr = cl,
-                                           url = ucl,
-                                           lrl = lcl),
-                           by = c("x" = "x")) %>% 
-          dplyr::select(x, y, cl, ucl, lcl,
-                        mr, amr, url, lrl,
-                        dplyr::everything())
+
+        data <- join_mr_columns(x_table = data,
+                                mr_table = mr$data)
       }
-      
+
       data <- data %>%
         dplyr::filter(!is.na(x))
       

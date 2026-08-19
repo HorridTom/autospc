@@ -119,10 +119,8 @@ autospc_chart_types <- function() {
 #' TEMPORARY - the whole function goes with the XMR split, Decided §5 in the
 #' worklist.
 #'
-#' `"XMR"` maps to `"X"`. It asks for a pair of charts, and the MR half is
-#' already created by the `chart_type = "MR"` re-invocation in `autospc()`, so
-#' the X half is all that is needed here. Every other chart type maps to
-#' itself.
+#' `"XMR"` maps to `"X"`, the first chart of the pair. Every other chart type
+#' maps to itself.
 #'
 #' Callers pass a `chart_type` that `validate_chart_type()` has already
 #' accepted, so anything reaching here is one of `autospc_chart_types()`.
@@ -136,6 +134,27 @@ chart_type_for_object <- function(chart_type) {
   }
 
   return(chart_type)
+
+}
+
+
+#' Are these two charts an XmR pair?
+#'
+#' An X chart and the MR chart of the same series, in that order - which is how
+#' `autospc(chart_type = "XMR")` puts them on the plot object.
+#'
+#' @param charts A list of `autospc_chart` objects.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+is_xmr_pair <- function(charts) {
+
+  if(length(charts) != 2L) {
+    return(FALSE)
+  }
+
+  return(inherits(charts[[1]], "autospc_chart_x") &&
+           inherits(charts[[2]], "autospc_chart_mr"))
 
 }
 

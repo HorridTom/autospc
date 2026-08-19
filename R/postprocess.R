@@ -143,6 +143,35 @@ centre_line_present <- function(data) {
 
 
 
+#' Join the moving range analysis onto the X analysis
+#'
+#' An XmR pair is one analysis of one series shown as two charts, so it goes
+#' out wide: the moving range and its limits sit beside the X columns as `mr`,
+#' `amr`, `url` and `lrl`.
+#'
+#' @return A data frame.
+#' @noRd
+join_mr_columns <- function(x_table,
+                            mr_table) {
+
+  joined <- x_table %>%
+    dplyr::left_join(mr_table %>%
+                       dplyr::filter(!is.na(x)) %>%
+                       dplyr::select(x,
+                                     mr = y,
+                                     amr = cl,
+                                     url = ucl,
+                                     lrl = lcl),
+                     by = c("x" = "x")) %>%
+    dplyr::select(x, y, cl, ucl, lcl,
+                  mr, amr, url, lrl,
+                  dplyr::everything())
+
+  return(joined)
+
+}
+
+
 #' Analyse a chart and prepare its data for drawing
 #'
 #' Everything between a built chart and a drawable frame: aggregate, order,
@@ -153,8 +182,8 @@ centre_line_present <- function(data) {
 #' caller gave them, which may be NULL, and goes back out with the values
 #' `postprocess()` resolved.
 #'
-#' @return A list of the analysed `chart`, the drawable `data`, the `derived` axis
-#'   extents, and `passed`.
+#' @return A list of the analysed `chart`, the drawable `data`, the `derived`
+#'   axis extents, and `passed`.
 #' @noRd
 run_analysis <- function(chart,
                             chart_type,

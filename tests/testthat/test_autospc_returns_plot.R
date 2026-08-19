@@ -104,16 +104,52 @@ test_that("show_limits = FALSE is still an autospc_plot", {
 
 test_that("an XMR run returns an autospc_plot", {
 
-  # the pair is drawn, but only the X chart is carried: the MR chart is analysed
-  # inside the chart_type = "MR" re-invocation, which returns a plot rather
-  # than a chart
   plot <- suppressWarnings(
     autospc(returns_data, chart_type = "XMR", period_min = 21L)
   )
 
   expect_s3_class(plot, "autospc_plot")
 
-  expect_length(autospc_plot_charts(plot), 1L)
+})
+
+
+test_that("an XMR run carries both charts of the pair, X first", {
+
+  charts <- autospc_plot_charts(suppressWarnings(
+    autospc(returns_data, chart_type = "XMR", period_min = 21L)
+  ))
+
+  expect_length(charts, 2L)
+
+  expect_s3_class(charts[[1]], "autospc_chart_x")
+
+  expect_s3_class(charts[[2]], "autospc_chart_mr")
+
+})
+
+
+test_that("show_mr = FALSE carries the X chart alone", {
+
+  charts <- autospc_plot_charts(suppressWarnings(
+    autospc(returns_data, chart_type = "XMR", show_mr = FALSE, period_min = 21L)
+  ))
+
+  expect_length(charts, 1L)
+
+  expect_s3_class(charts[[1]], "autospc_chart_x")
+
+})
+
+
+test_that("both charts of the pair have been analysed", {
+
+  charts <- autospc_plot_charts(suppressWarnings(
+    autospc(returns_data, chart_type = "XMR", period_min = 21L)
+  ))
+
+  expect_true(all(vapply(charts,
+                         function(chart) "cl" %in% colnames(chart$result$table),
+                         logical(1))))
 
 })
 
@@ -192,6 +228,40 @@ test_that("as.data.frame does not carry the drawing columns", {
 
   expect_false(any(c("annotation_level", "annotation_curvature", "cl_label")
                    %in% colnames(result)))
+
+})
+
+
+test_that("as.data.frame joins an XmR pair wide", {
+
+  plot <- suppressWarnings(
+    autospc(returns_data, chart_type = "XMR", period_min = 21L)
+  )
+
+  result <- as.data.frame(plot)
+
+  expect_identical(nrow(result), 30L)
+
+  expect_true(all(c("mr", "amr", "url", "lrl") %in% colnames(result)))
+
+  expect_false("chart" %in% colnames(result))
+
+})
+
+
+test_that("the wide join carries the moving ranges, not a second y column", {
+
+  plot <- suppressWarnings(
+    autospc(returns_data, chart_type = "XMR", period_min = 21L)
+  )
+
+  result <- as.data.frame(plot)
+
+  mr_chart <- autospc_plot_charts(plot)[[2]]
+
+  expect_identical(result$mr, mr_chart$result$table$y)
+
+  expect_identical(result$y, autospc_plot_charts(plot)[[1]]$result$table$y)
 
 })
 

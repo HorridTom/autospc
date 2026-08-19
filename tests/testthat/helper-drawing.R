@@ -11,3 +11,30 @@ drawn <- function(plot) {
   print(plot)
 
 }
+
+
+# Every piece of text in a combined XmR plot.
+#
+# cowplot::plot_grid() puts the two panels into one ggplot layer as a gtable,
+# so they can be read without drawing, but only by walking it.
+panel_texts <- function(plot) {
+
+  grob <- plot$layers[[1]]$geom_params$grob
+
+  if(is.null(grob)) {
+    stop("Not a combined plot - there is only one panel.", call. = FALSE)
+  }
+
+  walk <- function(g) {
+
+    if(!is.null(g$grobs))    return(unlist(lapply(g$grobs, walk)))
+    if(!is.null(g$children)) return(unlist(lapply(g$children, walk)))
+    if(!is.null(g$label))    return(as.character(g$label))
+
+    return(character(0))
+
+  }
+
+  return(walk(grob))
+
+}

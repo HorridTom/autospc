@@ -41,6 +41,16 @@
   and adding ggplot2 layers all work as before — and additionally carries the
   analysed chart it was drawn from. `as.data.frame()` on it returns the analysis.
 
+  An XmR chart carries both halves of the pair, the X chart first and the moving
+  range chart second. `as.data.frame()` on one returns them joined side by side,
+  with the moving range and its limits as `mr`, `amr`, `url` and `lrl` — the same
+  shape `autospc(plot_chart = FALSE)` returns.
+
+* A `title` or `subtitle` column in the data is no longer repeated over the
+  moving range chart of an XmR pair. The pair is one chart in two panels, so its
+  title is drawn once, above the X chart. A title given as an argument was
+  already drawn once; this makes the two agree.
+
 * `autospc(plot_chart = FALSE, show_limits = FALSE)` now returns the four
   columns describing the periods — `limitChange`, `periodStart`, `plotPeriod`
   and `cl_change` — which it previously returned only when `show_limits` was
@@ -52,6 +62,12 @@
   and were dropped for one without. They are now dropped in both cases.
 
 ## Bug fixes
+
+* `chart_type = "XMR"` no longer fails when `autospc()` is called from a
+  wrapper that forwards its arguments — `function(...) autospc(...)` — which
+  raised `'...' used in an incorrect context`. The XmR pair was the only chart
+  type that re-invoked `autospc()` through the call it had been given, and it no
+  longer does: both halves are analysed directly.
 
 * The series is now sorted by `x` before limits are calculated. The algorithm
   works through the points in order, so data supplied out of `x` order produced

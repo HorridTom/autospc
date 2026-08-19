@@ -2,7 +2,7 @@
 % Please edit documentation in R/autospc_plot.R
 \name{as.data.frame.autospc_plot}
 \alias{as.data.frame.autospc_plot}
-\title{The analysis results behind an autospc_plot}
+\title{The analysis behind an autospc_plot}
 \usage{
 \method{as.data.frame}{autospc_plot}(x, ...)
 }
@@ -15,7 +15,15 @@
 A data frame.
 }
 \description{
-The analysis results of each chart the plot holds, bound into one frame.
-Where the plot holds more than one chart, \code{chart} identifies which each row
-came from.
+The result of each chart the plot holds, in one frame.
+}
+\details{
+An XmR pair is one analysis of one series shown as two charts, so it goes
+out wide: the moving range and its limits join the X columns as \code{mr}, \code{amr},
+\code{url} and \code{lrl}. Several charts of the same type are separate analyses, so
+they stack long, with \code{chart} identifying which each row came from.
+
+This is the analytic result, not the frame \code{autospc(plot_chart = FALSE)}
+returns: it carries the columns the algorithm produced, and not the columns
+\code{postprocess_spc()} adds for drawing.
 }

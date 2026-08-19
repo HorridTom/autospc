@@ -150,6 +150,74 @@ create_spc_plot <- function(df,
 }
 
 
+#' Draw the moving range panel of an XmR pair
+#'
+#' The panel carries no title or subtitle: the pair shares the X chart's, which
+#' the combined plot renders once. Its caption is replaced by the combined
+#' plot's, and its legend is dropped, so neither depends on what is set here.
+#'
+#' @param analysis The list `run_analysis()` returned for the MR chart.
+#'
+#' @return A ggplot.
+#' @noRd
+draw_mr_panel <- function(analysis,
+                          xType,
+                          period_min,
+                          shift_rule_threshold,
+                          floating_median_n) {
+
+  data    <- analysis$data
+  derived <- analysis$derived
+  passed  <- analysis$passed
+
+  if(!centre_line_present(data)) {
+
+    return(create_timeseries_plot(
+      df = data,
+      title = NULL,
+      subtitle = NULL,
+      override_x_title = passed$override_x_title,
+      override_y_title = passed$override_y_title,
+      ylimlow = derived$ylimlow,
+      ylimhigh = derived$ylimhigh,
+      point_size = passed$point_size,
+      line_width_sf = passed$line_width_sf))
+
+  }
+
+  return(create_spc_plot(
+    df = data,
+    chart_type = "MR",
+    shift_rule_threshold = shift_rule_threshold,
+    xType = xType,
+    start_x = derived$start_x,
+    end_x = derived$end_x,
+    x_max = derived$x_max,
+    ylimlow = derived$ylimlow,
+    ylimhigh = derived$ylimhigh,
+    period_min = period_min,
+    title = NULL,
+    subtitle = NULL,
+    use_caption = passed$use_caption,
+    override_x_title = passed$override_x_title,
+    override_y_title = passed$override_y_title,
+    r1_col = passed$r1_col,
+    r2_col = passed$r2_col,
+    point_size = passed$point_size,
+    line_width_sf = passed$line_width_sf,
+    include_annotations = passed$include_annotations,
+    basic_annotations = passed$basic_annotations,
+    annotation_size = passed$annotation_size,
+    annotation_arrows = passed$annotation_arrows,
+    annotation_curvature = passed$annotation_arrow_curve,
+    floating_median_n = floating_median_n,
+    show_mr = FALSE,
+    x_break = passed$x_break,
+    x_date_format = passed$x_date_format))
+
+}
+
+
 create_timeseries_plot <- function(df,
                                    title,
                                    subtitle,

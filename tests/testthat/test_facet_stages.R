@@ -113,3 +113,22 @@ test_that("facet_stages works when relying on x,y columns in data", {
   
 })
 
+
+test_that("an XMR request is faceted as its X chart", {
+
+  plot <- suppressWarnings(
+    facet_stages(data.frame(x = 1L:60L,
+                            y = rep(c(10, 12, 11, 13, 9, 14), 10L)),
+                 split_rows = c(30L, 60L),
+                 chart_type = "XMR")
+  )
+
+  y_range <- ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$y.range
+
+  # show_mr is forced to FALSE, so one chart is drawn and the axis comes from
+  # the chart object built for it. y_axis_range.autospc_chart_mr() always starts
+  # the axis at zero; the X one starts below the lowest of lcl and y, which for
+  # this series is well above zero.
+  expect_gt(y_range[1], 0)
+
+})

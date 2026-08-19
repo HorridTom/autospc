@@ -114,26 +114,51 @@ autospc_chart_types <- function() {
 }
 
 
-#' Which chart type's class serves this request?
+#' The charts a request asks for
 #'
-#' TEMPORARY - the whole function goes with the XMR split, Decided §5 in the
-#' worklist.
+#' `chart_type = "XMR"` asks for two charts, an X and an MR of the same series.
+#' Every other chart type asks for one. This is the only place a chart type is
+#' read as a string rather than dispatched on: everything after it holds chart
+#' objects.
 #'
-#' `"XMR"` maps to `"X"`, the first chart of the pair. Every other chart type
-#' maps to itself.
+#' **The charts come back in drawing order, so a pair is X then MR.**
+#' `is_xmr_pair()`, the moving range panel and `as.data.frame()` all read that
+#' order, and `facet_stages()` takes the first.
+#'
+#' Both halves of a pair are built from the same data, because neither X nor MR
+#' aggregates and `prepare_data.autospc_chart_mr()` derives the moving ranges
+#' from `y`.
 #'
 #' Callers pass a `chart_type` that `validate_chart_type()` has already
 #' accepted, so anything reaching here is one of `autospc_chart_types()`.
 #'
-#' @return A character scalar.
+#' @return A list of one or two `autospc_chart` objects.
 #' @noRd
-chart_type_for_object <- function(chart_type) {
+build_charts <- function(chart_type,
+                         data,
+                         x,
+                         y,
+                         n,
+                         ...) {
 
   if(identical(chart_type, "XMR")) {
-    return("X")
+    chart_types <- c("X", "MR")
+  } else {
+    chart_types <- chart_type
   }
 
-  return(chart_type)
+  charts <- lapply(chart_types, function(type) {
+
+    autospc_chart(chart_type = type,
+                  data = data,
+                  x = x,
+                  y = y,
+                  n = n,
+                  ...)
+
+  })
+
+  return(charts)
 
 }
 

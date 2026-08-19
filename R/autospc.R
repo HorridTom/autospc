@@ -257,12 +257,11 @@ autospc <- function(data,
   y_name <- resolve_column_name(rlang::enquo(y), "y")
   n_name <- resolve_column_name(rlang::enquo(n), "n")
 
-  # Build the chart object, from the data exactly as passed. The construction
-  # helper renames the analysed columns to x, y and n.
-  #
-  # For chart_type = "XMR" this is the X chart of the pair.
-  chart <- autospc_chart(
-    chart_type = chart_type_for_object(chart_type),
+  # Build the chart objects, from the data exactly as passed. The construction
+  # helper renames the analysed columns to x, y and n. One chart for most chart
+  # types, two for XMR.
+  charts_list <- build_charts(
+    chart_type = chart_type,
     data = data,
     x = x_name,
     y = y_name,
@@ -279,29 +278,7 @@ autospc <- function(data,
     centre_line_tolerance = centre_line_tolerance
   )
 
-  # The other half of an XmR pair, built from the same data as passed:
-  # prepare_data.autospc_chart_mr() derives the moving ranges from y.
-  if(chart_type == "XMR") {
-
-    chart_mr <- autospc_chart(
-      chart_type = "MR",
-      data = data,
-      x = x_name,
-      y = y_name,
-      n = n_name,
-      period_min = period_min,
-      baseline_length = baseline_length,
-      shift_rule_threshold = shift_rule_threshold,
-      baseline_only = baseline_only,
-      establish_every_shift = establish_every_shift,
-      no_regrets = no_regrets,
-      overhanging_reversions = overhanging_reversions,
-      max_exclusions = max_exclusions,
-      mr_screen_max_loops = mr_screen_max_loops,
-      centre_line_tolerance = centre_line_tolerance
-    )
-
-  }
+  chart <- charts_list[[1]]
 
   # Preprocess inputs
   preprocessed_vars <- preprocess_inputs(
@@ -403,7 +380,7 @@ autospc <- function(data,
 
     if((chart_type == "XMR") & show_mr) {
 
-      mr <- run_analysis(chart = chart_mr,
+      mr <- run_analysis(chart = charts_list[[2]],
                          chart_type = "MR",
                          xType = xType,
                          passed = passed_as_given,

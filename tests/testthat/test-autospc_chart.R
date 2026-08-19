@@ -1,4 +1,4 @@
-# autospc_chart() and chart_type_for_object() each list the chart types
+# autospc_chart() and build_charts() each list the chart types
 # separately, so this mapping is written out once and used by both sets of
 # tests below
 factory_classes <- c("C"  = "autospc_chart_c",
@@ -412,26 +412,60 @@ test_that("the classes with no override inherit the empty default", {
 })
 
 
-# chart_type_for_object()
+# build_charts()
 
-test_that("every chart type except XMR maps to itself", {
+test_that("every chart type except XMR asks for one chart of its own type", {
 
   for(chart_type in setdiff(autospc_chart_types(), "XMR")) {
 
-    expect_identical(chart_type_for_object(chart_type), chart_type,
-                     info = chart_type)
+    charts <- build_charts(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y",
+                           n = "n")
+
+    expect_length(charts, 1L)
+
+    expect_s3_class(charts[[1]], factory_classes[[chart_type]])
 
   }
 
 })
 
 
-test_that("XMR maps to X", {
+test_that("XMR asks for two charts, X then MR", {
 
-  # XMR asks for a pair of charts. The MR half is created by the
-  # chart_type = "MR" re-invocation in autospc(), so the X half is all that is
-  # needed here.
-  expect_identical(chart_type_for_object("XMR"), "X")
+  charts <- build_charts(chart_type = "XMR",
+                         data = factory_data,
+                         x = "x",
+                         y = "y",
+                         n = "n")
+
+  expect_length(charts, 2L)
+
+  expect_s3_class(charts[[1]], "autospc_chart_x")
+
+  expect_s3_class(charts[[2]], "autospc_chart_mr")
+
+})
+
+
+test_that("both charts of a pair carry the same specification", {
+
+  charts <- build_charts(chart_type = "XMR",
+                         data = factory_data,
+                         x = "x",
+                         y = "y",
+                         n = "n",
+                         period_min = 17L,
+                         shift_rule_threshold = 6L)
+
+  expect_identical(charts[[1]]$period_min, 17L)
+
+  expect_identical(charts[[2]]$period_min, 17L)
+
+  expect_identical(charts[[1]]$shift_rule_threshold,
+                   charts[[2]]$shift_rule_threshold)
 
 })
 
@@ -445,18 +479,16 @@ test_that("X is a chart type a user can pass", {
 
 test_that("every chart type a user can pass can be built", {
 
-  # chart_type_for_object() takes its list from autospc_chart_types(), while
+  # build_charts() takes its list from autospc_chart_types(), while
   # autospc_chart() names each chart type in a separate branch. Nothing else
   # checks that the two agree.
   for(chart_type in autospc_chart_types()) {
 
-    object_chart_type <- chart_type_for_object(chart_type)
-
-    expect_no_error(autospc_chart(chart_type = object_chart_type,
-                                  data = factory_data,
-                                  x = "x",
-                                  y = "y",
-                                  n = "n"))
+    expect_no_error(build_charts(chart_type = chart_type,
+                                 data = factory_data,
+                                 x = "x",
+                                 y = "y",
+                                 n = "n"))
 
   }
 

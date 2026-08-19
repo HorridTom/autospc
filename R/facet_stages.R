@@ -98,11 +98,14 @@ facet_stages <- function(data,
   # postprocess() reads the y axis range and title off the chart object, so one
   # has to be supplied. It is passed explicitly rather than through dots_exprs,
   # which only carries what the user wrote.
-  chart <- autospc_chart(chart_type = chart_type_for_object(chart_type),
-                         data = results_data,
-                         x = "x",
-                         y = "y",
-                         n = "n")
+  #
+  # The first chart is the one drawn: show_mr is forced to FALSE above, so an
+  # XMR request is faceted as its X chart.
+  chart <- build_charts(chart_type = chart_type,
+                        data = results_data,
+                        x = "x",
+                        y = "y",
+                        n = "n")[[1]]
 
   # Postprocess data
   postprocessing_vars <- eval(rlang::call2("postprocess",

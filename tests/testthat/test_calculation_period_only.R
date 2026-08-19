@@ -7,7 +7,7 @@ test_that("calculation period only chart is created without warning", {
                     plot_chart = TRUE,
                     include_annotations = FALSE)
   
-  expect_no_warning(print(plot_1),
+  expect_no_warning(drawn(plot_1),
                     message = "containing missing values"
   )
 })

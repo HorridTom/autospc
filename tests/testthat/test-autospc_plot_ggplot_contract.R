@@ -21,16 +21,6 @@ contract_plot <- function() {
 
 }
 
-drawn <- function(plot) {
-
-  pdf(NULL)
-  on.exit(dev.off())
-
-  print(plot)
-
-}
-
-
 test_that("adding a theme keeps the class and the slots", {
 
   themed <- contract_plot() + ggplot2::theme_minimal()

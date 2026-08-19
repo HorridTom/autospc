@@ -487,3 +487,39 @@ baseline_period_length <- function(chart,
   return(min(chart$baseline_length, nrow(data)))
 
 }
+
+
+#' Describe the periods the algorithm formed
+#'
+#' Four columns, each a function of the limits table alone: where the limits
+#' changed, where each period starts, an identifier for the period, and the
+#' direction the centre line moved at each change.
+#'
+#' `plotPeriod` is re-derived by `extend_limits()` for any rows it adds beyond
+#' the end of the data.
+#'
+#' @return `data`, with the four columns added
+#' @noRd
+add_period_columns <- function(data) {
+
+  data <- data %>%
+    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType),
+                                       FALSE,
+                                       TRUE))
+
+  data <- data %>%
+    dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE |
+                                                 is.na(limitChange) |
+                                                 breakPoint == TRUE,
+                                               dplyr::row_number(),
+                                               NA_integer_))
+
+  data$periodStart <- fill_NA(data$periodStart)
+
+  data <- data %>%
+    dplyr::mutate(plotPeriod = paste0(periodType, periodStart),
+                  cl_change = sign(cl - dplyr::lag(cl)))
+
+  return(data)
+
+}

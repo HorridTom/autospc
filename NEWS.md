@@ -33,6 +33,16 @@
 
 ### Other changes
 
+* `autospc()` returns a plot object that is still a ggplot — printing, `ggsave()`
+  and adding ggplot2 layers all work as before — and additionally carries the
+  chart object(s) it was drawn from. `as.data.frame()` on it returns the
+  analysis results.
+
+* `autospc(plot_chart = FALSE, show_limits = FALSE)` now returns the four
+  columns describing the periods — `limitChange`, `periodStart`, `plotPeriod`
+  and `cl_change` — which it previously returned only when `show_limits` was
+  `TRUE`.
+
 * Columns other than those a chart uses are now dropped consistently. Previously
   the aggregation step was skipped entirely when no `x` value was repeated, so
   extra columns survived into the output for a series with one row per subgroup

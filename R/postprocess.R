@@ -88,12 +88,6 @@ postprocess_spc <- function(
     x_max
 ) {
   
-  df <- df %>%
-    dplyr::mutate(limitChange = ifelse(
-      periodType == dplyr::lag(periodType),
-      FALSE,
-      TRUE))
-  
   # ??NEEDED?? Store break points as vector
   breakPoints <- which(df$breakPoint)
   
@@ -121,21 +115,6 @@ postprocess_spc <- function(
                             upper_annotation_sf = upper_annotation_sf,
                             lower_annotation_sf = lower_annotation_sf,
                             annotation_arrow_curve = annotation_arrow_curve)
-  
-  # Get periods into groups for plotting
-  df <- df %>%
-    dplyr::mutate(
-      periodStart = dplyr::if_else(limitChange == TRUE |
-                                     is.na(limitChange) |
-                                     breakPoint == TRUE,
-                                   dplyr::row_number(),
-                                   NA_integer_))
-  
-  df$periodStart <- fill_NA(df$periodStart)
-  
-  df <- df %>%
-    dplyr::mutate(plotPeriod = paste0(periodType,
-                                      periodStart))
   
   # Extend display limits
   df <- extend_limits(df = df,

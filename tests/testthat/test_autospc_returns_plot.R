@@ -158,3 +158,57 @@ test_that("override_y_lim reaches the recorded y limit", {
   expect_identical(autospc_plot_derived(plot, "ylimhigh"), 40)
 
 })
+
+
+# as.data.frame()
+
+test_that("as.data.frame returns the analysis", {
+
+  plot <- run_returns()
+
+  result <- as.data.frame(plot)
+
+  expect_s3_class(result, "data.frame")
+
+  expect_identical(result,
+                   as.data.frame(autospc_plot_charts(plot)[[1]]$result$table))
+
+})
+
+
+test_that("as.data.frame carries the columns describing the periods", {
+
+  result <- as.data.frame(run_returns())
+
+  expect_true(all(c("limitChange", "periodStart", "plotPeriod", "cl_change")
+                  %in% colnames(result)))
+
+})
+
+
+test_that("as.data.frame does not carry the drawing columns", {
+
+  result <- as.data.frame(run_returns())
+
+  expect_false(any(c("annotation_level", "annotation_curvature", "cl_label")
+                   %in% colnames(result)))
+
+})
+
+
+test_that("as.data.frame identifies the chart when there is more than one", {
+
+  chart <- autospc_plot_charts(run_returns())[[1]]
+
+  two <- autospc_plot(
+    plot = ggplot2::ggplot(returns_data, ggplot2::aes(x = x, y = y)),
+    charts = list(chart, chart)
+  )
+
+  result <- as.data.frame(two)
+
+  expect_true("chart" %in% colnames(result))
+
+  expect_setequal(unique(result$chart), c("1", "2"))
+
+})

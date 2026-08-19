@@ -282,3 +282,28 @@ autospc_plot_derived <- function(plot,
   return(plot$presentation$derived[[value]])
 
 }
+
+
+#' The analysis results behind an autospc_plot
+#'
+#' The analysis results of each chart the plot holds, bound into one frame.
+#' Where the plot holds more than one chart, `chart` identifies which each row
+#' came from.
+#'
+#' @param x An `autospc_plot`.
+#' @param ... Ignored, for consistency with the generic.
+#'
+#' @return A data frame.
+#' @export
+as.data.frame.autospc_plot <- function(x, ...) {
+
+  results <- lapply(autospc_plot_charts(x),
+                    function(chart) chart$result$table)
+
+  if(length(results) == 1L) {
+    return(as.data.frame(results[[1]]))
+  }
+
+  return(as.data.frame(dplyr::bind_rows(results, .id = "chart")))
+
+}

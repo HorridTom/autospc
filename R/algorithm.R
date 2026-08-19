@@ -254,7 +254,7 @@ run_limit_algorithm <- function(chart) {
       dplyr::mutate(ucl = dplyr::if_else(is.na(y), as.numeric(NA), ucl)) %>%
       dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
     
-    chart$result$table <- limits_table
+    chart$result$table <- add_period_columns(limits_table)
     chart$result$re_establish_rows <- which(limits_table$breakPoint)
     chart$result$exclusions <- which(limits_table$excluded)
     chart$result$table$log <- render_log(chart)

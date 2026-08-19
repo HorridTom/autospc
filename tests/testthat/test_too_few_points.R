@@ -34,9 +34,13 @@ test_that("Charts with show_limits = FALSE behave as expected",{
   result_C <- autospc(test_data2, plot_chart = FALSE, chart_type = "C", period_min = 21, show_limits = FALSE)
   result_P <- autospc(test_data2, plot_chart = FALSE, chart_type = "P", period_min = 21, show_limits = FALSE)
   
-  #expect full limits table to be returned regardless of show_limits status
-  testthat::expect_equal(ncol(result_C), 14)
-  testthat::expect_equal(ncol(result_P), 20)
+  #expect full limits table to be returned regardless of show_limits status,
+  #including the four columns describing the periods
+  testthat::expect_equal(ncol(result_C), 18)
+  testthat::expect_equal(ncol(result_P), 24)
+
+  testthat::expect_true(all(c("limitChange", "periodStart", "plotPeriod",
+                              "cl_change") %in% colnames(result_C)))
   
   #expect no warning even for data passed in with too few points
   testthat::expect_warning(autospc(test_data, plot_chart = TRUE, chart_type = "C", show_limits = FALSE), regexp = NA)

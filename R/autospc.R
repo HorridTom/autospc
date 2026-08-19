@@ -355,10 +355,21 @@ autospc <- function(data,
   ylimlow            <- postprocessing_vars$ylimlow
   
   
+  # The axis extents postprocess() worked out, recorded as used rather than
+  # left to be recomputed. num_non_missing_y is not here: it follows from the
+  # chart alone, and the chart is on the object.
+  derived <- list(
+    start_x = start_x,
+    x_max = x_max,
+    end_x = end_x,
+    ylimlow = ylimlow,
+    ylimhigh = ylimhigh
+  )
+
   # The presentation parameters, as the plot is drawn with them: title and the
   # axis titles are the resolved values rather than what the caller passed,
   # which may have been NULL.
-  presentation <- list(
+  passed <- list(
     show_limits = show_limits,
     title = title,
     subtitle = subtitle,
@@ -458,7 +469,8 @@ autospc <- function(data,
       suppressWarnings(
         return(autospc_plot(plot = p,
                             charts = list(chart),
-                            presentation = presentation)) # Chart output
+                            passed = passed,
+                            derived = derived)) # Chart output
       )
 
     } else if(write_table) {
@@ -513,7 +525,8 @@ autospc <- function(data,
 
       return(autospc_plot(plot = p,
                           charts = list(chart),
-                          presentation = presentation))
+                          passed = passed,
+                          derived = derived))
     } else {
       return(data) # Table output
     }

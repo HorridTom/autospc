@@ -20,11 +20,13 @@ plot_chart_c <- function(...) {
 }
 
 test_plot <- function(charts = list(plot_chart_c()),
-                      presentation = list(show_limits = TRUE)) {
+                      passed = list(show_limits = TRUE),
+                      derived = list()) {
 
   autospc_plot(plot = built_plot(),
                charts = charts,
-               presentation = presentation)
+               passed = passed,
+               derived = derived)
 
 }
 
@@ -79,17 +81,31 @@ test_that("the plot carries the presentation parameters", {
 
   settings <- list(show_limits = FALSE, point_size = 4)
 
-  expect_identical(autospc_plot_presentation(test_plot(presentation = settings)),
+  expect_identical(autospc_plot_passed(test_plot(passed = settings)),
                    settings)
+
+})
+
+
+test_that("presentation returns both halves", {
+
+  presentation <- autospc_plot_presentation(
+    test_plot(passed = list(point_size = 4),
+              derived = list(ylimhigh = 110))
+  )
+
+  expect_identical(presentation,
+                   list(passed = list(point_size = 4),
+                        derived = list(ylimhigh = 110)))
 
 })
 
 
 test_that("a single presentation parameter can be read by name", {
 
-  plot <- test_plot(presentation = list(show_limits = FALSE, point_size = 4))
+  plot <- test_plot(passed = list(show_limits = FALSE, point_size = 4))
 
-  expect_identical(autospc_plot_presentation(plot, "point_size"), 4)
+  expect_identical(autospc_plot_passed(plot, "point_size"), 4)
 
 })
 
@@ -97,17 +113,19 @@ test_that("a single presentation parameter can be read by name", {
 test_that("a presentation parameter that was not supplied reads as NULL", {
 
   # the plot records what it was drawn with, not the renderer's defaults
-  expect_null(autospc_plot_presentation(test_plot(), "point_size"))
+  expect_null(autospc_plot_passed(test_plot(), "point_size"))
 
 })
 
 
-test_that("presentation defaults to empty", {
+test_that("both halves default to empty", {
 
   plot <- autospc_plot(plot = built_plot(),
                        charts = list(plot_chart_c()))
 
-  expect_identical(autospc_plot_presentation(plot), list())
+  expect_identical(autospc_plot_passed(plot), list())
+
+  expect_identical(autospc_plot_derived(plot), list())
 
 })
 
@@ -125,7 +143,8 @@ test_that("validate rejects an object that is not an autospc_plot", {
 test_that("validate rejects a plot that is not a ggplot", {
 
   not_a_plot <- structure(list(charts = list(plot_chart_c()),
-                               presentation = list()),
+                               presentation = list(passed = list(),
+                                                   derived = list())),
                           class = "autospc_plot")
 
   expect_error(validate_autospc_plot(not_a_plot), "it is not a ggplot")
@@ -137,7 +156,7 @@ test_that("validate rejects a class vector in the wrong order", {
 
   wrong_order <- built_plot()
   wrong_order$charts <- list(plot_chart_c())
-  wrong_order$presentation <- list()
+  wrong_order$presentation <- list(passed = list(), derived = list())
   class(wrong_order) <- c(class(wrong_order), "autospc_plot")
 
   expect_error(validate_autospc_plot(wrong_order), "must come first")
@@ -151,7 +170,8 @@ test_that("validate rejects a plot constructed twice", {
   # while the slots were silently overwritten
   twice <- new_autospc_plot(plot = test_plot(),
                             charts = list(plot_chart_c()),
-                            presentation = list())
+                            presentation = list(passed = list(),
+                                                derived = list()))
 
   expect_error(validate_autospc_plot(twice), "more than")
 
@@ -161,7 +181,7 @@ test_that("validate rejects a plot constructed twice", {
 test_that("validate rejects missing elements", {
 
   no_charts <- built_plot()
-  no_charts$presentation <- list()
+  no_charts$presentation <- list(passed = list(), derived = list())
   class(no_charts) <- c("autospc_plot", class(no_charts))
 
   expect_error(validate_autospc_plot(no_charts),
@@ -195,12 +215,50 @@ test_that("a single chart is rejected with a message saying so", {
 })
 
 
-test_that("validate rejects presentation that is not a named list", {
+test_that("validate rejects a half that is not a named list", {
 
-  expect_error(test_plot(presentation = c(show_limits = TRUE)),
-               "presentation must be a list")
+  expect_error(test_plot(passed = c(show_limits = TRUE)),
+               "presentation\\$passed must be a list")
 
-  expect_error(test_plot(presentation = list(TRUE)),
-               "presentation must be named")
+  expect_error(test_plot(passed = list(TRUE)),
+               "presentation\\$passed must be named")
+
+  expect_error(test_plot(derived = list(110)),
+               "presentation\\$derived must be named")
+
+})
+
+
+test_that("validate rejects a presentation missing a half", {
+
+  half_only <- built_plot()
+  half_only$charts <- list(plot_chart_c())
+  half_only$presentation <- list(passed = list())
+  class(half_only) <- c("autospc_plot", class(half_only))
+
+  expect_error(validate_autospc_plot(half_only),
+               "presentation element\\(s\\) not present: derived")
+
+})
+
+
+# derived
+
+test_that("the plot carries the values worked out for the drawing", {
+
+  values <- list(ylimhigh = 110, start_x = 1L)
+
+  plot <- test_plot(derived = values)
+
+  expect_identical(autospc_plot_derived(plot), values)
+
+  expect_identical(autospc_plot_derived(plot, "ylimhigh"), 110)
+
+})
+
+
+test_that("a derived value that was not worked out reads as NULL", {
+
+  expect_null(autospc_plot_derived(test_plot(), "ylimhigh"))
 
 })

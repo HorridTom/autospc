@@ -61,9 +61,9 @@ test_that("the returned plot carries the presentation parameters", {
 
   plot <- run_returns(point_size = 4, r1_col = "red")
 
-  expect_identical(autospc_plot_presentation(plot, "point_size"), 4)
+  expect_identical(autospc_plot_passed(plot, "point_size"), 4)
 
-  expect_identical(autospc_plot_presentation(plot, "r1_col"), "red")
+  expect_identical(autospc_plot_passed(plot, "r1_col"), "red")
 
 })
 
@@ -73,7 +73,7 @@ test_that("the presentation records resolved values, not the arguments", {
   # override_y_title is NULL as passed; postprocess() fills it from the class
   plot <- run_returns()
 
-  expect_false(is.null(autospc_plot_presentation(plot, "override_y_title")))
+  expect_false(is.null(autospc_plot_passed(plot, "override_y_title")))
 
 })
 
@@ -97,7 +97,7 @@ test_that("show_limits = FALSE is still an autospc_plot", {
 
   expect_s3_class(plot, "autospc_plot")
 
-  expect_false(autospc_plot_presentation(plot, "show_limits"))
+  expect_false(autospc_plot_passed(plot, "show_limits"))
 
 })
 
@@ -125,5 +125,36 @@ test_that("plot_chart = FALSE still returns a data frame", {
   expect_s3_class(result, "data.frame")
 
   expect_false(inherits(result, "autospc_plot"))
+
+})
+
+
+test_that("the returned plot carries the values it was drawn with", {
+
+  plot <- run_returns()
+
+  expect_setequal(names(autospc_plot_derived(plot)),
+                  c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh"))
+
+  expect_identical(autospc_plot_derived(plot, "start_x"), 1L)
+
+  expect_identical(autospc_plot_derived(plot, "x_max"), 30L)
+
+})
+
+
+test_that("the y limits recorded are the ones the class asks for", {
+
+  # y_axis_range.autospc_chart_c() starts the axis at zero
+  expect_identical(autospc_plot_derived(run_returns(), "ylimlow"), 0)
+
+})
+
+
+test_that("override_y_lim reaches the recorded y limit", {
+
+  plot <- run_returns(override_y_lim = 40)
+
+  expect_identical(autospc_plot_derived(plot, "ylimhigh"), 40)
 
 })

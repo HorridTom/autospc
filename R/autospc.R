@@ -355,6 +355,36 @@ autospc <- function(data,
   ylimlow            <- postprocessing_vars$ylimlow
   
   
+  # The presentation parameters, as the plot is drawn with them: title and the
+  # axis titles are the resolved values rather than what the caller passed,
+  # which may have been NULL.
+  presentation <- list(
+    show_limits = show_limits,
+    title = title,
+    subtitle = subtitle,
+    use_caption = use_caption,
+    override_x_title = override_x_title,
+    override_y_title = override_y_title,
+    override_y_lim = override_y_lim,
+    x_break = x_break,
+    x_date_format = x_date_format,
+    x_pad_end = x_pad_end,
+    r1_col = r1_col,
+    r2_col = r2_col,
+    point_size = point_size,
+    line_width_sf = line_width_sf,
+    highlight_exclusions = highlight_exclusions,
+    include_annotations = include_annotations,
+    basic_annotations = basic_annotations,
+    annotation_size = annotation_size,
+    align_labels = align_labels,
+    flip_labels = flip_labels,
+    upper_annotation_sf = upper_annotation_sf,
+    lower_annotation_sf = lower_annotation_sf,
+    annotation_arrows = annotation_arrows,
+    annotation_arrow_curve = annotation_arrow_curve
+  )
+
   # Check whether limits are to be displayed on chart
   if(show_limits & num_non_missing_y >= period_min){
     
@@ -422,10 +452,15 @@ autospc <- function(data,
         x_date_format = x_date_format
       )
       
+      # For chart_type = "XMR" the pair is drawn but only the X chart is
+      # carried: the MR chart is fitted inside the re-invocation above, which
+      # returns a plot rather than a chart.
       suppressWarnings(
-        return(p) # Chart output
+        return(autospc_plot(plot = p,
+                            charts = list(chart),
+                            presentation = presentation)) # Chart output
       )
-      
+
     } else if(write_table) {
       # (!plot_chart)
       
@@ -475,8 +510,10 @@ autospc <- function(data,
         ylimhigh = ylimhigh,
         point_size = point_size,
         line_width_sf = line_width_sf)
-      
-      return(p)
+
+      return(autospc_plot(plot = p,
+                          charts = list(chart),
+                          presentation = presentation))
     } else {
       return(data) # Table output
     }

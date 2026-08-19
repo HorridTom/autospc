@@ -128,19 +128,6 @@ test_that("an XMR run carries both charts of the pair, X first", {
 })
 
 
-test_that("show_mr = FALSE carries the X chart alone", {
-
-  charts <- autospc_plot_charts(suppressWarnings(
-    autospc(returns_data, chart_type = "XMR", show_mr = FALSE, period_min = 21L)
-  ))
-
-  expect_length(charts, 1L)
-
-  expect_s3_class(charts[[1]], "autospc_chart_x")
-
-})
-
-
 test_that("both charts of the pair have been analysed", {
 
   charts <- autospc_plot_charts(suppressWarnings(

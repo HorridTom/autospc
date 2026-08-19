@@ -27,18 +27,31 @@ facet_stages <- function(data,
   
   dots_exprs <- rlang::exprs(...)
   
-  if(dots_exprs$chart_type == "XMR") {
-    if(!("show_mr" %in% names(dots_exprs))) {
-      
-      dots_exprs$show_mr <- FALSE
-      
-    } else if (dots_exprs$show_mr) {
+  if("show_mr" %in% names(dots_exprs)) {
+
+    if(isTRUE(dots_exprs$show_mr)) {
       warning(paste("`facet_stages()` does not support `show_mr = TRUE`.",
-                    "Setting `show_mr` to `FALSE`. To facet an MR chart by",
-                    "stages use `facet_stages()` with `chart_type = MR`."))
-      
-      dots_exprs$show_mr <- FALSE
+                    "The X chart is faceted on its own. To facet an MR chart",
+                    "by stages use `facet_stages()` with `chart_type = MR`."))
     }
+
+    lifecycle::deprecate_warn(
+      when = "0.0.0.9051",
+      what = "facet_stages(show_mr)",
+      with = "facet_stages(chart_type)",
+      details = paste('chart_type = "X" facets the X chart on its own, which',
+                      'is what facet_stages() has always drawn for an XMR',
+                      'request.')
+    )
+
+    dots_exprs$show_mr <- NULL
+
+  }
+
+  # facet_stages() has never drawn the moving range chart, so an XMR request is
+  # an X chart faceted by stages.
+  if(dots_exprs$chart_type == "XMR") {
+    dots_exprs$chart_type <- "X"
   }
   
   dots_exprs$plot_chart <- FALSE
@@ -99,8 +112,7 @@ facet_stages <- function(data,
   # has to be supplied. It is passed explicitly rather than through dots_exprs,
   # which only carries what the user wrote.
   #
-  # The first chart is the one drawn: show_mr is forced to FALSE above, so an
-  # XMR request is faceted as its X chart.
+  # One chart, because an XMR request has been rewritten to "X" above.
   chart <- build_charts(chart_type = chart_type,
                         data = results_data,
                         x = "x",

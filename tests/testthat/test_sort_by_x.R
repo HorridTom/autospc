@@ -27,8 +27,7 @@ run_sorted <- function(d, chart_type) {
             chart_type = chart_type,
             x = mth,
             y = val,
-            plot_chart = FALSE,
-            show_mr = FALSE)
+            plot_chart = FALSE)
   )
 
 }
@@ -48,8 +47,8 @@ test_that("an XMR chart gives the same result whatever order the rows arrive in"
 
   # X and MR have no aggregate_data() method, so ordering the series is the
   # only thing that puts these rows in x order
-  expect_equal(run_sorted(shuffled_data, "XMR"),
-               run_sorted(sorted_data, "XMR"))
+  expect_equal(run_sorted(shuffled_data, "X"),
+               run_sorted(sorted_data, "X"))
 
 })
 
@@ -64,7 +63,7 @@ test_that("an MR chart gives the same result whatever order the rows arrive in",
 
 test_that("the series comes back in x order", {
 
-  for(chart_type in c("C", "C'", "XMR", "MR")) {
+  for(chart_type in c("C", "C'", "X", "MR")) {
 
     result <- run_sorted(shuffled_data, chart_type)
 

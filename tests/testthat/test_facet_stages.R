@@ -125,7 +125,7 @@ test_that("an XMR request is faceted as its X chart", {
 
   y_range <- ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$y.range
 
-  # show_mr is forced to FALSE, so one chart is drawn and the axis comes from
+  # an XMR request is rewritten to X, so one chart is drawn and the axis comes from
   # the chart object built for it. y_axis_range.autospc_chart_mr() always starts
   # the axis at zero; the X one starts below the lowest of lcl and y, which for
   # this series is well above zero.

@@ -31,6 +31,22 @@
   at <https://github.com/HorridTom/autospc/issues> — we are happy to help you
   move across.
 
+### Deprecations
+
+* `autospc(show_mr)` is deprecated. Use `chart_type` instead: `chart_type = "X"`
+  draws the X chart on its own, which is what `show_mr = FALSE` did, and
+  `chart_type = "XMR"` draws the pair. Supplying `show_mr` still works and still
+  does what it did, but now warns.
+
+  Note that the caption names the chart type, so a chart drawn with
+  `chart_type = "X"` is captioned "X Shewhart Chart" where the same chart drawn
+  with `chart_type = "XMR", show_mr = FALSE` was captioned "XMR Shewhart Chart".
+
+* `facet_stages(show_mr)` is deprecated for the same reason. `facet_stages()` has
+  never drawn the moving range chart, so an `XMR` request is now faceted as an
+  `X` chart — including its caption, which changes from "XMR Shewhart Chart" to
+  "X Shewhart Chart". Nothing else about the chart changes.
+
 ### Other changes
 
 * `chart_type = "X"` draws the X chart on its own, without the moving range

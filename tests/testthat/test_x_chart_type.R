@@ -27,7 +27,7 @@ test_that("an X run gives an autospc_chart_x", {
 
 test_that("X gives the same result as XMR without the moving range chart", {
 
-  # this equivalence is what makes show_mr redundant
+  # this equivalence is what let show_mr be deprecated
   expect_equal(
     autospc(x_type_data, chart_type = "X", period_min = 21L,
             plot_chart = FALSE),

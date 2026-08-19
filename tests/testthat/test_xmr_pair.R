@@ -34,17 +34,6 @@ test_that("both panels are drawn", {
 })
 
 
-test_that("show_mr = FALSE draws the X panel alone", {
-
-  plot <- run_pair(show_mr = FALSE)
-
-  expect_error(panel_texts(plot), "only one panel")
-
-  expect_identical(plot$labels$y, "X")
-
-})
-
-
 # the title belongs to the pair, not to either panel
 
 
@@ -107,14 +96,5 @@ test_that("XMR survives being called from a wrapper that forwards ...", {
       wrapper(pair_data, chart_type = "XMR", x = x, y = y, period_min = 21L)
     )
   )
-
-})
-
-
-test_that("show_mr = FALSE leaves the moving range columns off", {
-
-  wide <- run_pair(show_mr = FALSE, plot_chart = FALSE)
-
-  expect_false(any(c("mr", "amr", "url", "lrl") %in% colnames(wide)))
 
 })

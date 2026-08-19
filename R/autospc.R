@@ -79,8 +79,9 @@
 #' appended as columns.
 #' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
-#' @param show_mr Logical controlling whether the moving range chart is included
-#' in XMR chart
+#' @param show_mr `r lifecycle::badge("deprecated")` Use `chart_type` instead.
+#' `chart_type = "XMR"` draws the pair and `chart_type = "X"` draws the X
+#' chart on its own, which is what `show_mr = FALSE` did.
 #' @param write_table Boolean specifying whether to save the data as a CSV 
 #' (useful for doing lots of charts at a time).
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
@@ -192,7 +193,7 @@ autospc <- function(data,
                     ## Output Type
                     plot_chart = TRUE,
                     show_limits = TRUE,
-                    show_mr = TRUE,
+                    show_mr = deprecated(),
                     write_table = FALSE,
                     verbosity = 0L,
                     log_file_path = NULL,
@@ -246,6 +247,19 @@ autospc <- function(data,
                       "argument of its own. The equivalent scale factor is",
                       "1 + 1/x.")
     )
+  }
+
+  if(lifecycle::is_present(show_mr)) {
+    lifecycle::deprecate_warn(
+      when = "0.0.0.9051",
+      what = "autospc(show_mr)",
+      with = "autospc(chart_type)",
+      details = paste('chart_type = "X" draws the X chart on its own, which',
+                      'is what show_mr = FALSE did, and chart_type = "XMR"',
+                      'draws the pair.')
+    )
+  } else {
+    show_mr <- TRUE
   }
 
   # autospc_chart() has no branch for a chart type outside

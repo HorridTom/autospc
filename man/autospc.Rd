@@ -25,7 +25,7 @@ autospc(
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
-  show_mr = TRUE,
+  show_mr = deprecated(),
   write_table = FALSE,
   verbosity = 0L,
   log_file_path = NULL,
@@ -155,8 +155,9 @@ appended as columns.}
 \item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
 
-\item{show_mr}{Logical controlling whether the moving range chart is included
-in XMR chart}
+\item{show_mr}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{chart_type} instead.
+\code{chart_type = "XMR"} draws the pair and \code{chart_type = "X"} draws the X
+chart on its own, which is what \code{show_mr = FALSE} did.}
 
 \item{write_table}{Boolean specifying whether to save the data as a CSV
 (useful for doing lots of charts at a time).}

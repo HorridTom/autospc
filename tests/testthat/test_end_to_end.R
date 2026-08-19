@@ -76,8 +76,7 @@ test_that("P chart works with one binary observation per subgroup", {
 
   # Individual binary observations need n materialising as 1 and y coercing to
   # a count, both of which happen inside aggregation. Every proportion is 0% or
-  # 100%, so the chart is degenerate - whether it deserves a chart or an
-  # explanatory error is CLEAN UP #6.
+  # 100%, so the chart is degenerate.
   binary_data <- data.frame(
     subgroup = 1:30,
     outcome = c(FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE,

@@ -135,9 +135,7 @@ test_that("specific log entries are interpreted correctly", {
 })
 
 
-# The log column is built by render_log() from the chart's history. Until
-# 2026-08-14 it was accumulated during the run by record_log_entry(), and these
-# entries are that function's output, recorded before it was removed.
+# The log column is built by render_log() from the chart's history.
 
 test_that("the log records the algorithm's decisions", {
 

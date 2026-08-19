@@ -4,7 +4,6 @@
 # are to be displayed
 postprocess <- function(
     df,
-    chart_type = NULL,
     chart,
     override_x_title = NULL,
     override_y_title = NULL,
@@ -203,7 +202,6 @@ run_analysis <- function(chart,
 
   postprocessing_vars <- postprocess(
     df = data,
-    chart_type = chart_type,
     chart = chart,
     override_x_title = passed$override_x_title,
     override_y_title = passed$override_y_title,

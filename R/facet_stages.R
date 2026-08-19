@@ -95,7 +95,7 @@ facet_stages <- function(data,
   postprocess_args <- names(formals(autospc:::postprocess))
   pp_args <- dots_exprs[which(names(dots_exprs) %in% postprocess_args)]
 
-  # postprocess() counts the points through a method on the chart object, so one
+  # postprocess() reads the y axis range and title off the chart object, so one
   # has to be supplied. It is passed explicitly rather than through dots_exprs,
   # which only carries what the user wrote.
   chart <- autospc_chart(chart_type = chart_type_for_object(chart_type),
@@ -113,7 +113,6 @@ facet_stages <- function(data,
   
   override_x_title   <- postprocessing_vars$override_x_title
   override_y_title   <- postprocessing_vars$override_y_title
-  num_non_missing_y  <- postprocessing_vars$num_non_missing_y
   start_x            <- postprocessing_vars$start_x
   x_max              <- postprocessing_vars$x_max
   end_x              <- postprocessing_vars$end_x
@@ -133,7 +132,6 @@ facet_stages <- function(data,
                           x_max = x_max,
                           start_x = start_x,
                           end_x = end_x,
-                          num_non_missing_y = num_non_missing_y,
                           !!!c_args))
   
   return(sp)

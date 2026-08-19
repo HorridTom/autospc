@@ -46,3 +46,37 @@ test_that("Charts with show_limits = FALSE behave as expected",{
   
   
 })
+
+
+test_that("centre_line_present answers whether a table carries a centre line", {
+
+  expect_true(centre_line_present(data.frame(x = 1, y = 1, cl = 1)))
+
+  expect_false(centre_line_present(data.frame(x = 1, y = 1)))
+
+})
+
+
+test_that("a series with limits takes the limits path", {
+
+  result <- autospc(test_data2, plot_chart = FALSE, chart_type = "C",
+                    period_min = 21)
+
+  # postprocess_spc() runs, so the presentation columns are there
+  expect_true(all(c("limitChange", "annotation_level", "plotPeriod") %in%
+                    colnames(result)))
+
+})
+
+
+test_that("a series without limits does not take the limits path", {
+
+  result <- suppressWarnings(
+    autospc(test_data, plot_chart = FALSE, chart_type = "C", period_min = 21)
+  )
+
+  expect_false(centre_line_present(result))
+
+  expect_false("limitChange" %in% colnames(result))
+
+})

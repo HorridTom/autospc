@@ -14,8 +14,6 @@ postprocess <- function(
     xType
 ) {
   
-  num_non_missing_y <- n_effective_points(chart = chart, data = df)
-  
   # Start and end dates
   if(!is.null(extend_limits_to) && is.null(x_pad_end)) {
     x_pad_end = extend_limits_to
@@ -25,7 +23,7 @@ postprocess <- function(
   end_x <- max(x_max, x_pad_end)
   
   # Chart y limit
-  if(num_non_missing_y < chart$period_min) {
+  if(!centre_line_present(df)) {
     ylimlow <- min(df$y,
                    na.rm = TRUE)
     ylimhigh <- max(df$y,
@@ -63,7 +61,6 @@ postprocess <- function(
     df = df,
     override_x_title = override_x_title,
     override_y_title = override_y_title,
-    num_non_missing_y = num_non_missing_y,
     start_x = start_x,
     x_max = x_max,
     end_x = end_x,
@@ -150,4 +147,18 @@ postprocess_spc <- function(
   
 }
 
+
+#' Does this table carry a centre line?
+#'
+#' The algorithm returns a table with no `cl`, `ucl` or `lcl` when there were
+#' too few points to form a period, so the presence of `cl` answers whether it
+#' produced anything to draw.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+centre_line_present <- function(data) {
+  
+  return("cl" %in% colnames(data))
+  
+}
 

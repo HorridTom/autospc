@@ -318,7 +318,7 @@ autospc <- function(data,
   data <- chart$result$table
 
   # No limits columns means too few points to form a period
-  if(show_limits && !("cl" %in% colnames(data))) {
+  if(show_limits && !centre_line_present(data)) {
     warning(paste("The input data has fewer than the minimum number of",
                   "points needed to calculate one period. Timeseries data",
                   "without limits has been displayed."))
@@ -347,7 +347,6 @@ autospc <- function(data,
   data               <- postprocessing_vars$df
   override_x_title   <- postprocessing_vars$override_x_title
   override_y_title   <- postprocessing_vars$override_y_title
-  num_non_missing_y  <- postprocessing_vars$num_non_missing_y
   start_x            <- postprocessing_vars$start_x
   x_max              <- postprocessing_vars$x_max
   end_x              <- postprocessing_vars$end_x
@@ -356,8 +355,7 @@ autospc <- function(data,
   
   
   # The axis extents postprocess() worked out, recorded as used rather than
-  # left to be recomputed. num_non_missing_y is not here: it follows from the
-  # chart alone, and the chart is on the object.
+  # left to be recomputed.
   derived <- list(
     start_x = start_x,
     x_max = x_max,
@@ -397,7 +395,7 @@ autospc <- function(data,
   )
 
   # Check whether limits are to be displayed on chart
-  if(show_limits & num_non_missing_y >= period_min){
+  if(show_limits && centre_line_present(data)){
     
     data <- postprocess_spc(
       df = data,
@@ -441,7 +439,6 @@ autospc <- function(data,
         x_max = x_max,
         ylimlow = ylimlow,
         ylimhigh = ylimhigh,
-        num_non_missing_y = num_non_missing_y,
         period_min = period_min,
         title = title,
         subtitle = subtitle,

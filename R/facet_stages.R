@@ -93,7 +93,7 @@ facet_stages <- function(data,
   data_splits_list <- create_splits_list(df = df_rn,
                                          split_rows = split_rows)
 
-  results_splits_list <- lapply(
+  analyses <- lapply(
     data_splits_list,
     function(split) {
 
@@ -121,6 +121,15 @@ facet_stages <- function(data,
                  chart_type = chart_type,
                  log_file_path = arguments$log_file_path)
 
+      return(analysis)
+
+    }
+  )
+
+  results_splits_list <- lapply(
+    analyses,
+    function(analysis) {
+
       if(passed$show_limits && centre_line_present(analysis$data)) {
         return(dplyr::filter(analysis$data, !is.na(x)))
       }
@@ -139,15 +148,10 @@ facet_stages <- function(data,
     return(results_data)
   }
   
-  # postprocess() reads the y axis range and title off the chart object, so one
-  # has to be supplied.
-  #
-  # One chart, because chart_type = "XMR" was rewritten to "X" above.
-  chart <- build_charts(chart_type = chart_type,
-                        data = results_data,
-                        x = "x",
-                        y = "y",
-                        n = "n")[[1]]
+  # The facets are stages of one series, so the last one holds all of it. Its
+  # chart is what postprocess() dispatches y_axis_range() and y_axis_title() on,
+  # and the frame it measures is every facet joined.
+  chart <- analyses[[length(analyses)]]$chart
 
   postprocessing_vars <- postprocess(
     df = results_data,
@@ -160,29 +164,36 @@ facet_stages <- function(data,
     xType = xType
   )
 
-  override_x_title   <- postprocessing_vars$override_x_title
-  override_y_title   <- postprocessing_vars$override_y_title
-  start_x            <- postprocessing_vars$start_x
-  x_max              <- postprocessing_vars$x_max
-  end_x              <- postprocessing_vars$end_x
-  ylimhigh           <- postprocessing_vars$ylimhigh
-  ylimlow            <- postprocessing_vars$ylimlow
+  sp <- create_spc_plot(
+    df = results_data,
+    chart_type = chart_type,
+    shift_rule_threshold = arguments$shift_rule_threshold,
+    xType = xType,
+    start_x = postprocessing_vars$start_x,
+    end_x = postprocessing_vars$end_x,
+    x_max = postprocessing_vars$x_max,
+    ylimlow = postprocessing_vars$ylimlow,
+    ylimhigh = postprocessing_vars$ylimhigh,
+    split_rows = split_rows,
+    title = passed$title,
+    subtitle = passed$subtitle,
+    use_caption = passed$use_caption,
+    override_x_title = passed$override_x_title,
+    override_y_title = passed$override_y_title,
+    r1_col = passed$r1_col,
+    r2_col = passed$r2_col,
+    point_size = passed$point_size,
+    line_width_sf = passed$line_width_sf,
+    include_annotations = passed$include_annotations,
+    basic_annotations = passed$basic_annotations,
+    annotation_size = passed$annotation_size,
+    annotation_arrows = passed$annotation_arrows,
+    annotation_curvature = passed$annotation_arrow_curve,
+    floating_median_n = arguments$floating_median_n,
+    x_break = passed$x_break,
+    x_date_format = passed$x_date_format
+  )
 
-  csp_args <- names(formals(autospc:::create_spc_plot))
-  c_args <- dots_exprs[which(names(dots_exprs) %in% csp_args)]
-  
-  # Create SPC plot
-  sp <- eval(rlang::call2("create_spc_plot",
-                          df = results_data,
-                          split_rows = split_rows,
-                          ylimlow = ylimlow,
-                          ylimhigh = ylimhigh,
-                          xType = xType,
-                          x_max = x_max,
-                          start_x = start_x,
-                          end_x = end_x,
-                          !!!c_args))
-  
   return(sp)
   
 }

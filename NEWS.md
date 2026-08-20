@@ -79,6 +79,12 @@
 
 ## Bug fixes
 
+* `facet_stages()` now uses the same annotation positioning as `autospc()` on
+  R below 4.3. `basic_annotations` defaults to `getRversion() < "4.3.0"` in
+  `autospc()`, but the faceted path never passed the default on, so a faceted
+  chart fell back to the positioning that needs ggrepel and ggpp. On R 4.3 and
+  later nothing changes.
+
 * `chart_type = "XMR"` no longer fails when `autospc()` is called from a
   wrapper that forwards its arguments — `function(...) autospc(...)` — which
   raised `'...' used in an incorrect context`. The XmR pair was the only chart

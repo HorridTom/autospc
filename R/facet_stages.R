@@ -106,9 +106,7 @@ facet_stages <- function(data,
         n = "n",
         chart_args = chart_args,
         passed = passed,
-        extend_limits_to = arguments$extend_limits_to,
-        floating_median = arguments$floating_median,
-        floating_median_n = arguments$floating_median_n
+        extend_limits_to = arguments$extend_limits_to
       )
 
       if(passed$show_limits && !centre_line_present(analysis$data)) {
@@ -165,6 +163,12 @@ facet_stages <- function(data,
     xType = xType
   )
 
+  derived <- list(start_x = postprocessing_vars$start_x,
+                  x_max = postprocessing_vars$x_max,
+                  end_x = postprocessing_vars$end_x,
+                  ylimlow = postprocessing_vars$ylimlow,
+                  ylimhigh = postprocessing_vars$ylimhigh)
+
   # The titles the caller did not give have been resolved - the axis ones by
   # postprocess() from the chart's class, and the chart ones from the data.
   # They are what is drawn, so they are what the plot object records.
@@ -173,47 +177,19 @@ facet_stages <- function(data,
   passed["override_x_title"] <- list(postprocessing_vars$override_x_title)
   passed["override_y_title"] <- list(postprocessing_vars$override_y_title)
 
-  sp <- create_spc_plot(
-    df = results_data,
-    chart_type = chart_type,
-    shift_rule_threshold = arguments$shift_rule_threshold,
-    xType = xType,
-    start_x = postprocessing_vars$start_x,
-    end_x = postprocessing_vars$end_x,
-    x_max = postprocessing_vars$x_max,
-    ylimlow = postprocessing_vars$ylimlow,
-    ylimhigh = postprocessing_vars$ylimhigh,
-    split_rows = split_rows,
-    title = passed$title,
-    subtitle = passed$subtitle,
-    use_caption = passed$use_caption,
-    override_x_title = passed$override_x_title,
-    override_y_title = passed$override_y_title,
-    r1_col = passed$r1_col,
-    r2_col = passed$r2_col,
-    point_size = passed$point_size,
-    line_width_sf = passed$line_width_sf,
-    include_annotations = passed$include_annotations,
-    basic_annotations = passed$basic_annotations,
-    annotation_size = passed$annotation_size,
-    annotation_arrows = passed$annotation_arrows,
-    annotation_curvature = passed$annotation_arrow_curve,
-    floating_median_n = arguments$floating_median_n,
-    x_break = passed$x_break,
-    x_date_format = passed$x_date_format
-  )
-
   charts <- lapply(analyses, function(analysis) analysis$chart)
+
+  sp <- create_spc_plot(charts = charts,
+                        data = results_data,
+                        passed = passed,
+                        derived = derived,
+                        split_rows = split_rows)
 
   return(autospc_plot(
     plot = sp,
     charts = charts,
     passed = passed,
-    derived = list(start_x = postprocessing_vars$start_x,
-                   x_max = postprocessing_vars$x_max,
-                   end_x = postprocessing_vars$end_x,
-                   ylimlow = postprocessing_vars$ylimlow,
-                   ylimhigh = postprocessing_vars$ylimhigh)
+    derived = derived
   ))
   
 }

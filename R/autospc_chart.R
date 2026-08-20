@@ -88,6 +88,8 @@ autospc_chart_elements <- function() {
     "max_exclusions",
     "mr_screen_max_loops",
     "centre_line_tolerance",
+    "floating_median",
+    "floating_median_n",
     "data_original",
     # the analysis
     "result",
@@ -285,7 +287,9 @@ autospc_chart_list <- function(data,
                                overhanging_reversions = TRUE,
                                max_exclusions = 3L,
                                mr_screen_max_loops = 1L,
-                               centre_line_tolerance = 0) {
+                               centre_line_tolerance = 0,
+                               floating_median = "no",
+                               floating_median_n = 12L) {
   
   autospc_chart_l <- list(
     data = data,
@@ -301,6 +305,8 @@ autospc_chart_list <- function(data,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,
     centre_line_tolerance = centre_line_tolerance,
+    floating_median = floating_median,
+    floating_median_n = floating_median_n,
     # derived fields
     data_original = data,
     # the analysis, empty until the algorithm runs

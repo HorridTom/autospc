@@ -78,7 +78,7 @@ add_annotations_to_plot <- function(p,
                                     basic_annotations,
                                     annotation_size,
                                     annotation_arrows,
-                                    annotation_curvature) {
+                                    annotation_arrow_curve) {
   
   use_basic_annotations <- basic_annotations
   
@@ -99,7 +99,7 @@ add_annotations_to_plot <- function(p,
       df = df,
       annotation_size = annotation_size,
       annotation_arrows = annotation_arrows,
-      annotation_curvature = annotation_curvature
+      annotation_arrow_curve = annotation_arrow_curve
     )
   } else {
     p_annotated <- add_annotations_to_plot_basic(
@@ -107,7 +107,7 @@ add_annotations_to_plot <- function(p,
       df = df,
       annotation_size = annotation_size,
       annotation_arrows = annotation_arrows,
-      annotation_curvature = annotation_curvature
+      annotation_arrow_curve = annotation_arrow_curve
     )
   }
   
@@ -120,7 +120,7 @@ add_annotations_to_plot_pp <- function(p,
                                        df,
                                        annotation_size,
                                        annotation_arrows,
-                                       annotation_curvature) {
+                                       annotation_arrow_curve) {
   
   if(annotation_arrows) {
     
@@ -187,7 +187,7 @@ add_annotations_to_plot_basic <- function(p,
                                           df,
                                           annotation_size,
                                           annotation_arrows,
-                                          annotation_curvature) {
+                                          annotation_arrow_curve) {
   
   x_range <- max(df$x, na.rm = TRUE) - min(df$x, na.rm = TRUE)
   x_nudge <- x_range/25

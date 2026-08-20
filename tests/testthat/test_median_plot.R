@@ -164,3 +164,44 @@ test_that("NAs do not prevent median from being plotted",{
   expect_equal(result_median, 9.5)
 })
 
+
+# the window is a chart field, so it has to travel from autospc() to both
+# the analysis and the label
+
+
+test_that("a non-default floating_median_n reaches the analysis", {
+
+  medians <- function(n) {
+    result <- autospc(test_median_data,
+                      chart_type = "X",
+                      floating_median = "yes",
+                      floating_median_n = n,
+                      plot_chart = FALSE)
+    sum(!is.na(result$median))
+  }
+
+  expect_identical(medians(8L), 8L)
+
+  expect_identical(medians(20L), 20L)
+
+})
+
+
+test_that("a non-default floating_median_n reaches the label", {
+
+  label_x <- function(n) {
+    plot <- autospc(test_median_data,
+                    chart_type = "X",
+                    floating_median = "yes",
+                    floating_median_n = n)
+    built <- ggplot2::ggplot_build(plot)$data
+    labelled <- Filter(function(layer) "label" %in% names(layer), built)
+    median_label <- Filter(function(layer) all(layer$label == "Median"),
+                           labelled)
+    median_label[[1]]$x
+  }
+
+  # the label sits at the start of the window, so a wider window moves it left
+  expect_lt(label_x(20L), label_x(8L))
+
+})

@@ -59,3 +59,26 @@ test_that("X requires y, and says so in the same terms as MR and XMR", {
                fixed = TRUE)
 
 })
+
+
+test_that("the caption names the shift rule threshold the chart was analysed with", {
+
+  caption <- autospc(x_type_data,
+                     chart_type = "X",
+                     period_min = 21L,
+                     shift_rule_threshold = 6L)$labels$caption
+
+  expect_match(caption, "Six or more consecutive points", fixed = TRUE)
+
+})
+
+
+test_that("the caption names the chart type", {
+
+  caption <- autospc(x_type_data,
+                     chart_type = "X",
+                     period_min = 21L)$labels$caption
+
+  expect_match(caption, "X Shewhart Chart", fixed = TRUE)
+
+})

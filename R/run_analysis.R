@@ -34,9 +34,7 @@ analyse_series <- function(data,
                            n,
                            chart_args,
                            passed,
-                           extend_limits_to,
-                           floating_median,
-                           floating_median_n) {
+                           extend_limits_to) {
 
   # autospc_chart() has no branch for a chart type outside
   # autospc_chart_types(), so chart_type has to be valid before the object is
@@ -88,9 +86,7 @@ analyse_series <- function(data,
                            chart_type = chart_type,
                            xType = xType,
                            passed = passed,
-                           extend_limits_to = extend_limits_to,
-                           floating_median = floating_median,
-                           floating_median_n = floating_median_n)
+                           extend_limits_to = extend_limits_to)
 
   return(list(charts = charts_list,
               chart = analysis$chart,
@@ -118,12 +114,10 @@ analyse_series <- function(data,
 #'   axis extents, and the resolved `axis_titles`.
 #' @noRd
 run_analysis <- function(chart,
-                           chart_type,
-                           xType,
-                           passed,
-                           extend_limits_to,
-                           floating_median,
-                           floating_median_n) {
+                         chart_type,
+                         xType,
+                         passed,
+                         extend_limits_to) {
 
   chart <- aggregate_data(chart)
   chart <- order_series(chart)
@@ -164,8 +158,6 @@ run_analysis <- function(chart,
       chart_type = chart_type,
       chart = chart,
       highlight_exclusions = passed$highlight_exclusions,
-      floating_median = floating_median,
-      floating_median_n = floating_median_n,
       extend_limits_to = extend_limits_to,
       align_labels = passed$align_labels,
       flip_labels = passed$flip_labels,

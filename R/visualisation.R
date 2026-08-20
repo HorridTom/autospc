@@ -1,35 +1,30 @@
-create_spc_plot <- function(df,
+#' Draw an SPC chart, or an XmR pair
+#'
+#' The single chart is drawn from `charts[[1]]`. An XmR pair is drawn as two
+#' panels stacked by `cowplot::plot_grid()`, the moving range one arriving
+#' already drawn as `p_mr`.
+#'
+#' @param charts The analysed chart, or the pair, in a list.
+#' @param data The drawable frame, as `run_analysis()` returned it.
+#' @param passed The presentation parameters, with the axis titles resolved.
+#' @param derived The axis extents.
+#' @param p_mr The drawn moving range panel, for a pair.
+#' @param split_rows Non-NULL to facet by stage.
+#'
+#' @return A ggplot.
+#' @noRd
+create_spc_plot <- function(charts,
+                            data,
+                            passed,
+                            derived,
                             p_mr = NA,
-                            chart_type = NULL,
-                            xType,
-                            start_x,
-                            end_x,
-                            x_max,
-                            ylimlow,
-                            ylimhigh,
-                            period_min = 21,
-                            title = NULL,
-                            subtitle = NULL,
-                            use_caption = TRUE,
-                            override_x_title = NULL,
-                            override_y_title = NULL,
-                            r1_col = "orange",
-                            r2_col = "steelblue3",
-                            point_size = 2,
-                            line_width_sf = 1,
-                            include_annotations = TRUE,
-                            basic_annotations = FALSE,
-                            annotation_size = 3,
-                            annotation_arrows = FALSE,
-                            annotation_curvature = 0.3,
-                            floating_median_n = 12L,
-                            show_mr = TRUE,
-                            x_break = NULL,
-                            x_date_format = "%Y-%m-%d",
-                            split_rows = NULL,
-                            shift_rule_threshold = 8L) {
-  
-  df_long <- df %>%
+                            split_rows = NULL) {
+
+  pair <- is_xmr_pair(charts)
+
+  chart_type <- if(pair) "XMR" else chart_type_label(charts[[1]])
+
+  df_long <- data %>%
     tidyr::pivot_longer(cols = c(y, cl, ucl, lcl),
                         names_to = "series",
                         values_to = "value")
@@ -48,14 +43,14 @@ create_spc_plot <- function(df,
                          ggplot2::aes(x = x,
                                       y = value))
   
-  if(use_caption) {
+  if(passed$use_caption) {
     caption <- paste(chart_type,
                      "Shewhart Chart.",
                      "\n*Shewhart chart rules apply",
                      "\nRule 1: Any point outside the control limits", 
                      paste( 
                        "\nRule 2:",
-                       word_for_number(shift_rule_threshold),
+                       word_for_number(charts[[1]]$shift_rule_threshold),
                        "or more consecutive points all above, or all below, the centre line"
                        )
     )
@@ -68,45 +63,46 @@ create_spc_plot <- function(df,
   # Apply autospc formatting
   p <- format_SPC(pct,
                   df_long = df_long,
-                  r1_col = r1_col,
-                  r2_col = r2_col,
-                  point_size = point_size,
+                  r1_col = passed$r1_col,
+                  r2_col = passed$r2_col,
+                  point_size = passed$point_size,
                   rule_title = rule_title,
-                  line_width_sf = line_width_sf) +
-    ggplot2::ggtitle(title,
-                     subtitle = subtitle) +
-    ggplot2::labs(x = override_x_title,
-                  y = override_y_title,
+                  line_width_sf = passed$line_width_sf) +
+    ggplot2::ggtitle(passed$title,
+                     subtitle = passed$subtitle) +
+    ggplot2::labs(x = passed$override_x_title,
+                  y = passed$override_y_title,
                   caption = paste0(caption)) +
-    ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
+    ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::label_number(big.mark = ","))
   
   # Add floating median to chart if needed
-  if("median" %in% colnames(df)) {
+  if("median" %in% colnames(data)) {
     p <- add_floating_median(p = p,
                              df = df_long,
-                             floating_median_n = floating_median_n)
+                             floating_median_n = charts[[1]]$floating_median_n)
   }
   
   # Add annotations to chart if needed
-  if(include_annotations == TRUE){
-    
-    p <- add_annotations_to_plot(p = p,
-                                 df = df_long,
-                                 basic_annotations = basic_annotations,
-                                 annotation_size = annotation_size,
-                                 annotation_arrows = annotation_arrows,
-                                 annotation_curvature = annotation_curvature)
+  if(passed$include_annotations == TRUE){
+
+    p <- add_annotations_to_plot(
+      p = p,
+      df = df_long,
+      basic_annotations = passed$basic_annotations,
+      annotation_size = passed$annotation_size,
+      annotation_arrows = passed$annotation_arrows,
+      annotation_arrow_curve = passed$annotation_arrow_curve)
   }
   
   # Format x-axis depending on x type
   p <- format_x_axis(p = p,
-                     xType = xType,
-                     x_break = x_break,
-                     x_date_format = x_date_format,
-                     start_x = start_x,
-                     end_x = end_x)
+                     xType = class(data$x),
+                     x_break = passed$x_break,
+                     x_date_format = passed$x_date_format,
+                     start_x = derived$start_x,
+                     end_x = derived$end_x)
   
   # Facet by stages if needed
   if(!is.null(split_rows)) {
@@ -117,7 +113,7 @@ create_spc_plot <- function(df,
   }
   
   # Combine X and MR charts if needed
-  if((chart_type == "XMR") & show_mr) {
+  if(pair) {
     p <- p + 
       ggplot2::labs(caption = NULL,
                     x = NULL) + 
@@ -158,90 +154,56 @@ create_spc_plot <- function(df,
 #'
 #' @param analysis The list `run_analysis()` returned for the MR chart.
 #' @param passed The presentation parameters, shared with the X chart. The axis
-#'   titles are not among them - the MR chart resolved its own.
+#'   titles are replaced here - the moving range chart resolved its own.
 #'
 #' @return A ggplot.
 #' @noRd
 draw_mr_panel <- function(analysis,
-                          passed,
-                          xType,
-                          period_min,
-                          shift_rule_threshold,
-                          floating_median_n) {
+                          passed) {
 
-  data        <- analysis$data
-  derived     <- analysis$derived
-  axis_titles <- analysis$axis_titles
+  passed["title"]            <- list(NULL)
+  passed["subtitle"]         <- list(NULL)
+  passed["override_x_title"] <- list(analysis$axis_titles$x)
+  passed["override_y_title"] <- list(analysis$axis_titles$y)
 
-  if(!centre_line_present(data)) {
+  if(!centre_line_present(analysis$data)) {
 
-    return(create_timeseries_plot(
-      df = data,
-      title = NULL,
-      subtitle = NULL,
-      override_x_title = axis_titles$x,
-      override_y_title = axis_titles$y,
-      ylimlow = derived$ylimlow,
-      ylimhigh = derived$ylimhigh,
-      point_size = passed$point_size,
-      line_width_sf = passed$line_width_sf))
+    return(create_timeseries_plot(data = analysis$data,
+                                  passed = passed,
+                                  derived = analysis$derived))
 
   }
 
-  return(create_spc_plot(
-    df = data,
-    chart_type = "MR",
-    shift_rule_threshold = shift_rule_threshold,
-    xType = xType,
-    start_x = derived$start_x,
-    end_x = derived$end_x,
-    x_max = derived$x_max,
-    ylimlow = derived$ylimlow,
-    ylimhigh = derived$ylimhigh,
-    period_min = period_min,
-    title = NULL,
-    subtitle = NULL,
-    use_caption = passed$use_caption,
-    override_x_title = axis_titles$x,
-    override_y_title = axis_titles$y,
-    r1_col = passed$r1_col,
-    r2_col = passed$r2_col,
-    point_size = passed$point_size,
-    line_width_sf = passed$line_width_sf,
-    include_annotations = passed$include_annotations,
-    basic_annotations = passed$basic_annotations,
-    annotation_size = passed$annotation_size,
-    annotation_arrows = passed$annotation_arrows,
-    annotation_curvature = passed$annotation_arrow_curve,
-    floating_median_n = floating_median_n,
-    show_mr = FALSE,
-    x_break = passed$x_break,
-    x_date_format = passed$x_date_format))
+  return(create_spc_plot(charts = list(analysis$chart),
+                         data = analysis$data,
+                         passed = passed,
+                         derived = analysis$derived))
 
 }
 
 
-create_timeseries_plot <- function(df,
-                                   title,
-                                   subtitle,
-                                   override_x_title,
-                                   override_y_title,
-                                   ylimlow,
-                                   ylimhigh,
-                                   point_size,
-                                   line_width_sf) {
-  
-  time_series_plot <- ggplot2::ggplot(df, 
+#' Draw a series with no limits
+#'
+#' What is drawn when the algorithm produced no calculation period, or when the
+#' caller asked for no limits.
+#'
+#' @return A ggplot.
+#' @noRd
+create_timeseries_plot <- function(data,
+                                   passed,
+                                   derived) {
+
+  time_series_plot <- ggplot2::ggplot(data, 
                                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_line(colour = "black",
-                       linewidth = 0.5*line_width_sf) +
-    ggplot2::geom_point(colour = "black", size = point_size) +
+                       linewidth = 0.5*passed$line_width_sf) +
+    ggplot2::geom_point(colour = "black", size = passed$point_size) +
     theme_autospc() +
-    ggplot2::ggtitle(title,
-                     subtitle = subtitle) +
-    ggplot2::labs(x = override_x_title,
-                  y = override_y_title) +
-    ggplot2::scale_y_continuous(limits = c(ylimlow, ylimhigh),
+    ggplot2::ggtitle(passed$title,
+                     subtitle = passed$subtitle) +
+    ggplot2::labs(x = passed$override_x_title,
+                  y = passed$override_y_title) +
+    ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::number_format(accuracy = 1,
                                                                big.mark = ","))

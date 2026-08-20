@@ -276,7 +276,9 @@ autospc <- function(data,
     overhanging_reversions = overhanging_reversions,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,
-    centre_line_tolerance = centre_line_tolerance
+    centre_line_tolerance = centre_line_tolerance,
+    floating_median = floating_median,
+    floating_median_n = floating_median_n
   )
 
   # The presentation parameters, as the caller gave them. analyse_series()
@@ -315,9 +317,7 @@ autospc <- function(data,
                              n = n_name,
                              chart_args = chart_args,
                              passed = passed,
-                             extend_limits_to = extend_limits_to,
-                             floating_median = floating_median,
-                             floating_median_n = floating_median_n)
+                             extend_limits_to = extend_limits_to)
 
   charts_list <- analysis$charts
   chart       <- analysis$chart
@@ -368,9 +368,7 @@ autospc <- function(data,
                          chart_type = "MR",
                          xType = xType,
                          passed = analysis$passed,
-                         extend_limits_to = extend_limits_to,
-                         floating_median = floating_median,
-                         floating_median_n = floating_median_n)
+                         extend_limits_to = extend_limits_to)
 
       if(!centre_line_present(mr$data)) {
         warning(paste("The input data has fewer than the minimum number of",
@@ -391,47 +389,17 @@ autospc <- function(data,
 
       if(length(charts) > 1L) {
         p_mr <- draw_mr_panel(analysis = mr,
-                              passed = analysis$passed,
-                              xType = xType,
-                              period_min = period_min,
-                              shift_rule_threshold = shift_rule_threshold,
-                             floating_median_n = floating_median_n)
+                              passed = analysis$passed)
       } else {
         p_mr <- NA
       }
 
-      p <- create_spc_plot(
-        df = data,
-        p_mr = p_mr,
-        chart_type = chart_type,
-        shift_rule_threshold = shift_rule_threshold,
-        xType = xType,
-        start_x = start_x,
-        end_x = end_x,
-        x_max = x_max,
-        ylimlow = ylimlow,
-        ylimhigh = ylimhigh,
-        period_min = period_min,
-        title = title,
-        subtitle = subtitle,
-        use_caption = use_caption,
-        override_x_title = override_x_title,
-        override_y_title = override_y_title,
-        r1_col = r1_col,
-        r2_col = r2_col,
-        point_size = point_size,
-        line_width_sf = line_width_sf,
-        include_annotations = include_annotations,
-        basic_annotations = basic_annotations,
-        annotation_size = annotation_size,
-        annotation_arrows = annotation_arrows,
-        annotation_curvature = annotation_arrow_curve,
-        floating_median_n = floating_median_n,
-        show_mr = show_mr,
-        x_break = x_break,
-        x_date_format = x_date_format
-      )
-      
+      p <- create_spc_plot(charts = charts,
+                           data = data,
+                           passed = passed,
+                           derived = derived,
+                           p_mr = p_mr)
+
       return(autospc_plot(plot = p,
                           charts = charts,
                           passed = passed,
@@ -467,16 +435,9 @@ autospc <- function(data,
     
   } else { # Plot only the time series, without limits
     if(plot_chart == TRUE) {
-      p <- create_timeseries_plot(
-        df = data,
-        title = title,
-        subtitle = subtitle,
-        override_x_title = override_x_title,
-        override_y_title = override_y_title,
-        ylimlow = ylimlow,
-        ylimhigh = ylimhigh,
-        point_size = point_size,
-        line_width_sf = line_width_sf)
+      p <- create_timeseries_plot(data = data,
+                                  passed = passed,
+                                  derived = derived)
 
       return(autospc_plot(plot = p,
                           charts = list(chart),

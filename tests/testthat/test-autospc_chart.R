@@ -561,3 +561,24 @@ test_that("validate_autospc_chart requires the analysis slots", {
                "element\\(s\\) not present: result")
 
 })
+
+
+# chart_type_label() is the inverse of autospc_chart()
+
+
+test_that("every chart type survives the round trip to its class and back", {
+
+  # the caption reads the chart type off the class, so the two have to agree
+  for(chart_type in names(factory_classes)) {
+
+    chart <- autospc_chart(chart_type = chart_type,
+                           data = factory_data,
+                           x = "x",
+                           y = "y",
+                           n = "n")
+
+    expect_identical(chart_type_label(chart), chart_type, info = chart_type)
+
+  }
+
+})

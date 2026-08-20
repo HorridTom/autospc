@@ -75,8 +75,6 @@ postprocess_spc <- function(
     chart_type,
     chart,
     highlight_exclusions,
-    floating_median,
-    floating_median_n,
     extend_limits_to,
     align_labels,
     flip_labels,
@@ -101,8 +99,8 @@ postprocess_spc <- function(
   
   # add floating median column if needed
   df <- floating_median_column(df = df,
-                               floating_median = floating_median,
-                               floating_median_n = floating_median_n)
+                               floating_median = chart$floating_median,
+                               floating_median_n = chart$floating_median_n)
   
   # add annotation information
   df <- add_annotation_data(df = df,

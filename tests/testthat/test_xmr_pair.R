@@ -98,3 +98,13 @@ test_that("XMR survives being called from a wrapper that forwards ...", {
   )
 
 })
+
+
+test_that("the caption names the pair, not the X chart", {
+
+  # the pair is a cowplot grid, so the caption is inside it rather than on it
+  texts <- panel_texts(run_pair())
+
+  expect_true(any(grepl("XMR Shewhart Chart", texts, fixed = TRUE)))
+
+})

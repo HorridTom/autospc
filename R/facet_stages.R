@@ -5,8 +5,9 @@
 #' results at. Names specify facet strip labels.
 #' @param ... Arguments passed to [autospc::autospc()]
 #'
-#' @returns Faceted plot showing results of [autospc::autospc()] at
-#' different stages as specified by split_rows
+#' @returns An `autospc_plot` showing the results of [autospc::autospc()] at
+#' different stages as specified by split_rows, one facet per stage. It is a
+#' ggplot, and additionally carries the analysed chart behind each facet.
 #'
 #' @examples
 #' # Show progression of C' chart for count of monthly attendances over time
@@ -194,7 +195,18 @@ facet_stages <- function(data,
     x_date_format = passed$x_date_format
   )
 
-  return(sp)
+  charts <- lapply(analyses, function(analysis) analysis$chart)
+
+  return(autospc_plot(
+    plot = sp,
+    charts = charts,
+    passed = passed,
+    derived = list(start_x = postprocessing_vars$start_x,
+                   x_max = postprocessing_vars$x_max,
+                   end_x = postprocessing_vars$end_x,
+                   ylimlow = postprocessing_vars$ylimlow,
+                   ylimhigh = postprocessing_vars$ylimhigh)
+  ))
   
 }
 

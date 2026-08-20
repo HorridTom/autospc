@@ -111,3 +111,17 @@ test_that("a cowplot composite can be subclassed the same way", {
   expect_no_error(drawn(paired))
 
 })
+
+
+test_that("attaching the slots to a ggplot warns about nothing", {
+
+  # ggplot2 3.5.2 treats a ggplot as a list, so writing new elements into one is
+  # ordinary assignment. This is the assertion that says so, in place of the
+  # blanket suppressWarnings() that used to wrap the construction.
+  expect_no_warning(
+    autospc_plot(plot = ggplot2::ggplot(contract_data,
+                                        ggplot2::aes(x = x, y = y)),
+                 charts = autospc_plot_charts(contract_plot()))
+  )
+
+})

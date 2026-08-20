@@ -20,8 +20,9 @@ appended as columns.}
 \item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
 }
 \value{
-Faceted plot showing results of \code{\link[=autospc]{autospc()}} at
-different stages as specified by split_rows
+An \code{autospc_plot} showing the results of \code{\link[=autospc]{autospc()}} at
+different stages as specified by split_rows, one facet per stage. It is a
+ggplot, and additionally carries the analysed chart behind each facet.
 }
 \description{
 facet_stages

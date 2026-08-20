@@ -231,7 +231,7 @@ test_that("as.data.frame joins an XmR pair wide", {
 
   expect_true(all(c("mr", "amr", "url", "lrl") %in% colnames(result)))
 
-  expect_false("chart" %in% colnames(result))
+  expect_false("stage" %in% colnames(result))
 
 })
 
@@ -253,7 +253,7 @@ test_that("the wide join carries the moving ranges, not a second y column", {
 })
 
 
-test_that("as.data.frame identifies the chart when there is more than one", {
+test_that("as.data.frame identifies the stage when there is more than one", {
 
   chart <- autospc_plot_charts(run_returns())[[1]]
 
@@ -264,8 +264,8 @@ test_that("as.data.frame identifies the chart when there is more than one", {
 
   result <- as.data.frame(two)
 
-  expect_true("chart" %in% colnames(result))
+  expect_true("stage" %in% colnames(result))
 
-  expect_setequal(unique(result$chart), c("1", "2"))
+  expect_setequal(unique(result$stage), c("1", "2"))
 
 })

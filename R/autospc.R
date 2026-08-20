@@ -432,12 +432,10 @@ autospc <- function(data,
         x_date_format = x_date_format
       )
       
-      suppressWarnings(
-        return(autospc_plot(plot = p,
-                            charts = charts,
-                            passed = passed,
-                            derived = derived)) # Chart output
-      )
+      return(autospc_plot(plot = p,
+                          charts = charts,
+                          passed = passed,
+                          derived = derived)) # Chart output
 
     } else if(write_table) {
       # (!plot_chart)

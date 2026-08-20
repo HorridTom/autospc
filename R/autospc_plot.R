@@ -334,7 +334,10 @@ autospc_plot_derived <- function(plot,
 #' An XmR pair is one analysis of one series shown as two charts, so it goes
 #' out wide: the moving range and its limits join the X columns as `mr`, `amr`,
 #' `url` and `lrl`. Several charts of the same type are separate analyses, so
-#' they stack long, with `chart` identifying which each row came from.
+#' they stack long, with `stage` identifying which each row came from - the same
+#' column `facet_stages(plot_chart = FALSE)` returns, and the same name as the
+#' facet variable, because `facet_stages()` is the only thing that produces
+#' several charts of one type.
 #'
 #' This is the analytic result, not the frame `autospc(plot_chart = FALSE)`
 #' returns: it carries the columns the algorithm produced, and not the columns
@@ -361,6 +364,6 @@ as.data.frame.autospc_plot <- function(x, ...) {
                                          mr_table = results[[2]])))
   }
 
-  return(as.data.frame(dplyr::bind_rows(results, .id = "chart")))
+  return(as.data.frame(dplyr::bind_rows(results, .id = "stage")))
 
 }

@@ -281,3 +281,99 @@ test_that("x_break reaches the drawing", {
   expect_false(isTRUE(all.equal(breaks(x_break = 10), breaks(x_break = 30))))
 
 })
+
+
+# what facet_stages() returns
+
+
+test_that("facet_stages returns an autospc_plot that is still a ggplot", {
+
+  plot <- faceted_plot()
+
+  expect_s3_class(plot, "autospc_plot")
+
+  expect_identical(class(plot), c("autospc_plot", "gg", "ggplot"))
+
+})
+
+
+test_that("it carries one analysed chart per facet, in stage order", {
+
+  charts <- autospc_plot_charts(faceted_plot())
+
+  expect_length(charts, 3L)
+
+  expect_true(all(vapply(charts,
+                         function(chart) inherits(chart, "autospc_chart_c"),
+                         logical(1))))
+
+  # the facets are cumulative stages, so each chart analyses more of the series
+  # than the one before
+  expect_identical(vapply(charts,
+                          function(chart) nrow(chart$result$table),
+                          integer(1)),
+                   c(30L, 60L, 90L))
+
+})
+
+
+test_that("named split_rows name the charts", {
+
+  charts <- autospc_plot_charts(
+    facet_stages(facet_arg_data,
+                 split_rows = c(early = 30L, mid = 60L, all = 90L),
+                 chart_type = "C",
+                 period_min = 21L)
+  )
+
+  expect_identical(names(charts), c("early", "mid", "all"))
+
+})
+
+
+test_that("it records the axis extents it was drawn with", {
+
+  plot <- faceted_plot()
+
+  expect_setequal(names(autospc_plot_derived(plot)),
+                  c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh"))
+
+  # what is recorded is what the y scale was given, before ggplot expands it
+  limits <- ggplot2::ggplot_build(plot)$layout$panel_scales_y[[1]]$limits
+
+  expect_identical(limits, c(autospc_plot_derived(plot, "ylimlow"),
+                             autospc_plot_derived(plot, "ylimhigh")))
+
+  drawn <- faceted_plot(plot_chart = FALSE)
+
+  expect_identical(autospc_plot_derived(plot, "start_x"), min(drawn$x))
+
+  expect_identical(autospc_plot_derived(plot, "x_max"), max(drawn$x))
+
+  expect_identical(autospc_plot_derived(plot, "end_x"), max(drawn$x))
+
+})
+
+
+test_that("plot_chart = FALSE still returns a plain data frame", {
+
+  result <- faceted_plot(plot_chart = FALSE)
+
+  expect_s3_class(result, "data.frame")
+
+  expect_false(inherits(result, "autospc_plot"))
+
+})
+
+
+test_that("as.data.frame names the facets the way the frame does", {
+
+  faceted <- as.data.frame(faceted_plot())
+
+  drawn <- faceted_plot(plot_chart = FALSE)
+
+  expect_true("stage" %in% colnames(faceted))
+
+  expect_setequal(unique(faceted$stage), unique(drawn$stage))
+
+})

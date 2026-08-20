@@ -62,6 +62,12 @@
   with the moving range and its limits as `mr`, `amr`, `url` and `lrl` — the same
   shape `autospc(plot_chart = FALSE)` returns.
 
+  `facet_stages()` returns the same kind of object, carrying one analysed chart
+  per facet in stage order. Where `split_rows` is named, the charts take those
+  names. `as.data.frame()` on one stacks the facets, with `stage` saying which
+  each row came from — the same column `facet_stages(plot_chart = FALSE)`
+  returns.
+
 * A `title` or `subtitle` column in the data is no longer repeated over the
   moving range chart of an XmR pair. The pair is one chart in two panels, so its
   title is drawn once, above the X chart. A title given as an argument was

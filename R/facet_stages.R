@@ -40,16 +40,16 @@ facet_stages <- function(data,
       what = "facet_stages(show_mr)",
       with = "facet_stages(chart_type)",
       details = paste('chart_type = "X" facets the X chart on its own, which',
-                      'is what facet_stages() has always drawn for an XMR',
-                      'request.')
+                      'is what facet_stages() has always drawn for',
+                      'chart_type = "XMR".')
     )
 
     dots_exprs$show_mr <- NULL
 
   }
 
-  # facet_stages() has never drawn the moving range chart, so an XMR request is
-  # an X chart faceted by stages.
+  # facet_stages() has never drawn the moving range chart, so chart_type =
+  # "XMR" is faceted as an X chart.
   if(dots_exprs$chart_type == "XMR") {
     dots_exprs$chart_type <- "X"
   }
@@ -112,7 +112,7 @@ facet_stages <- function(data,
   # has to be supplied. It is passed explicitly rather than through dots_exprs,
   # which only carries what the user wrote.
   #
-  # One chart, because an XMR request has been rewritten to "X" above.
+  # One chart, because chart_type = "XMR" was rewritten to "X" above.
   chart <- build_charts(chart_type = chart_type,
                         data = results_data,
                         x = "x",

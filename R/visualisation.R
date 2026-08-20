@@ -157,18 +157,21 @@ create_spc_plot <- function(df,
 #' plot's, and its legend is dropped, so neither depends on what is set here.
 #'
 #' @param analysis The list `run_analysis()` returned for the MR chart.
+#' @param passed The presentation parameters, shared with the X chart. The axis
+#'   titles are not among them - the MR chart resolved its own.
 #'
 #' @return A ggplot.
 #' @noRd
 draw_mr_panel <- function(analysis,
+                          passed,
                           xType,
                           period_min,
                           shift_rule_threshold,
                           floating_median_n) {
 
-  data    <- analysis$data
-  derived <- analysis$derived
-  passed  <- analysis$passed
+  data        <- analysis$data
+  derived     <- analysis$derived
+  axis_titles <- analysis$axis_titles
 
   if(!centre_line_present(data)) {
 
@@ -176,8 +179,8 @@ draw_mr_panel <- function(analysis,
       df = data,
       title = NULL,
       subtitle = NULL,
-      override_x_title = passed$override_x_title,
-      override_y_title = passed$override_y_title,
+      override_x_title = axis_titles$x,
+      override_y_title = axis_titles$y,
       ylimlow = derived$ylimlow,
       ylimhigh = derived$ylimhigh,
       point_size = passed$point_size,
@@ -199,8 +202,8 @@ draw_mr_panel <- function(analysis,
     title = NULL,
     subtitle = NULL,
     use_caption = passed$use_caption,
-    override_x_title = passed$override_x_title,
-    override_y_title = passed$override_y_title,
+    override_x_title = axis_titles$x,
+    override_y_title = axis_titles$y,
     r1_col = passed$r1_col,
     r2_col = passed$r2_col,
     point_size = passed$point_size,

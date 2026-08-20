@@ -114,7 +114,7 @@ autospc_chart_types <- function() {
 }
 
 
-#' The charts a request asks for
+#' The charts a chart type asks for
 #'
 #' `chart_type = "XMR"` asks for two charts, an X and an MR of the same series.
 #' Every other chart type asks for one. This is the only place a chart type is

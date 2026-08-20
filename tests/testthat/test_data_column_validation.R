@@ -125,3 +125,35 @@ for (chart_type in chart_types_y) {
     })
   }
 }
+
+
+# the rounding reaches the analysis, not just the warning
+
+
+rounding_data <- data.frame(x = 1:30,
+                            y = rep(c(10.4, 12.6, 11.5, 13.4, 9.6, 14.4), 5L),
+                            n = rep(100L, 30))
+
+
+test_that("a C chart analyses the rounded y, not the y as passed", {
+
+  result <- suppressWarnings(
+    autospc(rounding_data, chart_type = "C", period_min = 21L,
+            plot_chart = FALSE)
+  )
+
+  expect_identical(result$y, round(rounding_data$y))
+
+})
+
+
+test_that("a P chart analyses the rounded numerator", {
+
+  result <- suppressWarnings(
+    autospc(rounding_data, chart_type = "P", period_min = 21L,
+            plot_chart = FALSE)
+  )
+
+  expect_identical(result$y_numerator, round(rounding_data$y))
+
+})

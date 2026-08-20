@@ -262,24 +262,11 @@ autospc <- function(data,
     show_mr <- TRUE
   }
 
-  # autospc_chart() has no branch for a chart type outside
-  # autospc_chart_types(), so chart_type has to be valid before the object is
-  # built. preprocess_inputs() checks it again.
-  validate_chart_type(chart_type)
-
   x_name <- resolve_column_name(rlang::enquo(x), "x")
   y_name <- resolve_column_name(rlang::enquo(y), "y")
   n_name <- resolve_column_name(rlang::enquo(n), "n")
 
-  # Build the chart objects, from the data exactly as passed. The construction
-  # helper renames the analysed columns to x, y and n. One chart for most chart
-  # types, two for XMR.
-  charts_list <- build_charts(
-    chart_type = chart_type,
-    data = data,
-    x = x_name,
-    y = y_name,
-    n = n_name,
+  chart_args <- list(
     period_min = period_min,
     baseline_length = baseline_length,
     shift_rule_threshold = shift_rule_threshold,
@@ -292,36 +279,8 @@ autospc <- function(data,
     centre_line_tolerance = centre_line_tolerance
   )
 
-  chart <- charts_list[[1]]
-
-  # Preprocess inputs
-  preprocessed_vars <- preprocess_inputs(
-    df = chart$data,
-    chart_type = chart_type,
-    title = title,
-    subtitle = subtitle
-  )
-
-  chart$data          <- preprocessed_vars$df
-  chart_type          <- preprocessed_vars$chart_type
-  title               <- preprocessed_vars$title
-  subtitle            <- preprocessed_vars$subtitle
-  xType               <- preprocessed_vars$xType
-
-  # Centre line labels sit a scale factor above the upper control limit, and
-  # the lower factor is its mirror image about 1. Only the upper default asks
-  # what kind of chart this is, so only that is a method. A value the caller
-  # passed wins over both.
-  if(is.null(upper_annotation_sf)) {
-    upper_annotation_sf <- upper_annotation_sf_default(chart)
-  }
-
-  if(is.null(lower_annotation_sf)) {
-    lower_annotation_sf <- 2 - upper_annotation_sf
-  }
-
-  # The presentation parameters. The axis titles go in as the caller gave them
-  # and come back resolved.
+  # The presentation parameters, as the caller gave them. analyse_series()
+  # resolves the ones with a default that depends on the chart.
   passed <- list(
     show_limits = show_limits,
     title = title,
@@ -349,30 +308,41 @@ autospc <- function(data,
     annotation_arrow_curve = annotation_arrow_curve
   )
 
-  # run_analysis() fills in the axis titles it resolves, so the MR half of a
-  # pair needs the list as the caller gave it: its y axis title is its own.
-  passed_as_given <- passed
+  analysis <- analyse_series(data = data,
+                             chart_type = chart_type,
+                             x = x_name,
+                             y = y_name,
+                             n = n_name,
+                             chart_args = chart_args,
+                             passed = passed,
+                             extend_limits_to = extend_limits_to,
+                             floating_median = floating_median,
+                             floating_median_n = floating_median_n)
 
-  prepared <- run_analysis(chart = chart,
-                           chart_type = chart_type,
-                           xType = xType,
-                           passed = passed,
-                           extend_limits_to = extend_limits_to,
-                           floating_median = floating_median,
-                           floating_median_n = floating_median_n)
+  charts_list <- analysis$charts
+  chart       <- analysis$chart
+  data        <- analysis$data
+  derived     <- analysis$derived
+  chart_type  <- analysis$chart_type
+  xType       <- analysis$xType
 
-  chart   <- prepared$chart
-  data    <- prepared$data
-  derived <- prepared$derived
-  passed  <- prepared$passed
-
-  override_x_title <- passed$override_x_title
-  override_y_title <- passed$override_y_title
+  override_x_title <- analysis$axis_titles$x
+  override_y_title <- analysis$axis_titles$y
   start_x          <- derived$start_x
   x_max            <- derived$x_max
   end_x            <- derived$end_x
   ylimhigh         <- derived$ylimhigh
   ylimlow          <- derived$ylimlow
+
+  # The plot object records the axis titles as they were resolved. The moving
+  # range half of a pair resolves its own, so it is given analysis$passed, which
+  # still has them as the caller left them.
+  passed <- analysis$passed
+  passed$override_x_title <- override_x_title
+  passed$override_y_title <- override_y_title
+
+  title    <- passed$title
+  subtitle <- passed$subtitle
 
   # No limits columns means too few points to form a period
   if(show_limits && !centre_line_present(data)) {
@@ -397,7 +367,7 @@ autospc <- function(data,
       mr <- run_analysis(chart = charts_list[[2]],
                          chart_type = "MR",
                          xType = xType,
-                         passed = passed_as_given,
+                         passed = analysis$passed,
                          extend_limits_to = extend_limits_to,
                          floating_median = floating_median,
                          floating_median_n = floating_median_n)
@@ -421,10 +391,11 @@ autospc <- function(data,
 
       if(length(charts) > 1L) {
         p_mr <- draw_mr_panel(analysis = mr,
+                              passed = analysis$passed,
                               xType = xType,
                               period_min = period_min,
                               shift_rule_threshold = shift_rule_threshold,
-                              floating_median_n = floating_median_n)
+                             floating_median_n = floating_median_n)
       } else {
         p_mr <- NA
       }

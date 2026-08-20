@@ -94,6 +94,21 @@ limits_table_columns <- function(chart) {
 }
 
 
+#' The centre line label, formatted
+#'
+#' Everything about how a centre line value is written: the rounding, which
+#' comes from `label_accuracy()`, and whether it carries a per cent sign or a
+#' thousands separator.
+#'
+#' @param cl the centre line values
+#' @param ylimhigh upper end of the y axis, passed on to `label_accuracy()`
+#' @return character, one label per value
+#' @noRd
+centre_line_label <- function(chart, cl, ylimhigh) {
+  UseMethod("centre_line_label")
+}
+
+
 #' Chart name
 #'
 #' @return string, name of chart for labels
@@ -120,6 +135,18 @@ first_label_row <- function(chart) {
 #' @noRd
 label_accuracy <- function(chart, ylimhigh) {
   UseMethod("label_accuracy")
+}
+
+
+#' Do this chart's labels always sit above the centre line?
+#'
+#' `flip_labels` asks for labels below the line when the centre line falls. Some
+#' chart types read badly that way and always stay above, whatever it says.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+labels_stay_above <- function(chart) {
+  UseMethod("labels_stay_above")
 }
 
 

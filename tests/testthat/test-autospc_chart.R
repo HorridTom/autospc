@@ -582,3 +582,22 @@ test_that("every chart type survives the round trip to its class and back", {
   }
 
 })
+
+
+test_that("the default centre line label separates thousands", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+
+  expect_identical(centre_line_label(chart, cl = 12217, ylimhigh = 20000),
+                   "12,217")
+
+})
+
+
+test_that("labels may flip below the line by default", {
+
+  chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
+
+  expect_false(labels_stay_above(chart))
+
+})

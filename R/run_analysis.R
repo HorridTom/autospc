@@ -83,7 +83,6 @@ analyse_series <- function(data,
   }
 
   analysis <- run_analysis(chart = chart,
-                           chart_type = chart_type,
                            xType = xType,
                            passed = passed,
                            extend_limits_to = extend_limits_to)
@@ -114,7 +113,6 @@ analyse_series <- function(data,
 #'   axis extents, and the resolved `axis_titles`.
 #' @noRd
 run_analysis <- function(chart,
-                         chart_type,
                          xType,
                          passed,
                          extend_limits_to) {
@@ -155,7 +153,6 @@ run_analysis <- function(chart,
 
     data <- postprocess_spc(
       df = data,
-      chart_type = chart_type,
       chart = chart,
       highlight_exclusions = passed$highlight_exclusions,
       extend_limits_to = extend_limits_to,

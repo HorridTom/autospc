@@ -405,3 +405,13 @@ test_that("P' chart labels are rounded to one decimal place", {
                    0.1)
 
 })
+
+
+test_that("a P prime chart label is a percentage", {
+
+  expect_identical(centre_line_label(chart_pp(pp_pre_agg_data),
+                                     cl = 43.28,
+                                     ylimhigh = 110),
+                   "43.3%")
+
+})

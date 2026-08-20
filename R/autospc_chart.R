@@ -431,6 +431,24 @@ extrapolate_limits.autospc_chart <- function(chart,
 # Presentation methods
 
 
+#' The centre line label, formatted
+#'
+#' A thousands separator and no suffix. The proportion charts override this.
+#'
+#' @return character
+#' @noRd
+centre_line_label.autospc_chart <- function(chart,
+                                            cl,
+                                            ylimhigh) {
+
+  return(scales::number(cl,
+                        big.mark = ",",
+                        accuracy = label_accuracy(chart = chart,
+                                                  ylimhigh = ylimhigh)))
+
+}
+
+
 #' Row that carries the first centre line label
 #'
 #' @return integer, row number
@@ -453,6 +471,19 @@ label_accuracy.autospc_chart <- function(chart,
                                          ylimhigh) {
 
   return(1)
+
+}
+
+
+#' Do this chart's labels always sit above the centre line?
+#'
+#' No by default - `flip_labels` decides. The moving range chart overrides this.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+labels_stay_above.autospc_chart <- function(chart) {
+
+  return(FALSE)
 
 }
 

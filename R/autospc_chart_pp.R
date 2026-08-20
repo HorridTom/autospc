@@ -252,6 +252,24 @@ extrapolate_limits.autospc_chart_pp <- function(chart,
 # Presentation methods
 
 
+#' The centre line label, formatted
+#'
+#' A per cent sign, and no thousands separator: the values are percentages.
+#'
+#' @return character
+#' @noRd
+centre_line_label.autospc_chart_pp <- function(chart,
+                                    cl,
+                                    ylimhigh) {
+
+  return(scales::number(cl,
+                        accuracy = label_accuracy(chart = chart,
+                                                  ylimhigh = ylimhigh),
+                        suffix = "%"))
+
+}
+
+
 #' Chart name
 #'
 #' @return string, name of chart for labels

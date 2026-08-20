@@ -415,3 +415,13 @@ test_that("P chart labels are rounded to one decimal place", {
   expect_identical(label_accuracy(chart_p(pre_agg_data), ylimhigh = 110), 0.1)
 
 })
+
+
+test_that("a P chart label is a percentage", {
+
+  expect_identical(centre_line_label(chart_p(pre_agg_data),
+                                     cl = 43.28,
+                                     ylimhigh = 110),
+                   "43.3%")
+
+})

@@ -225,3 +225,20 @@ test_that("the MR chart y axis starts at zero", {
                    list(low = 0, high = 18 * 1.1))
 
 })
+
+
+test_that("moving range labels always stay above the centre line", {
+
+  expect_true(labels_stay_above(test_chart_mr()))
+
+})
+
+
+test_that("the moving range label separates thousands", {
+
+  expect_identical(centre_line_label(test_chart_mr(),
+                                     cl = 1234,
+                                     ylimhigh = 5000),
+                   "1,234")
+
+})

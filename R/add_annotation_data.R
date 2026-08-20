@@ -1,6 +1,5 @@
 # Add annotation data to main dataframe
 add_annotation_data <- function(df,
-                                chart_type,
                                 chart,
                                 ylimhigh,
                                 align_labels,
@@ -9,25 +8,18 @@ add_annotation_data <- function(df,
                                 lower_annotation_sf,
                                 annotation_arrow_curve) {
   
-  accuracy <- label_accuracy(chart = chart,
-                             ylimhigh = ylimhigh)
-
   first_row <- first_label_row(chart)
+
+  labels <- centre_line_label(chart = chart,
+                              cl = df$cl,
+                              ylimhigh = ylimhigh)
   
   df <- df %>% 
     dplyr::mutate(cl_label = dplyr::if_else(
       breakPoint |
         dplyr::row_number() == first_row,
-      dplyr::if_else(rep(chart_type == "P" | chart_type == "P'",
-                         nrow(df)),
-                     scales::number(cl,
-                                    accuracy = accuracy,
-                                    suffix = "%"),
-                     scales::number(cl,
-                                    big.mark = ",",
-                                    accuracy = accuracy)),
+      labels,
       ""),
-      chart_type = chart_type,
       align_labels = align_labels,
       flip_labels = flip_labels,
       upper_annotation_level = dplyr::if_else(
@@ -40,7 +32,7 @@ add_annotation_data <- function(df,
         min(lcl, na.rm = TRUE) * lower_annotation_sf,
         lcl * lower_annotation_sf),
       lower_annotation_level = dplyr::if_else(
-        chart_type == "MR" | !flip_labels,
+        labels_stay_above(chart) | !flip_labels,
         upper_annotation_level,
         lower_level),
       annotation_level = dplyr::case_when(
@@ -61,7 +53,6 @@ add_annotation_data <- function(df,
       )
     ) %>%
     dplyr::select(
-      -chart_type,
       -align_labels,
       -flip_labels,
       -upper_annotation_level,

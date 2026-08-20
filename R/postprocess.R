@@ -72,7 +72,6 @@ postprocess <- function(
 # be displayed
 postprocess_spc <- function(
     df,
-    chart_type,
     chart,
     highlight_exclusions,
     extend_limits_to,
@@ -104,7 +103,6 @@ postprocess_spc <- function(
   
   # add annotation information
   df <- add_annotation_data(df = df,
-                            chart_type = chart_type,
                             chart = chart,
                             ylimhigh = ylimhigh,
                             align_labels = align_labels,

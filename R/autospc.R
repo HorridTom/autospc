@@ -365,7 +365,6 @@ autospc <- function(data,
     if((chart_type == "XMR") & show_mr) {
 
       mr <- run_analysis(chart = charts_list[[2]],
-                         chart_type = "MR",
                          xType = xType,
                          passed = analysis$passed,
                          extend_limits_to = extend_limits_to)

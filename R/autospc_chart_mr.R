@@ -175,6 +175,20 @@ label_accuracy.autospc_chart_mr <- function(chart,
 }
 
 
+#' Do this chart's labels always sit above the centre line?
+#'
+#' Yes. A label below the centre line of a range chart reads badly, so
+#' `flip_labels` does not apply here.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+labels_stay_above.autospc_chart_mr <- function(chart) {
+
+  return(TRUE)
+
+}
+
+
 #' Lower and upper ends of the y axis
 #'
 #' @return list of two numbers, low and high

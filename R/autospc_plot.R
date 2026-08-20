@@ -178,6 +178,49 @@ autospc_plot_presentation_elements <- function() {
 }
 
 
+#' The presentation parameters a plot is drawn with
+#'
+#' The presentation half of the argument split, and the single source of it.
+#' `autospc()` builds its `passed` list from exactly these, and `facet_stages()`
+#' uses them to tell which of the arguments it was handed are presentation
+#' rather than chart. `test-autospc_plot.R` holds the drift test.
+#'
+#' @return A character vector of parameter names.
+#' @noRd
+autospc_plot_passed_elements <- function() {
+
+  passed_elements <- c(
+    "show_limits",
+    "title",
+    "subtitle",
+    "use_caption",
+    "override_x_title",
+    "override_y_title",
+    "override_y_lim",
+    "x_break",
+    "x_date_format",
+    "x_pad_end",
+    "r1_col",
+    "r2_col",
+    "point_size",
+    "line_width_sf",
+    "highlight_exclusions",
+    "include_annotations",
+    "basic_annotations",
+    "annotation_size",
+    "align_labels",
+    "flip_labels",
+    "upper_annotation_sf",
+    "lower_annotation_sf",
+    "annotation_arrows",
+    "annotation_arrow_curve"
+  )
+
+  return(passed_elements)
+
+}
+
+
 #' Create an autospc_plot object
 #'
 #' Assemble, construct, validate, return - the same shape as the chart

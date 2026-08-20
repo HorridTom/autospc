@@ -338,8 +338,8 @@ autospc <- function(data,
   # range half of a pair resolves its own, so it is given analysis$passed, which
   # still has them as the caller left them.
   passed <- analysis$passed
-  passed$override_x_title <- override_x_title
-  passed$override_y_title <- override_y_title
+  passed["override_x_title"] <- list(override_x_title)
+  passed["override_y_title"] <- list(override_y_title)
 
   title    <- passed$title
   subtitle <- passed$subtitle

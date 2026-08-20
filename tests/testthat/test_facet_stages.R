@@ -125,10 +125,63 @@ test_that("an XMR request is faceted as its X chart", {
 
   y_range <- ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$y.range
 
-  # an XMR request is rewritten to X, so one chart is drawn and the axis comes from
-  # the chart object built for it. y_axis_range.autospc_chart_mr() always starts
-  # the axis at zero; the X one starts below the lowest of lcl and y, which for
-  # this series is well above zero.
+  # chart_type = "XMR" is rewritten to "X", so one chart is drawn and the axis
+  # comes from the chart object built for it.
+  # y_axis_range.autospc_chart_mr() always starts the axis at zero; the X one
+  # starts below the lowest of lcl and y, which for this series is above zero.
   expect_gt(y_range[1], 0)
+
+})
+
+
+# the arguments reach every facet
+
+
+facet_arg_data <- data.frame(x = 1:90,
+                             y = rep(c(50, 48, 49, 51, 52, 47), 15L))
+
+faceted_arg <- function(...) {
+  facet_stages(facet_arg_data,
+               split_rows = c(30L, 60L, 90L),
+               chart_type = "C",
+               plot_chart = FALSE,
+               ...)
+}
+
+
+test_that("the chart parameters reach the analysis of each facet", {
+
+  # period_min is a chart parameter, so it has to travel from facet_stages()
+  # through to every chart it builds
+  expect_false(isTRUE(all.equal(faceted_arg(period_min = 15L)$cl,
+                               faceted_arg(period_min = 30L)$cl)))
+
+})
+
+
+test_that("the last facet is the whole series, analysed as autospc would", {
+
+  faceted <- faceted_arg(period_min = 15L)
+
+  last <- faceted[faceted$stage == "3", ]
+
+  whole <- autospc(facet_arg_data,
+                   chart_type = "C",
+                   period_min = 15L,
+                   plot_chart = FALSE)
+
+  expect_equal(last$cl, whole$cl)
+
+  expect_equal(last$ucl, whole$ucl)
+
+  expect_equal(last$lcl, whole$lcl)
+
+})
+
+
+test_that("an argument the caller did not give takes autospc's default", {
+
+  expect_equal(faceted_arg()$cl,
+               faceted_arg(period_min = formals(autospc)$period_min)$cl)
 
 })

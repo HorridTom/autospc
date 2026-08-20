@@ -114,6 +114,23 @@ autospc_chart_types <- function() {
 }
 
 
+#' The chart parameters a caller can set
+#'
+#' The chart half of the argument split: the elements of an `autospc_chart` that
+#' come from the caller, as opposed to the data, the column names, and the
+#' elements the run fills in.
+#'
+#' @return A character vector of parameter names.
+#' @noRd
+autospc_chart_parameters <- function() {
+
+  return(setdiff(autospc_chart_elements(),
+                 c("data", "x", "y", "n",
+                   "data_original", "result", "history")))
+
+}
+
+
 #' The charts a chart type asks for
 #'
 #' `chart_type = "XMR"` asks for two charts, an X and an MR of the same series.

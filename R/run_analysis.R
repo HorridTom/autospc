@@ -62,11 +62,15 @@ analyse_series <- function(data,
     subtitle = passed$subtitle
   )
 
-  chart$data      <- preprocessed_vars$df
-  chart_type      <- preprocessed_vars$chart_type
-  passed$title    <- preprocessed_vars$title
-  passed$subtitle <- preprocessed_vars$subtitle
-  xType           <- preprocessed_vars$xType
+  chart$data <- preprocessed_vars$df
+  chart_type <- preprocessed_vars$chart_type
+  xType      <- preprocessed_vars$xType
+
+  # Assigned as single-element lists: `passed$title <- NULL` would delete
+  # the element rather than set it, so the list's shape would depend on
+  # whether a title was given.
+  passed["title"]    <- list(preprocessed_vars$title)
+  passed["subtitle"] <- list(preprocessed_vars$subtitle)
 
   # Centre line labels sit a scale factor above the upper control limit, and
   # the lower factor is its mirror image about 1. Only the upper default asks

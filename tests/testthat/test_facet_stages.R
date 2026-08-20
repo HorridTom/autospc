@@ -377,3 +377,72 @@ test_that("as.data.frame names the facets the way the frame does", {
   expect_setequal(unique(faceted$stage), unique(drawn$stage))
 
 })
+
+
+# the titles reach the drawing
+
+
+test_that("a faceted chart has axis labels", {
+
+  plot <- faceted_plot()
+
+  expect_identical(plot$labels$x, "Day")
+
+  expect_identical(plot$labels$y, "Number")
+
+})
+
+
+test_that("an axis title the caller gave wins over the resolved one", {
+
+  plot <- faceted_plot(override_y_title = "Attendances")
+
+  expect_identical(plot$labels$y, "Attendances")
+
+})
+
+
+test_that("a title in the data reaches the faceted chart", {
+
+  titled <- facet_arg_data
+  titled$title <- "From the data"
+  titled$subtitle <- "Also from the data"
+
+  plot <- facet_stages(titled,
+                       split_rows = c(30L, 60L, 90L),
+                       chart_type = "C",
+                       period_min = 21L)
+
+  expect_identical(plot$labels$title, "From the data")
+
+  expect_identical(plot$labels$subtitle, "Also from the data")
+
+})
+
+
+test_that("the plot object records the titles it was drawn with", {
+
+  plot <- faceted_plot()
+
+  expect_identical(autospc_plot_passed(plot, "override_x_title"), plot$labels$x)
+
+  expect_identical(autospc_plot_passed(plot, "override_y_title"), plot$labels$y)
+
+})
+
+
+test_that("leaving out chart_type says so, rather than failing on a length", {
+
+  # facet_stages() used to test dots_exprs$chart_type == "XMR", which is
+  # logical(0) when no chart type was given, so the call died before
+  # validate_chart_type() could say what was wrong
+  message <- tryCatch(
+    facet_stages(facet_arg_data, split_rows = c(30L, 60L, 90L)),
+    error = conditionMessage
+  )
+
+  expect_match(message, "chart_type")
+
+  expect_no_match(message, "argument is of length zero", fixed = TRUE)
+
+})

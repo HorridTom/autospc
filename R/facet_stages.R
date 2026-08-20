@@ -53,7 +53,7 @@ facet_stages <- function(data,
 
   # facet_stages() has never drawn the moving range chart, so chart_type =
   # "XMR" is faceted as an X chart.
-  if(dots_exprs$chart_type == "XMR") {
+  if(identical(dots_exprs$chart_type, "XMR")) {
     dots_exprs$chart_type <- "X"
   }
 
@@ -164,6 +164,14 @@ facet_stages <- function(data,
     extend_limits_to = arguments$extend_limits_to,
     xType = xType
   )
+
+  # The titles the caller did not give have been resolved - the axis ones by
+  # postprocess() from the chart's class, and the chart ones from the data.
+  # They are what is drawn, so they are what the plot object records.
+  passed["title"]            <- list(title)
+  passed["subtitle"]         <- list(subtitle)
+  passed["override_x_title"] <- list(postprocessing_vars$override_x_title)
+  passed["override_y_title"] <- list(postprocessing_vars$override_y_title)
 
   sp <- create_spc_plot(
     df = results_data,

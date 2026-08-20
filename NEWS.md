@@ -85,6 +85,16 @@
 
 ## Bug fixes
 
+* `facet_stages()` now labels its axes. It resolved the axis titles and then
+  never passed them to the drawing, so a faceted chart had no axis labels at
+  all, where the same data through `autospc()` was labelled. A `title` or
+  `subtitle` column in the data was dropped the same way and now reaches the
+  chart. Titles given as arguments were unaffected and still win.
+
+* `facet_stages()` without a `chart_type` now says so. It failed with
+  `argument is of length zero` before reaching the check that names the
+  argument and lists the chart types available.
+
 * `facet_stages()` now uses the same annotation positioning as `autospc()` on
   R below 4.3. `basic_annotations` defaults to `getRversion() < "4.3.0"` in
   `autospc()`, but the faceted path never passed the default on, so a faceted

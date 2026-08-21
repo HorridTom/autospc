@@ -21,7 +21,10 @@ The result of each chart the plot holds, in one frame.
 An XmR pair is one analysis of one series shown as two charts, so it goes
 out wide: the moving range and its limits join the X columns as \code{mr}, \code{amr},
 \code{url} and \code{lrl}. Several charts of the same type are separate analyses, so
-they stack long, with \code{chart} identifying which each row came from.
+they stack long, with \code{stage} identifying which each row came from - the same
+column \code{facet_stages(plot_chart = FALSE)} returns, and the same name as the
+facet variable, because \code{facet_stages()} is the only thing that produces
+several charts of one type.
 
 This is the analytic result, not the frame \code{autospc(plot_chart = FALSE)}
 returns: it carries the columns the algorithm produced, and not the columns

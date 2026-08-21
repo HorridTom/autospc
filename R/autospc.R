@@ -90,12 +90,11 @@
 #' @param log_file_path if not NULL (the default), path to save log file to.
 #' The file extension provided (.rds or .csv) determines the type of file the
 #' log data is saved to. Full log data is saved, regardless of verbosity.
-#' @param keep_candidate_tables Boolean specifying whether each candidate
-#' calculation period the algorithm considers keeps the table of limits it
-#' would have produced. The candidates themselves are recorded either way, with
-#' the reasons they were accepted or rejected; this is the full table of limits
-#' for each, which is what an application drawing the rejected periods needs and
-#' what makes an analysed chart several times larger.
+#' @param keep_candidate_tables Boolean specifying whether to retain the table
+#' of limits for each candidate calculation period the algorithm considers. The
+#' candidates themselves are recorded either way, with the reasons they were
+#' accepted or rejected; this is the full table of limits for each, and
+#' therefore makes an analysed chart several times larger.
 #' 
 #' ## Chart Appearance
 #' Arguments that control aspects of chart visualisation 

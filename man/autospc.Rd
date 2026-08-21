@@ -10,14 +10,14 @@ autospc(
   y,
   n,
   chart_type = NULL,
-  period_min = 21,
+  period_min = 21L,
   baseline_length = NULL,
   shift_rule_threshold = 8L,
   baseline_only = FALSE,
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
-  max_exclusions = 3,
+  max_exclusions = 3L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
@@ -29,6 +29,7 @@ autospc(
   write_table = FALSE,
   verbosity = 0L,
   log_file_path = NULL,
+  keep_candidate_tables = FALSE,
   title = NULL,
   subtitle = NULL,
   use_caption = TRUE,
@@ -168,7 +169,13 @@ none if 0.}
 
 \item{log_file_path}{if not NULL (the default), path to save log file to.
 The file extension provided (.rds or .csv) determines the type of file the
-log data is saved to. Full log data is saved, regardless of verbosity.
+log data is saved to. Full log data is saved, regardless of verbosity.}
+
+\item{keep_candidate_tables}{Boolean specifying whether to retain the table
+of limits for each candidate calculation period the algorithm considers. The
+candidates themselves are recorded either way, with the reasons they were
+accepted or rejected; this is the full table of limits for each, and
+therefore makes an analysed chart several times larger.
 \subsection{Chart Appearance}{
 
 Arguments that control aspects of chart visualisation

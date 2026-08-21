@@ -26,16 +26,27 @@ validate_autospc_chart_c <- function(x) {
     stop("Not an autospc_chart_c object.", call. = FALSE)
   }
   
-  return(
-    validate_autospc_chart(x)
-  )
+  x <- validate_autospc_chart(x)
+  
+  require_column(data = x$data,
+                 column = "y",
+                 message = paste("y not specified. For C and C' charts, y must",
+                                 "be specified."))
+  
+  require_column_type(data = x$data,
+                      column = "y",
+                      types = c("integer", "double"),
+                      message = paste("For a C or C' chart, y must be of type",
+                                      "integer or double."))
+  
+  return(x)
   
 }
 
 
 #' Create an autospc_chart_c object
 #'
-#' Helper for C charts: assemble, construct, validate, return.
+#' Helper for C charts: assemble, construct, validate, round, return.
 #'
 #' @return An object of class `c("autospc_chart_c", "autospc_chart")`.
 #' @noRd
@@ -55,13 +66,35 @@ autospc_chart_c <- function(data,
   autospc_chart_c_object <- new_autospc_chart_c(autospc_chart_c_l)
   
   autospc_chart_c_object <- validate_autospc_chart_c(autospc_chart_c_object)
-  
+
+  autospc_chart_c_object <- round_counts(autospc_chart_c_object)
+
   return(autospc_chart_c_object)
   
 }
 
 
 # Analysis methods
+
+#' Round the count columns to whole numbers
+#'
+#' @return autospc_chart_c object
+#' @noRd
+round_counts.autospc_chart_c <- function(chart) {
+
+  chart$data <- round_count_column(
+    data = chart$data,
+    column = "y",
+    message = paste("At least one element of y has non-zero fractional",
+                    "part. Rounding to the nearest whole number.\n",
+                    "C and C' charts are for count data, i.e. whole",
+                    "numbers only.")
+  )
+
+  return(chart)
+
+}
+
 
 #' Aggregate data for analysis
 #' 

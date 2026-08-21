@@ -81,10 +81,11 @@ make_data_column_validation_data <- function() {
                              return(df)})
   
   # As a starting point for expected results in testing, the remaining code in
-  # this function captures the current results of running
-  # validate_data_column_spec on the test dataframes. This makes the tests based
-  # on this data regression tests, although I manually checked these expected
-  # results before saving as fixtures (12/05/2026)
+  # this function captures the current results of building a chart from each of
+  # the test dataframes - which is where the column requirements are checked and
+  # where counts are rounded. This makes the tests based on this data regression
+  # tests, although I manually checked these expected results before saving as
+  # fixtures (12/05/2026)
   
   # Factory to build functions that catch the return value and any conditions
   # generated on calling the specified function
@@ -102,17 +103,25 @@ make_data_column_validation_data <- function() {
       list(res, warn=warn, err=err)
     }
   
-  # Run validate_data_column_spec on each dataframe in df_list, for the
-  # specified chart_type, and column bind the results onto results_stub.
-  # Returns either just the condition results (no_data = TRUE) or the returned
-  # dataframe as well (no_data = FALSE)
+  # Build a chart from each dataframe in df_list, for the specified chart_type,
+  # and column bind the results onto results_stub. Returns either just the
+  # condition results (no_data = TRUE) or the built charts as well
+  # (no_data = FALSE)
   validate_data <- function(df_list,
                             chart_type,
                             results_stub = NULL,
                             no_data = TRUE) {
     
+    build_from_columns <- function(df, chart_type) {
+      autospc:::build_charts(chart_type = chart_type,
+                             data = df,
+                             x = "x",
+                             y = "y",
+                             n = "n")
+    }
+
     validation_res <- lapply(df_list,
-                             result_catcher_factory(autospc:::validate_data_column_spec),
+                             result_catcher_factory(build_from_columns),
                              chart_type = chart_type)
     
     validated_data <- lapply(validation_res,
@@ -151,8 +160,8 @@ make_data_column_validation_data <- function() {
     }
   }
   
-  # Run validate_data_column_spec on each dataframe in df_list, for all
-  # specified chart_types, and column bind results to results_stub
+  # Build a chart from each dataframe in df_list, for all specified chart_types,
+  # and column bind results to results_stub
   validate_data_all <- function(df_list,
                                 chart_types,
                                 results_stub) {
@@ -184,7 +193,7 @@ make_data_column_validation_data <- function() {
   # Generate expected conditions for charts using only y column
   data_column_validation_expected_conditions_y <- validate_data_all(
     sig_test_dfs_y,
-    chart_types = c("XMR", "MR", "C", "C'"),
+    chart_types = c("XMR", "X", "MR", "C", "C'"),
     results_stub = df_sigs_y)
   
   # Save results

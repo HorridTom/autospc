@@ -322,6 +322,20 @@ autospc_chart_list <- function(data,
 # Methods
 
 
+#' Round the count columns to whole numbers
+#'
+#' Returns the chart unchanged: a chart type whose y is a measurement rather
+#' than a count has nothing to round. The count charts override this.
+#'
+#' @return autospc_chart object of the same class as chart
+#' @noRd
+round_counts.autospc_chart <- function(chart) {
+
+  return(chart)
+
+}
+
+
 #' Aggregate data for analysis
 #' 
 #' Returns the chart object unchanged, this reflects that the default behaviour

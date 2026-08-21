@@ -26,16 +26,27 @@ validate_autospc_chart_mr <- function(x) {
     stop("Not an autospc_chart_mr object.", call. = FALSE)
   }
 
-  return(
-    validate_autospc_chart(x)
-  )
+  x <- validate_autospc_chart(x)
+
+  require_column(data = x$data,
+                 column = "y",
+                 message = paste("y not specified. For X, MR and XMR charts, y",
+                                 "must be specified."))
+
+  require_column_type(data = x$data,
+                      column = "y",
+                      types = c("integer", "double"),
+                      message = paste("For X, MR and XMR charts, y must be of",
+                                      "type integer or double."))
+
+  return(x)
 
 }
 
 
 #' Create an autospc_chart_mr object
 #'
-#' Helper for MR charts: assemble, construct, validate, return.
+#' Helper for MR charts: assemble, construct, validate, round, return.
 #'
 #' @return An object of class `c("autospc_chart_mr", "autospc_chart")`.
 #' @noRd
@@ -55,6 +66,8 @@ autospc_chart_mr <- function(data,
   autospc_chart_mr_object <- new_autospc_chart_mr(autospc_chart_mr_l)
 
   autospc_chart_mr_object <- validate_autospc_chart_mr(autospc_chart_mr_object)
+
+  autospc_chart_mr_object <- round_counts(autospc_chart_mr_object)
 
   return(autospc_chart_mr_object)
 

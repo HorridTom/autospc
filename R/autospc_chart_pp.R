@@ -39,6 +39,39 @@ validate_autospc_chart_pp <- function(x) {
          call. = FALSE)
   }
 
+  require_column(data = x$data,
+                 column = "y",
+                 message = paste("y not specified. For P and P' charts, y must",
+                                 "be specified."))
+
+  if(!"n" %in% colnames(x$data)) {
+
+    # No denominator column: the numerator has to be individual binary
+    # observations, one row per observation.
+    require_column_type(data = x$data,
+                        column = "y",
+                        types = "logical",
+                        message = paste("n is not specified and y is not of",
+                                        "type logical. For P and P' charts, if",
+                                        "n is not specified, y must be of type",
+                                        "logical."))
+
+  } else {
+
+    require_column_type(data = x$data,
+                        column = "y",
+                        types = c("integer", "double"),
+                        message = paste("For a P or P' chart with n specified,",
+                                        "y must be of type integer or double."))
+
+    require_column_type(data = x$data,
+                        column = "n",
+                        types = c("integer", "double"),
+                        message = paste("For a P or P' chart with n specified,",
+                                        "n must be of type integer or double."))
+
+  }
+
   return(x)
 
 }
@@ -64,7 +97,7 @@ autospc_chart_pp_elements <- function() {
 
 #' Create an autospc_chart_pp object
 #'
-#' Helper for P' charts: assemble, construct, validate, return.
+#' Helper for P' charts: assemble, construct, validate, round, return.
 #'
 #' @return An object of class `c("autospc_chart_pp", "autospc_chart")`.
 #' @noRd
@@ -88,12 +121,51 @@ autospc_chart_pp <- function(data,
 
   autospc_chart_pp_object <- validate_autospc_chart_pp(autospc_chart_pp_object)
 
+  autospc_chart_pp_object <- round_counts(autospc_chart_pp_object)
+
   return(autospc_chart_pp_object)
 
 }
 
 
 # Analysis methods
+
+
+#' Round the count columns to whole numbers
+#'
+#' Nothing to round where no denominator column was given: the numerator is
+#' then individual binary observations, which the validator has already
+#' required to be logical.
+#'
+#' @return autospc_chart_pp object
+#' @noRd
+round_counts.autospc_chart_pp <- function(chart) {
+
+  if(!"n" %in% colnames(chart$data)) {
+    return(chart)
+  }
+
+  chart$data <- round_count_column(
+    data = chart$data,
+    column = "y",
+    message = paste("At least one element of y has non-zero",
+                    "fractional part. Rounding to the nearest whole",
+                    " number.\nP and P' charts with n specified",
+                    "require y to be a count, i.e. whole numbers only.")
+  )
+
+  chart$data <- round_count_column(
+    data = chart$data,
+    column = "n",
+    message = paste("At least one element of n has non-zero",
+                    "fractional part. Rounding to the nearest whole",
+                    " number.\nP and P' charts with n specified",
+                    "require n to be a count, i.e. whole numbers only.")
+  )
+
+  return(chart)
+
+}
 
 
 #' Aggregate data for analysis

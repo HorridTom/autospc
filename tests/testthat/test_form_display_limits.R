@@ -2,8 +2,12 @@
 test_data <- readRDS("testdata/test_data_display_limits.rds")
 
 # form_display_limits() dispatches on the chart object, so one has to be
-# supplied. A C chart carries its limits forward unchanged.
-test_chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
+# supplied. A C chart carries its limits forward unchanged. The fixture's y is
+# not whole, so building the chart rounds it and says so - and the rounded
+# column is never read, because the limits under test come from test_data.
+test_chart <- suppressWarnings(
+  autospc_chart_c(data = test_data, x = "x", y = "y")
+)
 
 test_that("Display period is formed correctly for C chart",{
   

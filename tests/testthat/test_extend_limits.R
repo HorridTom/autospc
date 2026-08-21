@@ -80,9 +80,9 @@ test_that("Limit extension works correctly for P chart", {
   lcl <- pbar - 3*sqrt((pbar*(1 - pbar))/nbar)
   ucl <- pbar + 3*sqrt((pbar*(1 - pbar))/nbar)
   
-  limit_values <- tibble::tibble_row(cl = pbar * 100,
-                                     lcl = lcl * 100,
-                                     ucl = ucl * 100)
+  limit_values <- data.frame(cl = pbar * 100,
+                             lcl = lcl * 100,
+                             ucl = ucl * 100)
   
   # Limit extension should result in two additional rows in the result, marking
   # the start and end of the extension period, with the correct limits and cl
@@ -128,6 +128,8 @@ test_that("Limit extension works correctly for P-prime chart (regression)", {
                   lcl,
                   cl)
   
+  # the stored answer was saved when autospc() returned a tibble; the values are
+  # unchanged, so it is compared as a data frame
   test_extend_limits_pp_answer <- test_extend_limits_pp_answer %>%
     dplyr::select(x,
                   y,
@@ -135,8 +137,9 @@ test_that("Limit extension works correctly for P-prime chart (regression)", {
                   y_numerator,
                   ucl,
                   lcl,
-                  cl)
-  
+                  cl) %>%
+    as.data.frame()
+
   expect_equal(results_ext,
                test_extend_limits_pp_answer)
   

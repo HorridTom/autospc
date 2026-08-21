@@ -55,7 +55,7 @@ check_x_type <- function(data) {
 }
 
 
-#' Order a chart's series by x
+#' Order a chart's series by x, and make it a plain data frame
 #'
 #' The algorithm walks the data in row order, so the rows have to be in x order
 #' before it runs, and before `prepare_data()` derives anything from their
@@ -65,12 +65,21 @@ check_x_type <- function(data) {
 #' `dplyr::arrange()` is stable, so rows sharing an x keep the order they
 #' arrived in. Missing x values sort to the end.
 #'
+#' This is also where `data` becomes a plain data frame, and it is the only
+#' place that does it. Every chart type passes through here, and it is after
+#' `aggregate_data()`, which is what produces a tibble: `dplyr::summarise()`
+#' returns one whatever it was given. Everything the algorithm derives from
+#' `data` is therefore a plain data frame as well - the limits table, the
+#' analysis in `chart$result$table`, and the tables recorded in
+#' `chart$history`. `data_original` is left as the caller passed it.
+#'
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 order_series <- function(chart) {
 
   chart$data <- chart$data %>%
-    dplyr::arrange(x)
+    dplyr::arrange(x) %>%
+    as.data.frame()
 
   return(chart)
 

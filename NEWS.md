@@ -88,6 +88,22 @@
   and `cl_change` — which it previously returned only when `show_limits` was
   `TRUE`.
 
+* `autospc(plot_chart = FALSE)` and `facet_stages(plot_chart = FALSE)` always
+  return a plain data frame. Previously the class depended on the chart type:
+  given a data frame, C and C′ charts returned a tibble and the other chart types
+  returned a data frame; given a tibble, every chart type returned a tibble. The
+  same now applies to the frames a chart object carries — the analysis in
+  `$result$table` and the tables in `$history`. `$data_original`, which is the
+  data as you passed it, is unchanged and keeps its class.
+
+  Add `tibble::as_tibble()` to the result if you want a tibble.
+
+* The analysed columns keep the type they were supplied with. `y`, and `n` for
+  a P or P′ chart, were coerced to double inside the algorithm, so integer counts
+  came back as doubles; they now come back as integers. The limits — `cl`, `ucl`
+  and `lcl` — are doubles as before, whatever the counts they were computed from.
+  Values are unchanged.
+
 * Columns other than those a chart uses are now dropped consistently. Previously
   the aggregation step was skipped entirely when no `x` value was repeated, so
   extra columns survived into the output for a series with one row per subgroup

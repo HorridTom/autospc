@@ -3,15 +3,7 @@
 form_calculation_limits <- function(data,
                                     counter,
                                     chart){
-  
-  #force columns into the correct type
-  if("y" %in% colnames(data)){
-    data$y <- as.double(data$y)
-  }
-  if("n" %in% colnames(data)){
-    data$n <- as.double(data$n)
-  }
-  
+
   if(counter == 1L & !is.null(chart$baseline_length)) {
     periodLength <- baseline_period_length(chart, data)
   } else {

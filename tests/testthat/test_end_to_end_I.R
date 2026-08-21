@@ -59,7 +59,7 @@ test_that("XMR chart process works end to end",{
     dplyr::select(x, y, cl, ucl, lcl,
                   mr, amr, url, lrl)
   
-  expect_equal(results, correct_answer_XMR)
+  expect_equal(results, as.data.frame(correct_answer_XMR))
   
 })
 
@@ -73,6 +73,6 @@ test_that("XMR chart works with numeric y",{
     dplyr::select(x, y, cl, ucl, lcl,
                   mr, amr, url, lrl)
   
-  expect_equal(results, correct_answer_XMR)
+  expect_equal(results, as.data.frame(correct_answer_XMR))
   
 })

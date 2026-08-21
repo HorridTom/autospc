@@ -21,6 +21,10 @@ correct_answer_CP <- readRDS("testdata/test_data_end_to_end/correct_answer_CP.rd
 correct_answer_P <- readRDS("testdata/test_data_end_to_end/correct_answer_P.rds")
 correct_answer_PP <- readRDS("testdata/test_data_end_to_end/correct_answer_PP.rds")
 
+# The stored answers were saved when autospc() returned a tibble for some chart
+# types. They hold the expected values, which have not changed; as.data.frame()
+# below compares them against the plain data frame autospc() now returns.
+
 test_that("C chart process works end to end",{
   
   results <- autospc(test_data, chart_type = "C", plot_chart = FALSE)
@@ -29,7 +33,7 @@ test_that("C chart process works end to end",{
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
                   highlight, limitChange, periodStart, plotPeriod)
   
-  expect_equal(results, correct_answer_C)
+  expect_equal(results, as.data.frame(correct_answer_C))
   
 })
 
@@ -41,7 +45,7 @@ test_that("C prime chart process works end to end",{
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
                   highlight, limitChange, periodStart, plotPeriod)
   
-  expect_equal(results, correct_answer_CP)
+  expect_equal(results, as.data.frame(correct_answer_CP))
   
 })
 
@@ -53,7 +57,7 @@ test_that("P chart process works end to end",{
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
                   highlight, limitChange, periodStart, plotPeriod)
   
-  expect_equal(results, correct_answer_P)
+  expect_equal(results, as.data.frame(correct_answer_P))
   
 })
 
@@ -65,7 +69,7 @@ test_that("P prime chart process works end to end",{
                   excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
                   highlight, limitChange, periodStart, plotPeriod)
   
-  expect_equal(results, correct_answer_PP)
+  expect_equal(results, as.data.frame(correct_answer_PP))
   
 })
 

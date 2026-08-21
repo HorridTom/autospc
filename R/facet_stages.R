@@ -240,16 +240,11 @@ create_splits_list <- function(df,
 #' @noRd
 autospc_argument_values <- function(given) {
 
-  defaults <- formals(autospc)
-  defaults <- defaults[setdiff(names(defaults), c("data", "x", "y", "n"))]
+  names_wanted <- setdiff(names(formals(autospc)),
+                          c("data", "x", "y", "n"))
 
-  # formals() gives each default as the expression it was written as, not as a
-  # value, so a default like getRversion() < "4.3.0" arrives as an unevaluated
-  # call. Evaluating in the package namespace is what R itself would do, and is
-  # what makes deprecated() - imported from lifecycle - resolvable.
-  values <- lapply(defaults,
-                   function(default) eval(default,
-                                          envir = asNamespace("autospc")))
+  values <- lapply(names_wanted, autospc_default)
+  names(values) <- names_wanted
 
   values[names(given)] <- given
 

@@ -83,7 +83,34 @@
   extra columns survived into the output for a series with one row per subgroup
   and were dropped for one without. They are now dropped in both cases.
 
+* `autospc(keep_candidate_tables)` is a new argument, `FALSE` by default. The
+  algorithm considers a candidate calculation period at each point where it might
+  re-establish the limits, and records each one it forms. Setting this to `TRUE`
+  additionally records, for each candidate, the full table of limits it would
+  have produced — which is what an application drawing the rejected periods
+  needs. It is off by default because those tables are several times the size of
+  everything else the chart holds: for a 600-point chart that re-establishes its
+  limits nine times, the chart object measured 111 KB with the default and 534 KB
+  with `keep_candidate_tables = TRUE`.
+
+* The default values of `period_min` and `max_exclusions` are now the integers
+  `21L` and `3L`, where they were the doubles `21` and `3`. Both are counts of
+  data points. Passing a double still works.
+
+* A rounding warning is no longer given for data that is then rejected. A P or P′
+  chart given a numerator with fractional values and a denominator of the wrong
+  type warned that it was rounding the numerator before erroring on the
+  denominator; it now raises the error without the warning.
+
 ## Bug fixes
+
+* Data holding a column called `x`, `y` or `n` no longer prevents a different
+  column being used for that argument. `autospc(data, x = month, y = count)`,
+  where `data` also has a column called `x`, failed with `Names must be unique`;
+  the column named in the argument is now used and the column called `x` is
+  dropped, along with the other columns the analysis does not use. The data as
+  supplied is unaffected. `facet_stages()` warned in the same situation and then
+  failed the same way; it now behaves as `autospc()` does.
 
 * `facet_stages()` now labels its axes. It resolved the axis titles and then
   never passed them to the drawing, so a faceted chart had no axis labels at

@@ -52,6 +52,21 @@ test_that("defaults populated as expected", {
 })
 
 
+test_that("a chart built without chart parameters takes autospc()'s defaults", {
+
+  chart <- test_chart_c()
+
+  for(parameter in autospc_chart_parameters()) {
+
+    expect_identical(chart[[parameter]],
+                     autospc_default(parameter),
+                     info = parameter)
+
+  }
+
+})
+
+
 test_that("data_original is populated correctly", {
   
   chart <- test_chart_c()
@@ -113,18 +128,6 @@ test_that("validate_autospc_chart_c returns a valid object unchanged", {
   chart <- test_chart_c()
 
   expect_identical(validate_autospc_chart_c(chart), chart)
-
-})
-
-
-test_that("internal defaults match autospc()", {
-
-  skip("Pending worklist Deferred #4 - integer/double defaults")
-
-  expect_identical(formals(autospc)$period_min,
-                   formals(autospc_chart_list)$period_min)
-  expect_identical(formals(autospc)$max_exclusions,
-                   formals(autospc_chart_list)$max_exclusions)
 
 })
 

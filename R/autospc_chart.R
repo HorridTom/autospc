@@ -271,30 +271,34 @@ autospc_chart <- function(chart_type,
 #' Assemble the elements common to all autospc_chart objects
 #'
 #' Assembles the shared elements and returns a plain, unclassed list, which each
-#' subclass helper then appends to, constructs from and validates. Defaults for
-#' the shared elements live here.
+#' subclass helper then appends to, constructs from and validates.
+#'
+#' Each default is read from the corresponding argument of `autospc()`, which is
+#' where every default in the package is declared. Writing the values here as
+#' well would mean two declarations that could disagree.
 #'
 #' The signature is deliberately **closed**
 #'
 #' @return A named list holding the elements given by
 #'   `autospc_chart_elements()`.
 #' @noRd
-autospc_chart_list <- function(data,
-                               x,
-                               y,
-                               period_min = 21L,
-                               baseline_length = NULL,
-                               shift_rule_threshold = 8L,
-                               baseline_only = FALSE,
-                               establish_every_shift = FALSE,
-                               no_regrets = TRUE,
-                               overhanging_reversions = TRUE,
-                               max_exclusions = 3L,
-                               mr_screen_max_loops = 1L,
-                               centre_line_tolerance = 0,
-                               floating_median = "no",
-                               floating_median_n = 12L,
-                               keep_candidate_tables = FALSE) {
+autospc_chart_list <- function(
+    data,
+    x,
+    y,
+    period_min = autospc_default("period_min"),
+    baseline_length = autospc_default("baseline_length"),
+    shift_rule_threshold = autospc_default("shift_rule_threshold"),
+    baseline_only = autospc_default("baseline_only"),
+    establish_every_shift = autospc_default("establish_every_shift"),
+    no_regrets = autospc_default("no_regrets"),
+    overhanging_reversions = autospc_default("overhanging_reversions"),
+    max_exclusions = autospc_default("max_exclusions"),
+    mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
+    centre_line_tolerance = autospc_default("centre_line_tolerance"),
+    floating_median = autospc_default("floating_median"),
+    floating_median_n = autospc_default("floating_median_n"),
+    keep_candidate_tables = autospc_default("keep_candidate_tables")) {
   
   autospc_chart_l <- list(
     data = data,

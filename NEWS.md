@@ -33,6 +33,16 @@
 
 ### Deprecations
 
+* `autospc(write_table)` is deprecated, and no longer writes a file. Save the
+  results yourself instead: `autospc(plot_chart = FALSE)` returns them as a data
+  frame, and `as.data.frame()` on a chart does the same. This is more flexible,
+  giving you the choice of what type of file, how to save it, where to save it,
+  etc.
+
+  Note that there was also a bug that meant the feature did not work:
+  `write_table = TRUE` failed. Supplying the argument now warns, and returns the
+  results as `plot_chart = FALSE` would.
+
 * `autospc(show_mr)` is deprecated. Use `chart_type` instead: `chart_type = "X"`
   draws the X chart on its own, which is what `show_mr = FALSE` did, and
   `chart_type = "XMR"` draws the pair. Supplying `show_mr` still works and still

@@ -70,3 +70,52 @@ test_that("period_min is the floor, not baseline_length", {
   expect_false("cl" %in% colnames(result))
 
 })
+
+
+# baseline_only
+
+
+analysed_ed <- function(...) {
+
+  autospc(ed_attendances_monthly,
+          chart_type = "C'",
+          x = month_start,
+          y = att_all,
+          period_min = 21L,
+          plot_chart = FALSE,
+          ...)
+
+}
+
+
+n_calculation_periods <- function(result) {
+
+  calculation <- result[result$periodType == "calculation", ]
+
+  length(unique(calculation$plotPeriod))
+
+}
+
+
+test_that("baseline_only stops the limits being re-established", {
+
+  # this series re-establishes its limits several times when it is allowed to,
+  # so a single calculation period is the effect of the setting rather than of
+  # the data
+  expect_identical(n_calculation_periods(analysed_ed(baseline_only = TRUE)), 1L)
+
+  expect_gt(n_calculation_periods(analysed_ed(baseline_only = FALSE)), 1L)
+
+})
+
+
+test_that("baseline_only keeps the limits of the first period throughout", {
+
+  result <- analysed_ed(baseline_only = TRUE)
+
+  expect_identical(unique(result$cl), result$cl[1])
+
+  # the points after the calculation period are drawn against those limits
+  expect_setequal(unique(result$periodType), c("calculation", "display"))
+
+})

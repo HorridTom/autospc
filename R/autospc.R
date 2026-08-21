@@ -82,8 +82,10 @@
 #' @param show_mr `r lifecycle::badge("deprecated")` Use `chart_type` instead.
 #' `chart_type = "XMR"` draws the pair and `chart_type = "X"` draws the X
 #' chart on its own, which is what `show_mr = FALSE` did.
-#' @param write_table Boolean specifying whether to save the data as a CSV 
-#' (useful for doing lots of charts at a time).
+#' @param write_table `r lifecycle::badge("deprecated")` Save the results
+#' yourself instead. `autospc(plot_chart = FALSE)` returns them as a data frame,
+#' and `as.data.frame()` on a chart does the same, either of which can be
+#' written to a path of your choosing.
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
 #' none if 0.
@@ -199,7 +201,7 @@ autospc <- function(data,
                     plot_chart = TRUE,
                     show_limits = TRUE,
                     show_mr = deprecated(),
-                    write_table = FALSE,
+                    write_table = deprecated(),
                     verbosity = 0L,
                     log_file_path = NULL,
                     keep_candidate_tables = FALSE,
@@ -252,6 +254,18 @@ autospc <- function(data,
                       "every chart type, so a P or P' chart no longer needs an",
                       "argument of its own. The equivalent scale factor is",
                       "1 + 1/x.")
+    )
+  }
+
+  if(lifecycle::is_present(write_table)) {
+    lifecycle::deprecate_warn(
+      when = "0.0.0.9051",
+      what = "autospc(write_table)",
+      details = paste("Save the results yourself instead:",
+                      "autospc(plot_chart = FALSE) returns them as a data",
+                      "frame, and as.data.frame() on a chart does the same.",
+                      "Either can be written with write.csv() to a path of",
+                      "your choosing. No file has been written.")
     )
   }
 
@@ -409,19 +423,6 @@ autospc <- function(data,
                           passed = passed,
                           derived = derived)) # Chart output
 
-    } else if(write_table) {
-      # (!plot_chart)
-      
-      title <- gsub(":", "_",title)
-      subtitle <- gsub(":","_", subtitle)
-      write.csv(df,
-                paste0("tables/",
-                       gsub(" ", "_", title),
-                       "_",
-                       gsub(" ", "_", subtitle,),
-                       ".csv"),
-                row.names = FALSE)
-      
     } else {
       # (!plot_chart)
       

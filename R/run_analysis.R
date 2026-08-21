@@ -25,7 +25,7 @@
 #'
 #' @return A list of the built `charts`; the analysed first `chart` with its
 #'   drawable `data`, `derived` axis extents and `axis_titles`; the resolved
-#'   `passed`; and `chart_type` and `xType`.
+#'   `passed`; and the `chart_type`.
 #' @noRd
 analyse_series <- function(data,
                            chart_type,
@@ -38,7 +38,7 @@ analyse_series <- function(data,
 
   # autospc_chart() has no branch for a chart type outside
   # autospc_chart_types(), so chart_type has to be valid before the object is
-  # built. preprocess_inputs() checks it again.
+  # built.
   validate_chart_type(chart_type)
 
   # The charts are built from the data exactly as passed. build_charts() renames
@@ -53,22 +53,17 @@ analyse_series <- function(data,
 
   chart <- charts_list[[1]]
 
-  preprocessed_vars <- preprocess_inputs(
-    df = chart$data,
-    chart_type = chart_type,
-    title = passed$title,
-    subtitle = passed$subtitle
-  )
+  check_x_type(chart$data)
 
-  chart$data <- preprocessed_vars$df
-  chart_type <- preprocessed_vars$chart_type
-  xType      <- preprocessed_vars$xType
+  titles <- titles_from_data(data = chart$data_original,
+                             title = passed$title,
+                             subtitle = passed$subtitle)
 
   # Assigned as single-element lists: `passed$title <- NULL` would delete
   # the element rather than set it, so the list's shape would depend on
   # whether a title was given.
-  passed["title"]    <- list(preprocessed_vars$title)
-  passed["subtitle"] <- list(preprocessed_vars$subtitle)
+  passed["title"]    <- list(titles$title)
+  passed["subtitle"] <- list(titles$subtitle)
 
   # Centre line labels sit a scale factor above the upper control limit, and
   # the lower factor is its mirror image about 1. Only the upper default asks
@@ -83,7 +78,6 @@ analyse_series <- function(data,
   }
 
   analysis <- run_analysis(chart = chart,
-                           xType = xType,
                            passed = passed,
                            extend_limits_to = extend_limits_to)
 
@@ -93,8 +87,7 @@ analyse_series <- function(data,
               derived = analysis$derived,
               axis_titles = analysis$axis_titles,
               passed = passed,
-              chart_type = chart_type,
-              xType = xType))
+              chart_type = chart_type))
 
 }
 
@@ -113,7 +106,6 @@ analyse_series <- function(data,
 #'   axis extents, and the resolved `axis_titles`.
 #' @noRd
 run_analysis <- function(chart,
-                         xType,
                          passed,
                          extend_limits_to) {
 
@@ -132,8 +124,7 @@ run_analysis <- function(chart,
     override_y_title = passed$override_y_title,
     override_y_lim = passed$override_y_lim,
     x_pad_end = passed$x_pad_end,
-    extend_limits_to = extend_limits_to,
-    xType = xType
+    extend_limits_to = extend_limits_to
   )
 
   data <- postprocessing_vars$df

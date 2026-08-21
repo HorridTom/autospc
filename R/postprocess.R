@@ -9,8 +9,7 @@ postprocess <- function(
     override_y_title = NULL,
     override_y_lim = NULL,
     x_pad_end = NULL,
-    extend_limits_to = NULL,
-    xType
+    extend_limits_to = NULL
 ) {
   
   # Start and end dates
@@ -48,12 +47,6 @@ postprocess <- function(
   
   if(is.null(override_y_title)) {
     override_y_title <- ytitle
-  }
-  
-  # Convert x column back to date if necessary
-  if(any(xType == "Date")) { 
-    df <- df %>%
-      dplyr::mutate(x = as.Date(x))
   }
   
   return(list(

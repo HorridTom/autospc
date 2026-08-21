@@ -69,19 +69,30 @@ facet_stages <- function(data,
   chart_args <- arguments[autospc_chart_parameters()]
   passed     <- arguments[autospc_plot_passed_elements()]
 
-  df_rn <- eval(rlang::call2("rename_columns",
-                             df = data,
-                             !!!xyn_exprs))
+  chart_type <- arguments$chart_type
 
-  preprocessed_vars <- preprocess_inputs(df = df_rn,
-                                         chart_type = arguments$chart_type,
-                                         title = passed$title,
-                                         subtitle = passed$subtitle)
+  validate_chart_type(chart_type)
 
-  chart_type <- preprocessed_vars$chart_type
-  title      <- preprocessed_vars$title
-  subtitle   <- preprocessed_vars$subtitle
-  xType      <- preprocessed_vars$xType
+  # One chart of the whole series, built for its data rather than to be
+  # analysed: the columns come out named x, y and n, the column requirements are
+  # checked, and any counts are rounded - each of them once for the call rather
+  # than once per facet. The chart parameters are left out because none of them
+  # touches the data.
+  whole_series <- autospc_chart(chart_type = chart_type,
+                                data = data,
+                                x = column_name_of(xyn_exprs, "x"),
+                                y = column_name_of(xyn_exprs, "y"),
+                                n = column_name_of(xyn_exprs, "n"))
+
+  df_rn <- whole_series$data
+
+  check_x_type(df_rn)
+
+  titles   <- titles_from_data(data = data,
+                               title = passed$title,
+                               subtitle = passed$subtitle)
+  title    <- titles$title
+  subtitle <- titles$subtitle
 
   split_rows <- sort(split_rows)
 
@@ -159,8 +170,7 @@ facet_stages <- function(data,
     override_y_title = passed$override_y_title,
     override_y_lim = passed$override_y_lim,
     x_pad_end = passed$x_pad_end,
-    extend_limits_to = arguments$extend_limits_to,
-    xType = xType
+    extend_limits_to = arguments$extend_limits_to
   )
 
   derived <- list(start_x = postprocessing_vars$start_x,

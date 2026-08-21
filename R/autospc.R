@@ -324,7 +324,6 @@ autospc <- function(data,
   data        <- analysis$data
   derived     <- analysis$derived
   chart_type  <- analysis$chart_type
-  xType       <- analysis$xType
 
   override_x_title <- analysis$axis_titles$x
   override_y_title <- analysis$axis_titles$y
@@ -365,7 +364,6 @@ autospc <- function(data,
     if((chart_type == "XMR") & show_mr) {
 
       mr <- run_analysis(chart = charts_list[[2]],
-                         xType = xType,
                          passed = analysis$passed,
                          extend_limits_to = extend_limits_to)
 

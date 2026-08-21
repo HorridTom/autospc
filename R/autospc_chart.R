@@ -32,11 +32,14 @@ new_autospc_chart <- function(x = list(),
 #' Additional elements are permitted - subclasses add their own
 #'
 #' **`data` and `data_original`.** `data_original` is what the user supplied,
-#' untouched. `data` is prepared input: its columns are named `x`, `y` and,
-#' where the class has one, `n` from the moment the object exists, and after
-#' `prepare_data()` its `y` is *the series under analysis*, which is not always
-#' the column the user passed. For MR it holds the moving ranges; for P and P'
-#' it holds percentages, with the counts kept as `y_numerator`.
+#' untouched. `data` is prepared input: from the moment the object exists it
+#' holds the columns the analysis uses and no others - `x`, `y` and, where the
+#' class has one, `n` - named for the fields they fill rather than for the
+#' columns they came from, meeting the class's column requirements, and with any
+#' counts whole. After `prepare_data()` its `y` is *the series under analysis*,
+#' which is not always the column the user passed. For MR it holds the moving
+#' ranges; for P and P' it holds percentages, with the counts kept as
+#' `y_numerator`.
 #'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd

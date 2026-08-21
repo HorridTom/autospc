@@ -9,10 +9,13 @@
 # three rows, one per subgroup
 test_data <- data.frame(x = 1:3, y = 1:3)
 
-# two rows per subgroup, plus a column the aggregation is expected to drop
+# two rows per subgroup, plus a column no chart keeps: construction takes only
+# the columns the analysis uses
 dup_data <- data.frame(x = rep(1:3, each = 2),
                        y = c(1, 2, 10, 20, 100, 200),
                        site = "a")
+
+dup_data_analysed <- dup_data[c("x", "y")]
 
 # a calculation period of counts with one obvious high point, so that excluding
 # it demonstrably moves the limits. Named for the count charts because the

@@ -76,13 +76,13 @@ test_that("the series comes back in x order", {
 
 test_that("ordering is stable, so rows sharing an x keep the order they arrived in", {
 
+  # the y values say which row is which: 10 arrived before 11, and 20 before 21
   tied <- data.frame(x = c(2L, 1L, 2L, 1L),
-                     y = c(20, 10, 21, 11),
-                     tag = c("first_2", "first_1", "second_2", "second_1"))
+                     y = c(20, 10, 21, 11))
 
   chart <- autospc_chart_c(data = tied, x = "x", y = "y")
 
-  expect_identical(order_series(chart)$data$tag,
-                   c("first_1", "second_1", "first_2", "second_2"))
+  expect_identical(order_series(chart)$data$y,
+                   c(10, 11, 20, 21))
 
 })

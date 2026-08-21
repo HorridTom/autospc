@@ -59,6 +59,21 @@ test_that("a title passed as an argument is rendered once", {
 })
 
 
+test_that("a title passed as an argument wins over one in the data", {
+
+  texts <- panel_texts(run_pair(pair_titled,
+                                title = "Passed in",
+                                subtitle = "And this"))
+
+  expect_identical(sum(texts == "Passed in"), 1L)
+
+  expect_false(any(texts == "From the data"))
+
+  expect_false(any(texts == "Also from the data"))
+
+})
+
+
 # the moving range analysis
 
 

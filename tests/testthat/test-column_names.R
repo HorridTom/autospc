@@ -70,11 +70,41 @@ test_that("the source column names are retained on the object", {
 })
 
 
-test_that("columns other than the named ones are left alone", {
+test_that("columns other than the named ones are not carried into the analysis", {
 
   chart <- autospc_chart_c(data = user_data, x = "month_start", y = "att_all")
 
-  expect_true("site" %in% names(chart$data))
+  expect_identical(names(chart$data), c("x", "y"))
+
+})
+
+
+test_that("the data as passed is kept whole, under the names it was passed with", {
+
+  chart <- autospc_chart_c(data = user_data, x = "month_start", y = "att_all")
+
+  expect_identical(chart$data_original, user_data)
+
+})
+
+
+test_that("a column already named x does not stop another being named as x", {
+
+  clashing <- user_data
+  clashing$x <- seq_len(nrow(clashing))
+
+  chart <- autospc_chart_c(data = clashing, x = "month_start", y = "att_all")
+
+  expect_identical(chart$data$x, user_data$month_start)
+
+})
+
+
+test_that("a column named as x that is not there is still an error", {
+
+  expect_error(
+    autospc_chart_c(data = user_data, x = "not_a_column", y = "att_all")
+  )
 
 })
 

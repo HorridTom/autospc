@@ -446,3 +446,41 @@ test_that("leaving out chart_type says so, rather than failing on a length", {
   expect_no_match(message, "argument is of length zero", fixed = TRUE)
 
 })
+
+
+test_that("a rounding warning is given once for the call, not once per facet", {
+
+  fractional <- data.frame(x = 1:90,
+                           y = rep(c(10.4, 12.6, 11.5, 13.4, 9.6, 14.4), 15L))
+
+  warnings_given <- character()
+
+  withCallingHandlers(
+    facet_stages(fractional, split_rows = c(30L, 60L, 90L), chart_type = "C",
+                 period_min = 21L, plot_chart = FALSE),
+    warning = function(w) {
+      warnings_given <<- c(warnings_given, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  rounding <- grepl("Rounding to the nearest whole", warnings_given, fixed = TRUE)
+
+  expect_identical(sum(rounding), 1L)
+
+})
+
+
+test_that("the facets are analysed from the rounded counts", {
+
+  fractional <- data.frame(x = 1:90,
+                           y = rep(c(10.4, 12.6, 11.5, 13.4, 9.6, 14.4), 15L))
+
+  result <- suppressWarnings(
+    facet_stages(fractional, split_rows = c(30L, 60L, 90L), chart_type = "C",
+                 period_min = 21L, plot_chart = FALSE)
+  )
+
+  expect_identical(result$y[result$stage == "3"], round(fractional$y))
+
+})

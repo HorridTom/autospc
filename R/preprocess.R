@@ -1,78 +1,56 @@
+# Preparing what a caller passed for the analysis and the drawing
 
-preprocess_inputs <- function(
-    df,
-    chart_type,
-    title = NULL,
-    subtitle = NULL) {
-  
-  validate_chart_type(chart_type)
 
-  #get title from data
-  if(is.null(title) & "title" %in% colnames(df)) {
-    title <- df$title[1]
+#' The title and subtitle a plot is drawn with
+#'
+#' A `title` or `subtitle` column in the data is one the caller has put there
+#' for the chart, and is used where they gave no argument. Only the first row is
+#' read: one series, one title.
+#'
+#' Read from the data as it was passed, rather than from `chart$data`, because a
+#' chart keeps only the columns its analysis uses.
+#'
+#' @return A list of `title` and `subtitle`, either of which may be NULL.
+#' @noRd
+titles_from_data <- function(data,
+                             title = NULL,
+                             subtitle = NULL) {
+
+  if(is.null(title) & "title" %in% colnames(data)) {
+    title <- data$title[1]
   }
-  
-  if(is.null(subtitle) & "subtitle" %in% colnames(df)) {
-    subtitle <- df$subtitle[1]
+
+  if(is.null(subtitle) & "subtitle" %in% colnames(data)) {
+    subtitle <- data$subtitle[1]
   }
-  
-  #get type from x variable so that ggplot axes are correct
-  #currently only accepting Date, numeric and integer as acceptable types
-  xType <- class(df$x)
-  if(all(xType != "Date") & 
-     all(xType!= c("POSIXct", "POSIXt")) & 
-     all(xType != "numeric") & 
-     all(xType != "integer")) {
-    warning(paste("Please make sure that your x column is a",
-                  "'Date', 'POSIXct', 'numeric' or 'integer' type."))
-  }
-  
-  return(list(
-    df = df,
-    chart_type = chart_type,
-    title = title,
-    subtitle = subtitle,
-    xType = xType
-  ))
+
+  return(list(title = title,
+              subtitle = subtitle))
 
 }
 
 
-# Function to rename columns
-rename_columns <- function(df, x, y, n) {
-  
-  data_colnames <- colnames(df)
-  
-  x <- rlang::enquo(x)
-  y <- rlang::enquo(y)
-  n <- rlang::enquo(n)
-  
-  # Rename columns to standard names
-  if(!rlang::quo_is_missing(x)) {
-    if("x" %in% data_colnames) {
-      warning("x is present in the data and specified as an argument.
-The column specified in the argument x will be used.")
-    }
-    df <- df %>% dplyr::rename(x = !!x)
-  }
-  
-  if(!rlang::quo_is_missing(y)) {
-    if("y" %in% data_colnames) {
-      warning("y is present in the data and specified as an argument.
-The column specified in the argument y will be used.")
-    }
-    df <- df %>% dplyr::rename(y = !!y)
-  }
-  
-  if(!rlang::quo_is_missing(n)) {
-    if("n" %in% data_colnames) {
-      warning("n is present in the data and specified as an argument.
-The column specified in the argument n will be used.")
-    }
-    df <- df %>% dplyr::rename(n = !!n)
+#' Warn where x is not a type the axis can be built from
+#'
+#' Date, POSIXct, numeric and integer are what the scales in `visualisation.R`
+#' know how to draw. Anything else is a warning rather than an error, because
+#' the analysis itself only needs x to order the rows.
+#'
+#' @return invisible TRUE
+#' @noRd
+check_x_type <- function(data) {
+
+  xType <- class(data$x)
+
+  if(all(xType != "Date") &
+     all(xType!= c("POSIXct", "POSIXt")) &
+     all(xType != "numeric") &
+     all(xType != "integer")) {
+    warning(paste("Please make sure that your x column is a",
+                  "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
 
-  return(df)
+  invisible(TRUE)
 
 }
 

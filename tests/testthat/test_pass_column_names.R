@@ -21,3 +21,35 @@ test_that("Renaming columns doesn't change the result",{
   testthat::expect_equal(result1, result2)
   
 })
+
+
+# a column already named x, y or n, and a different one named as that field
+
+
+clashing_data <- data.frame(x = rep("not the x column", 30L),
+                            month = 1:30,
+                            count = rep(c(10L, 12L, 11L, 13L, 9L, 14L), 5L))
+
+
+test_that("a column already named x does not stop another being named as x", {
+
+  result <- suppressWarnings(
+    autospc(clashing_data, chart_type = "C", x = month, y = count,
+            period_min = 21L, plot_chart = FALSE)
+  )
+
+  expect_identical(result$x, clashing_data$month)
+
+})
+
+
+test_that("facet_stages settles a clash the same way", {
+
+  result <- suppressWarnings(
+    facet_stages(clashing_data, split_rows = c(15L, 30L), chart_type = "C",
+                 x = month, y = count, period_min = 21L, plot_chart = FALSE)
+  )
+
+  expect_identical(unique(result$x), clashing_data$month)
+
+})

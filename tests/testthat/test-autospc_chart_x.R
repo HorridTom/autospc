@@ -110,7 +110,7 @@ test_that("aggregate_data leaves an X chart untouched", {
   chart <- dup_chart_x()
 
   expect_identical(aggregate_data(chart), chart)
-  expect_identical(aggregate_data(chart)$data, dup_data)
+  expect_identical(aggregate_data(chart)$data, dup_data_analysed)
 
 })
 

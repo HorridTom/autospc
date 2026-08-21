@@ -32,14 +32,14 @@ new_autospc_chart <- function(x = list(),
 #' Additional elements are permitted - subclasses add their own
 #'
 #' **`data` and `data_original`.** `data_original` is what the user supplied,
-#' untouched. `data` is prepared input: from the moment the object exists it
-#' holds the columns the analysis uses and no others - `x`, `y` and, where the
-#' class has one, `n` - named for the fields they fill rather than for the
-#' columns they came from, meeting the class's column requirements, and with any
-#' counts whole. After `prepare_data()` its `y` is *the series under analysis*,
-#' which is not always the column the user passed. For MR it holds the moving
-#' ranges; for P and P' it holds percentages, with the counts kept as
-#' `y_numerator`.
+#' untouched. `data` is prepared input. From the moment the object exists it
+#' holds only the columns the analysis uses - `x`, `y` and, where the class has
+#' one, `n` - renamed from the columns the user named for those arguments; those
+#' columns meet the class's requirements on presence and type, and any counts
+#' among them are whole numbers. After `prepare_data()` its `y` is *the series
+#' under analysis*, which is not always the column the user passed. For MR it
+#' holds the moving ranges; for P and P' it holds percentages, with the counts
+#' kept as `y_numerator`.
 #'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
@@ -93,6 +93,7 @@ autospc_chart_elements <- function() {
     "centre_line_tolerance",
     "floating_median",
     "floating_median_n",
+    "keep_candidate_tables",
     "data_original",
     # the analysis
     "result",
@@ -292,7 +293,8 @@ autospc_chart_list <- function(data,
                                mr_screen_max_loops = 1L,
                                centre_line_tolerance = 0,
                                floating_median = "no",
-                               floating_median_n = 12L) {
+                               floating_median_n = 12L,
+                               keep_candidate_tables = FALSE) {
   
   autospc_chart_l <- list(
     data = data,
@@ -310,6 +312,7 @@ autospc_chart_list <- function(data,
     centre_line_tolerance = centre_line_tolerance,
     floating_median = floating_median,
     floating_median_n = floating_median_n,
+    keep_candidate_tables = keep_candidate_tables,
     # derived fields
     data_original = data,
     # the analysis, empty until the algorithm runs
@@ -327,8 +330,9 @@ autospc_chart_list <- function(data,
 
 #' Round the count columns to whole numbers
 #'
-#' Returns the chart unchanged: a chart type whose y is a measurement rather
-#' than a count has nothing to round. The count charts override this.
+#' Returns the chart unchanged, because for chart types whose y is a measurement
+#' rather than a count there is nothing to round. The count charts override
+#' this.
 #'
 #' @return autospc_chart object of the same class as chart
 #' @noRd

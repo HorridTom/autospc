@@ -3,12 +3,12 @@
 
 #' The title and subtitle a plot is drawn with
 #'
-#' A `title` or `subtitle` column in the data is one the caller has put there
-#' for the chart, and is used where they gave no argument. Only the first row is
-#' read: one series, one title.
+#' Where the data holds a `title` or `subtitle` column and the corresponding
+#' argument is NULL, the value in the first row of that column is used. The
+#' argument takes precedence when both are given.
 #'
-#' Read from the data as it was passed, rather than from `chart$data`, because a
-#' chart keeps only the columns its analysis uses.
+#' `data` here is the data frame the caller passed, not `chart$data`, which
+#' holds only the columns the analysis uses.
 #'
 #' @return A list of `title` and `subtitle`, either of which may be NULL.
 #' @noRd

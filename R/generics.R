@@ -2,9 +2,10 @@
 
 #' Round the count columns to whole numbers
 #'
-#' Runs at construction, so a chart's counts are whole before anything is
-#' derived from them - the P and P' aggregation sums them, and summing rounded
-#' counts is not rounding a summed one.
+#' Called at construction, so that the counts are whole numbers before any
+#' calculation uses them. This matters because `aggregate_data()` sums the
+#' counts within each subgroup, and the sum of the rounded values is not always
+#' equal to the rounded sum.
 #'
 #' @return autospc_chart object of the same class as chart
 #' @noRd

@@ -68,3 +68,117 @@ test_that("a break with no position records nothing to be against", {
   expect_identical(chart$history$breaks$cl, NA_real_)
 
 })
+
+
+# keep_candidate_tables
+
+
+# example_series_2a produces two candidates, one rejected and one accepted
+candidates_of <- function(...) {
+
+  chart <- autospc_chart(chart_type = "C'",
+                         data = example_series_2a,
+                         x = "x",
+                         y = "y",
+                         ...)
+
+  run_limit_algorithm(prepare_data(chart))$history$candidates
+
+}
+
+
+test_that("a chart does not keep the candidate tables unless asked", {
+
+  candidates <- candidates_of()
+
+  expect_length(candidates, 2L)
+
+  expect_true(all(vapply(candidates,
+                         function(candidate) is.null(candidate$table),
+                         logical(1))))
+
+})
+
+
+test_that("keep_candidate_tables = TRUE keeps a full table per candidate", {
+
+  candidates <- candidates_of(keep_candidate_tables = TRUE)
+
+  expect_true(all(vapply(candidates,
+                         function(candidate) {
+                           nrow(candidate$table) == nrow(example_series_2a)
+                         },
+                         logical(1))))
+
+})
+
+
+test_that("a candidate has the same element names either way", {
+
+  # the table element is present and NULL rather than being absent, so that the
+  # names of a candidate do not depend on the argument
+  expect_identical(names(candidates_of()[[1]]),
+                   names(candidates_of(keep_candidate_tables = TRUE)[[1]]))
+
+})
+
+
+test_that("everything else the candidates record is unaffected", {
+
+  without <- candidates_of()
+  with    <- candidates_of(keep_candidate_tables = TRUE)
+
+  without_tables <- lapply(with,
+                           function(candidate) {
+                             candidate$table <- NULL
+                             candidate
+                           })
+
+  expect_equal(lapply(without,
+                      function(candidate) {
+                        candidate$table <- NULL
+                        candidate
+                      }),
+               without_tables)
+
+})
+
+
+test_that("the chart records whether it was asked to keep them", {
+
+  expect_false(new_chart()$keep_candidate_tables)
+
+  expect_true(new_chart(keep_candidate_tables = TRUE)$keep_candidate_tables)
+
+})
+
+
+test_that("autospc passes the argument down to the chart", {
+
+  plot <- suppressWarnings(
+    autospc(example_series_2a, chart_type = "C'", x = x, y = y,
+            keep_candidate_tables = TRUE)
+  )
+
+  candidates <- autospc_plot_charts(plot)[[1]]$history$candidates
+
+  expect_false(any(vapply(candidates,
+                          function(candidate) is.null(candidate$table),
+                          logical(1))))
+
+})
+
+
+test_that("the log text is the same whether the tables are kept or not", {
+
+  log_of <- function(...) {
+    result <- suppressWarnings(
+      autospc(example_series_2a, chart_type = "C'", x = x, y = y,
+              plot_chart = FALSE, ...)
+    )
+    result$log
+  }
+
+  expect_identical(log_of(), log_of(keep_candidate_tables = TRUE))
+
+})

@@ -9,8 +9,8 @@
 # three rows, one per subgroup
 test_data <- data.frame(x = 1:3, y = 1:3)
 
-# two rows per subgroup, plus a column no chart keeps: construction takes only
-# the columns the analysis uses
+# two rows per subgroup, plus a column that no chart retains, because
+# construction selects only the columns the analysis uses
 dup_data <- data.frame(x = rep(1:3, each = 2),
                        y = c(1, 2, 10, 20, 100, 200),
                        site = "a")

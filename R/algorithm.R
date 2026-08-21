@@ -166,7 +166,10 @@ run_limit_algorithm <- function(chart) {
                   chart$no_regrets == FALSE))
 
               # Record the candidate. Rejected candidates are not retained
-              # anywhere else.
+              # anywhere else. The table of limits the candidate would have
+              # produced is recorded only if keep_candidate_tables is TRUE,
+              # because each one is a copy of the whole limits table and there
+              # is one per candidate.
               period_end <- min(counter + chart$period_min - 1L,
                                 nrow(limits_table))
               prevailing_row <- if(counter > 1L) as.integer(counter) - 1L else
@@ -178,7 +181,8 @@ run_limit_algorithm <- function(chart) {
                   counter            = as.integer(counter),
                   period_rows        = counter:period_end,
                   trigger_direction  = triggering_rule_break_direction,
-                  table              = candidate_limits_table,
+                  table              = if(chart$keep_candidate_tables)
+                    candidate_limits_table else NULL,
                   prevailing         = list(
                     last_row = prevailing_row,
                     cl       = limits_table$cl[prevailing_row],

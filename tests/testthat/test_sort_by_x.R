@@ -76,7 +76,7 @@ test_that("the series comes back in x order", {
 
 test_that("ordering is stable, so rows sharing an x keep the order they arrived in", {
 
-  # the y values say which row is which: 10 arrived before 11, and 20 before 21
+  # the y values identify the rows: 10 is before 11 in the input, 20 before 21
   tied <- data.frame(x = c(2L, 1L, 2L, 1L),
                      y = c(20, 10, 21, 11))
 

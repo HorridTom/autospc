@@ -28,7 +28,7 @@ resolve_column_name <- function(column,
 }
 
 
-#' The column name given by one of `facet_stages()`'s x, y and n arguments
+#' The column name one of `facet_stages()`'s x, y and n arguments gives
 #'
 #' `facet_stages()` holds its arguments as expressions rather than as quosures,
 #' because it forwards them to `autospc()`. An argument the caller left out
@@ -50,21 +50,22 @@ column_name_of <- function(exprs,
 }
 
 
-#' Take the named columns out of a chart's data, under the names x, y and n
+#' Select the columns the analysis uses, and name them x, y and n
 #'
-#' `data` comes out carrying the columns the analysis uses and nothing else -
-#' `x`, `y` and, where the class has one, `n` - each named for the field it
-#' fills rather than for the column it came from. `data_original` still holds
-#' everything the caller passed, under the names they passed it with.
+#' `chart_list$data` is returned holding only `x`, `y` and, where the class has
+#' one, `n`, each renamed from the column the caller named for that argument.
+#' `chart_list$data_original` still holds every column the caller passed, under
+#' its original name.
 #'
-#' Selecting rather than renaming is what settles a column already named `x`
-#' where the caller named a different column as x: the one they named is the one
-#' kept, which is what they asked for, and the other goes with the rest of the
-#' columns the analysis does not use.
+#' `dplyr::select()` is used rather than `dplyr::rename()` so that data holding
+#' a column called `x`, where the caller passed a different column as `x`, is
+#' handled without error: the column the caller named is selected, and the one
+#' called `x` is dropped along with the other unused columns. `dplyr::rename()`
+#' would error, because the result would hold two columns called `x`.
 #'
 #' Called by each construction helper once all its fields are in place.
 #'
-#' @return the chart list, with `data` cut down to the named columns
+#' @return the chart list, with `data` reduced to the selected columns
 #' @noRd
 normalise_columns <- function(chart_list,
                               fields) {
@@ -81,12 +82,13 @@ normalise_columns <- function(chart_list,
 }
 
 
-#' Select the columns named by a field-to-column mapping
+#' Select and rename columns, given the column name for each field
 #'
-#' A column the caller named must be there, and its absence is their mistake to
-#' hear about. A column named only by the fallback may be absent: that is P and
-#' P' charts given individual binary observations, where no denominator column
-#' is supplied and `n` falls back to `"n"`.
+#' A column whose name differs from the field name was named by the caller, so
+#' it must be present and `dplyr::all_of()` errors if it is not. A column whose
+#' name equals the field name may be absent, and is skipped: this is the case
+#' for P and P' charts given individual binary observations, where no
+#' denominator column is supplied and `n` takes its default value of `"n"`.
 #'
 #' @param sources A character vector of column names, named for the fields they
 #'   fill.

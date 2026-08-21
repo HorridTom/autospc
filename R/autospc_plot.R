@@ -180,10 +180,14 @@ autospc_plot_presentation_elements <- function() {
 
 #' The presentation parameters a plot is drawn with
 #'
-#' The presentation half of the argument split, and the single source of it.
-#' `autospc()` builds its `passed` list from exactly these, and `facet_stages()`
-#' uses them to tell which of the arguments it was handed are presentation
-#' rather than chart. `test-autospc_plot.R` holds the drift test.
+#' The presentation half of the argument split, and the single definition of
+#' it. `autospc()` builds its `passed` list from exactly these, and
+#' `facet_stages()` uses them to select the presentation arguments from the ones
+#' it was passed.
+#'
+#' `autospc()` lists these parameter names again in its own source, so the two
+#' lists can differ without any error being raised. `test_chart_arguments.R`
+#' tests that each parameter named here is recorded on the plot object.
 #'
 #' @return A character vector of parameter names.
 #' @noRd

@@ -73,11 +73,12 @@ facet_stages <- function(data,
 
   validate_chart_type(chart_type)
 
-  # One chart of the whole series, built for its data rather than to be
-  # analysed: the columns come out named x, y and n, the column requirements are
-  # checked, and any counts are rounded - each of them once for the call rather
-  # than once per facet. The chart parameters are left out because none of them
-  # touches the data.
+  # Construct one chart from the whole series. It is not analysed: it is
+  # constructed for chart$data, which has the columns renamed to x, y and n, has
+  # been checked against the column requirements for the chart type, and has any
+  # counts rounded. Doing this here means each of those happens once per call
+  # rather than once per facet. The chart parameters are not passed because none
+  # of them affects chart$data.
   whole_series <- autospc_chart(chart_type = chart_type,
                                 data = data,
                                 x = column_name_of(xyn_exprs, "x"),

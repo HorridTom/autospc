@@ -17,9 +17,10 @@ data_column_validation_expected_conditions_y <- readRDS(
 chart_types_yn <- c("P", "P'")
 chart_types_y <- c("XMR", "X", "MR", "C", "C'")
 
-# The column requirements are checked when the chart is built, so building is
-# what these cases exercise. build_charts() takes "XMR" as well as the six
-# class names, and passes the data through unchanged.
+# The column requirements are checked in the class validators, which run when a
+# chart is constructed, so each case is tested by constructing a chart.
+# build_charts() is used rather than autospc_chart() because it accepts
+# chart_type = "XMR", constructing an X chart and an MR chart.
 build_from_columns <- function(df,
                                chart_type) {
 
@@ -32,8 +33,9 @@ build_from_columns <- function(df,
 }
 
 
-# A case expects an error or a warning, never both: the checks run before the
-# rounding, so a chart that is rejected is never repaired on the way out.
+# A case expects an error or a warning, never both, because the class validator
+# runs before round_counts(): if the data fails a requirement, construction
+# stops with an error and no rounding takes place.
 expect_conditions_of_case <- function(df,
                                       chart_type,
                                       expected_err,
@@ -115,10 +117,10 @@ for (chart_type in chart_types_y) {
 }
 
 
-# a rejected chart is not repaired on the way out
+# no rounding takes place when the data fails a requirement
 
 
-test_that("a P chart with a bad denominator errors without warning first", {
+test_that("a P chart with an invalid n column errors without warning first", {
 
   bad_denominator <- data.frame(x = 1:30,
                                 y = rep(c(10.4, 12.6, 11.5), 10L),

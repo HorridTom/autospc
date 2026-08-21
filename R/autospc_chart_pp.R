@@ -133,9 +133,9 @@ autospc_chart_pp <- function(data,
 
 #' Round the count columns to whole numbers
 #'
-#' Nothing to round where no denominator column was given: the numerator is
-#' then individual binary observations, which the validator has already
-#' required to be logical.
+#' Where the data has no n column there is nothing to round: y is then
+#' individual binary observations, which the validator has already required to
+#' be of type logical.
 #'
 #' @return autospc_chart_pp object
 #' @noRd

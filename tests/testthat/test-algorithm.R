@@ -1,11 +1,15 @@
 # The algorithm's decision history. example_series_2a forms two candidates: the
 # first is rejected under no_regrets, the second accepted.
+#
+# keep_candidate_tables is TRUE here because the assertions below read
+# candidate$table. It is FALSE by default - see test-history.R.
 
-analysed_2a <- function() {
+analysed_2a <- function(keep_candidate_tables = TRUE) {
   chart <- autospc_chart(chart_type = "C'",
                          data = example_series_2a,
                          x = "x",
-                         y = "y")
+                         y = "y",
+                         keep_candidate_tables = keep_candidate_tables)
   chart <- prepare_data(chart)
   run_limit_algorithm(chart)
 }
@@ -191,7 +195,8 @@ test_that("every identified break is recorded, with where it was found", {
 test_that("a break is against the prevailing limits, not a candidate's", {
 
   chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
-                         x = "x", y = "y")
+                         x = "x", y = "y",
+                         keep_candidate_tables = TRUE)
   analysed <- run_limit_algorithm(prepare_data(chart))
   breaks <- analysed$history$breaks
   rejected <- analysed$history$candidates[[1]]

@@ -1,6 +1,6 @@
-# The axis scales in visualisation.R are built for Date, POSIXct, numeric and
-# integer. Anything else is a warning rather than an error, because the analysis
-# only needs x to order the rows.
+# The axis scales in visualisation.R handle x columns of type Date, POSIXct,
+# numeric and integer. Any other type gives a warning rather than an error,
+# because the analysis itself only uses x to order the rows.
 
 x_type_message <- paste("Please make sure that your x column is a",
                         "'Date', 'POSIXct', 'numeric' or 'integer' type.")
@@ -12,7 +12,7 @@ x_type_data <- function(x) {
 
 }
 
-rounds_of_x_type_warning <- function(result) {
+count_x_type_warnings <- function(result) {
 
   warnings_given <- character()
 
@@ -78,7 +78,7 @@ test_that("a POSIXct x column is not warned about", {
 
 test_that("an XMR request is warned about once, not once per chart of the pair", {
 
-  count <- rounds_of_x_type_warning(
+  count <- count_x_type_warnings(
     autospc(x_type_data(as.character(1:30)), chart_type = "XMR",
             period_min = 21L, plot_chart = FALSE)
   )
@@ -90,10 +90,11 @@ test_that("an XMR request is warned about once, not once per chart of the pair",
 
 test_that("a faceted chart repeats the warning, once per facet and once more", {
 
-  # Four for three facets, measured on the code before check_x_type() existed
-  # and unchanged by it: facet_stages() checks the series it was given, and each
-  # facet is checked again as it is analysed. CLEAN UP #32.
-  count <- rounds_of_x_type_warning(
+  # Three facets give four warnings: facet_stages() checks the data it was
+  # passed, and each facet is checked again when it is analysed. The count was
+  # measured on the code before check_x_type() was written and is unchanged by
+  # it. CLEAN UP #32.
+  count <- count_x_type_warnings(
     facet_stages(x_type_data(as.character(1:30)),
                  split_rows = c(10L, 20L, 30L), chart_type = "C",
                  period_min = 21L, plot_chart = FALSE)

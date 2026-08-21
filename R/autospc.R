@@ -90,6 +90,12 @@
 #' @param log_file_path if not NULL (the default), path to save log file to.
 #' The file extension provided (.rds or .csv) determines the type of file the
 #' log data is saved to. Full log data is saved, regardless of verbosity.
+#' @param keep_candidate_tables Boolean specifying whether each candidate
+#' calculation period the algorithm considers keeps the table of limits it
+#' would have produced. The candidates themselves are recorded either way, with
+#' the reasons they were accepted or rejected; this is the full table of limits
+#' for each, which is what an application drawing the rejected periods needs and
+#' what makes an analysed chart several times larger.
 #' 
 #' ## Chart Appearance
 #' Arguments that control aspects of chart visualisation 
@@ -197,6 +203,7 @@ autospc <- function(data,
                     write_table = FALSE,
                     verbosity = 0L,
                     log_file_path = NULL,
+                    keep_candidate_tables = FALSE,
                     ## Chart Appearance
                     title = NULL,
                     subtitle = NULL,
@@ -278,7 +285,8 @@ autospc <- function(data,
     mr_screen_max_loops = mr_screen_max_loops,
     centre_line_tolerance = centre_line_tolerance,
     floating_median = floating_median,
-    floating_median_n = floating_median_n
+    floating_median_n = floating_median_n,
+    keep_candidate_tables = keep_candidate_tables
   )
 
   # The presentation parameters, as the caller gave them. analyse_series()

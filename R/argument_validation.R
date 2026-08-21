@@ -61,10 +61,10 @@ validate_chart_type <- function(chart_type) {
 
 #' Stop unless a column is present in the data
 #'
-#' `message` is the error the caller wants the user to read, so each class can
-#' name itself and the columns it requires.
+#' The error text is passed in as `message` so that each class can give the
+#' wording for the columns it requires.
 #'
-#' @return invisible TRUE, or an error carrying `message`
+#' @return invisible TRUE, or an error with `message` as its text
 #' @noRd
 require_column <- function(data,
                            column,
@@ -79,12 +79,12 @@ require_column <- function(data,
 }
 
 
-#' Stop unless a column is one of the given types
+#' Stop unless a column has one of the given types
 #'
-#' Types are as `typeof()` gives them, so a count column is "integer" or
+#' `types` are the values `typeof()` returns, so a count column is "integer" or
 #' "double" and a column of individual binary observations is "logical".
 #'
-#' @return invisible TRUE, or an error carrying `message`
+#' @return invisible TRUE, or an error with `message` as its text
 #' @noRd
 require_column_type <- function(data,
                                 column,
@@ -107,12 +107,12 @@ is.wholenumber <- function(x,
 }
 
 
-#' Round a count column, warning when it has to
+#' Round a count column, with a warning, if any value is not a whole number
 #'
-#' A column already holding whole numbers is left exactly as it is, integer or
-#' double, so the warning fires only where a value actually changes.
+#' A column whose values are all whole numbers is returned unchanged, whether it
+#' is of type integer or double, and no warning is given.
 #'
-#' @return `data`, with `column` rounded where it was not whole
+#' @return `data`, with `column` rounded if it needed rounding
 #' @noRd
 round_count_column <- function(data,
                                column,

@@ -282,9 +282,16 @@ autospc <- function(data,
     show_mr <- TRUE
   }
 
+  overhanging_reversions <- resolve_overhanging_reversions(
+    no_regrets = no_regrets,
+    overhanging_reversions = overhanging_reversions
+  )
+
   x_name <- resolve_column_name(rlang::enquo(x), "x")
   y_name <- resolve_column_name(rlang::enquo(y), "y")
   n_name <- resolve_column_name(rlang::enquo(n), "n")
+
+  check_x_type(data[[x_name]])
 
   chart_args <- list(
     period_min = period_min,
@@ -371,37 +378,49 @@ autospc <- function(data,
                   "without limits has been displayed."))
   }
 
-  # Output log data
+  # Limits are drawn where they were asked for and there are enough points to
+  # calculate them. The moving range half of a pair is analysed only then, so
+  # this decides what there is to log as well as what is drawn.
+  show_calculated_limits <- show_limits && centre_line_present(data)
+
+  # The log of each chart analysed, named for the chart type, so that an XmR
+  # pair writes one file holding both halves rather than each overwriting the
+  # other.
+  logs <- list(chart$result$table)
+  names(logs) <- chart_type_label(chart)
+
   log_output(chart$result$table,
              verbosity = verbosity,
-             chart_type = chart_type,
-             log_file_path = log_file_path)
+             chart_type = chart_type_label(chart))
 
-  # Check whether limits are to be displayed on chart
-  if(show_limits && centre_line_present(data)){
+  charts <- list(chart)
 
-    charts <- list(chart)
+  if(show_calculated_limits && (chart_type == "XMR") & show_mr) {
 
-    if((chart_type == "XMR") & show_mr) {
+    mr <- run_analysis(chart = charts_list[[2]],
+                       passed = analysis$passed,
+                       extend_limits_to = extend_limits_to)
 
-      mr <- run_analysis(chart = charts_list[[2]],
-                         passed = analysis$passed,
-                         extend_limits_to = extend_limits_to)
+    if(!centre_line_present(mr$data)) {
+      warning(paste("The input data has fewer than the minimum number of",
+                    "points needed to calculate one period. Timeseries data",
+                    "without limits has been displayed."))
+    }
 
-      if(!centre_line_present(mr$data)) {
-        warning(paste("The input data has fewer than the minimum number of",
-                      "points needed to calculate one period. Timeseries data",
-                      "without limits has been displayed."))
-      }
+    log_output(mr$chart$result$table,
+               verbosity = verbosity,
+               chart_type = chart_type_label(mr$chart))
 
-      log_output(mr$chart$result$table,
-                 verbosity = verbosity,
-                 chart_type = "MR",
+    logs[[chart_type_label(mr$chart)]] <- mr$chart$result$table
+
+    charts <- list(chart, mr$chart)
+
+  }
+
+  write_log_file(logs = logs,
                  log_file_path = log_file_path)
 
-      charts <- list(chart, mr$chart)
-
-    }
+  if(show_calculated_limits){
 
     if(plot_chart){
 

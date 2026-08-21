@@ -51,20 +51,20 @@ test_that("every chart parameter autospc takes reaches the chart", {
                   !!!given)
     )
 
-    # autospc_chart() changes the value of overhanging_reversions when it is
-    # FALSE and no_regrets is TRUE, so the comparison is against the value
-    # autospc_chart() records rather than against the value passed in
-    from_constructor <- suppressWarnings(
-      rlang::exec(autospc_chart,
-                  chart_type = "C",
-                  data = argument_data,
-                  x = "x",
-                  y = "y",
-                  !!!given)
-    )
+    # autospc() changes the value of overhanging_reversions when it is FALSE
+    # and no_regrets is TRUE, through resolve_overhanging_reversions(), so the
+    # comparison is against the resolved value rather than the value passed in
+    expected <- given[[parameter]]
+
+    if(identical(parameter, "overhanging_reversions")) {
+      expected <- suppressWarnings(
+        resolve_overhanging_reversions(no_regrets = autospc_default("no_regrets"),
+                                       overhanging_reversions = expected)
+      )
+    }
 
     expect_identical(autospc_plot_charts(from_autospc)[[1]][[parameter]],
-                     from_constructor[[parameter]],
+                     expected,
                      info = parameter)
 
   }

@@ -170,7 +170,9 @@ create_log_dataframe <- function(df,
                                  delim = ";") %>%
     dplyr::rowwise() %>% 
     dplyr::mutate(interpretation = interpret_log_entry(log_entry,
-                                                       verbosity = verbosity))
+                                                       verbosity = verbosity)) %>%
+    dplyr::ungroup() %>%
+    as.data.frame()
   
   
   return(df)
@@ -211,10 +213,17 @@ interpret_log <- function(df,
 }
 
 
+#' Print the log for one chart
+#'
+#' Called once per chart, so an XmR pair prints two logs and a faceted chart one
+#' per facet. `write_log_file()` writes the file, once for the whole call.
+#'
+#' @return invisible TRUE
+#' @noRd
 log_output <- function(df,
                        verbosity,
-                       chart_type ,
-                       log_file_path) {
+                       chart_type) {
+
   if(verbosity > 0){
     log_text <- interpret_log(df,
                               verbosity = verbosity)
@@ -224,40 +233,78 @@ log_output <- function(df,
     cat(log_text)
     cat("\n\n")
   }
-  
-  if(!is.null(log_file_path)) {
-    log_df <- create_log_dataframe(df,
-                                   verbosity = 2L)
-    fext <- tools::file_ext(log_file_path)
-    
-    if(tolower(fext) == "rds") {
-      
-      tryCatch(
-        expr = {
-          saveRDS(log_df,
-                  file = log_file_path)
-        },
-        error = function(cnd){
-          message("Unable to save log file.")
-          print(cnd)
-        }
-      )
-    } else if(tolower(fext) == "csv") {
-      tryCatch(
-        expr = {
-          write.csv(log_df,
-                    file = log_file_path)
-        },
-        error = function(cnd){
-          message("Unable to save log file.")
-          print(cnd)
-        }
-      )
-    } else {
-      warning("Invalid extension in log_file_path. Log file not written.")
-    }
+
+  invisible(TRUE)
+
+}
+
+
+#' Write the log file for one call to autospc() or facet_stages()
+#'
+#' One file per call, holding every chart the call analysed. `chart` says which
+#' each entry came from: the chart type for the two halves of an XmR pair, and
+#' the stage for a faceted chart. A call that analyses one chart writes the same
+#' shape, with one value in that column.
+#'
+#' The file holds the full log whatever `verbosity` says, as it always has.
+#'
+#' @param logs A named list of analysis tables, one per chart, named for the
+#'   value `chart` should take.
+#'
+#' @return invisible TRUE if a file was written, invisible FALSE if not
+#' @noRd
+write_log_file <- function(logs,
+                           log_file_path) {
+
+  if(is.null(log_file_path)) {
+    return(invisible(FALSE))
   }
-  
+
+  log_df <- lapply(logs,
+                   create_log_dataframe,
+                   verbosity = 2L)
+
+  log_df <- as.data.frame(dplyr::bind_rows(log_df,
+                                           .id = "chart"))
+
+  fext <- tools::file_ext(log_file_path)
+
+  if(tolower(fext) == "rds") {
+
+    tryCatch(
+      expr = {
+        saveRDS(log_df,
+                file = log_file_path)
+      },
+      error = function(cnd){
+        message("Unable to save log file.")
+        print(cnd)
+      }
+    )
+
+  } else if(tolower(fext) == "csv") {
+
+    tryCatch(
+      expr = {
+        write.csv(log_df,
+                  file = log_file_path)
+      },
+      error = function(cnd){
+        message("Unable to save log file.")
+        print(cnd)
+      }
+    )
+
+  } else {
+
+    warning("Invalid extension in log_file_path. Log file not written.")
+
+    return(invisible(FALSE))
+
+  }
+
+  invisible(TRUE)
+
 }
 
 

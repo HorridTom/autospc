@@ -53,8 +53,6 @@ analyse_series <- function(data,
 
   chart <- charts_list[[1]]
 
-  check_x_type(chart$data)
-
   titles <- titles_from_data(data = chart$data_original,
                              title = passed$title,
                              subtitle = passed$subtitle)

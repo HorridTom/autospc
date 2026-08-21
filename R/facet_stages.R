@@ -65,7 +65,13 @@ facet_stages <- function(data,
                   eval,
                   envir = caller)
 
-  arguments  <- autospc_argument_values(given)
+  arguments <- autospc_argument_values(given)
+
+  arguments$overhanging_reversions <- resolve_overhanging_reversions(
+    no_regrets = arguments$no_regrets,
+    overhanging_reversions = arguments$overhanging_reversions
+  )
+
   chart_args <- arguments[autospc_chart_parameters()]
   passed     <- arguments[autospc_plot_passed_elements()]
 
@@ -87,7 +93,7 @@ facet_stages <- function(data,
 
   df_rn <- whole_series$data
 
-  check_x_type(df_rn)
+  check_x_type(df_rn$x)
 
   titles   <- titles_from_data(data = data,
                                title = passed$title,
@@ -129,13 +135,25 @@ facet_stages <- function(data,
 
       log_output(analysis$chart$result$table,
                  verbosity = arguments$verbosity,
-                 chart_type = chart_type,
-                 log_file_path = arguments$log_file_path)
+                 chart_type = chart_type)
 
       return(analysis)
 
     }
   )
+
+  # One file for the call, with one entry per facet, rather than each facet
+  # writing over the one before. The facets take their names from split_rows
+  # where it has them, and their positions where it does not.
+  logs <- lapply(analyses,
+                 function(analysis) analysis$chart$result$table)
+
+  if(is.null(names(logs))) {
+    names(logs) <- as.character(seq_along(logs))
+  }
+
+  write_log_file(logs = logs,
+                 log_file_path = arguments$log_file_path)
 
   results_splits_list <- lapply(
     analyses,

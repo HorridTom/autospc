@@ -129,6 +129,30 @@
 
 ## Bug fixes
 
+* `log_file_path` now writes one file per call, holding every chart the call
+  analysed, with a `chart` column saying which each entry came from. An XmR run
+  wrote the file twice — once for the X chart and once for the moving range
+  chart, the second overwriting the first — so the X chart's log was lost. A
+  faceted run did the same once per facet, leaving only the last stage. For an
+  XmR pair `chart` holds the chart type, `"X"` or `"MR"`; for a faceted chart it
+  holds the stage, named from `split_rows` where it has names and numbered where
+  it does not. A run of a single chart writes the same shape, with one value in
+  that column.
+
+  The log written to file is also a plain data frame now, where it was a rowwise
+  tibble.
+
+* The console log of the X chart of an XmR pair is headed `X` rather than `XMR`.
+  It is the X chart's log; the moving range chart's log follows it, headed `MR`.
+
+* Setting `no_regrets = TRUE` with `overhanging_reversions = FALSE` warns once
+  per call. An XmR run warned twice, and a faceted run once per facet, because
+  the check ran once per chart constructed.
+
+* An x column of a type the chart cannot be drawn against — anything other than
+  `Date`, `POSIXct`, numeric or integer — warns once per call. A faceted run
+  warned once per facet and once more for the series as a whole.
+
 * Data holding a column called `x`, `y` or `n` no longer prevents a different
   column being used for that argument. `autospc(data, x = month, y = count)`,
   where `data` also has a column called `x`, failed with `Names must be unique`;

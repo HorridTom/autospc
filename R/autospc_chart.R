@@ -226,14 +226,6 @@ autospc_chart <- function(chart_type,
                           overhanging_reversions = TRUE,
                           ...) {
 
-  if(no_regrets & !overhanging_reversions) {
-    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
-                   "FALSE does not make sense, since no_regrets requires ",
-                   "consideration of overhanging reversions. Changing ",
-                   "overhanging_reversions to TRUE."))
-    overhanging_reversions <- TRUE
-  }
-
   autospc_chart_object <- switch(
     chart_type,
     "C"  = autospc_chart_c(data = data, x = x, y = y,

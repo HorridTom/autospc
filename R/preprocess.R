@@ -36,11 +36,24 @@ titles_from_data <- function(data,
 #' know how to draw. Anything else is a warning rather than an error, because
 #' the analysis itself only needs x to order the rows.
 #'
+#' Called once per call to `autospc()` or `facet_stages()`, on the series they
+#' were given. Checking each chart of an XmR pair, or each facet, would repeat
+#' the same warning for the same series.
+#'
+#' `x` is NULL where the caller named a column the data does not hold. Nothing
+#' is checked in that case: the class validator reports the missing column.
+#'
+#' @param x The column the caller named as x.
+#'
 #' @return invisible TRUE
 #' @noRd
-check_x_type <- function(data) {
+check_x_type <- function(x) {
 
-  xType <- class(data$x)
+  if(is.null(x)) {
+    return(invisible(TRUE))
+  }
+
+  xType <- class(x)
 
   if(all(xType != "Date") &
      all(xType!= c("POSIXct", "POSIXt")) &

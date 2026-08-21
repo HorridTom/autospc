@@ -59,6 +59,40 @@ validate_chart_type <- function(chart_type) {
 }
 
 
+#' Resolve overhanging_reversions against no_regrets
+#'
+#' The two arguments are not independent: the no-regrets rule asks whether a
+#' candidate period's final run may revert, so it cannot be applied while
+#' overhanging reversions are ignored. Where the pair is inconsistent,
+#' `overhanging_reversions` is set to TRUE and the caller is told.
+#'
+#' Called once per call to `autospc()` or `facet_stages()`, before the chart or
+#' charts are constructed. It is argument validation about a pair of user
+#' parameters rather than anything about a chart, which is why it is here and
+#' not in `autospc_chart()`: the constructor runs once per chart, so an XmR pair
+#' produced the same warning twice.
+#'
+#' @return TRUE or FALSE, the value `overhanging_reversions` should take
+#' @noRd
+resolve_overhanging_reversions <- function(no_regrets,
+                                           overhanging_reversions) {
+
+  if(no_regrets & !overhanging_reversions) {
+
+    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
+                   "FALSE does not make sense, since no_regrets requires ",
+                   "consideration of overhanging reversions. Changing ",
+                   "overhanging_reversions to TRUE."))
+
+    return(TRUE)
+
+  }
+
+  return(overhanging_reversions)
+
+}
+
+
 #' Stop unless a column is present in the data
 #'
 #' The error text is passed in as `message` so that each class can give the

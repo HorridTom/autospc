@@ -60,3 +60,87 @@ test_that("No regrets = FALSE",{
   testthat::expect_equal(sum(output_regrets5$breakPoint, na.rm = T), 1)
   
 })
+
+
+# no_regrets and overhanging_reversions are resolved once per call
+
+
+inconsistent_pair <- data.frame(x = 1:40,
+                                y = rep(c(10L, 12L, 11L, 13L, 9L, 14L, 10L, 12L), 5L))
+
+count_pair_warnings <- function(result) {
+
+  warnings_given <- character()
+
+  withCallingHandlers(
+    force(result),
+    warning = function(w) {
+      warnings_given <<- c(warnings_given, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  sum(grepl("does not make sense", warnings_given, fixed = TRUE))
+
+}
+
+
+test_that("an inconsistent pair is warned about once for a single chart", {
+
+  count <- count_pair_warnings(
+    autospc(inconsistent_pair, chart_type = "C", period_min = 21L,
+            overhanging_reversions = FALSE, plot_chart = FALSE)
+  )
+
+  expect_identical(count, 1L)
+
+})
+
+
+test_that("an XmR pair is warned about once, not once per chart", {
+
+  count <- count_pair_warnings(
+    autospc(inconsistent_pair, chart_type = "XMR", period_min = 21L,
+            overhanging_reversions = FALSE, plot_chart = FALSE)
+  )
+
+  expect_identical(count, 1L)
+
+})
+
+
+test_that("a faceted chart is warned about once, not once per facet", {
+
+  count <- count_pair_warnings(
+    facet_stages(inconsistent_pair, split_rows = c(20L, 40L), chart_type = "C",
+                 period_min = 21L, overhanging_reversions = FALSE,
+                 plot_chart = FALSE)
+  )
+
+  expect_identical(count, 1L)
+
+})
+
+
+test_that("the resolved value is what the chart carries", {
+
+  plot <- suppressWarnings(
+    autospc(inconsistent_pair, chart_type = "C", period_min = 21L,
+            overhanging_reversions = FALSE)
+  )
+
+  expect_true(autospc_plot_charts(plot)[[1]]$overhanging_reversions)
+
+})
+
+
+test_that("a consistent pair is left alone and says nothing", {
+
+  expect_no_warning(
+    plot <- autospc(inconsistent_pair, chart_type = "C", period_min = 21L,
+                    no_regrets = FALSE, overhanging_reversions = FALSE)
+  )
+
+  expect_false(autospc_plot_charts(plot)[[1]]$overhanging_reversions)
+
+})

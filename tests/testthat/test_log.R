@@ -75,9 +75,21 @@ test_that("log is interpreted correctly (regression)", {
   log_df <- autospc:::create_log_dataframe(log_out,
                                            verbosity = 2L)
   
+  # the stored answer was saved when this returned a rowwise tibble; the values
+  # are unchanged, so it is compared as a data frame
   expect_equal(log_df,
-               correct_log_df)
+               as.data.frame(dplyr::ungroup(correct_log_df)))
   
+})
+
+
+test_that("the log frame is a plain data frame", {
+
+  log_df <- autospc:::create_log_dataframe(log_out,
+                                           verbosity = 2L)
+
+  expect_identical(class(log_df), "data.frame")
+
 })
 
 

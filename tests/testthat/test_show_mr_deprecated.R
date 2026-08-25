@@ -71,6 +71,35 @@ test_that("show_mr = FALSE carries the X chart alone", {
 })
 
 
+test_that("show_mr = TRUE carries the pair, as leaving it out does", {
+
+  charts <- suppressWarnings(
+    autospc_plot_charts(run_show_mr(show_mr = TRUE))
+  )
+
+  expect_length(charts, 2L)
+
+})
+
+
+test_that("show_mr = FALSE does not change a chart type that is not XMR", {
+
+  # show_mr only ever chose whether the moving range chart of a requested pair
+  # was drawn, so it says nothing about any other chart type
+  charts <- suppressWarnings(
+    autospc_plot_charts(autospc(show_mr_data,
+                                chart_type = "C",
+                                period_min = 21L,
+                                show_mr = FALSE))
+  )
+
+  expect_length(charts, 1L)
+
+  expect_s3_class(charts[[1]], "autospc_chart_c")
+
+})
+
+
 test_that("show_mr = FALSE draws one panel, not a pair", {
 
   plot <- suppressWarnings(run_show_mr(show_mr = FALSE))

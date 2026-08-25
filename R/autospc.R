@@ -84,8 +84,9 @@
 #' chart on its own, which is what `show_mr = FALSE` did.
 #' @param write_table `r lifecycle::badge("deprecated")` Save the results
 #' yourself instead. `autospc(plot_chart = FALSE)` returns them as a data frame,
-#' and `as.data.frame()` on a chart does the same, either of which can be
-#' written to a path of your choosing.
+#' and `as.data.frame()` on the `autospc_plot` object `autospc()` returns does
+#' the same, either of which can be written to a path of your choosing with
+#' e.g. `write.csv()`.
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
 #' none if 0.
@@ -263,9 +264,10 @@ autospc <- function(data,
       what = "autospc(write_table)",
       details = paste("Save the results yourself instead:",
                       "autospc(plot_chart = FALSE) returns them as a data",
-                      "frame, and as.data.frame() on a chart does the same.",
-                      "Either can be written with write.csv() to a path of",
-                      "your choosing. No file has been written.")
+                      "frame, and as.data.frame() on the autospc_plot object",
+                      "autospc() returns does the same. Either can be written",
+                      "to a path of your choosing with e.g. write.csv().",
+                      "No file has been written.")
     )
   }
 
@@ -278,14 +280,15 @@ autospc <- function(data,
                       'is what show_mr = FALSE did, and chart_type = "XMR"',
                       'draws the pair.')
     )
-  } else {
-    show_mr <- TRUE
-  }
 
-  overhanging_reversions <- resolve_overhanging_reversions(
-    no_regrets = no_regrets,
-    overhanging_reversions = overhanging_reversions
-  )
+    # show_mr = FALSE drew the X chart of a requested pair on its own, which is
+    # chart_type = "X". Translating it here means nothing after this block reads
+    # show_mr.
+    if(isFALSE(show_mr) && identical(chart_type, "XMR")) {
+      chart_type <- "X"
+    }
+
+  }
 
   x_name <- resolve_column_name(rlang::enquo(x), "x")
   y_name <- resolve_column_name(rlang::enquo(y), "y")
@@ -293,50 +296,23 @@ autospc <- function(data,
 
   check_x_type(data[[x_name]])
 
-  chart_args <- list(
-    period_min = period_min,
-    baseline_length = baseline_length,
-    shift_rule_threshold = shift_rule_threshold,
-    baseline_only = baseline_only,
-    establish_every_shift = establish_every_shift,
-    no_regrets = no_regrets,
-    overhanging_reversions = overhanging_reversions,
-    max_exclusions = max_exclusions,
-    mr_screen_max_loops = mr_screen_max_loops,
-    centre_line_tolerance = centre_line_tolerance,
-    floating_median = floating_median,
-    floating_median_n = floating_median_n,
-    keep_candidate_tables = keep_candidate_tables
-  )
+  # One element per argument, holding the value this call gave it. data, x and
+  # y and n are left out because they are the series and the columns of it
+  # rather than parameters of the analysis, and the deprecated arguments because
+  # they have been dealt with above. Both groups can be absent from a call, and
+  # mget() collects the missing argument itself for one that is, which is not
+  # something this list should carry.
+  arguments <- mget(setdiff(names(formals()),
+                            c("data", "x", "y", "n",
+                              autospc_deprecated_arguments())))
+
+  arguments <- validate_algorithm_parameters(arguments)
+
+  chart_args <- arguments[autospc_chart_parameters()]
 
   # The presentation parameters, as the caller gave them. analyse_series()
   # resolves the ones with a default that depends on the chart.
-  passed <- list(
-    show_limits = show_limits,
-    title = title,
-    subtitle = subtitle,
-    use_caption = use_caption,
-    override_x_title = override_x_title,
-    override_y_title = override_y_title,
-    override_y_lim = override_y_lim,
-    x_break = x_break,
-    x_date_format = x_date_format,
-    x_pad_end = x_pad_end,
-    r1_col = r1_col,
-    r2_col = r2_col,
-    point_size = point_size,
-    line_width_sf = line_width_sf,
-    highlight_exclusions = highlight_exclusions,
-    include_annotations = include_annotations,
-    basic_annotations = basic_annotations,
-    annotation_size = annotation_size,
-    align_labels = align_labels,
-    flip_labels = flip_labels,
-    upper_annotation_sf = upper_annotation_sf,
-    lower_annotation_sf = lower_annotation_sf,
-    annotation_arrows = annotation_arrows,
-    annotation_arrow_curve = annotation_arrow_curve
-  )
+  passed <- arguments[autospc_plot_passed_elements()]
 
   analysis <- analyse_series(data = data,
                              chart_type = chart_type,
@@ -395,7 +371,7 @@ autospc <- function(data,
 
   charts <- list(chart)
 
-  if(show_calculated_limits && (chart_type == "XMR") & show_mr) {
+  if(show_calculated_limits && chart_type == "XMR") {
 
     mr <- run_analysis(chart = charts_list[[2]],
                        passed = analysis$passed,
@@ -445,7 +421,7 @@ autospc <- function(data,
     } else {
       # (!plot_chart)
       
-      if(chart_type == "XMR" & show_mr) {
+      if(chart_type == "XMR") {
 
         data <- join_mr_columns(x_table = data,
                                 mr_table = mr$data)

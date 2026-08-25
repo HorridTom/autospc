@@ -59,36 +59,42 @@ validate_chart_type <- function(chart_type) {
 }
 
 
-#' Resolve overhanging_reversions against no_regrets
+#' Check the algorithm parameters against each other
 #'
-#' The two arguments are not independent: the no-regrets rule asks whether a
-#' candidate period's final run may revert, so it cannot be applied while
-#' overhanging reversions are ignored. Where the pair is inconsistent,
-#' `overhanging_reversions` is set to TRUE and the caller is told.
+#' Some of the algorithm parameters are not independent of each other, so a
+#' value that is valid on its own can still be invalid beside another. This is
+#' where those checks go. Where a pair is inconsistent the caller is told and
+#' one of the two is changed, so the returned list is what the analysis should
+#' use rather than what the caller wrote.
+#'
+#' `no_regrets` and `overhanging_reversions`: the no-regrets rule asks whether
+#' a candidate period's final run may revert, so it cannot be applied while
+#' overhanging reversions are ignored. `overhanging_reversions` is set to TRUE.
 #'
 #' Called once per call to `autospc()` or `facet_stages()`, before the chart or
-#' charts are constructed. It is argument validation about a pair of user
-#' parameters rather than anything about a chart, which is why it is here and
-#' not in `autospc_chart()`: the constructor runs once per chart, so an XmR pair
+#' charts are constructed. It is validation of the arguments a user gave rather
+#' than anything about a chart, which is why it is here and not in
+#' `autospc_chart()`: the constructor runs once per chart, so an XmR pair
 #' produced the same warning twice.
 #'
-#' @return TRUE or FALSE, the value `overhanging_reversions` should take
+#' @param arguments A named list of the argument values for one call.
+#'
+#' @return `arguments`, with any value the checks changed.
 #' @noRd
-resolve_overhanging_reversions <- function(no_regrets,
-                                           overhanging_reversions) {
+validate_algorithm_parameters <- function(arguments) {
 
-  if(no_regrets & !overhanging_reversions) {
+  if(arguments$no_regrets & !arguments$overhanging_reversions) {
 
     warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
                    "FALSE does not make sense, since no_regrets requires ",
                    "consideration of overhanging reversions. Changing ",
                    "overhanging_reversions to TRUE."))
 
-    return(TRUE)
+    arguments$overhanging_reversions <- TRUE
 
   }
 
-  return(overhanging_reversions)
+  return(arguments)
 
 }
 

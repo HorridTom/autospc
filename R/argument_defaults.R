@@ -25,3 +25,32 @@ autospc_default <- function(name) {
               envir = asNamespace("autospc")))
 
 }
+
+
+#' The deprecated arguments of autospc()
+#'
+#' Every deprecated argument is declared with `deprecated()` as its default, so
+#' the signature itself says which they are.
+#'
+#' `deprecated()` returns the missing argument rather than a value, which is how
+#' `lifecycle::is_present()` tells an argument the caller supplied from one they
+#' did not. So where the caller supplied none, what is collected for one of
+#' these is the missing argument rather than anything a function could use,
+#' which is why they are excluded wherever the arguments of a call are
+#' collected.
+#'
+#' @return A character vector of argument names.
+#' @noRd
+autospc_deprecated_arguments <- function() {
+
+  defaults <- formals(autospc)
+
+  is_deprecated <- vapply(defaults,
+                          function(default) {
+                            identical(default, quote(deprecated()))
+                          },
+                          logical(1L))
+
+  return(names(defaults)[is_deprecated])
+
+}

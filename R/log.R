@@ -286,8 +286,8 @@ write_log_file <- function(logs,
 
     tryCatch(
       expr = {
-        write.csv(log_df,
-                  file = log_file_path)
+        utils::write.csv(log_df,
+                         file = log_file_path)
       },
       error = function(cnd){
         message("Unable to save log file.")

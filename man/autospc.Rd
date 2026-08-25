@@ -162,8 +162,9 @@ chart on its own, which is what \code{show_mr = FALSE} did.}
 
 \item{write_table}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Save the results
 yourself instead. \code{autospc(plot_chart = FALSE)} returns them as a data frame,
-and \code{as.data.frame()} on a chart does the same, either of which can be
-written to a path of your choosing.}
+and \code{as.data.frame()} on the \code{autospc_plot} object \code{autospc()} returns does
+the same, either of which can be written to a path of your choosing with
+e.g. \code{write.csv()}.}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
 standard output log; the higher the number the more information is provided,

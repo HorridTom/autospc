@@ -67,10 +67,7 @@ facet_stages <- function(data,
 
   arguments <- autospc_argument_values(given)
 
-  arguments$overhanging_reversions <- resolve_overhanging_reversions(
-    no_regrets = arguments$no_regrets,
-    overhanging_reversions = arguments$overhanging_reversions
-  )
+  arguments <- validate_algorithm_parameters(arguments)
 
   chart_args <- arguments[autospc_chart_parameters()]
   passed     <- arguments[autospc_plot_passed_elements()]
@@ -250,7 +247,10 @@ create_splits_list <- function(df,
 #' default from `autospc()`'s signature where the caller gave none.
 #'
 #' `data`, `x`, `y` and `n` are not among them. `data` is the data itself, and
-#' the other three hold column names rather than values.
+#' the other three hold column names rather than values. The deprecated
+#' arguments are not among them either: their default is a sentinel rather than
+#' a value, and `facet_stages()` deals with the one it supports before this is
+#' called.
 #'
 #' @param given A named list of the argument values the caller supplied.
 #'
@@ -259,7 +259,8 @@ create_splits_list <- function(df,
 autospc_argument_values <- function(given) {
 
   names_wanted <- setdiff(names(formals(autospc)),
-                          c("data", "x", "y", "n"))
+                          c("data", "x", "y", "n",
+                            autospc_deprecated_arguments()))
 
   values <- lapply(names_wanted, autospc_default)
   names(values) <- names_wanted

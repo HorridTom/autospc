@@ -1,9 +1,10 @@
 # autospc() builds two lists of arguments: chart_args, which it passes to
-# autospc_chart(), and passed, which it records on the plot object. The names in
-# those lists are written out in autospc(), and they are also written out in
-# autospc_chart_parameters() and autospc_plot_passed_elements(). Adding a
-# parameter to one and not the other raises no error, so these tests check that
-# every parameter named in those two functions arrives where it is meant to.
+# autospc_chart(), and passed, which it records on the plot object. Both are
+# selected from the arguments of the call by the names in
+# autospc_chart_parameters() and autospc_plot_passed_elements(), so a name in
+# either of those that autospc() does not take gives a NULL rather than an
+# error. These tests check that every parameter named in those two functions
+# arrives where it is meant to.
 
 argument_data <- data.frame(x = 1:30,
                             y = rep(c(10L, 12L, 11L, 13L, 9L, 14L), 5L))
@@ -26,6 +27,23 @@ chart_argument_alternatives <- list(
   floating_median_n = 8L,
   keep_candidate_tables = TRUE
 )
+
+
+test_that("the deprecated arguments are the ones autospc declares as deprecated", {
+
+  # autospc() collects the arguments of a call with mget(), which cannot give a
+  # value for an argument declared with deprecated() unless the caller supplied
+  # one, so those arguments are left out. They are found by their default rather
+  # than named, and this is the list that finding them is expected to produce:
+  # deprecating an argument, or removing one, should fail here until the change
+  # has been looked at.
+  expect_setequal(autospc_deprecated_arguments(),
+                  c("show_mr",
+                    "write_table",
+                    "override_annotation_dist",
+                    "override_annotation_dist_P"))
+
+})
 
 
 test_that("the alternatives cover every chart parameter", {
@@ -52,15 +70,18 @@ test_that("every chart parameter autospc takes reaches the chart", {
     )
 
     # autospc() changes the value of overhanging_reversions when it is FALSE
-    # and no_regrets is TRUE, through resolve_overhanging_reversions(), so the
-    # comparison is against the resolved value rather than the value passed in
+    # and no_regrets is TRUE, through validate_algorithm_parameters(), so the
+    # comparison is against the validated value rather than the value passed in
     expected <- given[[parameter]]
 
     if(identical(parameter, "overhanging_reversions")) {
-      expected <- suppressWarnings(
-        resolve_overhanging_reversions(no_regrets = autospc_default("no_regrets"),
-                                       overhanging_reversions = expected)
+      validated <- suppressWarnings(
+        validate_algorithm_parameters(
+          list(no_regrets = autospc_default("no_regrets"),
+               overhanging_reversions = expected)
+        )
       )
+      expected <- validated$overhanging_reversions
     }
 
     expect_identical(autospc_plot_charts(from_autospc)[[1]][[parameter]],

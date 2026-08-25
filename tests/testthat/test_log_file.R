@@ -9,7 +9,8 @@ log_file_data <- data.frame(x = 1:60,
 
 written_log <- function(...) {
 
-  path <- withr::local_tempfile(fileext = ".rds")
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
 
   suppressWarnings(
     autospc(log_file_data, period_min = 21L, plot_chart = FALSE,
@@ -55,7 +56,8 @@ test_that("the X chart's log is not written over by the moving range chart's", {
 
 test_that("a faceted chart writes one entry per stage", {
 
-  path <- withr::local_tempfile(fileext = ".rds")
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
 
   suppressWarnings(
     facet_stages(log_file_data, split_rows = c(20L, 40L, 60L),
@@ -72,7 +74,8 @@ test_that("a faceted chart writes one entry per stage", {
 
 test_that("named split_rows name the stages in the log", {
 
-  path <- withr::local_tempfile(fileext = ".rds")
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
 
   suppressWarnings(
     facet_stages(log_file_data,
@@ -90,7 +93,8 @@ test_that("named split_rows name the stages in the log", {
 
 test_that("a csv log file is written too", {
 
-  path <- withr::local_tempfile(fileext = ".csv")
+  path <- tempfile(fileext = ".csv")
+  on.exit(unlink(path), add = TRUE)
 
   suppressWarnings(
     autospc(log_file_data, chart_type = "XMR", period_min = 21L,
@@ -106,7 +110,8 @@ test_that("a csv log file is written too", {
 
 test_that("an unusable extension warns and writes nothing", {
 
-  path <- withr::local_tempfile(fileext = ".txt")
+  path <- tempfile(fileext = ".txt")
+  on.exit(unlink(path), add = TRUE)
 
   warnings_given <- character()
 

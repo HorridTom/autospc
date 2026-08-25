@@ -3,7 +3,7 @@
 # An autospc_plot IS a ggplot: its class vector is c("autospc_plot", "gg",
 # "ggplot"), so printing, ggsave() and adding ggplot2 layers all keep working.
 # What it adds is the analysed chart or charts it was drawn from, and how it was
-# drawn - the presentation parameters passed, and the values derived from them.
+# drawn - the presentation parameters, and the values derived from them.
 #
 # Everything in the package that depends on a ggplot being an S3 list lives in
 # this file. new_autospc_plot() writes the class vector and the slots; the
@@ -157,8 +157,8 @@ autospc_plot_elements <- function() {
 
 #' The two halves of an autospc_plot's presentation
 #'
-#' `passed` is what the caller asked for; `derived` is what was worked out from
-#' that and the charts. A value that is both - an axis end the caller set -
+#' `parameters` is what the caller asked for; `derived` is what was worked out
+#' from that and the charts. A value that is both - an axis end the caller set -
 #' appears in each, as asked for and as used.
 #'
 #' Every parameter and every derived value goes inside one of these, rather than
@@ -169,7 +169,7 @@ autospc_plot_elements <- function() {
 autospc_plot_presentation_elements <- function() {
 
   presentation_elements <- c(
-    "passed",
+    "parameters",
     "derived"
   )
 
@@ -181,7 +181,7 @@ autospc_plot_presentation_elements <- function() {
 #' The presentation parameters a plot is drawn with
 #'
 #' The presentation half of the argument split, and the single definition of
-#' it. `autospc()` builds its `passed` list from exactly these, and
+#' it. `autospc()` builds its `parameters` list from exactly these, and
 #' `facet_stages()` uses them to select the presentation arguments from the ones
 #' it was passed.
 #'
@@ -191,7 +191,7 @@ autospc_plot_presentation_elements <- function() {
 #'
 #' @return A character vector of parameter names.
 #' @noRd
-autospc_plot_passed_elements <- function() {
+autospc_plot_parameter_names <- function() {
 
   passed_elements <- c(
     "show_limits",
@@ -226,40 +226,69 @@ autospc_plot_passed_elements <- function() {
 }
 
 
+#' The title and subtitle a plot is drawn with
+#'
+#' Where the data holds a `title` or `subtitle` column and the corresponding
+#' argument is NULL, the value in the first row of that column is used. The
+#' argument takes precedence when both are given.
+#'
+#' `data` here is the data frame the caller passed, not `chart$data`, which
+#' holds only the columns the analysis uses.
+#'
+#' @return A list of `title` and `subtitle`, either of which may be NULL.
+#' @noRd
+titles_from_data <- function(data,
+                             title = NULL,
+                             subtitle = NULL) {
+
+  if(is.null(title) & "title" %in% colnames(data)) {
+    title <- data$title[1]
+  }
+
+  if(is.null(subtitle) & "subtitle" %in% colnames(data)) {
+    subtitle <- data$subtitle[1]
+  }
+
+  return(list(title = title,
+              subtitle = subtitle))
+
+}
+
+
 #' Resolve the presentation parameters whose default depends on the chart
 #'
 #' The title and subtitle, which come from columns of the data where the caller
 #' gave none, and the two annotation scale factors, which come from the chart
 #' type. A value the caller passed wins over all four. Called once per call.
 #'
-#' @param passed A named list of the presentation parameters, as the caller gave
-#'   them.
+#' @param parameters A named list of the presentation parameters, as the caller
+#'   gave them.
 #' @param chart An `autospc_chart`.
 #'
-#' @return `passed`, with those four resolved.
+#' @return `parameters`, with those four resolved.
 #' @noRd
-resolve_presentation <- function(passed,
-                                 chart) {
+resolve_default_parameters <- function(parameters,
+                                       chart) {
 
   titles <- titles_from_data(data = chart$data_original,
-                             title = passed$title,
-                             subtitle = passed$subtitle)
+                             title = parameters$title,
+                             subtitle = parameters$subtitle)
 
   # Assigned as single-element lists so that a NULL sets the element rather than
   # deleting it.
-  passed["title"]    <- list(titles$title)
-  passed["subtitle"] <- list(titles$subtitle)
+  parameters["title"]    <- list(titles$title)
+  parameters["subtitle"] <- list(titles$subtitle)
 
   # The lower factor is the mirror image of the upper about 1.
-  if(is.null(passed$upper_annotation_sf)) {
-    passed$upper_annotation_sf <- upper_annotation_sf_default(chart)
+  if(is.null(parameters$upper_annotation_sf)) {
+    parameters$upper_annotation_sf <- upper_annotation_sf_default(chart)
   }
 
-  if(is.null(passed$lower_annotation_sf)) {
-    passed$lower_annotation_sf <- 2 - passed$upper_annotation_sf
+  if(is.null(parameters$lower_annotation_sf)) {
+    parameters$lower_annotation_sf <- 2 - parameters$upper_annotation_sf
   }
 
-  return(passed)
+  return(parameters)
 
 }
 
@@ -278,16 +307,20 @@ resolve_presentation <- function(passed,
 #' time series - which draws the first chart alone, so that is the chart the
 #' object carries. A faceted plot is always drawn as an SPC chart.
 #'
+#' `main` below is the plot data the plot is drawn from: the location chart of a
+#' pair, the only chart of a single chart plot, or every facet at once of a
+#' faceted one.
+#'
 #' @param charts A list of analysed `autospc_chart` objects.
-#' @param passed A named list of the presentation parameters. The axis titles
-#'   are taken from the frame that is drawn, so that the object records what is
-#'   drawn.
+#' @param parameters A named list of the presentation parameters. The axis
+#'   titles are taken from the plot data that is drawn, so that the object
+#'   records what is drawn.
 #' @param split_rows Non-NULL to facet by stage.
 #'
 #' @return An object of class `c("autospc_plot", "gg", "ggplot")`.
 #' @noRd
 autospc_plot <- function(charts,
-                         passed,
+                         parameters,
                          split_rows = NULL) {
 
   if(inherits(charts, "autospc_chart")) {
@@ -296,35 +329,35 @@ autospc_plot <- function(charts,
          call. = FALSE)
   }
 
-  frames <- drawable_frames(charts = charts,
-                            passed = passed)
+  plot_data <- build_plot_data(charts = charts,
+                               parameters = parameters)
 
   if(!is.null(split_rows)) {
-    frames <- list(faceted_frame(charts = charts,
-                                 passed = passed,
-                                 frames = frames))
+    plot_data <- list(faceted_plot_data(plot_data = plot_data,
+                                        parameters = parameters))
   }
 
-  passed["override_x_title"] <- list(frames[[1]]$axis_titles$x)
-  passed["override_y_title"] <- list(frames[[1]]$axis_titles$y)
+  main <- plot_data[[1]]
 
-  limits_drawn <- isTRUE(passed$show_limits) &&
-    centre_line_present(frames[[1]]$data)
+  parameters["override_x_title"] <- list(main$axis_titles$x)
+  parameters["override_y_title"] <- list(main$axis_titles$y)
+
+  limits_drawn <- isTRUE(parameters$show_limits) &&
+    centre_line_present(main$table)
 
   if(!limits_drawn && is.null(split_rows)) {
 
     charts <- charts[1]
-    frames <- frames[1]
+    plot_data <- plot_data[1]
 
-    plot <- create_timeseries_plot(data = frames[[1]]$data,
-                                   passed = passed,
-                                   derived = frames[[1]]$derived)
+    plot <- create_timeseries_plot(data = main$table,
+                                   parameters = parameters,
+                                   derived = main$derived)
 
   } else {
 
-    plot <- create_spc_plot(charts = charts,
-                            frames = frames,
-                            passed = passed,
+    plot <- create_spc_plot(plot_data = plot_data,
+                            parameters = parameters,
                             split_rows = split_rows)
 
   }
@@ -332,8 +365,8 @@ autospc_plot <- function(charts,
   autospc_plot_object <- new_autospc_plot(
     plot = plot,
     charts = charts,
-    presentation = list(passed = passed,
-                        derived = frames[[1]]$derived)
+    presentation = list(parameters = parameters,
+                        derived = main$derived)
   )
 
   autospc_plot_object <- validate_autospc_plot(autospc_plot_object)
@@ -356,7 +389,7 @@ autospc_plot_charts <- function(plot) {
 
 #' How an autospc_plot was drawn
 #'
-#' @return A list of two named lists, `passed` and `derived`.
+#' @return A list of two named lists, `parameters` and `derived`.
 #' @noRd
 autospc_plot_presentation <- function(plot) {
 
@@ -372,14 +405,14 @@ autospc_plot_presentation <- function(plot) {
 #'
 #' @return The named list, or one element of it.
 #' @noRd
-autospc_plot_passed <- function(plot,
-                                parameter = NULL) {
+autospc_plot_parameters <- function(plot,
+                                    parameter = NULL) {
 
   if(is.null(parameter)) {
-    return(plot$presentation$passed)
+    return(plot$presentation$parameters)
   }
 
-  return(plot$presentation$passed[[parameter]])
+  return(plot$presentation$parameters[[parameter]])
 
 }
 
@@ -412,7 +445,7 @@ autospc_plot_derived <- function(plot,
 
 #' The analysis behind an autospc_plot
 #'
-#' The result of each chart the plot holds, in one frame.
+#' The result of each chart the plot holds, in one table.
 #'
 #' An XmR pair is one analysis of one series shown as two charts, so it goes
 #' out wide: the moving range and its limits join the X columns as `mr`, `amr`,
@@ -422,7 +455,7 @@ autospc_plot_derived <- function(plot,
 #' facet variable, because `facet_stages()` is the only thing that produces
 #' several charts of one type.
 #'
-#' This is the analytic result, not the frame `autospc(plot_chart = FALSE)`
+#' This is the analytic result, not the table `autospc(plot_chart = FALSE)`
 #' returns: it carries the columns the algorithm produced, and not the columns
 #' `postprocess_spc()` adds for drawing.
 #'

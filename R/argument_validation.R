@@ -59,6 +59,44 @@ validate_chart_type <- function(chart_type) {
 }
 
 
+#' Warn where x is not a type the axis can be built from
+#'
+#' Date, POSIXct, numeric and integer are what the scales in `visualisation.R`
+#' know how to draw. Anything else is a warning rather than an error, because
+#' the analysis itself only needs x to order the rows.
+#'
+#' Called once per call to `autospc()` or `facet_stages()`, on the series they
+#' were given. Checking each chart of an XmR pair, or each facet, would repeat
+#' the same warning for the same series.
+#'
+#' `x` is NULL where the caller named a column the data does not hold. Nothing
+#' is checked in that case: the class validator reports the missing column.
+#'
+#' @param x The column the caller named as x.
+#'
+#' @return invisible TRUE
+#' @noRd
+check_x_type <- function(x) {
+
+  if(is.null(x)) {
+    return(invisible(TRUE))
+  }
+
+  xType <- class(x)
+
+  if(all(xType != "Date") &
+     all(xType!= c("POSIXct", "POSIXt")) &
+     all(xType != "numeric") &
+     all(xType != "integer")) {
+    warning(paste("Please make sure that your x column is a",
+                  "'Date', 'POSIXct', 'numeric' or 'integer' type."))
+  }
+
+  invisible(TRUE)
+
+}
+
+
 #' Check the algorithm parameters against each other
 #'
 #' The checks on parameters that are not independent of one another. Where a

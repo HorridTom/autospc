@@ -82,7 +82,7 @@ test_that("the frames carried by a chart are plain data frames", {
 })
 
 
-test_that("the tables recorded for each candidate are plain data frames", {
+test_that("the tables recorded for each candidate are plain data frame", {
 
   chart <- autospc_chart(chart_type = "C'",
                          data = tibble::as_tibble(example_series_2a),

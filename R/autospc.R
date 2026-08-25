@@ -305,7 +305,7 @@ autospc <- function(data,
   chart_args <- arguments[autospc_chart_parameters()]
 
   # The presentation parameters, as the caller gave them.
-  passed <- arguments[autospc_plot_passed_elements()]
+  parameters <- arguments[autospc_plot_parameter_names()]
 
   validate_chart_type(chart_type)
 
@@ -320,8 +320,8 @@ autospc <- function(data,
 
   charts <- analyse_charts(charts)
 
-  passed <- resolve_presentation(passed = passed,
-                                 chart = charts[[1]])
+  parameters <- resolve_default_parameters(parameters = parameters,
+                                           chart = charts[[1]])
 
   charts_with_limits <- vapply(charts,
                                function(chart) {
@@ -352,11 +352,11 @@ autospc <- function(data,
                  log_file_path = log_file_path)
 
   if(!plot_chart) {
-    return(drawable_table(charts = charts,
-                          passed = passed))
+    return(combined_plot_data(charts = charts,
+                              parameters = parameters))
   }
 
   return(autospc_plot(charts = charts,
-                      passed = passed))
+                      parameters = parameters))
 
 }

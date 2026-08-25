@@ -1,28 +1,34 @@
 #' Draw an SPC chart, or an XmR pair
 #'
-#' The chart is drawn from the first frame. An XmR pair is drawn as two panels
-#' stacked by `cowplot::plot_grid()`, the moving range one drawn here from the
-#' second frame.
+#' An XmR pair is drawn as two panels stacked by `cowplot::plot_grid()`, the
+#' moving range one drawn here from the dispersion chart's plot data.
 #'
-#' @param charts The analysed chart, or the pair, or one per facet, in a list.
-#' @param frames The drawable frames, as `drawable_frame()` gives them: one per
-#'   chart for a pair, and one for a faceted plot, holding every facet.
-#' @param passed The presentation parameters, with the axis titles resolved.
+#' `main` below is the plot data the plot is drawn from: the location chart of a
+#' pair, the only chart of a single chart plot, or every facet at once of a
+#' faceted one. It carries the chart it came from.
+#'
+#' @param plot_data The plot data to draw, as `build_plot_data()` gives it: a
+#' chart object, plus other information needed for plotting. One
+#' element per chart for a pair, and just one for a faceted plot, holding every
+#' facet.
+#' @param parameters The presentation parameters, with the axis titles resolved.
 #' @param split_rows Non-NULL to facet by stage.
 #'
 #' @return A ggplot.
 #' @noRd
-create_spc_plot <- function(charts,
-                            frames,
-                            passed,
+create_spc_plot <- function(plot_data,
+                            parameters,
                             split_rows = NULL) {
 
-  data    <- frames[[1]]$data
-  derived <- frames[[1]]$derived
+  main <- plot_data[[1]]
 
-  pair <- is_xmr_pair(charts)
+  chart   <- main$chart
+  data    <- main$table
+  derived <- main$derived
 
-  chart_type <- if(pair) "XMR" else chart_type_label(charts[[1]])
+  pair <- is_xmr_pair(lapply(plot_data, function(each) each$chart))
+
+  chart_type <- if(pair) "XMR" else chart_type_label(chart)
 
   df_long <- data %>%
     tidyr::pivot_longer(cols = c(y, cl, ucl, lcl),
@@ -43,14 +49,14 @@ create_spc_plot <- function(charts,
                          ggplot2::aes(x = x,
                                       y = value))
   
-  if(passed$use_caption) {
+  if(parameters$use_caption) {
     caption <- paste(chart_type,
                      "Shewhart Chart.",
                      "\n*Shewhart chart rules apply",
                      "\nRule 1: Any point outside the control limits", 
                      paste( 
                        "\nRule 2:",
-                       word_for_number(charts[[1]]$shift_rule_threshold),
+                       word_for_number(chart$shift_rule_threshold),
                        "or more consecutive points all above, or all below, the centre line"
                        )
     )
@@ -63,15 +69,15 @@ create_spc_plot <- function(charts,
   # Apply autospc formatting
   p <- format_SPC(pct,
                   df_long = df_long,
-                  r1_col = passed$r1_col,
-                  r2_col = passed$r2_col,
-                  point_size = passed$point_size,
+                  r1_col = parameters$r1_col,
+                  r2_col = parameters$r2_col,
+                  point_size = parameters$point_size,
                   rule_title = rule_title,
-                  line_width_sf = passed$line_width_sf) +
-    ggplot2::ggtitle(passed$title,
-                     subtitle = passed$subtitle) +
-    ggplot2::labs(x = passed$override_x_title,
-                  y = passed$override_y_title,
+                  line_width_sf = parameters$line_width_sf) +
+    ggplot2::ggtitle(parameters$title,
+                     subtitle = parameters$subtitle) +
+    ggplot2::labs(x = parameters$override_x_title,
+                  y = parameters$override_y_title,
                   caption = paste0(caption)) +
     ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
                                 breaks = scales::breaks_pretty(),
@@ -81,26 +87,26 @@ create_spc_plot <- function(charts,
   if("median" %in% colnames(data)) {
     p <- add_floating_median(p = p,
                              df = df_long,
-                             floating_median_n = charts[[1]]$floating_median_n)
+                             floating_median_n = chart$floating_median_n)
   }
   
   # Add annotations to chart if needed
-  if(passed$include_annotations == TRUE){
+  if(parameters$include_annotations == TRUE){
 
     p <- add_annotations_to_plot(
       p = p,
       df = df_long,
-      basic_annotations = passed$basic_annotations,
-      annotation_size = passed$annotation_size,
-      annotation_arrows = passed$annotation_arrows,
-      annotation_arrow_curve = passed$annotation_arrow_curve)
+      basic_annotations = parameters$basic_annotations,
+      annotation_size = parameters$annotation_size,
+      annotation_arrows = parameters$annotation_arrows,
+      annotation_arrow_curve = parameters$annotation_arrow_curve)
   }
   
   # Format x-axis depending on x type
   p <- format_x_axis(p = p,
                      xType = class(data$x),
-                     x_break = passed$x_break,
-                     x_date_format = passed$x_date_format,
+                     x_break = parameters$x_break,
+                     x_date_format = parameters$x_date_format,
                      start_x = derived$start_x,
                      end_x = derived$end_x)
   
@@ -120,8 +126,8 @@ create_spc_plot <- function(charts,
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), 
                      axis.ticks.x = ggplot2::element_blank())
 
-    p_mr <- draw_mr_panel(frame = frames[[2]],
-                          passed = passed) +
+    p_mr <- draw_mr_panel(plot_data = plot_data$dispersion,
+                          parameters = parameters) +
       ggplot2::labs(caption = caption)
     
     legend <- cowplot::get_legend(p)
@@ -152,30 +158,29 @@ create_spc_plot <- function(charts,
 #' The panel carries no title or subtitle, and the axis titles are the moving
 #' range chart's own. Called by `create_spc_plot()` for a pair.
 #'
-#' @param frame The moving range chart's drawable frame.
-#' @param passed The presentation parameters, shared with the X chart.
+#' @param plot_data The moving range chart's plot data.
+#' @param parameters The presentation parameters, shared with the X chart.
 #'
 #' @return A ggplot.
 #' @noRd
-draw_mr_panel <- function(frame,
-                          passed) {
+draw_mr_panel <- function(plot_data,
+                          parameters) {
 
-  passed["title"]            <- list(NULL)
-  passed["subtitle"]         <- list(NULL)
-  passed["override_x_title"] <- list(frame$axis_titles$x)
-  passed["override_y_title"] <- list(frame$axis_titles$y)
+  parameters["title"]            <- list(NULL)
+  parameters["subtitle"]         <- list(NULL)
+  parameters["override_x_title"] <- list(plot_data$axis_titles$x)
+  parameters["override_y_title"] <- list(plot_data$axis_titles$y)
 
-  if(!centre_line_present(frame$data)) {
+  if(!centre_line_present(plot_data$table)) {
 
-    return(create_timeseries_plot(data = frame$data,
-                                  passed = passed,
-                                  derived = frame$derived))
+    return(create_timeseries_plot(data = plot_data$table,
+                                  parameters = parameters,
+                                  derived = plot_data$derived))
 
   }
 
-  return(create_spc_plot(charts = list(frame$chart),
-                         frames = list(frame),
-                         passed = passed))
+  return(create_spc_plot(plot_data = list(plot_data),
+                         parameters = parameters))
 
 }
 
@@ -188,19 +193,19 @@ draw_mr_panel <- function(frame,
 #' @return A ggplot.
 #' @noRd
 create_timeseries_plot <- function(data,
-                                   passed,
+                                   parameters,
                                    derived) {
 
   time_series_plot <- ggplot2::ggplot(data, 
                                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_line(colour = "black",
-                       linewidth = 0.5*passed$line_width_sf) +
-    ggplot2::geom_point(colour = "black", size = passed$point_size) +
+                       linewidth = 0.5*parameters$line_width_sf) +
+    ggplot2::geom_point(colour = "black", size = parameters$point_size) +
     theme_autospc() +
-    ggplot2::ggtitle(passed$title,
-                     subtitle = passed$subtitle) +
-    ggplot2::labs(x = passed$override_x_title,
-                  y = passed$override_y_title) +
+    ggplot2::ggtitle(parameters$title,
+                     subtitle = parameters$subtitle) +
+    ggplot2::labs(x = parameters$override_x_title,
+                  y = parameters$override_y_title) +
     ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::number_format(accuracy = 1,

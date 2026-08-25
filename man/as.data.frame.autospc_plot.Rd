@@ -15,7 +15,7 @@
 A data frame.
 }
 \description{
-The result of each chart the plot holds, in one frame.
+The result of each chart the plot holds, in one table.
 }
 \details{
 An XmR pair is one analysis of one series shown as two charts, so it goes
@@ -26,7 +26,7 @@ column \code{facet_stages(plot_chart = FALSE)} returns, and the same name as the
 facet variable, because \code{facet_stages()} is the only thing that produces
 several charts of one type.
 
-This is the analytic result, not the frame \code{autospc(plot_chart = FALSE)}
+This is the analytic result, not the table \code{autospc(plot_chart = FALSE)}
 returns: it carries the columns the algorithm produced, and not the columns
 \code{postprocess_spc()} adds for drawing.
 }

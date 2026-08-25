@@ -29,30 +29,32 @@ analyse_charts <- function(charts) {
 }
 
 
-#' Join the moving range analysis onto the X analysis
+#' Order a chart's series by x, and make it a plain data frame
 #'
-#' An XmR pair is one analysis of one series shown as two charts, so it goes
-#' out wide: the moving range and its limits sit beside the X columns as `mr`,
-#' `amr`, `url` and `lrl`.
+#' The algorithm walks the data in row order, so the rows have to be in x order
+#' before it runs, and before `prepare_data()` derives anything from their
+#' order - an MR chart's moving ranges are differences between neighbouring
+#' rows.
 #'
-#' @return A data frame.
+#' `dplyr::arrange()` is stable, so rows sharing an x keep the order they
+#' arrived in. Missing x values sort to the end.
+#'
+#' This is also where `data` becomes a plain data frame, and it is the only
+#' place that does it. Every chart type passes through here, and it is after
+#' `aggregate_data()`, which is what produces a tibble: `dplyr::summarise()`
+#' returns one whatever it was given. Everything the algorithm derives from
+#' `data` is therefore a plain data frame as well - the limits table, the
+#' analysis in `chart$result$table`, and the tables recorded in
+#' `chart$history`. `data_original` is left as the caller passed it.
+#'
+#' @return autospc_chart object of the same class as chart
 #' @noRd
-join_mr_columns <- function(x_table,
-                           mr_table) {
+order_series <- function(chart) {
 
-  joined <- x_table %>%
-    dplyr::left_join(mr_table %>%
-                       dplyr::filter(!is.na(x)) %>%
-                       dplyr::select(x,
-                                    mr = y,
-                                    amr = cl,
-                                    url = ucl,
-                                    lrl = lcl),
-                     by = c("x" = "x")) %>%
-    dplyr::select(x, y, cl, ucl, lcl,
-                  mr, amr, url, lrl,
-                  dplyr::everything())
+  chart$data <- chart$data %>%
+    dplyr::arrange(x) %>%
+    as.data.frame()
 
-  return(joined)
+  return(chart)
 
 }

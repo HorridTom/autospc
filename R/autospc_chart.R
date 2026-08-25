@@ -165,7 +165,7 @@ build_charts <- function(chart_type,
                          ...) {
 
   if(identical(chart_type, "XMR")) {
-    chart_types <- c("X", "MR")
+    chart_types <- c(location = "X", dispersion = "MR")
   } else {
     chart_types <- chart_type
   }
@@ -222,36 +222,16 @@ autospc_chart <- function(chart_type,
                           x,
                           y,
                           n,
-                          no_regrets = TRUE,
-                          overhanging_reversions = TRUE,
                           ...) {
 
   autospc_chart_object <- switch(
     chart_type,
-    "C"  = autospc_chart_c(data = data, x = x, y = y,
-                           no_regrets = no_regrets,
-                           overhanging_reversions = overhanging_reversions,
-                           ...),
-    "C'" = autospc_chart_cp(data = data, x = x, y = y,
-                            no_regrets = no_regrets,
-                            overhanging_reversions = overhanging_reversions,
-                            ...),
-    "P"  = autospc_chart_p(data = data, x = x, y = y, n = n,
-                           no_regrets = no_regrets,
-                           overhanging_reversions = overhanging_reversions,
-                           ...),
-    "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n,
-                            no_regrets = no_regrets,
-                            overhanging_reversions = overhanging_reversions,
-                            ...),
-    "X"  = autospc_chart_x(data = data, x = x, y = y,
-                           no_regrets = no_regrets,
-                           overhanging_reversions = overhanging_reversions,
-                           ...),
-    "MR" = autospc_chart_mr(data = data, x = x, y = y,
-                            no_regrets = no_regrets,
-                            overhanging_reversions = overhanging_reversions,
-                            ...),
+    "C"  = autospc_chart_c(data = data, x = x, y = y, ...),
+    "C'" = autospc_chart_cp(data = data, x = x, y = y, ...),
+    "P"  = autospc_chart_p(data = data, x = x, y = y, n = n, ...),
+    "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
+    "X"  = autospc_chart_x(data = data, x = x, y = y, ...),
+    "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
     stop("No autospc_chart class for chart_type: ", chart_type, call. = FALSE)
   )
 

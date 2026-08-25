@@ -424,9 +424,9 @@ test_that("the plot object records the titles it was drawn with", {
 
   plot <- faceted_plot()
 
-  expect_identical(autospc_plot_passed(plot, "override_x_title"), plot$labels$x)
+  expect_identical(autospc_plot_parameters(plot, "override_x_title"), plot$labels$x)
 
-  expect_identical(autospc_plot_passed(plot, "override_y_title"), plot$labels$y)
+  expect_identical(autospc_plot_parameters(plot, "override_y_title"), plot$labels$y)
 
 })
 
@@ -437,11 +437,11 @@ test_that("the plot object records the annotation scale factors it was drawn wit
   # answer
   plot <- faceted_plot()
 
-  expect_identical(autospc_plot_passed(plot, "upper_annotation_sf"),
+  expect_identical(autospc_plot_parameters(plot, "upper_annotation_sf"),
                    upper_annotation_sf_default(autospc_plot_charts(plot)[[1]]))
 
-  expect_identical(autospc_plot_passed(plot, "lower_annotation_sf"),
-                   2 - autospc_plot_passed(plot, "upper_annotation_sf"))
+  expect_identical(autospc_plot_parameters(plot, "lower_annotation_sf"),
+                   2 - autospc_plot_parameters(plot, "upper_annotation_sf"))
 
 })
 
@@ -511,7 +511,7 @@ test_that("no stage short of points gives no warning", {
 
 test_that("a faceted chart with no limits errors - CLEAN UP #35", {
 
-  # the pinned behaviour is a bug: the frame has no limits columns to draw
+  # the pinned behaviour is a bug: the plot data has no limits columns to draw
   # from, and the fix is CLEAN UP #35
   short <- data.frame(x = 1:10, y = rep(c(10L, 12L), 5L))
 

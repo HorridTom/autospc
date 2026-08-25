@@ -19,6 +19,13 @@ run_pair <- function(data = pair_data, ...) {
 }
 
 
+test_that("the charts of a pair are named by the part they play", {
+
+  expect_named(autospc_plot_charts(run_pair()), c("location", "dispersion"))
+
+})
+
+
 test_that("an XMR chart draws", {
 
   expect_no_error(drawn(run_pair()))
@@ -59,10 +66,11 @@ test_that("both halves of a pair are short of points together", {
 
   }
 
-  expect_identical(limits_of(just_enough), c(TRUE, TRUE))
+  expect_identical(limits_of(just_enough), c(location = TRUE,
+                                             dispersion = TRUE))
 
   # a pair with no limits carries the X chart alone
-  expect_identical(limits_of(one_short), FALSE)
+  expect_identical(limits_of(one_short), c(location = FALSE))
 
 })
 

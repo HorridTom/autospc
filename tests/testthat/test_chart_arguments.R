@@ -1,5 +1,5 @@
 # autospc() selects chart_args and passed from the arguments of the call, by the
-# names in autospc_chart_parameters() and autospc_plot_passed_elements(). These
+# names in autospc_chart_parameters() and autospc_plot_parameter_names(). These
 # tests check that every parameter named in those two functions arrives where it
 # is meant to.
 
@@ -99,10 +99,10 @@ test_that("every presentation parameter autospc takes reaches the plot object", 
     autospc(argument_data, chart_type = "C", period_min = 21L)
   )
 
-  expect_setequal(names(autospc_plot_passed(plot)),
-                  autospc_plot_passed_elements())
+  expect_setequal(names(autospc_plot_parameters(plot)),
+                  autospc_plot_parameter_names())
 
-  for(parameter in setdiff(autospc_plot_passed_elements(), resolved)) {
+  for(parameter in setdiff(autospc_plot_parameter_names(), resolved)) {
 
     given <- list(1.5)
     names(given) <- parameter
@@ -130,7 +130,7 @@ test_that("every presentation parameter autospc takes reaches the plot object", 
                   !!!given)
     )
 
-    expect_identical(autospc_plot_passed(drawn_with, parameter),
+    expect_identical(autospc_plot_parameters(drawn_with, parameter),
                      given[[parameter]],
                      info = parameter)
 

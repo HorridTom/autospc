@@ -14,12 +14,12 @@ contract_plot <- function(
     plot = ggplot2::ggplot(contract_data, ggplot2::aes(x = x, y = y)) +
       ggplot2::geom_point(),
     charts = list(autospc_chart_c(data = contract_data, x = "x", y = "y")),
-    passed = list(point_size = 4)) {
+    parameters = list(point_size = 4)) {
 
   validate_autospc_plot(
     new_autospc_plot(plot = plot,
                      charts = charts,
-                     presentation = list(passed = passed,
+                     presentation = list(parameters = parameters,
                                          derived = list()))
   )
 
@@ -33,7 +33,7 @@ test_that("adding a theme keeps the class and the slots", {
 
   expect_length(autospc_plot_charts(themed), 1L)
 
-  expect_identical(autospc_plot_passed(themed, "point_size"), 4)
+  expect_identical(autospc_plot_parameters(themed, "point_size"), 4)
 
 })
 
@@ -46,7 +46,7 @@ test_that("adding a layer keeps the class and the slots", {
 
   expect_length(autospc_plot_charts(layered), 1L)
 
-  expect_identical(autospc_plot_passed(layered, "point_size"), 4)
+  expect_identical(autospc_plot_parameters(layered, "point_size"), 4)
 
 })
 

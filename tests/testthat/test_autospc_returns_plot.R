@@ -61,9 +61,9 @@ test_that("the returned plot carries the presentation parameters", {
 
   plot <- run_returns(point_size = 4, r1_col = "red")
 
-  expect_identical(autospc_plot_passed(plot, "point_size"), 4)
+  expect_identical(autospc_plot_parameters(plot, "point_size"), 4)
 
-  expect_identical(autospc_plot_passed(plot, "r1_col"), "red")
+  expect_identical(autospc_plot_parameters(plot, "r1_col"), "red")
 
 })
 
@@ -73,7 +73,7 @@ test_that("the presentation records resolved values, not the arguments", {
   # override_y_title is NULL as passed; postprocess() fills it from the class
   plot <- run_returns()
 
-  expect_false(is.null(autospc_plot_passed(plot, "override_y_title")))
+  expect_false(is.null(autospc_plot_parameters(plot, "override_y_title")))
 
 })
 
@@ -97,7 +97,7 @@ test_that("show_limits = FALSE is still an autospc_plot", {
 
   expect_s3_class(plot, "autospc_plot")
 
-  expect_false(autospc_plot_passed(plot, "show_limits"))
+  expect_false(autospc_plot_parameters(plot, "show_limits"))
 
 })
 
@@ -281,7 +281,7 @@ test_that("as.data.frame identifies the stage when there is more than one", {
     new_autospc_plot(
       plot = ggplot2::ggplot(returns_data, ggplot2::aes(x = x, y = y)),
       charts = list(chart, chart),
-      presentation = list(passed = list(), derived = list())
+      presentation = list(parameters = list(), derived = list())
     )
   )
 

@@ -7,18 +7,16 @@
 #' @noRd
 run_limit_algorithm <- function(chart) {
 
-  data <- chart$data
-
   #set counter to one
   counter <- 1
   
   # [1] Counter initialised
   # Check whether there are enough data points to form one period
-  if(!enough_data_for_new_period(data = data,
+  if(!enough_data_for_new_period(data = chart$data,
                                  counter = counter,
                                  chart = chart)){
     
-    chart$result$table <- data
+    chart$result$table <- chart$data
     chart$result$table$log <- render_log(chart)
 
     return(chart)
@@ -27,13 +25,13 @@ run_limit_algorithm <- function(chart) {
     
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
-      data = data, 
+      data = chart$data, 
       counter_at_period_start = counter, 
       chart = chart)
     
     # Set counter to first point after end of first period
     if(counter == 1L & !is.null(chart$baseline_length)) {
-      baseline_rows <- baseline_period_length(chart, data)
+      baseline_rows <- baseline_period_length(chart, chart$data)
       chart$history$baseline <- list(length = baseline_rows,
                                      rows = 1:baseline_rows)
       counter <- counter + baseline_rows
@@ -44,7 +42,7 @@ run_limit_algorithm <- function(chart) {
     
     if(!chart$baseline_only){
       # [3] Algorithm loop starts - unless user specified no recalculations
-      while(counter < nrow(data)){
+      while(counter < nrow(chart$data)){
         
         # [4] Check whether enough points after the counter to form new period
         if(!enough_data_for_new_period(data = limits_table,
@@ -94,7 +92,8 @@ run_limit_algorithm <- function(chart) {
           }
           
           # [5] Check whether there are any further rule 2 breaks
-          if(is.na(rule2_break_position) | rule2_break_position >= nrow(data)){
+          if(is.na(rule2_break_position) |
+             rule2_break_position >= nrow(chart$data)){
             # [5b] If not, then there can be no more additional periods
             chart <- record_stop(chart, counter,
                                  "no further shift rule breaks")

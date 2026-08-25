@@ -70,7 +70,7 @@ facet_stages <- function(data,
   arguments <- validate_algorithm_parameters(arguments)
 
   chart_args <- arguments[autospc_chart_parameters()]
-  passed     <- arguments[autospc_plot_passed_elements()]
+  parameters <- arguments[autospc_plot_parameter_names()]
 
   chart_type <- arguments$chart_type
 
@@ -93,8 +93,8 @@ facet_stages <- function(data,
   check_x_type(df_rn$x)
 
   # Resolved once for the call, from the chart of the whole series.
-  passed <- resolve_presentation(passed = passed,
-                                 chart = whole_series)
+  parameters <- resolve_default_parameters(parameters = parameters,
+                                           chart = whole_series)
 
   split_rows <- sort(split_rows)
 
@@ -139,7 +139,7 @@ facet_stages <- function(data,
                   logical(1L))
 
   # One warning for the call, naming the stages that are short of points
-  if(passed$show_limits && any(short)) {
+  if(parameters$show_limits && any(short)) {
 
     subject <- paste("Stages", paste(stage_names[short], collapse = ", "),
                      "have")
@@ -169,12 +169,12 @@ facet_stages <- function(data,
                  log_file_path = arguments$log_file_path)
 
   if(!plot_chart) {
-    return(drawable_table(charts = charts,
-                          passed = passed))
+    return(combined_plot_data(charts = charts,
+                              parameters = parameters))
   }
 
   return(autospc_plot(charts = charts,
-                      passed = passed,
+                      parameters = parameters,
                       split_rows = split_rows))
 
 }

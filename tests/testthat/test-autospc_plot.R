@@ -19,14 +19,19 @@ plot_chart_c <- function(...) {
 
 }
 
+# autospc_plot() draws the plot it constructs, so these tests go a level below
+# it: new_autospc_plot() writes the class and the slots, and
+# validate_autospc_plot() checks them.
 test_plot <- function(charts = list(plot_chart_c()),
                       passed = list(show_limits = TRUE),
                       derived = list()) {
 
-  autospc_plot(plot = built_plot(),
-               charts = charts,
-               passed = passed,
-               derived = derived)
+  validate_autospc_plot(
+    new_autospc_plot(plot = built_plot(),
+                     charts = charts,
+                     presentation = list(passed = passed,
+                                         derived = derived))
+  )
 
 }
 
@@ -118,10 +123,9 @@ test_that("a presentation parameter that was not supplied reads as NULL", {
 })
 
 
-test_that("both halves default to empty", {
+test_that("both halves can be empty", {
 
-  plot <- autospc_plot(plot = built_plot(),
-                       charts = list(plot_chart_c()))
+  plot <- test_plot(passed = list(), derived = list())
 
   expect_identical(autospc_plot_passed(plot), list())
 
@@ -209,7 +213,8 @@ test_that("a single chart is rejected with a message saying so", {
 
   # the natural mistake, and "must be a list of at least one" would not explain
   # it, because a chart is a list
-  expect_error(autospc_plot(plot = built_plot(), charts = plot_chart_c()),
+  expect_error(autospc_plot(charts = plot_chart_c(),
+                            passed = list()),
                "not a single chart")
 
 })

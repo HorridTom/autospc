@@ -1,24 +1,24 @@
 #' Draw an SPC chart, or an XmR pair
 #'
-#' The single chart is drawn from `charts[[1]]`. An XmR pair is drawn as two
-#' panels stacked by `cowplot::plot_grid()`, the moving range one arriving
-#' already drawn as `p_mr`.
+#' The chart is drawn from the first frame. An XmR pair is drawn as two panels
+#' stacked by `cowplot::plot_grid()`, the moving range one drawn here from the
+#' second frame.
 #'
-#' @param charts The analysed chart, or the pair, in a list.
-#' @param data The drawable frame, as `run_analysis()` returned it.
+#' @param charts The analysed chart, or the pair, or one per facet, in a list.
+#' @param frames The drawable frames, as `drawable_frame()` gives them: one per
+#'   chart for a pair, and one for a faceted plot, holding every facet.
 #' @param passed The presentation parameters, with the axis titles resolved.
-#' @param derived The axis extents.
-#' @param p_mr The drawn moving range panel, for a pair.
 #' @param split_rows Non-NULL to facet by stage.
 #'
 #' @return A ggplot.
 #' @noRd
 create_spc_plot <- function(charts,
-                            data,
+                            frames,
                             passed,
-                            derived,
-                            p_mr = NA,
                             split_rows = NULL) {
+
+  data    <- frames[[1]]$data
+  derived <- frames[[1]]$derived
 
   pair <- is_xmr_pair(charts)
 
@@ -119,8 +119,9 @@ create_spc_plot <- function(charts,
                     x = NULL) + 
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), 
                      axis.ticks.x = ggplot2::element_blank())
-    
-    p_mr <- p_mr + 
+
+    p_mr <- draw_mr_panel(frame = frames[[2]],
+                          passed = passed) +
       ggplot2::labs(caption = caption)
     
     legend <- cowplot::get_legend(p)
@@ -148,36 +149,33 @@ create_spc_plot <- function(charts,
 
 #' Draw the moving range panel of an XmR pair
 #'
-#' The panel carries no title or subtitle: the pair shares the X chart's, which
-#' the combined plot renders once. Its caption is replaced by the combined
-#' plot's, and its legend is dropped, so neither depends on what is set here.
+#' The panel carries no title or subtitle, and the axis titles are the moving
+#' range chart's own. Called by `create_spc_plot()` for a pair.
 #'
-#' @param analysis The list `run_analysis()` returned for the MR chart.
-#' @param passed The presentation parameters, shared with the X chart. The axis
-#'   titles are replaced here - the moving range chart resolved its own.
+#' @param frame The moving range chart's drawable frame.
+#' @param passed The presentation parameters, shared with the X chart.
 #'
 #' @return A ggplot.
 #' @noRd
-draw_mr_panel <- function(analysis,
+draw_mr_panel <- function(frame,
                           passed) {
 
   passed["title"]            <- list(NULL)
   passed["subtitle"]         <- list(NULL)
-  passed["override_x_title"] <- list(analysis$axis_titles$x)
-  passed["override_y_title"] <- list(analysis$axis_titles$y)
+  passed["override_x_title"] <- list(frame$axis_titles$x)
+  passed["override_y_title"] <- list(frame$axis_titles$y)
 
-  if(!centre_line_present(analysis$data)) {
+  if(!centre_line_present(frame$data)) {
 
-    return(create_timeseries_plot(data = analysis$data,
+    return(create_timeseries_plot(data = frame$data,
                                   passed = passed,
-                                  derived = analysis$derived))
+                                  derived = frame$derived))
 
   }
 
-  return(create_spc_plot(charts = list(analysis$chart),
-                         data = analysis$data,
-                         passed = passed,
-                         derived = analysis$derived))
+  return(create_spc_plot(charts = list(frame$chart),
+                         frames = list(frame),
+                         passed = passed))
 
 }
 

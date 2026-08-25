@@ -174,6 +174,26 @@ test_that("the y limits recorded are the ones the class asks for", {
 })
 
 
+test_that("extend_limits_to reaches the recorded end of the x axis", {
+
+  plot <- run_returns(extend_limits_to = 40)
+
+  expect_identical(autospc_plot_derived(plot, "x_max"), 30L)
+
+  expect_identical(autospc_plot_derived(plot, "end_x"), 40)
+
+})
+
+
+test_that("x_pad_end wins over extend_limits_to for the end of the x axis", {
+
+  plot <- run_returns(extend_limits_to = 40, x_pad_end = 50)
+
+  expect_identical(autospc_plot_derived(plot, "end_x"), 50)
+
+})
+
+
 test_that("override_y_lim reaches the recorded y limit", {
 
   plot <- run_returns(override_y_lim = 40)
@@ -257,9 +277,12 @@ test_that("as.data.frame identifies the stage when there is more than one", {
 
   chart <- autospc_plot_charts(run_returns())[[1]]
 
-  two <- autospc_plot(
-    plot = ggplot2::ggplot(returns_data, ggplot2::aes(x = x, y = y)),
-    charts = list(chart, chart)
+  two <- validate_autospc_plot(
+    new_autospc_plot(
+      plot = ggplot2::ggplot(returns_data, ggplot2::aes(x = x, y = y)),
+      charts = list(chart, chart),
+      presentation = list(passed = list(), derived = list())
+    )
   )
 
   result <- as.data.frame(two)

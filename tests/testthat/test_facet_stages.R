@@ -446,6 +446,83 @@ test_that("the plot object records the annotation scale factors it was drawn wit
 })
 
 
+# too few points for limits
+
+
+short_facet_data <- data.frame(x = 1:40,
+                               y = rep(c(50, 48, 49, 51, 52, 47, 50, 49), 5L))
+
+facet_warnings <- function(...) {
+
+  warnings_given <- character()
+
+  withCallingHandlers(
+    facet_stages(short_facet_data, chart_type = "C", period_min = 21L,
+                 plot_chart = FALSE, ...),
+    warning = function(w) {
+      warnings_given <<- c(warnings_given, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  return(warnings_given)
+
+}
+
+
+test_that("one warning names the stage that is short of points", {
+
+  # 10 points in the first stage, 40 in the second
+  given <- facet_warnings(split_rows = c(10L, 40L))
+
+  expect_length(given, 1L)
+
+  expect_match(given, "Stage 1 has fewer than the minimum number of points")
+
+})
+
+
+test_that("one warning names every stage that is short of points", {
+
+  given <- facet_warnings(split_rows = c(5L, 10L, 40L))
+
+  expect_length(given, 1L)
+
+  expect_match(given, "Stages 1, 2 have fewer than the minimum number of points")
+
+})
+
+
+test_that("the warning names the stages the way split_rows does", {
+
+  given <- facet_warnings(split_rows = c(early = 10L, late = 40L))
+
+  expect_match(given, "Stage early has")
+
+})
+
+
+test_that("no stage short of points gives no warning", {
+
+  expect_length(facet_warnings(split_rows = c(30L, 40L)), 0L)
+
+})
+
+
+test_that("a faceted chart with no limits errors - CLEAN UP #35", {
+
+  # the pinned behaviour is a bug: the frame has no limits columns to draw
+  # from, and the fix is CLEAN UP #35
+  short <- data.frame(x = 1:10, y = rep(c(10L, 12L), 5L))
+
+  expect_error(
+    suppressWarnings(facet_stages(short, split_rows = c(5L, 10L),
+                                  chart_type = "C", period_min = 21L))
+  )
+
+})
+
+
 test_that("leaving out chart_type says so, rather than failing on a length", {
 
   # facet_stages() used to test dots_exprs$chart_type == "XMR", which is

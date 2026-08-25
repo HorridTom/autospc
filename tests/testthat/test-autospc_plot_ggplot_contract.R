@@ -10,13 +10,17 @@
 contract_data <- data.frame(x = 1:5,
                             y = c(3, 4, 2, 5, 3))
 
-contract_plot <- function() {
-
-  autospc_plot(
+contract_plot <- function(
     plot = ggplot2::ggplot(contract_data, ggplot2::aes(x = x, y = y)) +
       ggplot2::geom_point(),
     charts = list(autospc_chart_c(data = contract_data, x = "x", y = "y")),
-    passed = list(point_size = 4)
+    passed = list(point_size = 4)) {
+
+  validate_autospc_plot(
+    new_autospc_plot(plot = plot,
+                     charts = charts,
+                     presentation = list(passed = passed,
+                                         derived = list()))
   )
 
 }
@@ -98,7 +102,7 @@ test_that("a cowplot composite can be subclassed the same way", {
       ggplot2::geom_line()
   )
 
-  paired <- autospc_plot(
+  paired <- contract_plot(
     plot = composite,
     charts = list(autospc_chart_c(data = contract_data, x = "x", y = "y"),
                   autospc_chart_mr(data = contract_data, x = "x", y = "y"))
@@ -119,9 +123,9 @@ test_that("attaching the slots to a ggplot warns about nothing", {
   # ordinary assignment. This is the assertion that says so, in place of the
   # blanket suppressWarnings() that used to wrap the construction.
   expect_no_warning(
-    autospc_plot(plot = ggplot2::ggplot(contract_data,
-                                        ggplot2::aes(x = x, y = y)),
-                 charts = autospc_plot_charts(contract_plot()))
+    contract_plot(plot = ggplot2::ggplot(contract_data,
+                                         ggplot2::aes(x = x, y = y)),
+                  charts = autospc_plot_charts(contract_plot()))
   )
 
 })

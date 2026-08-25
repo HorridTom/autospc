@@ -351,70 +351,12 @@ autospc <- function(data,
   write_log_file(logs = logs,
                  log_file_path = log_file_path)
 
-  # What each chart is drawn from.
-  frames <- lapply(charts,
-                   drawable_frame,
-                   passed = passed,
-                   extend_limits_to = extend_limits_to)
-
-  data    <- frames[[1]]$data
-  derived <- frames[[1]]$derived
-
-  # Limits are drawn where they were asked for and there are enough points
-  show_calculated_limits <- show_limits && centre_line_present(data)
-
   if(!plot_chart) {
-
-    if(show_calculated_limits) {
-
-      if(is_xmr_pair(charts)) {
-        data <- join_mr_columns(x_table = data,
-                                mr_table = frames[[2]]$data)
-      }
-
-      data <- data %>%
-        dplyr::filter(!is.na(x))
-
-    }
-
-    return(data)
-
+    return(drawable_table(charts = charts,
+                          passed = passed))
   }
 
-  # The plot object records the axis titles that are drawn.
-  passed["override_x_title"] <- list(frames[[1]]$axis_titles$x)
-  passed["override_y_title"] <- list(frames[[1]]$axis_titles$y)
-
-  # A series with no limits is drawn as a time series, without an MR panel.
-  if(!show_calculated_limits) {
-
-    p <- create_timeseries_plot(data = data,
-                                passed = passed,
-                                derived = derived)
-
-    return(autospc_plot(plot = p,
-                        charts = list(charts[[1]]),
-                        passed = passed,
-                        derived = derived))
-
-  }
-
-  if(is_xmr_pair(charts)) {
-    p_mr <- draw_mr_panel(analysis = frames[[2]],
-                          passed = passed)
-  } else {
-    p_mr <- NA
-  }
-
-  p <- create_spc_plot(charts = charts,
-                       data = data,
-                       passed = passed,
-                       derived = derived,
-                       p_mr = p_mr)
-
-  return(autospc_plot(plot = p,
-                      charts = charts,
-                      passed = passed,
-                      derived = derived))
+  return(autospc_plot(charts = charts,
+                      passed = passed))
 
 }

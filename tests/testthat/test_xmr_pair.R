@@ -26,6 +26,20 @@ test_that("an XMR chart draws", {
 })
 
 
+test_that("a pair with too few points for limits carries the X chart alone", {
+
+  one_short <- data.frame(x = 1:20, y = rep(c(4, 7, 5, 6), 5))
+
+  plot <- suppressWarnings(autospc(one_short, chart_type = "XMR",
+                                   period_min = 21L))
+
+  expect_length(autospc_plot_charts(plot), 1L)
+
+  expect_s3_class(autospc_plot_charts(plot)[[1]], "autospc_chart_x")
+
+})
+
+
 test_that("both halves of a pair are short of points together", {
 
   # the two halves need the same number of points to form a period, which is

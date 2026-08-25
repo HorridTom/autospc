@@ -204,6 +204,7 @@ autospc_plot_passed_elements <- function() {
     "x_break",
     "x_date_format",
     "x_pad_end",
+    "extend_limits_to",
     "r1_col",
     "r2_col",
     "point_size",
@@ -263,24 +264,31 @@ resolve_presentation <- function(passed,
 }
 
 
-#' Create an autospc_plot object
+#' Draw an autospc_plot from the charts it is made of
 #'
-#' Assemble, construct, validate, return - the same shape as the chart
-#' construction helpers.
+#' Draw, construct, validate, return. The analysed charts and the presentation
+#' go in; the plot object comes out, carrying the charts and the presentation
+#' it was drawn with.
 #'
-#' @param plot A built ggplot. For an XmR pair this is the combined plot.
-#' @param charts A list of validated `autospc_chart` objects.
-#' @param passed A named list of the presentation parameters the plot was drawn
-#'   with.
-#' @param derived A named list of the values worked out for the drawing - the
-#'   axis extents.
+#' The charts are in drawing order, so the first is the chart the plot is drawn
+#' from and the second, for an XmR pair, is its moving range panel. A faceted
+#' plot is drawn from every facet at once.
+#'
+#' A series with limits is drawn as an SPC chart, and one without as a plain
+#' time series - which draws the first chart alone, so that is the chart the
+#' object carries. A faceted plot is always drawn as an SPC chart.
+#'
+#' @param charts A list of analysed `autospc_chart` objects.
+#' @param passed A named list of the presentation parameters. The axis titles
+#'   are taken from the frame that is drawn, so that the object records what is
+#'   drawn.
+#' @param split_rows Non-NULL to facet by stage.
 #'
 #' @return An object of class `c("autospc_plot", "gg", "ggplot")`.
 #' @noRd
-autospc_plot <- function(plot,
-                         charts,
-                         passed = list(),
-                         derived = list()) {
+autospc_plot <- function(charts,
+                         passed,
+                         split_rows = NULL) {
 
   if(inherits(charts, "autospc_chart")) {
     stop(paste("charts must be a list of autospc_chart objects, not a single",
@@ -288,11 +296,44 @@ autospc_plot <- function(plot,
          call. = FALSE)
   }
 
+  frames <- drawable_frames(charts = charts,
+                            passed = passed)
+
+  if(!is.null(split_rows)) {
+    frames <- list(faceted_frame(charts = charts,
+                                 passed = passed,
+                                 frames = frames))
+  }
+
+  passed["override_x_title"] <- list(frames[[1]]$axis_titles$x)
+  passed["override_y_title"] <- list(frames[[1]]$axis_titles$y)
+
+  limits_drawn <- isTRUE(passed$show_limits) &&
+    centre_line_present(frames[[1]]$data)
+
+  if(!limits_drawn && is.null(split_rows)) {
+
+    charts <- charts[1]
+    frames <- frames[1]
+
+    plot <- create_timeseries_plot(data = frames[[1]]$data,
+                                   passed = passed,
+                                   derived = frames[[1]]$derived)
+
+  } else {
+
+    plot <- create_spc_plot(charts = charts,
+                            frames = frames,
+                            passed = passed,
+                            split_rows = split_rows)
+
+  }
+
   autospc_plot_object <- new_autospc_plot(
     plot = plot,
     charts = charts,
     presentation = list(passed = passed,
-                        derived = derived)
+                        derived = frames[[1]]$derived)
   )
 
   autospc_plot_object <- validate_autospc_plot(autospc_plot_object)

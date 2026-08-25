@@ -117,6 +117,11 @@ test_that("every presentation parameter autospc takes reaches the plot object", 
       given[[parameter]] <- "given"
     }
 
+    # limits can only be extended to a point beyond the end of the data
+    if(identical(parameter, "extend_limits_to")) {
+      given[[parameter]] <- 40
+    }
+
     drawn_with <- suppressWarnings(
       rlang::exec(autospc,
                   argument_data,

@@ -107,116 +107,76 @@ facet_stages <- function(data,
   data_splits_list <- create_splits_list(df = df_rn,
                                          split_rows = split_rows)
 
-  analyses <- lapply(
+  charts <- lapply(
     data_splits_list,
     function(split) {
 
       # The split came from the chart of the whole series, so its columns are
       # already named x, y and n.
-      charts <- rlang::exec(build_charts,
-                            chart_type = chart_type,
-                            data = split,
-                            x = "x",
-                            y = "y",
-                            n = "n",
-                            !!!chart_args)
+      facet <- rlang::exec(build_charts,
+                           chart_type = chart_type,
+                           data = split,
+                           x = "x",
+                           y = "y",
+                           n = "n",
+                           !!!chart_args)
 
-      charts <- analyse_charts(charts)
-
-      analysis <- drawable_frame(chart = charts[[1]],
-                                 passed = passed,
-                                 extend_limits_to = arguments$extend_limits_to)
-
-      if(passed$show_limits && !centre_line_present(analysis$data)) {
-        warning(paste("The input data has fewer than the minimum number of",
-                      "points needed to calculate one period. Timeseries data",
-                      "without limits has been displayed."))
-      }
-
-      log_output(analysis$chart$result$table,
-                 verbosity = arguments$verbosity,
-                 chart_type = chart_type)
-
-      return(analysis)
+      return(analyse_charts(facet)[[1]])
 
     }
   )
 
-  # One file for the call, with one entry per facet, rather than each facet
-  # writing over the one before. The facets take their names from split_rows
-  # where it has them, and their positions where it does not.
-  logs <- lapply(analyses,
-                 function(analysis) analysis$chart$result$table)
+  # The facets take their names from split_rows where it has them, and their
+  # positions where it does not.
+  stage_names <- names(charts)
 
-  if(is.null(names(logs))) {
-    names(logs) <- as.character(seq_along(logs))
+  if(is.null(stage_names)) {
+    stage_names <- as.character(seq_along(charts))
   }
+
+  short <- vapply(charts,
+                  function(chart) !centre_line_present(chart$result$table),
+                  logical(1L))
+
+  # One warning for the call, naming the stages that are short of points
+  if(passed$show_limits && any(short)) {
+
+    subject <- paste("Stages", paste(stage_names[short], collapse = ", "),
+                     "have")
+
+    if(sum(short) == 1L) {
+      subject <- paste("Stage", stage_names[short], "has")
+    }
+
+    warning(paste(subject, "fewer than the minimum number of points needed to",
+                  "calculate one period. Timeseries data without limits has",
+                  "been displayed."))
+
+  }
+
+  for(chart in charts) {
+    log_output(chart$result$table,
+               verbosity = arguments$verbosity,
+               chart_type = chart_type)
+  }
+
+  # One file for the call, with one entry per facet, rather than each facet
+  # writing over the one before.
+  logs <- lapply(charts, function(chart) chart$result$table)
+  names(logs) <- stage_names
 
   write_log_file(logs = logs,
                  log_file_path = arguments$log_file_path)
 
-  results_splits_list <- lapply(
-    analyses,
-    function(analysis) {
-
-      if(passed$show_limits && centre_line_present(analysis$data)) {
-        return(dplyr::filter(analysis$data, !is.na(x)))
-      }
-
-      return(analysis$data)
-
-    }
-  )
-
-  results_data <- dplyr::bind_rows(
-    results_splits_list,
-    .id = "stage"
-  )
-
   if(!plot_chart) {
-    return(results_data)
+    return(drawable_table(charts = charts,
+                          passed = passed))
   }
-  
-  # The facets are stages of one series, so the last one holds all of it. Its
-  # chart is what postprocess() dispatches y_axis_range() and y_axis_title() on,
-  # and the frame it measures is every facet joined.
-  chart <- analyses[[length(analyses)]]$chart
 
-  postprocessing_vars <- postprocess(
-    df = results_data,
-    chart = chart,
-    override_x_title = passed$override_x_title,
-    override_y_title = passed$override_y_title,
-    override_y_lim = passed$override_y_lim,
-    x_pad_end = passed$x_pad_end,
-    extend_limits_to = arguments$extend_limits_to
-  )
+  return(autospc_plot(charts = charts,
+                      passed = passed,
+                      split_rows = split_rows))
 
-  derived <- list(start_x = postprocessing_vars$start_x,
-                  x_max = postprocessing_vars$x_max,
-                  end_x = postprocessing_vars$end_x,
-                  ylimlow = postprocessing_vars$ylimlow,
-                  ylimhigh = postprocessing_vars$ylimhigh)
-
-  # The plot object records the axis titles that are drawn.
-  passed["override_x_title"] <- list(postprocessing_vars$override_x_title)
-  passed["override_y_title"] <- list(postprocessing_vars$override_y_title)
-
-  charts <- lapply(analyses, function(analysis) analysis$chart)
-
-  sp <- create_spc_plot(charts = charts,
-                        data = results_data,
-                        passed = passed,
-                        derived = derived,
-                        split_rows = split_rows)
-
-  return(autospc_plot(
-    plot = sp,
-    charts = charts,
-    passed = passed,
-    derived = derived
-  ))
-  
 }
 
 

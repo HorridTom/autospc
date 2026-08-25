@@ -281,9 +281,7 @@ autospc <- function(data,
                       'draws the pair.')
     )
 
-    # show_mr = FALSE drew the X chart of a requested pair on its own, which is
-    # chart_type = "X". Translating it here means nothing after this block reads
-    # show_mr.
+    # show_mr = FALSE drew the X chart of a pair on its own
     if(isFALSE(show_mr) && identical(chart_type, "XMR")) {
       chart_type <- "X"
     }
@@ -296,12 +294,8 @@ autospc <- function(data,
 
   check_x_type(data[[x_name]])
 
-  # One element per argument, holding the value this call gave it. data, x and
-  # y and n are left out because they are the series and the columns of it
-  # rather than parameters of the analysis, and the deprecated arguments because
-  # they have been dealt with above. Both groups can be absent from a call, and
-  # mget() collects the missing argument itself for one that is, which is not
-  # something this list should carry.
+  # Every argument of the call by name, apart from the data, the columns, and
+  # the deprecated arguments dealt with above.
   arguments <- mget(setdiff(names(formals()),
                             c("data", "x", "y", "n",
                               autospc_deprecated_arguments())))
@@ -310,142 +304,117 @@ autospc <- function(data,
 
   chart_args <- arguments[autospc_chart_parameters()]
 
-  # The presentation parameters, as the caller gave them. analyse_series()
-  # resolves the ones with a default that depends on the chart.
+  # The presentation parameters, as the caller gave them.
   passed <- arguments[autospc_plot_passed_elements()]
 
-  analysis <- analyse_series(data = data,
-                             chart_type = chart_type,
-                             x = x_name,
-                             y = y_name,
-                             n = n_name,
-                             chart_args = chart_args,
-                             passed = passed,
-                             extend_limits_to = extend_limits_to)
+  validate_chart_type(chart_type)
 
-  charts_list <- analysis$charts
-  chart       <- analysis$chart
-  data        <- analysis$data
-  derived     <- analysis$derived
-  chart_type  <- analysis$chart_type
+  # One chart, or the two of an XmR pair.
+  charts <- rlang::exec(build_charts,
+                        chart_type = chart_type,
+                        data = data,
+                        x = x_name,
+                        y = y_name,
+                        n = n_name,
+                        !!!chart_args)
 
-  override_x_title <- analysis$axis_titles$x
-  override_y_title <- analysis$axis_titles$y
-  start_x          <- derived$start_x
-  x_max            <- derived$x_max
-  end_x            <- derived$end_x
-  ylimhigh         <- derived$ylimhigh
-  ylimlow          <- derived$ylimlow
+  charts <- analyse_charts(charts)
 
-  # The plot object records the axis titles as they were resolved. The moving
-  # range half of a pair resolves its own, so it is given analysis$passed, which
-  # still has them as the caller left them.
-  passed <- analysis$passed
-  passed["override_x_title"] <- list(override_x_title)
-  passed["override_y_title"] <- list(override_y_title)
+  passed <- resolve_presentation(passed = passed,
+                                 chart = charts[[1]])
 
-  title    <- passed$title
-  subtitle <- passed$subtitle
+  charts_with_limits <- vapply(charts,
+                               function(chart) {
+                                 centre_line_present(chart$result$table)
+                               },
+                               logical(1L))
 
-  # No limits columns means too few points to form a period
-  if(show_limits && !centre_line_present(data)) {
+  # One warning for the call, however many charts were short of points
+  if(show_limits && !all(charts_with_limits)) {
     warning(paste("The input data has fewer than the minimum number of",
                   "points needed to calculate one period. Timeseries data",
                   "without limits has been displayed."))
   }
 
-  # Limits are drawn where they were asked for and there are enough points to
-  # calculate them. The moving range half of a pair is analysed only then, so
-  # this decides what there is to log as well as what is drawn.
-  show_calculated_limits <- show_limits && centre_line_present(data)
+  # One log entry per chart, named for the chart type
+  logs <- lapply(charts, function(chart) chart$result$table)
+  names(logs) <- vapply(charts,
+                        function(chart) chart_type_label(chart),
+                        character(1L))
 
-  # The log of each chart analysed, named for the chart type, so that an XmR
-  # pair writes one file holding both halves rather than each overwriting the
-  # other.
-  logs <- list(chart$result$table)
-  names(logs) <- chart_type_label(chart)
-
-  log_output(chart$result$table,
-             verbosity = verbosity,
-             chart_type = chart_type_label(chart))
-
-  charts <- list(chart)
-
-  if(show_calculated_limits && chart_type == "XMR") {
-
-    mr <- run_analysis(chart = charts_list[[2]],
-                       passed = analysis$passed,
-                       extend_limits_to = extend_limits_to)
-
-    if(!centre_line_present(mr$data)) {
-      warning(paste("The input data has fewer than the minimum number of",
-                    "points needed to calculate one period. Timeseries data",
-                    "without limits has been displayed."))
-    }
-
-    log_output(mr$chart$result$table,
+  for(chart in charts) {
+    log_output(chart$result$table,
                verbosity = verbosity,
-               chart_type = chart_type_label(mr$chart))
-
-    logs[[chart_type_label(mr$chart)]] <- mr$chart$result$table
-
-    charts <- list(chart, mr$chart)
-
+               chart_type = chart_type_label(chart))
   }
 
   write_log_file(logs = logs,
                  log_file_path = log_file_path)
 
-  if(show_calculated_limits){
+  # What each chart is drawn from.
+  frames <- lapply(charts,
+                   drawable_frame,
+                   passed = passed,
+                   extend_limits_to = extend_limits_to)
 
-    if(plot_chart){
+  data    <- frames[[1]]$data
+  derived <- frames[[1]]$derived
 
-      if(length(charts) > 1L) {
-        p_mr <- draw_mr_panel(analysis = mr,
-                              passed = analysis$passed)
-      } else {
-        p_mr <- NA
-      }
+  # Limits are drawn where they were asked for and there are enough points
+  show_calculated_limits <- show_limits && centre_line_present(data)
 
-      p <- create_spc_plot(charts = charts,
-                           data = data,
-                           passed = passed,
-                           derived = derived,
-                           p_mr = p_mr)
+  if(!plot_chart) {
 
-      return(autospc_plot(plot = p,
-                          charts = charts,
-                          passed = passed,
-                          derived = derived)) # Chart output
+    if(show_calculated_limits) {
 
-    } else {
-      # (!plot_chart)
-      
-      if(chart_type == "XMR") {
-
+      if(is_xmr_pair(charts)) {
         data <- join_mr_columns(x_table = data,
-                                mr_table = mr$data)
+                                mr_table = frames[[2]]$data)
       }
 
       data <- data %>%
         dplyr::filter(!is.na(x))
-      
-      return(data)
-    }
-    
-  } else { # Plot only the time series, without limits
-    if(plot_chart == TRUE) {
-      p <- create_timeseries_plot(data = data,
-                                  passed = passed,
-                                  derived = derived)
 
-      return(autospc_plot(plot = p,
-                          charts = list(chart),
-                          passed = passed,
-                          derived = derived))
-    } else {
-      return(data) # Table output
     }
+
+    return(data)
+
   }
-}
 
+  # The plot object records the axis titles that are drawn.
+  passed["override_x_title"] <- list(frames[[1]]$axis_titles$x)
+  passed["override_y_title"] <- list(frames[[1]]$axis_titles$y)
+
+  # A series with no limits is drawn as a time series, without an MR panel.
+  if(!show_calculated_limits) {
+
+    p <- create_timeseries_plot(data = data,
+                                passed = passed,
+                                derived = derived)
+
+    return(autospc_plot(plot = p,
+                        charts = list(charts[[1]]),
+                        passed = passed,
+                        derived = derived))
+
+  }
+
+  if(is_xmr_pair(charts)) {
+    p_mr <- draw_mr_panel(analysis = frames[[2]],
+                          passed = passed)
+  } else {
+    p_mr <- NA
+  }
+
+  p <- create_spc_plot(charts = charts,
+                       data = data,
+                       passed = passed,
+                       derived = derived,
+                       p_mr = p_mr)
+
+  return(autospc_plot(plot = p,
+                      charts = charts,
+                      passed = passed,
+                      derived = derived))
+
+}

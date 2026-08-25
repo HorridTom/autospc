@@ -42,6 +42,21 @@ test_that("an XmR pair writes both halves to one file", {
 })
 
 
+test_that("a pair with too few points for limits writes both halves too", {
+
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
+
+  suppressWarnings(
+    autospc(log_file_data[1:10, ], period_min = 21L, chart_type = "XMR",
+            plot_chart = FALSE, log_file_path = path)
+  )
+
+  expect_identical(unique(readRDS(path)$chart), c("X", "MR"))
+
+})
+
+
 test_that("the X chart's log is not written over by the moving range chart's", {
 
   pair <- written_log(chart_type = "XMR")

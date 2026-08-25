@@ -92,11 +92,9 @@ facet_stages <- function(data,
 
   check_x_type(df_rn$x)
 
-  titles   <- titles_from_data(data = data,
-                               title = passed$title,
-                               subtitle = passed$subtitle)
-  title    <- titles$title
-  subtitle <- titles$subtitle
+  # Resolved once for the call, from the chart of the whole series.
+  passed <- resolve_presentation(passed = passed,
+                                 chart = whole_series)
 
   split_rows <- sort(split_rows)
 
@@ -113,16 +111,21 @@ facet_stages <- function(data,
     data_splits_list,
     function(split) {
 
-      analysis <- analyse_series(
-        data = split,
-        chart_type = chart_type,
-        x = "x",
-        y = "y",
-        n = "n",
-        chart_args = chart_args,
-        passed = passed,
-        extend_limits_to = arguments$extend_limits_to
-      )
+      # The split came from the chart of the whole series, so its columns are
+      # already named x, y and n.
+      charts <- rlang::exec(build_charts,
+                            chart_type = chart_type,
+                            data = split,
+                            x = "x",
+                            y = "y",
+                            n = "n",
+                            !!!chart_args)
+
+      charts <- analyse_charts(charts)
+
+      analysis <- drawable_frame(chart = charts[[1]],
+                                 passed = passed,
+                                 extend_limits_to = arguments$extend_limits_to)
 
       if(passed$show_limits && !centre_line_present(analysis$data)) {
         warning(paste("The input data has fewer than the minimum number of",
@@ -195,11 +198,7 @@ facet_stages <- function(data,
                   ylimlow = postprocessing_vars$ylimlow,
                   ylimhigh = postprocessing_vars$ylimhigh)
 
-  # The titles the caller did not give have been resolved - the axis ones by
-  # postprocess() from the chart's class, and the chart ones from the data.
-  # They are what is drawn, so they are what the plot object records.
-  passed["title"]            <- list(title)
-  passed["subtitle"]         <- list(subtitle)
+  # The plot object records the axis titles that are drawn.
   passed["override_x_title"] <- list(postprocessing_vars$override_x_title)
   passed["override_y_title"] <- list(postprocessing_vars$override_y_title)
 

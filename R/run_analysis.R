@@ -1,165 +1,30 @@
-# Taking a series through to an analysed chart
-#
-# analyse_series() is the whole path for one series. run_analysis() is the path
-# for one chart, called once per chart the chart type asks for.
-# join_mr_columns() puts the two halves of a pair back together for output.
+# Taking constructed charts through to analysed charts
 
-#' Analyse a series as the chart type asks for
+#' Analyse each chart
 #'
-#' Everything between the arguments a caller supplied and an analysed chart:
-#' validate the chart type, build the chart or charts, preprocess the inputs,
-#' resolve the presentation defaults that depend on the chart, and run the
-#' analysis on the first chart.
+#' Aggregate the series, order it, prepare it, and run the limit algorithm over
+#' it, for each chart in turn.
 #'
-#' **Only the first chart is analysed.** The moving range half of an XmR pair is
-#' analysed by the caller, once it knows the first produced limits - which is
-#' also what orders the warning and the log output for each half.
+#' @param charts A list of `autospc_chart` objects, as `build_charts()` gives
+#'   them.
 #'
-#' `passed` goes in as the caller gave it and comes back with `title`,
-#' `subtitle` and the two annotation scale factors resolved. The axis titles are
-#' not among them: they are per chart, so they come back under `axis_titles`.
-#'
-#' @param chart_args A named list of the chart parameters, as `autospc_chart()`
-#'   takes them.
-#' @param passed A named list of the presentation parameters.
-#'
-#' @return A list of the built `charts`; the analysed first `chart` with its
-#'   drawable `data`, `derived` axis extents and `axis_titles`; the resolved
-#'   `passed`; and the `chart_type`.
+#' @return A list of `autospc_chart` objects, each with `chart$result` set.
 #' @noRd
-analyse_series <- function(data,
-                           chart_type,
-                           x,
-                           y,
-                           n,
-                           chart_args,
-                           passed,
-                           extend_limits_to) {
+analyse_charts <- function(charts) {
 
-  # autospc_chart() has no branch for a chart type outside
-  # autospc_chart_types(), so chart_type has to be valid before the object is
-  # built.
-  validate_chart_type(chart_type)
+  analysed <- lapply(charts, function(chart) {
 
-  # The charts are built from the data exactly as passed. build_charts() renames
-  # the analysed columns to x, y and n.
-  charts_list <- rlang::exec(build_charts,
-                            chart_type = chart_type,
-                            data = data,
-                            x = x,
-                            y = y,
-                            n = n,
-                            !!!chart_args)
+    chart <- aggregate_data(chart)
+    chart <- order_series(chart)
+    chart <- prepare_data(chart)
 
-  chart <- charts_list[[1]]
+    chart <- run_limit_algorithm(chart)
 
-  titles <- titles_from_data(data = chart$data_original,
-                             title = passed$title,
-                             subtitle = passed$subtitle)
+    return(chart)
 
-  # Assigned as single-element lists: `passed$title <- NULL` would delete
-  # the element rather than set it, so the list's shape would depend on
-  # whether a title was given.
-  passed["title"]    <- list(titles$title)
-  passed["subtitle"] <- list(titles$subtitle)
+  })
 
-  # Centre line labels sit a scale factor above the upper control limit, and
-  # the lower factor is its mirror image about 1. Only the upper default asks
-  # what kind of chart this is, so only that is a method. A value the caller
-  # passed wins over both.
-  if(is.null(passed$upper_annotation_sf)) {
-    passed$upper_annotation_sf <- upper_annotation_sf_default(chart)
-  }
-
-  if(is.null(passed$lower_annotation_sf)) {
-    passed$lower_annotation_sf <- 2 - passed$upper_annotation_sf
-  }
-
-  analysis <- run_analysis(chart = chart,
-                           passed = passed,
-                           extend_limits_to = extend_limits_to)
-
-  return(list(charts = charts_list,
-              chart = analysis$chart,
-              data = analysis$data,
-              derived = analysis$derived,
-              axis_titles = analysis$axis_titles,
-              passed = passed,
-              chart_type = chart_type))
-
-}
-
-
-#' Analyse a chart and prepare its data for drawing
-#'
-#' Everything between a built chart and a drawable frame: aggregate, order,
-#' prepare, run the algorithm, then postprocess. Called once per chart, so an
-#' XmR pair calls it twice.
-#'
-#' The axis titles come back separately rather than written into `passed`,
-#' because each chart resolves its own from its class - the moving range half
-#' of a pair is labelled MR where the X half is labelled X.
-#'
-#' @return A list of the analysed `chart`, the drawable `data`, the `derived`
-#'   axis extents, and the resolved `axis_titles`.
-#' @noRd
-run_analysis <- function(chart,
-                         passed,
-                         extend_limits_to) {
-
-  chart <- aggregate_data(chart)
-  chart <- order_series(chart)
-  chart <- prepare_data(chart)
-
-  chart <- run_limit_algorithm(chart)
-
-  data <- chart$result$table
-
-  postprocessing_vars <- postprocess(
-    df = data,
-    chart = chart,
-    override_x_title = passed$override_x_title,
-    override_y_title = passed$override_y_title,
-    override_y_lim = passed$override_y_lim,
-    x_pad_end = passed$x_pad_end,
-    extend_limits_to = extend_limits_to
-  )
-
-  data <- postprocessing_vars$df
-
-  axis_titles <- list(x = postprocessing_vars$override_x_title,
-                      y = postprocessing_vars$override_y_title)
-
-  derived <- list(
-    start_x = postprocessing_vars$start_x,
-    x_max = postprocessing_vars$x_max,
-    end_x = postprocessing_vars$end_x,
-    ylimlow = postprocessing_vars$ylimlow,
-    ylimhigh = postprocessing_vars$ylimhigh
-  )
-
-  if(passed$show_limits && centre_line_present(data)) {
-
-    data <- postprocess_spc(
-      df = data,
-      chart = chart,
-      highlight_exclusions = passed$highlight_exclusions,
-      extend_limits_to = extend_limits_to,
-      align_labels = passed$align_labels,
-      flip_labels = passed$flip_labels,
-      upper_annotation_sf = passed$upper_annotation_sf,
-      lower_annotation_sf = passed$lower_annotation_sf,
-      annotation_arrow_curve = passed$annotation_arrow_curve,
-      ylimhigh = derived$ylimhigh,
-      x_max = derived$x_max
-    )
-
-  }
-
-  return(list(chart = chart,
-              data = data,
-              derived = derived,
-              axis_titles = axis_titles))
+  return(analysed)
 
 }
 

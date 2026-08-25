@@ -61,21 +61,13 @@ validate_chart_type <- function(chart_type) {
 
 #' Check the algorithm parameters against each other
 #'
-#' Some of the algorithm parameters are not independent of each other, so a
-#' value that is valid on its own can still be invalid beside another. This is
-#' where those checks go. Where a pair is inconsistent the caller is told and
-#' one of the two is changed, so the returned list is what the analysis should
-#' use rather than what the caller wrote.
+#' The checks on parameters that are not independent of one another. Where a
+#' pair is inconsistent, one of the two is changed and the caller is warned.
 #'
-#' `no_regrets` and `overhanging_reversions`: the no-regrets rule asks whether
-#' a candidate period's final run may revert, so it cannot be applied while
-#' overhanging reversions are ignored. `overhanging_reversions` is set to TRUE.
+#' `no_regrets = TRUE` with `overhanging_reversions = FALSE` sets
+#' `overhanging_reversions` to TRUE.
 #'
-#' Called once per call to `autospc()` or `facet_stages()`, before the chart or
-#' charts are constructed. It is validation of the arguments a user gave rather
-#' than anything about a chart, which is why it is here and not in
-#' `autospc_chart()`: the constructor runs once per chart, so an XmR pair
-#' produced the same warning twice.
+#' Called once per call to `autospc()` or `facet_stages()`.
 #'
 #' @param arguments A named list of the argument values for one call.
 #'

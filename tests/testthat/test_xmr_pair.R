@@ -26,6 +26,33 @@ test_that("an XMR chart draws", {
 })
 
 
+test_that("both halves of a pair are short of points together", {
+
+  # the two halves need the same number of points to form a period, which is
+  # what makes one "fewer than the minimum" warning for the call right
+  just_enough <- data.frame(x = 1:21, y = rep(c(4, 7, 5), 7))
+  one_short   <- data.frame(x = 1:20, y = rep(c(4, 7, 5, 6), 5))
+
+  limits_of <- function(data) {
+
+    charts <- autospc_plot_charts(
+      suppressWarnings(autospc(data, chart_type = "XMR", period_min = 21L))
+    )
+
+    vapply(charts,
+           function(chart) centre_line_present(chart$result$table),
+           logical(1L))
+
+  }
+
+  expect_identical(limits_of(just_enough), c(TRUE, TRUE))
+
+  # a pair with no limits carries the X chart alone
+  expect_identical(limits_of(one_short), FALSE)
+
+})
+
+
 test_that("both panels are drawn", {
 
   expect_setequal(intersect(panel_texts(run_pair()), c("X", "MR")),

@@ -84,8 +84,6 @@ test_that("show_mr = TRUE carries the pair, as leaving it out does", {
 
 test_that("show_mr = FALSE does not change a chart type that is not XMR", {
 
-  # show_mr only ever chose whether the moving range chart of a requested pair
-  # was drawn, so it says nothing about any other chart type
   charts <- suppressWarnings(
     autospc_plot_charts(autospc(show_mr_data,
                                 chart_type = "C",

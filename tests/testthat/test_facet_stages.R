@@ -431,6 +431,21 @@ test_that("the plot object records the titles it was drawn with", {
 })
 
 
+test_that("the plot object records the annotation scale factors it was drawn with", {
+
+  # the caller passes NULL and the chart type answers; what is recorded is the
+  # answer
+  plot <- faceted_plot()
+
+  expect_identical(autospc_plot_passed(plot, "upper_annotation_sf"),
+                   upper_annotation_sf_default(autospc_plot_charts(plot)[[1]]))
+
+  expect_identical(autospc_plot_passed(plot, "lower_annotation_sf"),
+                   2 - autospc_plot_passed(plot, "upper_annotation_sf"))
+
+})
+
+
 test_that("leaving out chart_type says so, rather than failing on a length", {
 
   # facet_stages() used to test dots_exprs$chart_type == "XMR", which is

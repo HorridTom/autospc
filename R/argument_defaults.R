@@ -29,15 +29,7 @@ autospc_default <- function(name) {
 
 #' The deprecated arguments of autospc()
 #'
-#' Every deprecated argument is declared with `deprecated()` as its default, so
-#' the signature itself says which they are.
-#'
-#' `deprecated()` returns the missing argument rather than a value, which is how
-#' `lifecycle::is_present()` tells an argument the caller supplied from one they
-#' did not. So where the caller supplied none, what is collected for one of
-#' these is the missing argument rather than anything a function could use,
-#' which is why they are excluded wherever the arguments of a call are
-#' collected.
+#' The arguments whose default is `deprecated()`.
 #'
 #' @return A character vector of argument names.
 #' @noRd

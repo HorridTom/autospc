@@ -1,10 +1,7 @@
-# autospc() builds two lists of arguments: chart_args, which it passes to
-# autospc_chart(), and passed, which it records on the plot object. Both are
-# selected from the arguments of the call by the names in
-# autospc_chart_parameters() and autospc_plot_passed_elements(), so a name in
-# either of those that autospc() does not take gives a NULL rather than an
-# error. These tests check that every parameter named in those two functions
-# arrives where it is meant to.
+# autospc() selects chart_args and passed from the arguments of the call, by the
+# names in autospc_chart_parameters() and autospc_plot_passed_elements(). These
+# tests check that every parameter named in those two functions arrives where it
+# is meant to.
 
 argument_data <- data.frame(x = 1:30,
                             y = rep(c(10L, 12L, 11L, 13L, 9L, 14L), 5L))
@@ -31,12 +28,8 @@ chart_argument_alternatives <- list(
 
 test_that("the deprecated arguments are the ones autospc declares as deprecated", {
 
-  # autospc() collects the arguments of a call with mget(), which cannot give a
-  # value for an argument declared with deprecated() unless the caller supplied
-  # one, so those arguments are left out. They are found by their default rather
-  # than named, and this is the list that finding them is expected to produce:
-  # deprecating an argument, or removing one, should fail here until the change
-  # has been looked at.
+  # the deprecated arguments are found by their default rather than named, and
+  # this is the list that is expected
   expect_setequal(autospc_deprecated_arguments(),
                   c("show_mr",
                     "write_table",

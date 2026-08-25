@@ -1,5 +1,71 @@
 # Postprocessing functions
 
+#' The frame a chart is drawn from, and what its axes need
+#'
+#' The postprocessing every chart needs, and then the presentation columns that
+#' only a chart with limits has. Called once per chart.
+#'
+#' @param chart An analysed `autospc_chart`.
+#' @param passed A named list of the presentation parameters.
+#'
+#' @return A list of the `chart`, the drawable `data`, the `derived` axis
+#'   extents, and the `axis_titles` the chart resolved from its class.
+#' @noRd
+drawable_frame <- function(chart,
+                           passed,
+                           extend_limits_to) {
+
+  data <- chart$result$table
+
+  postprocessing_vars <- postprocess(
+    df = data,
+    chart = chart,
+    override_x_title = passed$override_x_title,
+    override_y_title = passed$override_y_title,
+    override_y_lim = passed$override_y_lim,
+    x_pad_end = passed$x_pad_end,
+    extend_limits_to = extend_limits_to
+  )
+
+  data <- postprocessing_vars$df
+
+  axis_titles <- list(x = postprocessing_vars$override_x_title,
+                      y = postprocessing_vars$override_y_title)
+
+  derived <- list(
+    start_x = postprocessing_vars$start_x,
+    x_max = postprocessing_vars$x_max,
+    end_x = postprocessing_vars$end_x,
+    ylimlow = postprocessing_vars$ylimlow,
+    ylimhigh = postprocessing_vars$ylimhigh
+  )
+
+  if(passed$show_limits && centre_line_present(data)) {
+
+    data <- postprocess_spc(
+      df = data,
+      chart = chart,
+      highlight_exclusions = passed$highlight_exclusions,
+      extend_limits_to = extend_limits_to,
+      align_labels = passed$align_labels,
+      flip_labels = passed$flip_labels,
+      upper_annotation_sf = passed$upper_annotation_sf,
+      lower_annotation_sf = passed$lower_annotation_sf,
+      annotation_arrow_curve = passed$annotation_arrow_curve,
+      ylimhigh = derived$ylimhigh,
+      x_max = derived$x_max
+    )
+
+  }
+
+  return(list(chart = chart,
+              data = data,
+              derived = derived,
+              axis_titles = axis_titles))
+
+}
+
+
 # General postprocessing, required regardless of whether limits
 # are to be displayed
 postprocess <- function(

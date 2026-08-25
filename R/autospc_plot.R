@@ -225,6 +225,44 @@ autospc_plot_passed_elements <- function() {
 }
 
 
+#' Resolve the presentation parameters whose default depends on the chart
+#'
+#' The title and subtitle, which come from columns of the data where the caller
+#' gave none, and the two annotation scale factors, which come from the chart
+#' type. A value the caller passed wins over all four. Called once per call.
+#'
+#' @param passed A named list of the presentation parameters, as the caller gave
+#'   them.
+#' @param chart An `autospc_chart`.
+#'
+#' @return `passed`, with those four resolved.
+#' @noRd
+resolve_presentation <- function(passed,
+                                 chart) {
+
+  titles <- titles_from_data(data = chart$data_original,
+                             title = passed$title,
+                             subtitle = passed$subtitle)
+
+  # Assigned as single-element lists so that a NULL sets the element rather than
+  # deleting it.
+  passed["title"]    <- list(titles$title)
+  passed["subtitle"] <- list(titles$subtitle)
+
+  # The lower factor is the mirror image of the upper about 1.
+  if(is.null(passed$upper_annotation_sf)) {
+    passed$upper_annotation_sf <- upper_annotation_sf_default(chart)
+  }
+
+  if(is.null(passed$lower_annotation_sf)) {
+    passed$lower_annotation_sf <- 2 - passed$upper_annotation_sf
+  }
+
+  return(passed)
+
+}
+
+
 #' Create an autospc_plot object
 #'
 #' Assemble, construct, validate, return - the same shape as the chart

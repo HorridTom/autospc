@@ -1,13 +1,23 @@
 
-#' facet_stages
+#' Plot SPC charts at successive stages of a series
+#'
+#' `facet_stages()` analyses the same series in stages, each time using more of
+#' it, and plots the results side by side - one facet per stage. Each facet is
+#' what `autospc()` would have drawn from the data available at that point, so
+#' the set of them shows how the chart, and the control limits, developed as the
+#' data arrived.
+#'
 #' @inheritParams autospc
 #' @param split_rows A vector of row numbers specifying the stages to display
 #' results at. Names specify facet strip labels.
 #' @param ... Arguments passed to [autospc::autospc()]
 #'
-#' @returns An `autospc_plot` showing the results of [autospc::autospc()] at
-#' different stages as specified by split_rows, one facet per stage. It is a
-#' ggplot, and additionally carries the analysed chart behind each facet.
+#' @returns With `plot_chart = TRUE` (the default), an `autospc_plot`: one
+#' ggplot, faceted by stage, which also carries the analysed chart behind each
+#' facet and the parameters it was drawn with.
+#'
+#' With `plot_chart = FALSE`, a data frame holding every stage, with `stage`
+#' saying which each row belongs to.
 #'
 #' @examples
 #' # Show progression of C' chart for count of monthly attendances over time
@@ -70,7 +80,7 @@ facet_stages <- function(data,
   arguments <- validate_algorithm_parameters(arguments)
 
   chart_args <- arguments[autospc_chart_parameters()]
-  parameters <- arguments[autospc_plot_parameter_names()]
+  visualisation_params <- arguments[visualisation_param_names()]
 
   chart_type <- arguments$chart_type
 
@@ -93,8 +103,10 @@ facet_stages <- function(data,
   check_x_type(df_rn$x)
 
   # Resolved once for the call, from the chart of the whole series.
-  parameters <- resolve_default_parameters(parameters = parameters,
-                                           chart = whole_series)
+  visualisation_params <- resolve_default_visualisation_params(
+    visualisation_params = visualisation_params,
+    chart = whole_series
+  )
 
   split_rows <- sort(split_rows)
 
@@ -134,21 +146,21 @@ facet_stages <- function(data,
     stage_names <- as.character(seq_along(charts))
   }
 
-  # Each facet is named for its stage in the warning and the log file
+  # A facet is named for its stage rather than for its chart type
   report_analysis(charts = charts,
-                  labels = stage_names,
-                  show_limits = parameters$show_limits,
+                  show_limits = visualisation_params$show_limits,
                   verbosity = arguments$verbosity,
                   log_file_path = arguments$log_file_path,
+                  labels = stage_names,
                   short_message = stages_short_message)
 
   if(!plot_chart) {
     return(charts_as_table(charts = charts,
-                           parameters = parameters))
+                           visualisation_params = visualisation_params))
   }
 
   return(autospc_plot(charts = charts,
-                      parameters = parameters,
+                      visualisation_params = visualisation_params,
                       split_rows = split_rows))
 
 }

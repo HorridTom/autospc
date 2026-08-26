@@ -221,17 +221,21 @@ interpret_log <- function(df,
 #'
 #' @param charts A list of analysed `autospc_chart` objects.
 #' @param labels One label per chart, naming it in the log file and in the
-#'   warning: the chart type for a chart, the stage for a facet.
+#'   warning. The chart type by default; `facet_stages()` passes the stages.
 #' @param short_message A function taking the labels of the charts that were
 #'   short of points, and giving the warning to raise about them.
 #'
 #' @return invisible NULL
 #' @noRd
 report_analysis <- function(charts,
-                            labels,
                             show_limits,
                             verbosity,
                             log_file_path,
+                            labels = vapply(charts,
+                                            function(chart) {
+                                              chart_type_label(chart)
+                                            },
+                                            character(1L)),
                             short_message = series_short_message) {
 
   short <- vapply(charts,

@@ -11,13 +11,14 @@
 #' chart object, plus other information needed for plotting. One
 #' element per chart for a pair, and just one for a faceted plot, holding every
 #' facet.
-#' @param parameters The presentation parameters, with the axis titles resolved.
+#' @param visualisation_params The visualisation parameters, with the axis
+#'   titles resolved.
 #' @param split_rows Non-NULL to facet by stage.
 #'
 #' @return A ggplot.
 #' @noRd
 create_spc_plot <- function(plot_data,
-                            parameters,
+                            visualisation_params,
                             split_rows = NULL) {
 
   main <- plot_data[[1]]
@@ -49,7 +50,7 @@ create_spc_plot <- function(plot_data,
                          ggplot2::aes(x = x,
                                       y = value))
   
-  if(parameters$use_caption) {
+  if(visualisation_params$use_caption) {
     caption <- paste(chart_type,
                      "Shewhart Chart.",
                      "\n*Shewhart chart rules apply",
@@ -69,15 +70,15 @@ create_spc_plot <- function(plot_data,
   # Apply autospc formatting
   p <- format_SPC(pct,
                   df_long = df_long,
-                  r1_col = parameters$r1_col,
-                  r2_col = parameters$r2_col,
-                  point_size = parameters$point_size,
+                  r1_col = visualisation_params$r1_col,
+                  r2_col = visualisation_params$r2_col,
+                  point_size = visualisation_params$point_size,
                   rule_title = rule_title,
-                  line_width_sf = parameters$line_width_sf) +
-    ggplot2::ggtitle(parameters$title,
-                     subtitle = parameters$subtitle) +
-    ggplot2::labs(x = parameters$override_x_title,
-                  y = parameters$override_y_title,
+                  line_width_sf = visualisation_params$line_width_sf) +
+    ggplot2::ggtitle(visualisation_params$title,
+                     subtitle = visualisation_params$subtitle) +
+    ggplot2::labs(x = visualisation_params$override_x_title,
+                  y = visualisation_params$override_y_title,
                   caption = paste0(caption)) +
     ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
                                 breaks = scales::breaks_pretty(),
@@ -91,22 +92,22 @@ create_spc_plot <- function(plot_data,
   }
   
   # Add annotations to chart if needed
-  if(parameters$include_annotations == TRUE){
+  if(visualisation_params$include_annotations == TRUE){
 
     p <- add_annotations_to_plot(
       p = p,
       df = df_long,
-      basic_annotations = parameters$basic_annotations,
-      annotation_size = parameters$annotation_size,
-      annotation_arrows = parameters$annotation_arrows,
-      annotation_arrow_curve = parameters$annotation_arrow_curve)
+      basic_annotations = visualisation_params$basic_annotations,
+      annotation_size = visualisation_params$annotation_size,
+      annotation_arrows = visualisation_params$annotation_arrows,
+      annotation_arrow_curve = visualisation_params$annotation_arrow_curve)
   }
   
   # Format x-axis depending on x type
   p <- format_x_axis(p = p,
                      xType = class(data$x),
-                     x_break = parameters$x_break,
-                     x_date_format = parameters$x_date_format,
+                     x_break = visualisation_params$x_break,
+                     x_date_format = visualisation_params$x_date_format,
                      start_x = derived$start_x,
                      end_x = derived$end_x)
   
@@ -127,7 +128,7 @@ create_spc_plot <- function(plot_data,
                      axis.ticks.x = ggplot2::element_blank())
 
     p_mr <- draw_mr_panel(plot_data = plot_data$dispersion,
-                          parameters = parameters) +
+                          visualisation_params = visualisation_params) +
       ggplot2::labs(caption = caption)
     
     legend <- cowplot::get_legend(p)
@@ -159,28 +160,29 @@ create_spc_plot <- function(plot_data,
 #' range chart's own. Called by `create_spc_plot()` for a pair.
 #'
 #' @param plot_data The moving range chart's plot data.
-#' @param parameters The presentation parameters, shared with the X chart.
+#' @param visualisation_params The visualisation parameters, shared with the X
+#'   chart.
 #'
 #' @return A ggplot.
 #' @noRd
 draw_mr_panel <- function(plot_data,
-                          parameters) {
+                          visualisation_params) {
 
-  parameters["title"]            <- list(NULL)
-  parameters["subtitle"]         <- list(NULL)
-  parameters["override_x_title"] <- list(plot_data$axis_titles$x)
-  parameters["override_y_title"] <- list(plot_data$axis_titles$y)
+  visualisation_params["title"]            <- list(NULL)
+  visualisation_params["subtitle"]         <- list(NULL)
+  visualisation_params["override_x_title"] <- list(plot_data$axis_titles$x)
+  visualisation_params["override_y_title"] <- list(plot_data$axis_titles$y)
 
   if(!centre_line_present(plot_data$table)) {
 
     return(create_timeseries_plot(data = plot_data$table,
-                                  parameters = parameters,
+                                  visualisation_params = visualisation_params,
                                   derived = plot_data$derived))
 
   }
 
   return(create_spc_plot(plot_data = list(plot_data),
-                         parameters = parameters))
+                         visualisation_params = visualisation_params))
 
 }
 
@@ -193,19 +195,20 @@ draw_mr_panel <- function(plot_data,
 #' @return A ggplot.
 #' @noRd
 create_timeseries_plot <- function(data,
-                                   parameters,
+                                   visualisation_params,
                                    derived) {
 
   time_series_plot <- ggplot2::ggplot(data, 
                                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_line(colour = "black",
-                       linewidth = 0.5*parameters$line_width_sf) +
-    ggplot2::geom_point(colour = "black", size = parameters$point_size) +
+                       linewidth = 0.5*visualisation_params$line_width_sf) +
+    ggplot2::geom_point(colour = "black",
+                        size = visualisation_params$point_size) +
     theme_autospc() +
-    ggplot2::ggtitle(parameters$title,
-                     subtitle = parameters$subtitle) +
-    ggplot2::labs(x = parameters$override_x_title,
-                  y = parameters$override_y_title) +
+    ggplot2::ggtitle(visualisation_params$title,
+                     subtitle = visualisation_params$subtitle) +
+    ggplot2::labs(x = visualisation_params$override_x_title,
+                  y = visualisation_params$override_y_title) +
     ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::number_format(accuracy = 1,

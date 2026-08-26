@@ -256,12 +256,20 @@ scale factor is \code{1 + 1/override_annotation_dist}, so
 every chart type, so a P or P' chart no longer needs an argument of its own.}
 }
 \value{
-An SPC ggplot or corresponding data
+With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: a ggplot
+of the chart, or of the pair for \code{chart_type = "XMR"}, which also carries the
+analysed chart objects it was drawn from and the parameters it was drawn
+with. Anything that works on a ggplot works on it, including \code{+}, \code{print()}
+and \code{ggplot2::ggsave()}, and \code{as.data.frame()} gives the analysis behind it.
+
+With \code{plot_chart = FALSE}, a data frame: the subgroup-aggregated data with
+the centre line, the control limits and the rest of the analytic output
+appended as columns.
 }
 \description{
 \code{autospc()} creates a statistical process control chart from a
-dataframe. Control limits are re-established according to specified rules,
-including via the Stable Shift Algorithm.
+data frame. Control limits are re-established according to specified rules,
+by default the Stable Shift Algorithm.
 }
 \examples{
 # Using a C' chart to track changes in the count of monthly attendance 

@@ -1,7 +1,7 @@
-# autospc() selects chart_args and passed from the arguments of the call, by the
-# names in autospc_chart_parameters() and autospc_plot_parameter_names(). These
-# tests check that every parameter named in those two functions arrives where it
-# is meant to.
+# autospc() selects chart_args and visualisation_params from the arguments of
+# the call, by the names in autospc_chart_parameters() and
+# visualisation_param_names(). These tests check that every parameter named in
+# those two functions arrives where it is meant to.
 
 argument_data <- data.frame(x = 1:30,
                             y = rep(c(10L, 12L, 11L, 13L, 9L, 14L), 5L))
@@ -86,7 +86,7 @@ test_that("every chart parameter autospc takes reaches the chart", {
 })
 
 
-test_that("every presentation parameter autospc takes reaches the plot object", {
+test_that("every visualisation parameter reaches the plot object", {
 
   # These six are not compared: where the caller passes NULL, autospc() replaces
   # it with a value taken from the data or the chart type, so the value recorded
@@ -99,10 +99,10 @@ test_that("every presentation parameter autospc takes reaches the plot object", 
     autospc(argument_data, chart_type = "C", period_min = 21L)
   )
 
-  expect_setequal(names(autospc_plot_parameters(plot)),
-                  autospc_plot_parameter_names())
+  expect_setequal(names(autospc_plot_visualisation_params(plot)),
+                  visualisation_param_names())
 
-  for(parameter in setdiff(autospc_plot_parameter_names(), resolved)) {
+  for(parameter in setdiff(visualisation_param_names(), resolved)) {
 
     given <- list(1.5)
     names(given) <- parameter
@@ -130,7 +130,7 @@ test_that("every presentation parameter autospc takes reaches the plot object", 
                   !!!given)
     )
 
-    expect_identical(autospc_plot_parameters(drawn_with, parameter),
+    expect_identical(autospc_plot_visualisation_params(drawn_with, parameter),
                      given[[parameter]],
                      info = parameter)
 

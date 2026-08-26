@@ -424,9 +424,11 @@ test_that("the plot object records the titles it was drawn with", {
 
   plot <- faceted_plot()
 
-  expect_identical(autospc_plot_parameters(plot, "override_x_title"), plot$labels$x)
+  expect_identical(autospc_plot_visualisation_params(plot, "override_x_title"),
+                   plot$labels$x)
 
-  expect_identical(autospc_plot_parameters(plot, "override_y_title"), plot$labels$y)
+  expect_identical(autospc_plot_visualisation_params(plot, "override_y_title"),
+                   plot$labels$y)
 
 })
 
@@ -437,11 +439,15 @@ test_that("the plot object records the annotation scale factors it was drawn wit
   # answer
   plot <- faceted_plot()
 
-  expect_identical(autospc_plot_parameters(plot, "upper_annotation_sf"),
-                   upper_annotation_sf_default(autospc_plot_charts(plot)[[1]]))
+  expect_identical(
+    autospc_plot_visualisation_params(plot, "upper_annotation_sf"),
+    upper_annotation_sf_default(autospc_plot_charts(plot)[[1]])
+  )
 
-  expect_identical(autospc_plot_parameters(plot, "lower_annotation_sf"),
-                   2 - autospc_plot_parameters(plot, "upper_annotation_sf"))
+  expect_identical(
+    autospc_plot_visualisation_params(plot, "lower_annotation_sf"),
+    2 - autospc_plot_visualisation_params(plot, "upper_annotation_sf")
+  )
 
 })
 

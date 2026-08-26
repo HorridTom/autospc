@@ -1,8 +1,8 @@
 #' Plot SPC charts with automated limit recalculation
 #' 
 #' `autospc()` creates a statistical process control chart from a
-#' dataframe. Control limits are re-established according to specified rules,
-#' including via the Stable Shift Algorithm.
+#' data frame. Control limits are re-established according to specified rules,
+#' by default the Stable Shift Algorithm.
 #' 
 #' @param data A data frame. For column requirements by chart type, see
 #' \code{vignette("data-requirements", package = "autospc")}.
@@ -148,7 +148,15 @@
 #' `upper_annotation_sf` and `lower_annotation_sf` instead. These apply to
 #' every chart type, so a P or P' chart no longer needs an argument of its own.
 #'
-#' @return An SPC ggplot or corresponding data 
+#' @return With `plot_chart = TRUE` (the default), an `autospc_plot`: a ggplot
+#' of the chart, or of the pair for `chart_type = "XMR"`, which also carries the
+#' analysed chart objects it was drawn from and the parameters it was drawn
+#' with. Anything that works on a ggplot works on it, including `+`, `print()`
+#' and `ggplot2::ggsave()`, and `as.data.frame()` gives the analysis behind it.
+#'
+#' With `plot_chart = FALSE`, a data frame: the subgroup-aggregated data with
+#' the centre line, the control limits and the rest of the analytic output
+#' appended as columns.
 #'
 #' @examples 
 #' # Using a C' chart to track changes in the count of monthly attendance 
@@ -305,8 +313,8 @@ autospc <- function(data,
   # The validated analysis parameters
   chart_args <- arguments[autospc_chart_parameters()]
 
-  # The presentation parameters, as the caller gave them.
-  parameters <- arguments[autospc_plot_parameter_names()]
+  # The visualisation parameters, as the caller gave them.
+  visualisation_params <- arguments[visualisation_param_names()]
 
   validate_chart_type(chart_type)
 
@@ -322,25 +330,25 @@ autospc <- function(data,
   # Run the analysis
   charts <- analyse_charts(charts)
   
-  # Resolve visualisation parameters, based on chart type
-  parameters <- resolve_default_parameters(parameters = parameters,
-                                           chart = charts[[1]])
+  # Resolve visualisation parameters, based on chart type. The chart asked is
+  # the one drawn in the main panel: the location chart of a pair, or the only
+  # chart. Both halves of a pair answer the same.
+  visualisation_params <- resolve_default_visualisation_params(
+    visualisation_params = visualisation_params,
+    chart = charts[[1]]
+  )
 
-  # Each chart is named for its chart type in the warning and the log file
   report_analysis(charts = charts,
-                  labels = vapply(charts,
-                                  function(chart) chart_type_label(chart),
-                                  character(1L)),
                   show_limits = show_limits,
                   verbosity = verbosity,
                   log_file_path = log_file_path)
 
   if(!plot_chart) {
     return(charts_as_table(charts = charts,
-                           parameters = parameters))
+                           visualisation_params = visualisation_params))
   }
 
   return(autospc_plot(charts = charts,
-                      parameters = parameters))
+                      visualisation_params = visualisation_params))
 
 }

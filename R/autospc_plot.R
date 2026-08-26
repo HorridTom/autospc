@@ -3,7 +3,7 @@
 # An autospc_plot IS a ggplot: its class vector is c("autospc_plot", "gg",
 # "ggplot"), so printing, ggsave() and adding ggplot2 layers all keep working.
 # What it adds is the analysed chart or charts it was drawn from, and how it was
-# drawn - the presentation parameters, and the values derived from them.
+# drawn - the visualisation parameters, and the values derived from them.
 #
 # Everything in the package that depends on a ggplot being an S3 list lives in
 # this file. new_autospc_plot() writes the class vector and the slots; the
@@ -157,9 +157,9 @@ autospc_plot_elements <- function() {
 
 #' The two halves of an autospc_plot's presentation
 #'
-#' `parameters` is what the caller asked for; `derived` is what was worked out
-#' from that and the charts. A value that is both - an axis end the caller set -
-#' appears in each, as asked for and as used.
+#' `visualisation_params` is what the caller asked for; `derived` is what was
+#' worked out from that and the charts. A value that is both - an axis end the
+#' caller set - appears in each, as asked for and as used.
 #'
 #' Every parameter and every derived value goes inside one of these, rather than
 #' becoming an element of its own.
@@ -169,7 +169,7 @@ autospc_plot_elements <- function() {
 autospc_plot_presentation_elements <- function() {
 
   presentation_elements <- c(
-    "parameters",
+    "visualisation_params",
     "derived"
   )
 
@@ -178,22 +178,21 @@ autospc_plot_presentation_elements <- function() {
 }
 
 
-#' The presentation parameters a plot is drawn with
+#' The visualisation parameters a plot is drawn with
 #'
-#' The presentation half of the argument split, and the single definition of
-#' it. `autospc()` builds its `parameters` list from exactly these, and
-#' `facet_stages()` uses them to select the presentation arguments from the ones
-#' it was passed.
+#' The visualisation half of the argument split, and the single definition of
+#' it. `autospc()` and `facet_stages()` select their `visualisation_params` from
+#' the arguments of the call by exactly these names.
 #'
-#' `autospc()` lists these parameter names again in its own source, so the two
-#' lists can differ without any error being raised. `test_chart_arguments.R`
-#' tests that each parameter named here is recorded on the plot object.
+#' A name here that `autospc()` does not take gives a NULL rather than an error,
+#' so `test_chart_arguments.R` tests that each parameter named here is recorded
+#' on the plot object.
 #'
 #' @return A character vector of parameter names.
 #' @noRd
-autospc_plot_parameter_names <- function() {
+visualisation_param_names <- function() {
 
-  passed_elements <- c(
+  parameter_names <- c(
     "show_limits",
     "title",
     "subtitle",
@@ -221,7 +220,7 @@ autospc_plot_parameter_names <- function() {
     "annotation_arrow_curve"
   )
 
-  return(passed_elements)
+  return(parameter_names)
 
 }
 
@@ -255,40 +254,42 @@ titles_from_data <- function(data,
 }
 
 
-#' Resolve the presentation parameters whose default depends on the chart
+#' Resolve the visualisation parameters whose default depends on the chart
 #'
 #' The title and subtitle, which come from columns of the data where the caller
 #' gave none, and the two annotation scale factors, which come from the chart
 #' type. A value the caller passed wins over all four. Called once per call.
 #'
-#' @param parameters A named list of the presentation parameters, as the caller
-#'   gave them.
+#' @param visualisation_params A named list of the visualisation parameters, as
+#'   the caller gave them.
 #' @param chart An `autospc_chart`.
 #'
-#' @return `parameters`, with those four resolved.
+#' @return `visualisation_params`, with those four resolved.
 #' @noRd
-resolve_default_parameters <- function(parameters,
-                                       chart) {
+resolve_default_visualisation_params <- function(visualisation_params,
+                                                 chart) {
 
   titles <- titles_from_data(data = chart$data_original,
-                             title = parameters$title,
-                             subtitle = parameters$subtitle)
+                             title = visualisation_params$title,
+                             subtitle = visualisation_params$subtitle)
 
   # Assigned as single-element lists so that a NULL sets the element rather than
   # deleting it.
-  parameters["title"]    <- list(titles$title)
-  parameters["subtitle"] <- list(titles$subtitle)
+  visualisation_params["title"]    <- list(titles$title)
+  visualisation_params["subtitle"] <- list(titles$subtitle)
 
   # The lower factor is the mirror image of the upper about 1.
-  if(is.null(parameters$upper_annotation_sf)) {
-    parameters$upper_annotation_sf <- upper_annotation_sf_default(chart)
+  if(is.null(visualisation_params$upper_annotation_sf)) {
+    visualisation_params$upper_annotation_sf <-
+      upper_annotation_sf_default(chart)
   }
 
-  if(is.null(parameters$lower_annotation_sf)) {
-    parameters$lower_annotation_sf <- 2 - parameters$upper_annotation_sf
+  if(is.null(visualisation_params$lower_annotation_sf)) {
+    visualisation_params$lower_annotation_sf <-
+      2 - visualisation_params$upper_annotation_sf
   }
 
-  return(parameters)
+  return(visualisation_params)
 
 }
 
@@ -312,15 +313,15 @@ resolve_default_parameters <- function(parameters,
 #' faceted one.
 #'
 #' @param charts A list of analysed `autospc_chart` objects.
-#' @param parameters A named list of the presentation parameters. The axis
-#'   titles are taken from the plot data that is drawn, so that the object
-#'   records what is drawn.
+#' @param visualisation_params A named list of the visualisation parameters.
+#'   The axis titles are taken from the plot data that is drawn, so that the
+#'   object records what is drawn.
 #' @param split_rows Non-NULL to facet by stage.
 #'
 #' @return An object of class `c("autospc_plot", "gg", "ggplot")`.
 #' @noRd
 autospc_plot <- function(charts,
-                         parameters,
+                         visualisation_params,
                          split_rows = NULL) {
 
   if(inherits(charts, "autospc_chart")) {
@@ -330,19 +331,21 @@ autospc_plot <- function(charts,
   }
 
   plot_data <- build_plot_data(charts = charts,
-                               parameters = parameters)
+                               visualisation_params = visualisation_params)
 
   if(!is.null(split_rows)) {
-    plot_data <- list(faceted_plot_data(plot_data = plot_data,
-                                        parameters = parameters))
+    plot_data <- list(faceted_plot_data(
+      plot_data = plot_data,
+      visualisation_params = visualisation_params
+    ))
   }
 
   main <- plot_data[[1]]
 
-  parameters["override_x_title"] <- list(main$axis_titles$x)
-  parameters["override_y_title"] <- list(main$axis_titles$y)
+  visualisation_params["override_x_title"] <- list(main$axis_titles$x)
+  visualisation_params["override_y_title"] <- list(main$axis_titles$y)
 
-  limits_drawn <- isTRUE(parameters$show_limits) &&
+  limits_drawn <- isTRUE(visualisation_params$show_limits) &&
     centre_line_present(main$table)
 
   if(!limits_drawn && is.null(split_rows)) {
@@ -351,13 +354,13 @@ autospc_plot <- function(charts,
     plot_data <- plot_data[1]
 
     plot <- create_timeseries_plot(data = main$table,
-                                   parameters = parameters,
+                                   visualisation_params = visualisation_params,
                                    derived = main$derived)
 
   } else {
 
     plot <- create_spc_plot(plot_data = plot_data,
-                            parameters = parameters,
+                            visualisation_params = visualisation_params,
                             split_rows = split_rows)
 
   }
@@ -365,7 +368,7 @@ autospc_plot <- function(charts,
   autospc_plot_object <- new_autospc_plot(
     plot = plot,
     charts = charts,
-    presentation = list(parameters = parameters,
+    presentation = list(visualisation_params = visualisation_params,
                         derived = main$derived)
   )
 
@@ -389,7 +392,7 @@ autospc_plot_charts <- function(plot) {
 
 #' How an autospc_plot was drawn
 #'
-#' @return A list of two named lists, `parameters` and `derived`.
+#' @return A list of two named lists, `visualisation_params` and `derived`.
 #' @noRd
 autospc_plot_presentation <- function(plot) {
 
@@ -398,21 +401,21 @@ autospc_plot_presentation <- function(plot) {
 }
 
 
-#' The presentation parameters an autospc_plot was drawn with
+#' The visualisation parameters an autospc_plot was drawn with
 #'
 #' @param parameter Optional name of a single parameter. A parameter that was
 #'   not supplied returns `NULL`.
 #'
 #' @return The named list, or one element of it.
 #' @noRd
-autospc_plot_parameters <- function(plot,
-                                    parameter = NULL) {
+autospc_plot_visualisation_params <- function(plot,
+                                              parameter = NULL) {
 
   if(is.null(parameter)) {
-    return(plot$presentation$parameters)
+    return(plot$presentation$visualisation_params)
   }
 
-  return(plot$presentation$parameters[[parameter]])
+  return(plot$presentation$visualisation_params[[parameter]])
 
 }
 

@@ -1,5 +1,5 @@
 # Helpers that write chart$history. Their use through a real run is covered in
-# test-algorithm.R.
+# test-establish_limits.R.
 
 new_chart <- function(...) {
   autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y", ...)

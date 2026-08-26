@@ -186,7 +186,7 @@ autospc_plot_presentation_elements <- function() {
 #' the arguments of the call by exactly these names.
 #'
 #' A name here that `autospc()` does not take gives a NULL rather than an error,
-#' so `test_chart_arguments.R` tests that each parameter named here is recorded
+#' so `test-chart_arguments.R` tests that each parameter named here is recorded
 #' on the plot object.
 #'
 #' @return A character vector of parameter names.

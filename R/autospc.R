@@ -1,8 +1,8 @@
 #' Plot SPC charts with automated limit recalculation
 #' 
 #' `autospc()` creates a statistical process control chart from a
-#' dataframe, applying the Stable Shift Algorithm to automate recalculation of
-#' control limits.
+#' dataframe. Control limits are re-established according to specified rules,
+#' including via the Stable Shift Algorithm.
 #' 
 #' @param data A data frame. For column requirements by chart type, see
 #' \code{vignette("data-requirements", package = "autospc")}.
@@ -22,8 +22,8 @@
 #' \cr
 #' See \code{vignette("data-requirements", package = "autospc")} for more
 #' details.
-#' @param chart_type The type of chart you wish to plot. Must must have length one.
-#' Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
+#' @param chart_type The type of chart you wish to plot. Must must have length
+#' one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 #' 
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish
@@ -49,7 +49,7 @@
 #' calculation period. Set to FALSE only with no_regrets = FALSE.
 #' 
 #' ## SPC Parameters
-#' Parameters that control how cetnre line and control limits are established
+#' Parameters that control how centre line and control limits are established
 #' for each period, and details of how SPC rules are applied
 #' @param max_exclusions The maximum number of extreme points to exclude from 
 #' limit calculations.
@@ -61,7 +61,7 @@
 #' limit on the mr chart.
 #' @param centre_line_tolerance Minimum difference between a point's vertical
 #' position and the centre line to count as "on the centre line" for the
-#' purposes ofshift rule breaks
+#' purposes of shift rule breaks
 #' @param floating_median Whether to add a floating median line to the chart,
 #' calculated based on the final floating_median_n data points on the chart:
 #' "no" - do not display a floating median,
@@ -75,8 +75,8 @@
 #' ## Output Type
 #' Arguments that control how the result is outputted
 #' @param plot_chart Boolean specifying whether to plot the chart. If not, the
-#' data is returned with centre line, control limits and other analytic output
-#' appended as columns.
+#' subgroup-aggregated data is returned with centre line, control limits and
+#' other analytic output appended as columns.
 #' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
 #' @param show_mr `r lifecycle::badge("deprecated")` Use `chart_type` instead.
@@ -101,8 +101,8 @@
 #' 
 #' ## Chart Appearance
 #' Arguments that control aspects of chart visualisation 
-#' @param title Optional string specifying chart title. Overrides df$title.
-#' @param subtitle Optional string specifying subtitle. Overrides df$subtitle.
+#' @param title Optional string specifying chart title. Overrides data$title.
+#' @param subtitle Optional string specifying subtitle. Overrides data$subtitle.
 #' @param use_caption Boolean controlling whether the caption is displayed.
 #' @param override_x_title String specifying horizontal axis label.
 #' @param override_y_title String specifying vertical axis label.
@@ -294,14 +294,15 @@ autospc <- function(data,
 
   check_x_type(data[[x_name]])
 
-  # Every argument of the call by name, apart from the data, the columns, and
-  # the deprecated arguments dealt with above.
+  # Named list of every argument of the call by name, apart from the data,
+  # the columns, and the deprecated arguments dealt with above.
   arguments <- mget(setdiff(names(formals()),
                             c("data", "x", "y", "n",
                               autospc_deprecated_arguments())))
 
   arguments <- validate_algorithm_parameters(arguments)
-
+  
+  # The validated analysis parameters
   chart_args <- arguments[autospc_chart_parameters()]
 
   # The presentation parameters, as the caller gave them.
@@ -309,7 +310,7 @@ autospc <- function(data,
 
   validate_chart_type(chart_type)
 
-  # One chart, or the two of an XmR pair.
+  # Build the chart objects: one chart, or an XmR pair.
   charts <- rlang::exec(build_charts,
                         chart_type = chart_type,
                         data = data,
@@ -317,9 +318,11 @@ autospc <- function(data,
                         y = y_name,
                         n = n_name,
                         !!!chart_args)
-
+  
+  # Run the analysis
   charts <- analyse_charts(charts)
-
+  
+  # Resolve visualisation parameters, based on chart type
   parameters <- resolve_default_parameters(parameters = parameters,
                                            chart = charts[[1]])
 

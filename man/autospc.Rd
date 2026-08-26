@@ -80,8 +80,8 @@ denominator for P and P' charts.
 See \code{vignette("data-requirements", package = "autospc")} for more
 details.}
 
-\item{chart_type}{The type of chart you wish to plot. Must must have length one.
-Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
+\item{chart_type}{The type of chart you wish to plot. Must must have length
+one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
 Parameters that control behaviour of the algorithm used to re-establish
@@ -115,7 +115,7 @@ prevent recalculation even if they overhang the end of the candidate
 calculation period. Set to FALSE only with no_regrets = FALSE.
 \subsection{SPC Parameters}{
 
-Parameters that control how cetnre line and control limits are established
+Parameters that control how centre line and control limits are established
 for each period, and details of how SPC rules are applied
 }}
 
@@ -132,7 +132,7 @@ limit on the mr chart.}
 
 \item{centre_line_tolerance}{Minimum difference between a point's vertical
 position and the centre line to count as "on the centre line" for the
-purposes ofshift rule breaks}
+purposes of shift rule breaks}
 
 \item{floating_median}{Whether to add a floating median line to the chart,
 calculated based on the final floating_median_n data points on the chart:
@@ -150,8 +150,8 @@ Arguments that control how the result is outputted
 }}
 
 \item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
-data is returned with centre line, control limits and other analytic output
-appended as columns.}
+subgroup-aggregated data is returned with centre line, control limits and
+other analytic output appended as columns.}
 
 \item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
@@ -184,9 +184,9 @@ therefore makes an analysed chart several times larger.
 Arguments that control aspects of chart visualisation
 }}
 
-\item{title}{Optional string specifying chart title. Overrides df$title.}
+\item{title}{Optional string specifying chart title. Overrides data$title.}
 
-\item{subtitle}{Optional string specifying subtitle. Overrides df$subtitle.}
+\item{subtitle}{Optional string specifying subtitle. Overrides data$subtitle.}
 
 \item{use_caption}{Boolean controlling whether the caption is displayed.}
 
@@ -260,8 +260,8 @@ An SPC ggplot or corresponding data
 }
 \description{
 \code{autospc()} creates a statistical process control chart from a
-dataframe, applying the Stable Shift Algorithm to automate recalculation of
-control limits.
+dataframe. Control limits are re-established according to specified rules,
+including via the Stable Shift Algorithm.
 }
 \examples{
 # Using a C' chart to track changes in the count of monthly attendance 

@@ -14,8 +14,8 @@ facet_stages(data, split_rows, plot_chart = TRUE, ...)
 results at. Names specify facet strip labels.}
 
 \item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
-data is returned with centre line, control limits and other analytic output
-appended as columns.}
+subgroup-aggregated data is returned with centre line, control limits and
+other analytic output appended as columns.}
 
 \item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
 }

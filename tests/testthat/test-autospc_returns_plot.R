@@ -26,8 +26,11 @@ test_that("autospc returns an autospc_plot", {
 
 test_that("what autospc returns is still a ggplot", {
 
-  expect_identical(class(run_returns()),
-                   c("autospc_plot", "gg", "ggplot"))
+  expect_identical(class(run_returns())[1], "autospc_plot")
+
+  expect_s3_class(run_returns(), "gg")
+
+  expect_s3_class(run_returns(), "ggplot")
 
 })
 

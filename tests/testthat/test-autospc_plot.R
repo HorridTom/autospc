@@ -49,9 +49,13 @@ test_that("an autospc_plot is still a ggplot", {
 
 test_that("autospc_plot comes first in the class vector", {
 
-  # methods have to be found before ggplot2's
-  expect_identical(class(test_plot()),
-                   c("autospc_plot", "gg", "ggplot"))
+  # methods have to be found before ggplot2's. The rest of the vector is
+  # ggplot2's own and differs between its versions, so it is not asserted.
+  expect_identical(class(test_plot())[1], "autospc_plot")
+
+  expect_s3_class(test_plot(), "gg")
+
+  expect_s3_class(test_plot(), "ggplot")
 
 })
 

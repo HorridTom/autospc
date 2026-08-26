@@ -292,7 +292,11 @@ test_that("facet_stages returns an autospc_plot that is still a ggplot", {
 
   expect_s3_class(plot, "autospc_plot")
 
-  expect_identical(class(plot), c("autospc_plot", "gg", "ggplot"))
+  expect_identical(class(plot)[1], "autospc_plot")
+
+  expect_s3_class(plot, "gg")
+
+  expect_s3_class(plot, "ggplot")
 
 })
 

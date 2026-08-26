@@ -31,7 +31,9 @@ test_that("adding a theme keeps the class and the slots", {
 
   themed <- contract_plot() + ggplot2::theme_minimal()
 
-  expect_identical(class(themed), c("autospc_plot", "gg", "ggplot"))
+  expect_identical(class(themed)[1], "autospc_plot")
+
+  expect_s3_class(themed, "ggplot")
 
   expect_length(autospc_plot_charts(themed), 1L)
 
@@ -44,7 +46,9 @@ test_that("adding a layer keeps the class and the slots", {
 
   layered <- contract_plot() + ggplot2::geom_line()
 
-  expect_identical(class(layered), c("autospc_plot", "gg", "ggplot"))
+  expect_identical(class(layered)[1], "autospc_plot")
+
+  expect_s3_class(layered, "ggplot")
 
   expect_length(autospc_plot_charts(layered), 1L)
 
@@ -59,7 +63,9 @@ test_that("adding a scale keeps the class and the slots", {
   # ggplot2 handles differently on `+`
   scaled <- contract_plot() + ggplot2::scale_y_continuous(limits = c(0, 10))
 
-  expect_identical(class(scaled), c("autospc_plot", "gg", "ggplot"))
+  expect_identical(class(scaled)[1], "autospc_plot")
+
+  expect_s3_class(scaled, "ggplot")
 
   expect_length(autospc_plot_charts(scaled), 1L)
 
@@ -110,7 +116,9 @@ test_that("a cowplot composite can be subclassed the same way", {
                   autospc_chart_mr(data = contract_data, x = "x", y = "y"))
   )
 
-  expect_identical(class(paired), c("autospc_plot", "gg", "ggplot"))
+  expect_identical(class(paired)[1], "autospc_plot")
+
+  expect_s3_class(paired, "ggplot")
 
   expect_length(autospc_plot_charts(paired), 2L)
 

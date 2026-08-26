@@ -1,16 +1,18 @@
 # autospc_plot class
 #
-# An autospc_plot IS a ggplot: its class vector is c("autospc_plot", "gg",
-# "ggplot"), so printing, ggsave() and adding ggplot2 layers all keep working.
-# What it adds is the analysed chart or charts it was drawn from, and how it was
-# drawn - the visualisation parameters, and the axis extents worked out from
-# them.
+# An autospc_plot IS a ggplot: its class vector begins with "autospc_plot" and
+# ggplot2's own classes follow it, so printing, ggsave() and adding ggplot2
+# layers all keep working. What it adds is the analysed chart or charts it was
+# drawn from, and how it was drawn - the visualisation parameters, and the axis
+# extents worked out from them.
 #
-# Everything in the package that depends on a ggplot being an S3 list lives in
+# The slots are read with [[ rather than by name. From ggplot2 4.0.0 a ggplot
+# is an S7 object, whose names() is empty although [[ and $ still reach what
+# was assigned to it; up to ggplot2 3.5 it is a list and either works.
+#
+# Everything in the package that depends on a ggplot carrying slots lives in
 # this file. new_autospc_plot() writes the class vector and the slots; the
-# accessors read them; nothing else touches either. When the ggplot2 minimum
-# version rises to 4.0 the slots will become S7 properties, and this file is
-# what will change.
+# accessors read them; nothing else touches either.
 
 
 #' Construct an autospc_plot from a built ggplot
@@ -22,7 +24,8 @@
 #' The class is prepended rather than replaced, so the object remains a ggplot
 #' to everything that dispatches on `"gg"` or `"ggplot"`.
 #'
-#' @return An object of class `c("autospc_plot", "gg", "ggplot")`.
+#' @return An object whose class vector begins `"autospc_plot"`, followed by
+#'   ggplot2's own classes.
 #' @noRd
 new_autospc_plot <- function(plot,
                              charts,
@@ -75,9 +78,12 @@ validate_autospc_plot <- function(x) {
          call. = FALSE)
   }
 
-  element_names <- names(x)
+  # Read with [[ rather than names(): from ggplot2 4.0.0 a ggplot is an S7
+  # object, whose names() is empty even though [[ still reads what is there.
+  element_check <- vapply(autospc_plot_elements(),
+                          function(element) !is.null(x[[element]]),
+                          logical(1))
 
-  element_check <- autospc_plot_elements() %in% element_names
   if(!all(element_check)) {
     stop(paste("Malformed autospc_plot object - element(s) not present:",
                paste(autospc_plot_elements()[!element_check],
@@ -319,7 +325,8 @@ resolve_default_visualisation_params <- function(visualisation_params,
 #'   object records what is drawn.
 #' @param split_rows Non-NULL to facet by stage.
 #'
-#' @return An object of class `c("autospc_plot", "gg", "ggplot")`.
+#' @return An object whose class vector begins `"autospc_plot"`, followed by
+#'   ggplot2's own classes.
 #' @noRd
 autospc_plot <- function(charts,
                          visualisation_params,

@@ -70,11 +70,32 @@ test_that("the returned plot carries the presentation parameters", {
 
 test_that("the presentation records resolved values, not the arguments", {
 
-  # override_y_title is NULL as passed; postprocess() fills it from the class
+  # override_y_title is NULL as passed; axis_specifications() fills it from the
+  # class
   plot <- run_returns()
 
   expect_false(is.null(autospc_plot_visualisation_params(plot,
                                                          "override_y_title")))
+
+})
+
+
+test_that("a chart has no x axis title unless one is given", {
+
+  expect_null(run_returns()$labels$x)
+
+  expect_identical(run_returns(override_x_title = "Point")$labels$x, "Point")
+
+})
+
+
+test_that("a series drawn without limits has no x axis title either", {
+
+  plot <- suppressWarnings(
+    autospc(returns_short, chart_type = "C", period_min = 21L)
+  )
+
+  expect_null(plot$labels$x)
 
 })
 

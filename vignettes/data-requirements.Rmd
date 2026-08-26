@@ -25,7 +25,6 @@ knitr::opts_chunk$set(
 
 ```{r setup, message=FALSE}
 library(autospc)
-library(dplyr)
 ```
 
 For each type of Statistical Process Control (SPC) chart supported by *autospc*,
@@ -53,7 +52,7 @@ Below is an example call to `autospc()`. Note that as is often the case, the
 first argument (`data`) is passed by position, and the rest are passed as named
 arguments. 
 
-```{r example-xmr, fig.cap="Example XMR chart", fig.show='hide', message=FALSE}
+```{r example-c-prime, fig.cap="Example C' chart", fig.show='hide', message=FALSE}
 autospc(
   ed_attendances_monthly, 
   chart_type = "C'", 
@@ -76,9 +75,9 @@ horizontal axis (i.e. ordering the data) on the chart. Object classes that are
 currently supported for `x` are: `Date`, `POSIXct`, `numeric`, and
 `integer`.
 
-# XMR charts
+# XMR charts (and their components, X and MR charts)
 
-The data columns required for the XMR chart are as follows: 
+The data columns required for XMR, X and MR charts are as follows: 
 
 * The subgrouping variable, to be plotted on the horizontal axis, `x`
 * The variable of interest, to be plotted on the vertical axis, `y`. This must
@@ -86,8 +85,8 @@ be of type `integer` or `double`.
 
 Unlike C/C' charts (see Section \@ref(c-and-c-charts)), XMR charts place no
 further restriction on `y`: non-whole-number doubles are accepted without
-modification or warning, since XMR charts are suitable for continuous
-measurements as well as counts.
+modification or warning, since they are suitable for continuous measurements
+as well as counts.
 
 # C and C' charts
 
@@ -180,7 +179,7 @@ type.
 
 ```{r summary-table, echo=FALSE}
 summary_df <- data.frame(
-  `Chart type` = c("XMR / MR",
+  `Chart type` = c("X / MR / XMR",
                    "C / C'",
                    "P / P' (observation level)",
                    "P / P' (aggregated)"),

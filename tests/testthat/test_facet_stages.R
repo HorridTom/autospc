@@ -382,13 +382,21 @@ test_that("as.data.frame names the facets the way the frame does", {
 # the titles reach the drawing
 
 
-test_that("a faceted chart has axis labels", {
+test_that("a faceted chart takes its y axis label from the chart type", {
 
   plot <- faceted_plot()
 
-  expect_identical(plot$labels$x, "Day")
-
   expect_identical(plot$labels$y, "Number")
+
+})
+
+
+test_that("a faceted chart has no x axis label unless one is given", {
+
+  expect_null(faceted_plot()$labels$x)
+
+  expect_identical(faceted_plot(override_x_title = "Month")$labels$x,
+                   "Month")
 
 })
 

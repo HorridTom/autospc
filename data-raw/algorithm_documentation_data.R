@@ -100,7 +100,7 @@ get_log_explanation_table <- function() {
     "6"            , "06xxyz"  , paste0("Check whether there are sufficient",
                                         " data to proceed."),
     ""             , ""        , "xx = 00: Yes",
-    ""             , ""        , "xx =10: No",
+    ""             , ""        , "xx = 10: No",
     ""             , ""        , "Examine candidate limits.",
     ""             , ""        , "y = 0: No opposing rule break",
     ""             , ""        , "y = 1: At least one opposing rule break.",

@@ -150,7 +150,7 @@ round_counts.autospc_chart_pp <- function(chart) {
     column = "y",
     message = paste("At least one element of y has non-zero",
                     "fractional part. Rounding to the nearest whole",
-                    " number.\nP and P' charts with n specified",
+                    "number.\nP and P' charts with n specified",
                     "require y to be a count, i.e. whole numbers only.")
   )
 
@@ -159,7 +159,7 @@ round_counts.autospc_chart_pp <- function(chart) {
     column = "n",
     message = paste("At least one element of n has non-zero",
                     "fractional part. Rounding to the nearest whole",
-                    " number.\nP and P' charts with n specified",
+                    "number.\nP and P' charts with n specified",
                     "require n to be a count, i.e. whole numbers only.")
   )
 

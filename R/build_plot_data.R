@@ -239,23 +239,20 @@ axis_specifications <- function(table,
     ylimhigh <- visualisation_params$override_y_lim
   }
 
-  # The axis titles the caller did not give come from the chart
+  # The y axis title comes from the chart where the caller gave none. The x
+  # axis has a title only if the caller gave one.
   x_title <- visualisation_params$override_x_title
   y_title <- visualisation_params$override_y_title
-
-  if(is.null(x_title)) {
-    x_title <- "Day"
-  }
 
   if(is.null(y_title)) {
     y_title <- y_axis_title(chart)
   }
 
   return(list(axis_extents = list(start_x = start_x,
-                             x_max = x_max,
-                             end_x = end_x,
-                             ylimlow = ylimlow,
-                             ylimhigh = ylimhigh),
+                                  x_max = x_max,
+                                  end_x = end_x,
+                                  ylimlow = ylimlow,
+                                  ylimhigh = ylimhigh),
               axis_titles = list(x = x_title,
                                  y = y_title)))
 

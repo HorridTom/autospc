@@ -80,6 +80,12 @@
 
 ### Other changes
 
+* A chart has no x axis title unless you give one. The default was `"Day"`,
+  whatever the x column held, so a chart of monthly or weekly data was labelled
+  "Day" as well. Use `override_x_title` for a title of your own. The y axis is
+  unchanged: where you give no `override_y_title` it still takes one from the
+  chart type.
+
 * `chart_type = "X"` draws the X chart on its own, without the moving range
   chart beneath it. It gives the same result as `chart_type = "XMR"` with
   `show_mr = FALSE`.

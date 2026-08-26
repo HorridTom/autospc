@@ -24,7 +24,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(autospc)
 library(dplyr)
-library(scales)
 # library(DiagrammeR)
 ```
 
@@ -126,20 +125,21 @@ the period over which they are extended is referred to as the *display period*.
 
 In charts produced by *autospc*, limits are displayed as black dashed lines over
 their calculation period, and grey dashed lines over their display period. For
-example, in \@ref(fig:example-1), there is one calculation period, covering
-days 1 to 21 inclusive, extended into its display period covering day 22
-onwards.
+example, in Figure \@ref(fig:example-1), there is one calculation period,
+covering days 1 to 21 inclusive, extended into its display period covering
+day 22 onwards.
 
 ### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
 threshold for a shift rule break (`shift_rule_threshold`), set to \(8\) by default in
-`autospc()`. In \@ref(fig:example-1), there is a rule-breaking run of
-length 10 starting on day 22. By default, rule-breaking runs are highlighted in
-blue by `autospc`.
+`autospc()`. In Figure \@ref(fig:example-1), there is a rule-breaking run of
+length 10 starting on day 22. By default, rule-breaking runs are highlighted
+in blue by `autospc`.
 
 Runs that are subsets of longer runs with the same end point count here, so for
 example with the default `shift_rule_threshold = 8`, the run of length 10 in
-\@ref(fig:example-1) actually comprises three rule-breaking runs, commencing at
+Figure \@ref(fig:example-1) actually comprises three rule-breaking runs,
+commencing at
 the first, second and third points in the length 10 run. In this example, the
 first rule-breaking run starts on day 22 and has length 10, the second starts on
 day 23 and has length 9, and the third starts on day 24 and has length 8. The
@@ -151,8 +151,8 @@ In the SSA, a rule-breaking run commencing during a display period triggers
 consideration of whether to re-establish limits. Such a run is referred to as a
 *triggering rule break*.
 
-In \@ref(fig:example-1) the highlighted rule-breaking run is a triggering rule 
-break.
+In Figure \@ref(fig:example-1) the highlighted rule-breaking run is a
+triggering rule break.
 
 ### Candidate limits
 In order to decide whether to re-establish control limits at a triggering rule
@@ -167,10 +167,10 @@ points on or after the start of the triggering rule break (day 22), so it is not
 possible to re-establish limits at day 22, and there are no candidate limits to
 consider.
 
-In Figure \@ref(fig:example-2) we imagine rolling time forward, so that we have
-more data to add to the chart in \@ref(fig:example-1). Figure
+In Figure \@ref(fig:example-2) we imagine rolling time forward, so that we
+have more data to add to the chart in Figure \@ref(fig:example-1). Figure
 \@ref(fig:example-2) shows the data against the (baseline) calculation limits.
-Figure  \@ref(fig:example-3) shows candidate limits established at the start of
+Figure \@ref(fig:example-3) shows candidate limits established at the start of
 the triggering rule break, i.e. day 22.
 
 ```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
@@ -347,8 +347,13 @@ csv file.
 The data frame that is saved has one row for each log entry, and contains the
 following columns:
 
- - `counter`        : the counter value (row number of the dataframe
- passed to the `data` argument of `autospc()`) that the log entry refers to
+ - `chart`          : which chart the entry came from - the chart type for a
+ single chart, `"X"` or `"MR"` for the two halves of an XmR pair, and the
+ stage for a faceted chart
+ - `counter`        : the counter value that the log entry refers to. This is
+ the row of the series the algorithm analysed, which is the data passed to the
+ `data` argument of `autospc()` after it has been aggregated over `x` and put
+ in `x` order
  - `x`              : the value of the `x` column at this counter value (the
  column passed as `x` to `autospc()`)
  - `log_entry`      : the log entry, recorded in shorthand (see below)

@@ -134,12 +134,14 @@ test_that("the resolved value is what the chart carries", {
 })
 
 
-test_that("a consistent pair is left alone and says nothing", {
+test_that("a consistent pair is left alone and doesn't warn of inconsistency", {
 
-  expect_no_warning(
+  count <- count_pair_warnings(
     plot <- autospc(inconsistent_pair, chart_type = "C", period_min = 21L,
                     no_regrets = FALSE, overhanging_reversions = FALSE)
   )
+
+  expect_identical(count, 0L)
 
   expect_false(autospc_plot_charts(plot)[[1]]$overhanging_reversions)
 

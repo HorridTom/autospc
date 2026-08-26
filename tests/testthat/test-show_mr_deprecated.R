@@ -173,7 +173,8 @@ test_that("facet_stages warns about show_mr once, not once per stage", {
 
 test_that("facet_stages does not warn when show_mr is left out", {
 
-  expect_no_warning(facet_show_mr())
+  expect_no_warning(facet_show_mr(),
+                    class = "lifecycle_warning_deprecated")
 
 })
 

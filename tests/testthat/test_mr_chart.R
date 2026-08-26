@@ -15,7 +15,7 @@ test_mr_limit_answer <- readRDS(file.path("testdata",
 # when mr_screen_max_loops = 0
 test_that("mR chart limits the same as qicharts2 v.0.7.2",{
   
-  mrs = get_mrs(y = mr_data$y)
+  mrs = moving_ranges(y = mr_data$y)
   results <- get_mr_limits(mr = mrs,
                            mr_screen_max_loops = 0)
   
@@ -85,7 +85,7 @@ test_that("an MR chart analyses the moving ranges, not the values passed in", {
   result <- autospc(values, chart_type = "MR", plot_chart = FALSE,
                     period_min = 21)
 
-  expect_identical(result$y, get_mrs(values$y))
+  expect_identical(result$y, moving_ranges(values$y))
 
   # and the centre line is the mean moving range, not the mean value
   expect_lt(result$cl[21], mean(values$y))

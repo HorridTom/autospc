@@ -15,18 +15,18 @@ test_that("establish_every_shift works correctly", {
   )
   
   result <- result_data %>%
-    dplyr::group_by(plotPeriod) %>%
+    dplyr::group_by(plot_period) %>%
     dplyr::summarise(n_points = dplyr::n(),
-                     periodType = dplyr::first(periodType),
-                     periodStart = dplyr::first(periodStart)) %>% 
-    dplyr::filter(periodType == "calculation") %>%
-    dplyr::arrange(plotPeriod)
+                     period_type = dplyr::first(period_type),
+                     period_start = dplyr::first(period_start)) %>% 
+    dplyr::filter(period_type == "calculation") %>%
+    dplyr::arrange(plot_period)
   
   expect_equal(nrow(result),
                3L)
   
   expect_equal(result %>%
-                 dplyr::pull(periodStart),
+                 dplyr::pull(period_start),
                c(1L, 30L, 59L))
   
 })

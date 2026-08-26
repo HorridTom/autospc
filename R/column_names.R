@@ -74,7 +74,7 @@ normalise_columns <- function(chart_list,
                     function(field) chart_list[[field]],
                     character(1))
 
-  chart_list$data <- select_named_columns(df = chart_list$data,
+  chart_list$data <- select_named_columns(data = chart_list$data,
                                           sources = sources)
 
   return(chart_list)
@@ -93,21 +93,21 @@ normalise_columns <- function(chart_list,
 #' @param sources A character vector of column names, named for the fields they
 #'   fill.
 #'
-#' @return `df`, holding only the named columns, named for their fields
+#' @return `data`, holding only the named columns, named for their fields
 #' @noRd
-select_named_columns <- function(df,
+select_named_columns <- function(data,
                                  sources) {
 
   wanted <- vapply(seq_along(sources),
                    function(i) {
                      sources[[i]] != names(sources)[[i]] ||
-                       sources[[i]] %in% colnames(df)
+                       sources[[i]] %in% colnames(data)
                    },
                    logical(1))
 
-  df <- df %>%
+  data <- data %>%
     dplyr::select(dplyr::all_of(sources[wanted]))
 
-  return(df)
+  return(data)
 
 }

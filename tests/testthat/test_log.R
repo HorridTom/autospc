@@ -21,7 +21,7 @@ correct_log <- structure(list(x = c(1L, 22L, 36L),
                          class = "data.frame") %>%
   tibble::as_tibble()
 
-correct_log_df <- structure(
+correct_log_table <- structure(
   list(counter = c(1L, 1L, 2L, 2L, 3L, 3L),
        x = c(1L, 1L, 22L, 22L, 36L, 36L),
        log_entry = c("0100", "0200", "0300", "040136",
@@ -72,13 +72,13 @@ test_that("log is populated correctly (regression)", {
 
 test_that("log is interpreted correctly (regression)", {
   
-  log_df <- autospc:::create_log_dataframe(log_out,
-                                           verbosity = 2L)
+  log_table <- autospc:::create_log_dataframe(log_out,
+                                              verbosity = 2L)
   
   # the stored answer was saved when this returned a rowwise tibble; the values
   # are unchanged, so it is compared as a data frame
-  expect_equal(log_df,
-               as.data.frame(dplyr::ungroup(correct_log_df)))
+  expect_equal(log_table,
+               as.data.frame(dplyr::ungroup(correct_log_table)))
   
 })
 
@@ -99,10 +99,10 @@ test_that("each printed log is headed by the chart type it came from", {
 
 test_that("the log frame is a plain data frame", {
 
-  log_df <- autospc:::create_log_dataframe(log_out,
-                                           verbosity = 2L)
+  log_table <- autospc:::create_log_dataframe(log_out,
+                                              verbosity = 2L)
 
-  expect_identical(class(log_df), "data.frame")
+  expect_identical(class(log_table), "data.frame")
 
 })
 
@@ -166,7 +166,7 @@ test_that("specific log entries are interpreted correctly", {
 test_that("the log records the algorithm's decisions", {
 
   analyse <- function(data, ...) {
-    suppressWarnings(run_limit_algorithm(prepare_data(
+    suppressWarnings(establish_limits(prepare_data(
       autospc_chart(chart_type = "C\'", data = data, x = "x", y = "y", ...))))
   }
 
@@ -210,7 +210,7 @@ test_that("the log covers the other chart types", {
   proportions <- data.frame(x = 1:60,
                             y = rep(c(10, 12, 11, 13, 9, 10), 10),
                             n = rep(100L, 60))
-  fitted_p <- run_limit_algorithm(prepare_data(
+  fitted_p <- establish_limits(prepare_data(
     autospc_chart(chart_type = "P", data = proportions,
                   x = "x", y = "y", n = "n")))
 
@@ -220,7 +220,7 @@ test_that("the log covers the other chart types", {
   # 050001 is a break below the centre line, 050010 above
   ed <- data.frame(x = ed_attendances_monthly$month_start,
                    y = ed_attendances_monthly$att_all)
-  fitted_mr <- run_limit_algorithm(prepare_data(
+  fitted_mr <- establish_limits(prepare_data(
     autospc_chart(chart_type = "MR", data = ed, x = "x", y = "y")))
 
   expect_identical(entries(fitted_mr),
@@ -241,7 +241,7 @@ test_that("an entry past the end of the table is held at the last row", {
                       y = c(10, 12, 11, 13, 9, 10, 12, 11, 13, 9, 10,
                             12, 11, 13, 9, 10, 12, 11, 13, 9, 10))
 
-  analysed <- suppressWarnings(run_limit_algorithm(prepare_data(
+  analysed <- suppressWarnings(establish_limits(prepare_data(
     autospc_chart(chart_type = "C\'", data = exact, x = "x", y = "y",
                   period_min = 21L))))
 

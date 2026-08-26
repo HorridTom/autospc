@@ -145,8 +145,8 @@ test_that("print returns the chart invisibly", {
 
 test_that("a long analysis is truncated rather than filling the console", {
 
-  many <- data.frame(periodType = rep("calculation", 30),
-                     plotPeriod = paste0("calculation", 1:30),
+  many <- data.frame(period_type = rep("calculation", 30),
+                     plot_period = paste0("calculation", 1:30),
                      cl = seq_len(30))
 
   lines <- format_calculation_periods(many, max_shown = 4L)
@@ -160,9 +160,9 @@ test_that("a long analysis is truncated rather than filling the console", {
 
 test_that("display periods are not listed as calculation periods", {
 
-  table <- data.frame(periodType = c("calculation", "calculation", "display"),
-                      plotPeriod = c("calculation1", "calculation1",
-                                     "display3"),
+  table <- data.frame(period_type = c("calculation", "calculation", "display"),
+                      plot_period = c("calculation1", "calculation1",
+                                      "display3"),
                       cl = c(10, 10, 10))
 
   expect_length(format_calculation_periods(table), 1L)

@@ -116,7 +116,7 @@ facet_stages <- function(data,
                     nrow(data))
   }
 
-  data_splits_list <- create_splits_list(df = df_rn,
+  data_splits_list <- create_splits_list(data = df_rn,
                                          split_rows = split_rows)
 
   charts <- lapply(
@@ -166,18 +166,18 @@ facet_stages <- function(data,
 }
 
 
-create_splits_list <- function(df,
+create_splits_list <- function(data,
                                split_rows) {
   
   if(is.null(split_rows)) {
     
-    data_splits <- list(df)
+    data_splits <- list(data)
     
   } else {
     
     data_splits <- lapply(split_rows,
                           function(x) {
-                            df[1:x,]
+                            data[1:x,]
                           })
   }
   

@@ -19,7 +19,7 @@ test_ichart_exclusions_answer <- readRDS(
 
 #test that the i chart limits is the same as qicharts2 results 
 test_that("I chart limits the same as qicharts2 v.0.7.2",{
-  results <- get_i_limits(y = test_data$y,
+  results <- get_x_limits(y = test_data$y,
                           exclusion_points = c(6, 15))
   
   expect_equal(results$cl, test_ichart_exclusions_answer$cl)

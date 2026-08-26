@@ -11,7 +11,7 @@ test_that(paste0("break points are inserted even with no change in centre line",
                    num_breakpoints = sum(result %>%
                                            dplyr::filter(dplyr::row_number()
                                                          != 1L) %>%
-                                           dplyr::pull(breakPoint))
+                                           dplyr::pull(break_point))
                    
                    expect_equal(num_breakpoints,
                                 1L)

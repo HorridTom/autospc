@@ -1,10 +1,10 @@
-# Add floating median line to the plot p
-add_floating_median <- function(df,
-                                p,
+# Add floating median line to the plot spc_plot
+add_floating_median <- function(table,
+                                spc_plot,
                                 floating_median_n) {
   
-  p <- p +
-    ggplot2::geom_line(data = df %>%
+  spc_plot <- spc_plot +
+    ggplot2::geom_line(data = table %>%
                          dplyr::filter(series == "cl"), 
                        ggplot2::aes(x, median),
                        linetype = "75551555",
@@ -14,17 +14,17 @@ add_floating_median <- function(df,
                        na.rm = TRUE) +
     ggplot2::annotate(
       "text",
-      x = df %>%
+      x = table %>%
         dplyr::filter(series == "cl") %>%
         dplyr::filter(dplyr::row_number() ==
-                        nrow(df %>%
+                        nrow(table %>%
                                dplyr::filter(series == "cl")) -
                         floating_median_n + 1L) %>%
         dplyr::pull(x),
-      y = df %>%
+      y = table %>%
         dplyr::filter(series == "cl") %>%
         dplyr::filter(dplyr::row_number() ==
-                        nrow(df %>%
+                        nrow(table %>%
                                dplyr::filter(series == "cl")) -
                         floating_median_n + 1L) %>%
         dplyr::pull(median)*0.95,
@@ -33,6 +33,6 @@ add_floating_median <- function(df,
       colour = "gray50",
       na.rm = TRUE)
   
-  return(p)
+  return(spc_plot)
   
 }

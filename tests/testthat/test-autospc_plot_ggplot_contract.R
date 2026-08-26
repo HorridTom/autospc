@@ -21,7 +21,7 @@ contract_plot <- function(
                      charts = charts,
                      presentation = list(
                        visualisation_params = visualisation_params,
-                       derived = list()
+                       axis_extents = list()
                      ))
   )
 

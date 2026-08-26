@@ -85,14 +85,14 @@ autospc_chart_mr <- function(data,
 #' downstream needs the original values, and `chart$data_original` keeps what
 #' the user supplied.
 #'
-#' `get_mrs()` prepends `NA`, so the series stays aligned with `x` and is one
-#' non-missing value shorter - see `n_effective_points()`.
+#' `moving_ranges()` prepends `NA`, so the series stays aligned with `x` and is
+#' one non-missing value shorter - see `n_effective_points()`.
 #'
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart_mr <- function(chart) {
 
-  mrs <- get_mrs(y = chart$data$y)
+  mrs <- moving_ranges(y = chart$data$y)
 
   chart$data <- chart$data %>%
     dplyr::mutate(y = mrs)
@@ -104,10 +104,10 @@ prepare_data.autospc_chart_mr <- function(chart) {
 
 #' Number of points available for analysis
 #'
-#' One more than the non-missing moving ranges. `get_mrs()` prepends `NA`, so an
-#' MR series always has exactly one fewer non-missing value than the series it
-#' was derived from, and the algorithm's data-sufficiency checks are about that
-#' underlying series.
+#' One more than the non-missing moving ranges. `moving_ranges()` prepends `NA`,
+#' so an MR series always has exactly one fewer non-missing value than the
+#' series it was derived from, and the algorithm's data-sufficiency checks are
+#' about that underlying series.
 #'
 #' @return integer
 #' @noRd

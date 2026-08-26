@@ -63,7 +63,7 @@ test_that("P chart display limits follow the denominator", {
                     baseline_only = TRUE,
                     plot_chart = FALSE)
 
-  display <- limits[limits$periodType == "display", ]
+  display <- limits[limits$period_type == "display", ]
 
   expect_gt(nrow(display), 0)
   expect_gt(length(unique(display$ucl)), 1)

@@ -105,8 +105,8 @@ get_pp_limits <- function(y,
   
   
   mr  <- abs(diff(z_i))
-  mr_lims <- mr_lims_calc(mr = mr,
-                          mr_screen_max_loops = mr_screen_max_loops)
+  mr_lims <- mr_limits(mr = mr,
+                       mr_screen_max_loops = mr_screen_max_loops)
   amr <- mr_lims$mean_mr
   ulmr <- mr_lims$ucl_mr
   

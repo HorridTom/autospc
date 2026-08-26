@@ -21,7 +21,7 @@ build_plot_data <- function(charts,
 
 #' The plot data of one chart
 #'
-#' Four elements: the `chart`, its `table`, the `derived` axis extents, and the
+#' Four elements: the `chart`, its `table`, its `axis_extents`, and the
 #' `axis_titles` the chart resolved from its class.
 #'
 #' `table` is `chart$result$table` - the analysis - with the columns only the
@@ -38,30 +38,30 @@ build_plot_data <- function(charts,
 #' @param chart An analysed `autospc_chart`.
 #' @param visualisation_params A named list of the visualisation parameters.
 #'
-#' @return A list of the `chart`, its `table`, the `derived` axis extents and
-#'   the `axis_titles`.
+#' @return A list of the `chart`, its `table`, its `axis_extents` and the
+#'   `axis_titles`.
 #' @noRd
 plot_data_for_chart <- function(chart,
                                 visualisation_params) {
 
   table <- chart$result$table
 
-  axes <- axis_values(data = table,
-                      chart = chart,
-                      visualisation_params = visualisation_params)
+  axes <- axis_specifications(table = table,
+                              chart = chart,
+                              visualisation_params = visualisation_params)
 
   if(visualisation_params$show_limits && centre_line_present(table)) {
 
-    table <- postprocess_spc(data = table,
-                             chart = chart,
-                             visualisation_params = visualisation_params,
-                             derived = axes$derived)
+    table <- add_plot_columns(table = table,
+                              chart = chart,
+                              visualisation_params = visualisation_params,
+                              axis_extents = axes$axis_extents)
 
   }
 
   return(list(chart = chart,
               table = table,
-              derived = axes$derived,
+              axis_extents = axes$axis_extents,
               axis_titles = axes$axis_titles))
 
 }
@@ -85,13 +85,13 @@ faceted_plot_data <- function(plot_data,
   # Every facet is the same kind of chart, so the axes are taken from the last.
   chart <- plot_data[[length(plot_data)]]$chart
 
-  axes <- axis_values(data = table,
-                      chart = chart,
-                      visualisation_params = visualisation_params)
+  axes <- axis_specifications(table = table,
+                              chart = chart,
+                              visualisation_params = visualisation_params)
 
   return(list(chart = chart,
               table = table,
-              derived = axes$derived,
+              axis_extents = axes$axis_extents,
               axis_titles = axes$axis_titles))
 
 }
@@ -209,11 +209,11 @@ join_mr_columns <- function(x_table,
 #' @param chart The `autospc_chart` the vertical axis is taken from.
 #' @param visualisation_params A named list of the visualisation parameters.
 #'
-#' @return A list of the `derived` axis extents and the `axis_titles`.
+#' @return A list of the `axis_extents` and the `axis_titles`.
 #' @noRd
-axis_values <- function(data,
-                        chart,
-                        visualisation_params) {
+axis_specifications <- function(table,
+                                chart,
+                                visualisation_params) {
 
   x_pad_end <- visualisation_params$x_pad_end
 
@@ -221,16 +221,16 @@ axis_values <- function(data,
     x_pad_end <- visualisation_params$extend_limits_to
   }
 
-  start_x <- min(data$x, na.rm = TRUE)
-  x_max <- max(data$x, na.rm = TRUE)
+  start_x <- min(table$x, na.rm = TRUE)
+  x_max <- max(table$x, na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
 
-  if(!centre_line_present(data)) {
-    ylimlow <- min(data$y, na.rm = TRUE)
-    ylimhigh <- max(data$y, na.rm = TRUE)
+  if(!centre_line_present(table)) {
+    ylimlow <- min(table$y, na.rm = TRUE)
+    ylimhigh <- max(table$y, na.rm = TRUE)
   } else {
     y_range <- y_axis_range(chart = chart,
-                            data = data)
+                            data = table)
     ylimlow <- y_range$low
     ylimhigh <- y_range$high
   }
@@ -251,7 +251,7 @@ axis_values <- function(data,
     y_title <- y_axis_title(chart)
   }
 
-  return(list(derived = list(start_x = start_x,
+  return(list(axis_extents = list(start_x = start_x,
                              x_max = x_max,
                              end_x = end_x,
                              ylimlow = ylimlow,
@@ -270,44 +270,44 @@ axis_values <- function(data,
 #' @param data The analysed plot data.
 #' @param chart The analysed `autospc_chart`.
 #' @param visualisation_params A named list of the visualisation parameters.
-#' @param derived The axis extents, as `axis_values()` gives them.
+#' @param axis_extents The axis extents, as `axis_specifications()` gives them.
 #'
 #' @return A data frame.
 #' @noRd
-postprocess_spc <- function(data,
-                            chart,
-                            visualisation_params,
-                            derived) {
+add_plot_columns <- function(table,
+                             chart,
+                             visualisation_params,
+                             axis_extents) {
 
   if(visualisation_params$highlight_exclusions) {
-    data <- data %>% dplyr::mutate(
+    table <- table %>% dplyr::mutate(
       highlight = ifelse(excluded & !is.na(excluded),
                          "Excluded from limits calculation",
                          highlight)
     )
   }
 
-  data <- floating_median_column(df = data,
-                                 floating_median = chart$floating_median,
-                                 floating_median_n = chart$floating_median_n)
+  table <- floating_median_column(table = table,
+                                  floating_median = chart$floating_median,
+                                  floating_median_n = chart$floating_median_n)
 
-  data <- add_annotation_data(
-    df = data,
+  table <- add_annotation_data(
+    table = table,
     chart = chart,
-    ylimhigh = derived$ylimhigh,
+    ylimhigh = axis_extents$ylimhigh,
     align_labels = visualisation_params$align_labels,
     flip_labels = visualisation_params$flip_labels,
     upper_annotation_sf = visualisation_params$upper_annotation_sf,
     lower_annotation_sf = visualisation_params$lower_annotation_sf,
     annotation_arrow_curve = visualisation_params$annotation_arrow_curve)
 
-  data <- extend_limits(df = data,
-                        chart = chart,
-                        extend_limits_to =
+  table <- extend_limits(table = table,
+                         chart = chart,
+                         extend_limits_to =
                           visualisation_params$extend_limits_to,
-                        x_max = derived$x_max)
+                         x_max = axis_extents$x_max)
 
-  return(data)
+  return(table)
 
 }
 

@@ -28,5 +28,5 @@ several charts of one type.
 
 This is the analytic result, not the table \code{autospc(plot_chart = FALSE)}
 returns: it carries the columns the algorithm produced, and not the columns
-\code{postprocess_spc()} adds for drawing.
+\code{add_plot_columns()} adds for drawing.
 }

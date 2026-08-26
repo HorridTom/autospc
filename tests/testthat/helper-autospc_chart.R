@@ -28,7 +28,7 @@ count_period_data <- data.frame(x = 1:10,
 # 30 leaves the two large moving ranges just under the MR upper limit, so
 # screening is inert and a test using it cannot tell whether
 # mr_screen_max_loops was read at all. Verified to bite for both
-# get_cp_limits() and get_i_limits().
+# get_cp_limits() and get_x_limits().
 screening_data <- data.frame(x = 1:10,
                              y = c(12, 15, 11, 14, 13, 60, 12, 14, 13, 11))
 

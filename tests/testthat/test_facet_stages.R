@@ -34,42 +34,42 @@ test_that("facet_stages produces correct data output", {
                                ucl,
                                lcl,
                                cl,
-                               periodType,
+                               period_type,
                                excluded,
                                log,
-                               breakPoint,
+                               break_point,
                                rule1,
                                rule2,
-                               aboveOrBelowCl,
+                               above_or_below_cl,
                                highlight,
-                               limitChange,
+                               limit_change,
                                cl_label,
                                cl_change,
                                annotation_level,
                                annotation_curvature,
-                               periodStart,
-                               plotPeriod),
+                               period_start,
+                               plot_period),
                stage2 %>%
                  dplyr::select(x,
                                y,
                                ucl,
                                lcl,
                                cl,
-                               periodType,
+                               period_type,
                                excluded,
                                log,
-                               breakPoint,
+                               break_point,
                                rule1,
                                rule2,
-                               aboveOrBelowCl,
+                               above_or_below_cl,
                                highlight,
-                               limitChange,
+                               limit_change,
                                cl_label,
                                cl_change,
                                annotation_level,
                                annotation_curvature,
-                               periodStart,
-                               plotPeriod))
+                               period_start,
+                               plot_period))
   
 })
 
@@ -335,22 +335,22 @@ test_that("it records the axis extents it was drawn with", {
 
   plot <- faceted_plot()
 
-  expect_setequal(names(autospc_plot_derived(plot)),
+  expect_setequal(names(autospc_plot_axis_extents(plot)),
                   c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh"))
 
   # what is recorded is what the y scale was given, before ggplot expands it
   limits <- ggplot2::ggplot_build(plot)$layout$panel_scales_y[[1]]$limits
 
-  expect_identical(limits, c(autospc_plot_derived(plot, "ylimlow"),
-                             autospc_plot_derived(plot, "ylimhigh")))
+  expect_identical(limits, c(autospc_plot_axis_extents(plot, "ylimlow"),
+                             autospc_plot_axis_extents(plot, "ylimhigh")))
 
   drawn <- faceted_plot(plot_chart = FALSE)
 
-  expect_identical(autospc_plot_derived(plot, "start_x"), min(drawn$x))
+  expect_identical(autospc_plot_axis_extents(plot, "start_x"), min(drawn$x))
 
-  expect_identical(autospc_plot_derived(plot, "x_max"), max(drawn$x))
+  expect_identical(autospc_plot_axis_extents(plot, "x_max"), max(drawn$x))
 
-  expect_identical(autospc_plot_derived(plot, "end_x"), max(drawn$x))
+  expect_identical(autospc_plot_axis_extents(plot, "end_x"), max(drawn$x))
 
 })
 

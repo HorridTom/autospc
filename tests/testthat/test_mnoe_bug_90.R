@@ -15,8 +15,8 @@ test_that("Bug 90 is fixed: period_min respected even with NAs", {
   # period in the algorithm results
   calc_period_lengths <- result_with_missing_data %>% 
     dplyr::filter(!is.na(y),
-                  periodType == "calculation") %>% 
-    dplyr::group_by(plotPeriod) %>%
+                  period_type == "calculation") %>% 
+    dplyr::group_by(plot_period) %>%
     dplyr::summarise(period_length = dplyr::n())
   
   # Check whether each calculation period is compliant with the specified 

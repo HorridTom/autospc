@@ -18,7 +18,7 @@ analyse_charts <- function(charts) {
     chart <- order_series(chart)
     chart <- prepare_data(chart)
 
-    chart <- run_limit_algorithm(chart)
+    chart <- establish_limits(chart)
 
     return(chart)
 

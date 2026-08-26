@@ -82,12 +82,12 @@ check_x_type <- function(x) {
     return(invisible(TRUE))
   }
 
-  xType <- class(x)
+  x_class <- class(x)
 
-  if(all(xType != "Date") &
-     all(xType!= c("POSIXct", "POSIXt")) &
-     all(xType != "numeric") &
-     all(xType != "integer")) {
+  if(all(x_class != "Date") &
+     all(x_class!= c("POSIXct", "POSIXt")) &
+     all(x_class != "numeric") &
+     all(x_class != "integer")) {
     warning(paste("Please make sure that your x column is a",
                   "'Date', 'POSIXct', 'numeric' or 'integer' type."))
   }
@@ -170,8 +170,8 @@ require_column_type <- function(data,
 }
 
 
-is.wholenumber <- function(x,
-                           tol = .Machine$double.eps^0.5)  {
+is_whole_number <- function(x,
+                            tol = .Machine$double.eps^0.5)  {
   return(abs(x - round(x)) < tol)
 
 }
@@ -190,7 +190,7 @@ round_count_column <- function(data,
 
   values <- data[[column]]
 
-  if(typeof(values) != "double" || !any(!is.wholenumber(values), na.rm = TRUE)) {
+  if(typeof(values) != "double" || !any(!is_whole_number(values), na.rm = TRUE)) {
     return(data)
   }
 

@@ -3,7 +3,8 @@
 # An autospc_plot IS a ggplot: its class vector is c("autospc_plot", "gg",
 # "ggplot"), so printing, ggsave() and adding ggplot2 layers all keep working.
 # What it adds is the analysed chart or charts it was drawn from, and how it was
-# drawn - the visualisation parameters, and the values derived from them.
+# drawn - the visualisation parameters, and the axis extents worked out from
+# them.
 #
 # Everything in the package that depends on a ggplot being an S3 list lives in
 # this file. new_autospc_plot() writes the class vector and the slots; the
@@ -48,7 +49,7 @@ new_autospc_plot <- function(plot,
 #' - `presentation`: a list carrying exactly the elements named by
 #'   `autospc_plot_presentation_elements()`, each a named list, possibly empty
 #'
-#' Nothing is guaranteed about *which* parameters or derived values are present.
+#' Nothing is guaranteed about *which* parameters or axis extents are present.
 #'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
@@ -157,11 +158,11 @@ autospc_plot_elements <- function() {
 
 #' The two halves of an autospc_plot's presentation
 #'
-#' `visualisation_params` is what the caller asked for; `derived` is what was
-#' worked out from that and the charts. A value that is both - an axis end the
-#' caller set - appears in each, as asked for and as used.
+#' `visualisation_params` is what the caller asked for; `axis_extents` is what
+#' was worked out from that and the charts. A value that is both - an axis end
+#' the caller set - appears in each, as asked for and as used.
 #'
-#' Every parameter and every derived value goes inside one of these, rather than
+#' Every parameter and every axis extent goes inside one of these, rather than
 #' becoming an element of its own.
 #'
 #' @return A character vector of element names.
@@ -170,7 +171,7 @@ autospc_plot_presentation_elements <- function() {
 
   presentation_elements <- c(
     "visualisation_params",
-    "derived"
+    "axis_extents"
   )
 
   return(presentation_elements)
@@ -353,9 +354,9 @@ autospc_plot <- function(charts,
     charts <- charts[1]
     plot_data <- plot_data[1]
 
-    plot <- create_timeseries_plot(data = main$table,
+    plot <- create_timeseries_plot(table = main$table,
                                    visualisation_params = visualisation_params,
-                                   derived = main$derived)
+                                   axis_extents = main$axis_extents)
 
   } else {
 
@@ -369,7 +370,7 @@ autospc_plot <- function(charts,
     plot = plot,
     charts = charts,
     presentation = list(visualisation_params = visualisation_params,
-                        derived = main$derived)
+                        axis_extents = main$axis_extents)
   )
 
   autospc_plot_object <- validate_autospc_plot(autospc_plot_object)
@@ -392,7 +393,8 @@ autospc_plot_charts <- function(plot) {
 
 #' How an autospc_plot was drawn
 #'
-#' @return A list of two named lists, `visualisation_params` and `derived`.
+#' @return A list of two named lists, `visualisation_params` and
+#'   `axis_extents`.
 #' @noRd
 autospc_plot_presentation <- function(plot) {
 
@@ -434,14 +436,14 @@ autospc_plot_visualisation_params <- function(plot,
 #'
 #' @return The named list, or one element of it.
 #' @noRd
-autospc_plot_derived <- function(plot,
-                                 value = NULL) {
+autospc_plot_axis_extents <- function(plot,
+                                      value = NULL) {
 
   if(is.null(value)) {
-    return(plot$presentation$derived)
+    return(plot$presentation$axis_extents)
   }
 
-  return(plot$presentation$derived[[value]])
+  return(plot$presentation$axis_extents[[value]])
 
 }
 
@@ -460,7 +462,7 @@ autospc_plot_derived <- function(plot,
 #'
 #' This is the analytic result, not the table `autospc(plot_chart = FALSE)`
 #' returns: it carries the columns the algorithm produced, and not the columns
-#' `postprocess_spc()` adds for drawing.
+#' `add_plot_columns()` adds for drawing.
 #'
 #' @param x An `autospc_plot`.
 #' @param ... Ignored, for consistency with the generic.

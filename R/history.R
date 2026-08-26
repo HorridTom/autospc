@@ -66,7 +66,7 @@ record_break <- function(chart,
     data.frame(counter = as.integer(counter),
                position = position,
                direction = if(is.na(position)) NA_integer_ else
-                 limits_table$aboveOrBelowCl[position],
+                 limits_table$above_or_below_cl[position],
                already_at_break = already_at_break,
                cl = if(is.na(position)) NA_real_ else limits_table$cl[position],
                ucl = if(is.na(position)) NA_real_ else limits_table$ucl[position],

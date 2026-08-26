@@ -7,7 +7,7 @@ test_that("Bug 148 is fixed: no error", {
     autospc(bug_148_data,
                   chart_type = "C",
                   plot_chart = FALSE),
-    message = "`oppositeBreak` must be size"
+    message = "`opposite_break` must be size"
   )
   
 })

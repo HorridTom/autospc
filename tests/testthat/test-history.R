@@ -39,11 +39,11 @@ test_that("the stop reason replaces rather than accumulates", {
 
 test_that("a break records the limits it was identified against", {
 
-  # aboveOrBelowCl is 1 above the centre line, -1 below
+  # above_or_below_cl is 1 above the centre line, -1 below
   limits <- data.frame(cl = rep(10, 5),
                        ucl = rep(20, 5),
                        lcl = rep(0, 5),
-                       aboveOrBelowCl = c(1L, 1L, -1L, -1L, 1L))
+                       above_or_below_cl = c(1L, 1L, -1L, -1L, 1L))
 
   chart <- record_break(new_chart(), counter = 2L, position = 3L,
                         already_at_break = FALSE, limits_table = limits)
@@ -58,7 +58,7 @@ test_that("a break records the limits it was identified against", {
 
 test_that("a break with no position records nothing to be against", {
 
-  limits <- data.frame(cl = 10, ucl = 20, lcl = 0, aboveOrBelowCl = 1L)
+  limits <- data.frame(cl = 10, ucl = 20, lcl = 0, above_or_below_cl = 1L)
 
   chart <- record_break(new_chart(), counter = 2L, position = NA,
                         already_at_break = FALSE, limits_table = limits)
@@ -82,7 +82,7 @@ candidates_of <- function(...) {
                          y = "y",
                          ...)
 
-  run_limit_algorithm(prepare_data(chart))$history$candidates
+  establish_limits(prepare_data(chart))$history$candidates
 
 }
 

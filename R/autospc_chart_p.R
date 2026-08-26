@@ -265,7 +265,7 @@ extend_display_limits.autospc_chart_p <- function(chart,
 
   limits_table[counter:nrow(limits_table), "cl"] <-
     limits_table[(counter - 1), "cl"]
-  limits_table[counter:nrow(limits_table), "periodType"] <- "display"
+  limits_table[counter:nrow(limits_table), "period_type"] <- "display"
 
   #splits limits table to just the section that we want
   limits_table_top <- limits_table[1:(counter - 1),]
@@ -276,10 +276,10 @@ extend_display_limits.autospc_chart_p <- function(chart,
     dplyr::mutate(pbar = as.numeric(pbar)) %>%
     dplyr::mutate(ucl_display = pbar + (constant/sqrt(n)) ) %>%
     dplyr::mutate(lcl_display = pbar - (constant/sqrt(n)) ) %>%
-    dplyr::mutate(ucl = dplyr::if_else(periodType == "display",
+    dplyr::mutate(ucl = dplyr::if_else(period_type == "display",
                                        ucl_display,
                                        ucl)) %>%
-    dplyr::mutate(lcl = dplyr::if_else(periodType == "display",
+    dplyr::mutate(lcl = dplyr::if_else(period_type == "display",
                                        lcl_display,
                                        lcl)) %>%
     dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl)) %>%

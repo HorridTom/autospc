@@ -7,9 +7,9 @@ test_that("Consecutive opposite shifts are considered distinct",{
                           plot_chart = FALSE)
   
   result <- result_df %>% 
-    dplyr::group_by(plotPeriod) %>%
-    dplyr::summarise(periodType = dplyr::first(periodType),
-                     first_point = dplyr::first(periodStart),
+    dplyr::group_by(plot_period) %>%
+    dplyr::summarise(period_type = dplyr::first(period_type),
+                     first_point = dplyr::first(period_start),
                      num_points = dplyr::n()) %>%
     dplyr::arrange(first_point)
   
@@ -21,11 +21,11 @@ test_that("Consecutive opposite shifts are considered distinct",{
   # at point 50.
   
   num_calc_periods <- result %>%
-    dplyr::filter(periodType == "calculation") %>%
+    dplyr::filter(period_type == "calculation") %>%
     nrow()
   
   calc_period_starts <- result %>%
-    dplyr::filter(periodType == "calculation") %>%
+    dplyr::filter(period_type == "calculation") %>%
     dplyr::pull(first_point)
   
   expect_equal(num_calc_periods,

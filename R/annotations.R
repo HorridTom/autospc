@@ -1,5 +1,5 @@
 # Add annotation data to main dataframe
-add_annotation_data <- function(df,
+add_annotation_data <- function(table,
                                 chart,
                                 ylimhigh,
                                 align_labels,
@@ -11,12 +11,12 @@ add_annotation_data <- function(df,
   first_row <- first_label_row(chart)
 
   labels <- centre_line_label(chart = chart,
-                              cl = df$cl,
+                              cl = table$cl,
                               ylimhigh = ylimhigh)
   
-  df <- df %>% 
+  table <- table %>% 
     dplyr::mutate(cl_label = dplyr::if_else(
-      breakPoint |
+      break_point |
         dplyr::row_number() == first_row,
       labels,
       ""),
@@ -38,7 +38,7 @@ add_annotation_data <- function(df,
       annotation_level = dplyr::case_when(
         dplyr::row_number() == first_row ~
           upper_annotation_level,
-        breakPoint == FALSE ~ 0,
+        break_point == FALSE ~ 0,
         cl_change == 1 ~ upper_annotation_level,
         cl_change == 0 ~ upper_annotation_level,
         cl_change == -1 ~ lower_annotation_level
@@ -46,7 +46,7 @@ add_annotation_data <- function(df,
       annotation_curvature = dplyr::case_when(
         dplyr::row_number() == first_row ~
           annotation_arrow_curve,
-        breakPoint == FALSE ~ 0,
+        break_point == FALSE ~ 0,
         cl_change == 1 ~ annotation_arrow_curve,
         cl_change == -1 & flip_labels ~ -annotation_arrow_curve,
         cl_change == -1 & !flip_labels ~ annotation_arrow_curve
@@ -59,13 +59,13 @@ add_annotation_data <- function(df,
       -lower_level,
       -lower_annotation_level)
   
-  return(df)
+  return(table)
   
 }
 
 
-add_annotations_to_plot <- function(p,
-                                    df,
+add_annotations_to_plot <- function(spc_plot,
+                                    table,
                                     basic_annotations,
                                     annotation_size,
                                     annotation_arrows,
@@ -85,44 +85,44 @@ add_annotations_to_plot <- function(p,
   }
   
   if(!use_basic_annotations) {
-    p_annotated <- add_annotations_to_plot_pp(
-      p = p,
-      df = df,
+    annotated_plot <- add_annotations_to_plot_pp(
+      spc_plot = spc_plot,
+      table = table,
       annotation_size = annotation_size,
       annotation_arrows = annotation_arrows,
       annotation_arrow_curve = annotation_arrow_curve
     )
   } else {
-    p_annotated <- add_annotations_to_plot_basic(
-      p = p,
-      df = df,
+    annotated_plot <- add_annotations_to_plot_basic(
+      spc_plot = spc_plot,
+      table = table,
       annotation_size = annotation_size,
       annotation_arrows = annotation_arrows,
       annotation_arrow_curve = annotation_arrow_curve
     )
   }
   
-  return(p_annotated)
+  return(annotated_plot)
   
 }
 
 
-add_annotations_to_plot_pp <- function(p,
-                                       df,
+add_annotations_to_plot_pp <- function(spc_plot,
+                                       table,
                                        annotation_size,
                                        annotation_arrows,
                                        annotation_arrow_curve) {
   
   if(annotation_arrows) {
     
-    p_annotated <- p + ggrepel::geom_text_repel(
+    annotated_plot <- spc_plot + ggrepel::geom_text_repel(
       data = . %>% dplyr::filter(series %in% c("cl"),
                                  !is.na(annotation_level)),
       ggplot2::aes(x = x,
                    y = value,
                    label = cl_label),
       position = ggpp::position_nudge_to(
-        y = df %>%
+        y = table %>%
           dplyr::filter(series %in% c("cl"),
                         !is.na(value),
                         !is.na(annotation_level)) %>%
@@ -135,7 +135,7 @@ add_annotations_to_plot_pp <- function(p,
       force             = 0,
       hjust             = 0,
       segment.size      = 0.75,
-      segment.curvature = df %>%
+      segment.curvature = table %>%
         dplyr::filter(series %in% c("cl"),
                       !is.na(value),
                       !is.na(annotation_level)) %>%
@@ -147,14 +147,14 @@ add_annotations_to_plot_pp <- function(p,
       na.rm = TRUE,
       max.overlaps = Inf)
   } else {
-    p_annotated <- p + ggrepel::geom_text_repel(
+    annotated_plot <- spc_plot + ggrepel::geom_text_repel(
       data = . %>% dplyr::filter(series %in% c("cl"),
                                  !is.na(annotation_level)),
       ggplot2::aes(x = x,
                    y = value,
                    label = cl_label),
       position = ggpp::position_nudge_to(
-        y = df %>%
+        y = table %>%
           dplyr::filter(series %in% c("cl"),
                         !is.na(value),
                         !is.na(annotation_level)) %>%
@@ -169,21 +169,21 @@ add_annotations_to_plot_pp <- function(p,
       max.overlaps = Inf)
   }
   
-  return(p_annotated)
+  return(annotated_plot)
   
 }
 
 
-add_annotations_to_plot_basic <- function(p,
-                                          df,
+add_annotations_to_plot_basic <- function(spc_plot,
+                                          table,
                                           annotation_size,
                                           annotation_arrows,
                                           annotation_arrow_curve) {
   
-  x_range <- max(df$x, na.rm = TRUE) - min(df$x, na.rm = TRUE)
+  x_range <- max(table$x, na.rm = TRUE) - min(table$x, na.rm = TRUE)
   x_nudge <- x_range/25
   
-  p_annotated <- p +
+  annotated_plot <- spc_plot +
     ggplot2::geom_text(
       data = . %>% dplyr::filter(series %in% c("cl"),
                                  !is.na(annotation_level)),
@@ -196,7 +196,7 @@ add_annotations_to_plot_basic <- function(p,
       size = annotation_size,
       fontface = "bold")
   
-  return(p_annotated)
+  return(annotated_plot)
   
 }
 

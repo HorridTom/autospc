@@ -90,7 +90,7 @@ test_that("the tables recorded for each candidate are plain data frame", {
                          y = "y",
                          keep_candidate_tables = TRUE)
 
-  chart <- run_limit_algorithm(prepare_data(order_series(aggregate_data(chart))))
+  chart <- establish_limits(prepare_data(order_series(aggregate_data(chart))))
 
   expect_gt(length(chart$history$candidates), 0L)
 

@@ -39,7 +39,7 @@ test_that("Charts with show_limits = FALSE behave as expected",{
   testthat::expect_equal(ncol(result_C), 18)
   testthat::expect_equal(ncol(result_P), 24)
 
-  testthat::expect_true(all(c("limitChange", "periodStart", "plotPeriod",
+  testthat::expect_true(all(c("limit_change", "period_start", "plot_period",
                               "cl_change") %in% colnames(result_C)))
   
   #expect no warning even for data passed in with too few points
@@ -79,8 +79,8 @@ test_that("a series with limits takes the limits path", {
   result <- autospc(test_data2, plot_chart = FALSE, chart_type = "C",
                     period_min = 21)
 
-  # postprocess_spc() runs, so the presentation columns are there
-  expect_true(all(c("limitChange", "annotation_level", "plotPeriod") %in%
+  # add_plot_columns() runs, so the presentation columns are there
+  expect_true(all(c("limit_change", "annotation_level", "plot_period") %in%
                     colnames(result)))
 
 })
@@ -94,6 +94,6 @@ test_that("a series without limits does not take the limits path", {
 
   expect_false(centre_line_present(result))
 
-  expect_false("limitChange" %in% colnames(result))
+  expect_false("limit_change" %in% colnames(result))
 
 })

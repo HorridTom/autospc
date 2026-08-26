@@ -396,7 +396,7 @@ extend_display_limits.autospc_chart <- function(chart,
   limits_table[display_rows, "ucl"] <- limits_table[last_calculated, "ucl"]
   limits_table[display_rows, "lcl"] <- limits_table[last_calculated, "lcl"]
   limits_table[display_rows, "cl"] <- limits_table[last_calculated, "cl"]
-  limits_table[display_rows, "periodType"] <- "display"
+  limits_table[display_rows, "period_type"] <- "display"
 
   return(limits_table)
 
@@ -592,11 +592,11 @@ print.autospc_chart <- function(x, ...) {
 format_calculation_periods <- function(table,
                                        max_shown = 10L) {
 
-  periods <- unique(table$plotPeriod[table$periodType == "calculation"])
+  periods <- unique(table$plot_period[table$period_type == "calculation"])
 
   lines <- vapply(periods, function(period) {
 
-    rows <- which(table$plotPeriod == period)
+    rows <- which(table$plot_period == period)
 
     sprintf("  rows %4d-%4d   cl = %s",
             min(rows),

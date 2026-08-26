@@ -157,12 +157,12 @@ test_that("the returned plot carries the values it was drawn with", {
 
   plot <- run_returns()
 
-  expect_setequal(names(autospc_plot_derived(plot)),
+  expect_setequal(names(autospc_plot_axis_extents(plot)),
                   c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh"))
 
-  expect_identical(autospc_plot_derived(plot, "start_x"), 1L)
+  expect_identical(autospc_plot_axis_extents(plot, "start_x"), 1L)
 
-  expect_identical(autospc_plot_derived(plot, "x_max"), 30L)
+  expect_identical(autospc_plot_axis_extents(plot, "x_max"), 30L)
 
 })
 
@@ -170,7 +170,7 @@ test_that("the returned plot carries the values it was drawn with", {
 test_that("the y limits recorded are the ones the class asks for", {
 
   # y_axis_range.autospc_chart_c() starts the axis at zero
-  expect_identical(autospc_plot_derived(run_returns(), "ylimlow"), 0)
+  expect_identical(autospc_plot_axis_extents(run_returns(), "ylimlow"), 0)
 
 })
 
@@ -179,9 +179,9 @@ test_that("extend_limits_to reaches the recorded end of the x axis", {
 
   plot <- run_returns(extend_limits_to = 40)
 
-  expect_identical(autospc_plot_derived(plot, "x_max"), 30L)
+  expect_identical(autospc_plot_axis_extents(plot, "x_max"), 30L)
 
-  expect_identical(autospc_plot_derived(plot, "end_x"), 40)
+  expect_identical(autospc_plot_axis_extents(plot, "end_x"), 40)
 
 })
 
@@ -190,7 +190,7 @@ test_that("x_pad_end wins over extend_limits_to for the end of the x axis", {
 
   plot <- run_returns(extend_limits_to = 40, x_pad_end = 50)
 
-  expect_identical(autospc_plot_derived(plot, "end_x"), 50)
+  expect_identical(autospc_plot_axis_extents(plot, "end_x"), 50)
 
 })
 
@@ -199,7 +199,7 @@ test_that("override_y_lim reaches the recorded y limit", {
 
   plot <- run_returns(override_y_lim = 40)
 
-  expect_identical(autospc_plot_derived(plot, "ylimhigh"), 40)
+  expect_identical(autospc_plot_axis_extents(plot, "ylimhigh"), 40)
 
 })
 
@@ -224,7 +224,7 @@ test_that("as.data.frame carries the columns describing the periods", {
 
   result <- as.data.frame(run_returns())
 
-  expect_true(all(c("limitChange", "periodStart", "plotPeriod", "cl_change")
+  expect_true(all(c("limit_change", "period_start", "plot_period", "cl_change")
                   %in% colnames(result)))
 
 })
@@ -282,7 +282,7 @@ test_that("as.data.frame identifies the stage when there is more than one", {
     new_autospc_plot(
       plot = ggplot2::ggplot(returns_data, ggplot2::aes(x = x, y = y)),
       charts = list(chart, chart),
-      presentation = list(visualisation_params = list(), derived = list())
+      presentation = list(visualisation_params = list(), axis_extents = list())
     )
   )
 

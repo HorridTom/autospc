@@ -24,14 +24,14 @@ plot_chart_c <- function(...) {
 # validate_autospc_plot() checks them.
 test_plot <- function(charts = list(plot_chart_c()),
                       visualisation_params = list(show_limits = TRUE),
-                      derived = list()) {
+                      axis_extents = list()) {
 
   validate_autospc_plot(
     new_autospc_plot(plot = built_plot(),
                      charts = charts,
                      presentation = list(
                        visualisation_params = visualisation_params,
-                       derived = derived
+                       axis_extents = axis_extents
                      ))
   )
 
@@ -99,12 +99,12 @@ test_that("presentation returns both halves", {
 
   presentation <- autospc_plot_presentation(
     test_plot(visualisation_params = list(point_size = 4),
-              derived = list(ylimhigh = 110))
+              axis_extents = list(ylimhigh = 110))
   )
 
   expect_identical(presentation,
                    list(visualisation_params = list(point_size = 4),
-                        derived = list(ylimhigh = 110)))
+                        axis_extents = list(ylimhigh = 110)))
 
 })
 
@@ -129,11 +129,11 @@ test_that("a visualisation parameter that was not supplied reads as NULL", {
 
 test_that("both halves can be empty", {
 
-  plot <- test_plot(visualisation_params = list(), derived = list())
+  plot <- test_plot(visualisation_params = list(), axis_extents = list())
 
   expect_identical(autospc_plot_visualisation_params(plot), list())
 
-  expect_identical(autospc_plot_derived(plot), list())
+  expect_identical(autospc_plot_axis_extents(plot), list())
 
 })
 
@@ -153,7 +153,7 @@ test_that("validate rejects a plot that is not a ggplot", {
   not_a_plot <- structure(list(charts = list(plot_chart_c()),
                                presentation = list(
                                  visualisation_params = list(),
-                                 derived = list()
+                                 axis_extents = list()
                                )),
                           class = "autospc_plot")
 
@@ -167,7 +167,7 @@ test_that("validate rejects a class vector in the wrong order", {
   wrong_order <- built_plot()
   wrong_order$charts <- list(plot_chart_c())
   wrong_order$presentation <- list(visualisation_params = list(),
-                                   derived = list())
+                                   axis_extents = list())
   class(wrong_order) <- c(class(wrong_order), "autospc_plot")
 
   expect_error(validate_autospc_plot(wrong_order), "must come first")
@@ -182,7 +182,7 @@ test_that("validate rejects a plot constructed twice", {
   twice <- new_autospc_plot(plot = test_plot(),
                             charts = list(plot_chart_c()),
                             presentation = list(visualisation_params = list(),
-                                                derived = list()))
+                                                axis_extents = list()))
 
   expect_error(validate_autospc_plot(twice), "more than")
 
@@ -193,7 +193,7 @@ test_that("validate rejects missing elements", {
 
   no_charts <- built_plot()
   no_charts$presentation <- list(visualisation_params = list(),
-                                 derived = list())
+                                 axis_extents = list())
   class(no_charts) <- c("autospc_plot", class(no_charts))
 
   expect_error(validate_autospc_plot(no_charts),
@@ -236,8 +236,8 @@ test_that("validate rejects a half that is not a named list", {
   expect_error(test_plot(visualisation_params = list(TRUE)),
                "presentation\\$visualisation_params must be named")
 
-  expect_error(test_plot(derived = list(110)),
-               "presentation\\$derived must be named")
+  expect_error(test_plot(axis_extents = list(110)),
+               "presentation\\$axis_extents must be named")
 
 })
 
@@ -250,28 +250,28 @@ test_that("validate rejects a presentation missing a half", {
   class(half_only) <- c("autospc_plot", class(half_only))
 
   expect_error(validate_autospc_plot(half_only),
-               "presentation element\\(s\\) not present: derived")
+               "presentation element\\(s\\) not present: axis_extents")
 
 })
 
 
-# derived
+# axis extents
 
 test_that("the plot carries the values worked out for the drawing", {
 
   values <- list(ylimhigh = 110, start_x = 1L)
 
-  plot <- test_plot(derived = values)
+  plot <- test_plot(axis_extents = values)
 
-  expect_identical(autospc_plot_derived(plot), values)
+  expect_identical(autospc_plot_axis_extents(plot), values)
 
-  expect_identical(autospc_plot_derived(plot, "ylimhigh"), 110)
+  expect_identical(autospc_plot_axis_extents(plot, "ylimhigh"), 110)
 
 })
 
 
-test_that("a derived value that was not worked out reads as NULL", {
+test_that("an axis extent that was not worked out reads as NULL", {
 
-  expect_null(autospc_plot_derived(test_plot(), "ylimhigh"))
+  expect_null(autospc_plot_axis_extents(test_plot(), "ylimhigh"))
 
 })

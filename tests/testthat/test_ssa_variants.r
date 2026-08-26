@@ -3,13 +3,13 @@
 calc_period_starts <- function(df) {
   
   cps <- df %>%
-    dplyr::group_by(periodStart,
-                    periodType) %>%
+    dplyr::group_by(period_start,
+                    period_type) %>%
     dplyr::summarise(npoints = dplyr::n(),
                      .groups = "drop") %>%
-    dplyr::filter(periodType == "calculation") %>%
-    dplyr::arrange(periodStart) %>%
-    dplyr::pull(periodStart)
+    dplyr::filter(period_type == "calculation") %>%
+    dplyr::arrange(period_start) %>%
+    dplyr::pull(period_start)
   
   return(cps)
   

@@ -248,8 +248,8 @@ display_table <- data.frame(x = 1:6,
                             ucl = c(rep(18, 3), rep(NA_real_, 3)),
                             lcl = c(rep(4, 3), rep(NA_real_, 3)),
                             cl = c(rep(11, 3), rep(NA_real_, 3)),
-                            periodType = c(rep("calculation", 3),
-                                           rep(NA_character_, 3)))
+                            period_type = c(rep("calculation", 3),
+                                            rep(NA_character_, 3)))
 
 
 test_that("the default carries the last calculated limits forward", {
@@ -264,7 +264,7 @@ test_that("the default carries the last calculated limits forward", {
   expect_identical(extended$ucl, rep(18, 6))
   expect_identical(extended$lcl, rep(4, 6))
   expect_identical(extended$cl, rep(11, 6))
-  expect_identical(extended$periodType,
+  expect_identical(extended$period_type,
                    c(rep("calculation", 3), rep("display", 3)))
 
 })

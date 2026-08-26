@@ -29,9 +29,9 @@ test_that("C chart process works end to end",{
   
   results <- autospc(test_data, chart_type = "C", plot_chart = FALSE)
   results <- results %>%
-    dplyr::select(x, y, ucl, lcl, cl, periodType, 
-                  excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
-                  highlight, limitChange, periodStart, plotPeriod)
+    dplyr::select(x, y, ucl, lcl, cl, period_type, 
+                  excluded, break_point, rule1, rule2, above_or_below_cl, 
+                  highlight, limit_change, period_start, plot_period)
   
   expect_equal(results, as.data.frame(correct_answer_C))
   
@@ -41,9 +41,9 @@ test_that("C prime chart process works end to end",{
   
   results <- autospc(test_data, chart_type = "C'", plot_chart = FALSE)
   results <- results %>%
-    dplyr::select(x, y, ucl, lcl, cl, periodType, 
-                  excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
-                  highlight, limitChange, periodStart, plotPeriod)
+    dplyr::select(x, y, ucl, lcl, cl, period_type, 
+                  excluded, break_point, rule1, rule2, above_or_below_cl, 
+                  highlight, limit_change, period_start, plot_period)
   
   expect_equal(results, as.data.frame(correct_answer_CP))
   
@@ -53,9 +53,9 @@ test_that("P chart process works end to end",{
   
   results <- autospc(test_data, chart_type = "P", plot_chart = FALSE)
   results <- results %>%
-    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, 
-                  excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
-                  highlight, limitChange, periodStart, plotPeriod)
+    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, period_type, 
+                  excluded, break_point, rule1, rule2, above_or_below_cl, 
+                  highlight, limit_change, period_start, plot_period)
   
   expect_equal(results, as.data.frame(correct_answer_P))
   
@@ -65,9 +65,9 @@ test_that("P prime chart process works end to end",{
   
   results <- autospc(test_data, chart_type = "P'", plot_chart = FALSE)
   results <- results %>%
-    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, periodType, 
-                  excluded, breakPoint, rule1, rule2, aboveOrBelowCl, 
-                  highlight, limitChange, periodStart, plotPeriod)
+    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl, period_type, 
+                  excluded, break_point, rule1, rule2, above_or_below_cl, 
+                  highlight, limit_change, period_start, plot_period)
   
   expect_equal(results, as.data.frame(correct_answer_PP))
   

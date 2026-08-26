@@ -3,7 +3,7 @@ test_data7 <- readRDS("testdata/test_rulelength_data/test_e2e_data_7.rds")
 test_data8 <- readRDS("testdata/test_rulelength_data/test_e2e_data_8.rds")
 test_data9 <- readRDS("testdata/test_rulelength_data/test_e2e_data_9.rds")
 
-# these tests use the "limitChange" column to check whether limits are
+# these tests use the "limit_change" column to check whether limits are
 # re-established after 21 points, or if they become display limits,
 # based on different shift_rule_thresholds
 test_that("check rule length for run of 6", {
@@ -36,10 +36,10 @@ test_that("check rule length for run of 6", {
     shift_rule_threshold = 9, 
     period_min = 21
     )
-  resultslist <- unlist(c(results6[22,"limitChange"], 
-                          results7[22,"limitChange"], 
-                          results8[22,"limitChange"], 
-                          results9[22,"limitChange"]
+  resultslist <- unlist(c(results6[22,"limit_change"], 
+                          results7[22,"limit_change"], 
+                          results8[22,"limit_change"], 
+                          results9[22,"limit_change"]
                           ))
   names(resultslist) <- NULL 
   #removes column names so the comparison can be carried out
@@ -78,10 +78,10 @@ test_that("check rule length for run of 7", {
     shift_rule_threshold = 9, 
     period_min = 21
     )
-  resultslist <- unlist(c(results6[22,"limitChange"], 
-                          results7[22,"limitChange"], 
-                          results8[22,"limitChange"], 
-                          results9[22,"limitChange"]
+  resultslist <- unlist(c(results6[22,"limit_change"], 
+                          results7[22,"limit_change"], 
+                          results8[22,"limit_change"], 
+                          results9[22,"limit_change"]
                           ))
   names(resultslist) <- NULL
   expect_equal(resultslist, !c(TRUE, TRUE, FALSE, FALSE))
@@ -117,10 +117,10 @@ test_that("check rule length for run of 8", {
     shift_rule_threshold = 9, 
     period_min = 21
     )
-  resultslist <- unlist(c(results6[22,"limitChange"], 
-                          results7[22,"limitChange"], 
-                          results8[22,"limitChange"], 
-                          results9[22,"limitChange"]
+  resultslist <- unlist(c(results6[22,"limit_change"], 
+                          results7[22,"limit_change"], 
+                          results8[22,"limit_change"], 
+                          results9[22,"limit_change"]
                           ))
   names(resultslist) <- NULL
   expect_equal(resultslist, !c(TRUE, TRUE, TRUE, FALSE))
@@ -156,10 +156,10 @@ test_that("rule length change for run of 9", {
     shift_rule_threshold = 9, 
     period_min = 21
     )
-  resultslist <- unlist(c(results6[22,"limitChange"], 
-                          results7[22,"limitChange"], 
-                          results8[22,"limitChange"], 
-                          results9[22,"limitChange"]
+  resultslist <- unlist(c(results6[22,"limit_change"], 
+                          results7[22,"limit_change"], 
+                          results8[22,"limit_change"], 
+                          results9[22,"limit_change"]
                           ))
   names(resultslist) <- NULL
   expect_equal(resultslist, !c(TRUE, TRUE, TRUE, TRUE))

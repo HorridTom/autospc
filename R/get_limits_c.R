@@ -77,8 +77,8 @@ get_cp_limits <- function(y,
   z_i <- (y_excl - cl) / stdev
   
   mr  <- abs(diff(z_i))
-  mr_lims <- mr_lims_calc(mr = mr,
-                          mr_screen_max_loops = mr_screen_max_loops)
+  mr_lims <- mr_limits(mr = mr,
+                       mr_screen_max_loops = mr_screen_max_loops)
   
   sigma_z <- mr_lims$mean_mr / 1.128
   

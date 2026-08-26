@@ -11,11 +11,11 @@ test_that("baseline_length sets the first period and the limits it gives", {
   )
 
   result <- result_data %>%
-    dplyr::group_by(plotPeriod) %>%
+    dplyr::group_by(plot_period) %>%
     dplyr::summarise(n_points = dplyr::n(),
-                     periodType = dplyr::first(periodType)) %>%
-    dplyr::filter(periodType == "calculation") %>%
-    dplyr::arrange(plotPeriod)
+                     period_type = dplyr::first(period_type)) %>%
+    dplyr::filter(period_type == "calculation") %>%
+    dplyr::arrange(plot_period)
 
   expect_equal(nrow(result),
                2L)
@@ -48,7 +48,7 @@ test_that("a baseline longer than the series uses all of the series", {
                     plot_chart = FALSE)
 
   expect_true("cl" %in% colnames(result))
-  expect_identical(sum(result$periodType == "calculation"), 30L)
+  expect_identical(sum(result$period_type == "calculation"), 30L)
   expect_equal(unique(result$cl), mean(thirty$y))
 
 })
@@ -90,9 +90,9 @@ analysed_ed <- function(...) {
 
 n_calculation_periods <- function(result) {
 
-  calculation <- result[result$periodType == "calculation", ]
+  calculation <- result[result$period_type == "calculation", ]
 
-  length(unique(calculation$plotPeriod))
+  length(unique(calculation$plot_period))
 
 }
 
@@ -116,6 +116,6 @@ test_that("baseline_only keeps the limits of the first period throughout", {
   expect_identical(unique(result$cl), result$cl[1])
 
   # the points after the calculation period are drawn against those limits
-  expect_setequal(unique(result$periodType), c("calculation", "display"))
+  expect_setequal(unique(result$period_type), c("calculation", "display"))
 
 })

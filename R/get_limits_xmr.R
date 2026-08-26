@@ -1,6 +1,6 @@
 # Get i limits
 # Input y as a vector. returns cl, ucl and lcl as a list. 
-get_i_limits <- function(y, 
+get_x_limits <- function(y, 
                          na.rm = TRUE,
                          mr_screen_max_loops = 1,
                          exclusion_points = NULL){
@@ -28,8 +28,8 @@ get_i_limits <- function(y,
   
   # Calculations of limits for I charts
   mr <- abs(diff(y_excl))
-  mr_lims <- mr_lims_calc(mr = mr,
-                          mr_screen_max_loops = mr_screen_max_loops)
+  mr_lims <- mr_limits(mr = mr,
+                       mr_screen_max_loops = mr_screen_max_loops)
   
   mean_i <- mean(y_excl, na.rm = TRUE)
   sigma <- mr_lims$mean_mr/1.128 
@@ -43,8 +43,8 @@ get_i_limits <- function(y,
 }
 
 # Get moving ranges
-get_mrs <- function(y,
-                    exclusion_points = NULL) {
+moving_ranges <- function(y,
+                          exclusion_points = NULL) {
   # Exclude exclusion points from calculations
   if(!is.null(exclusion_points) & length(exclusion_points) > 0){
     y_excl <- y[-exclusion_points]
@@ -73,8 +73,8 @@ get_mr_limits <- function(mr,
     mr_excl <- mr
   }
   
-  mr_lims <- mr_lims_calc(mr = mr_excl,
-                          mr_screen_max_loops = mr_screen_max_loops)
+  mr_lims <- mr_limits(mr = mr_excl,
+                       mr_screen_max_loops = mr_screen_max_loops)
   
   cl <- mr_lims$mean_mr 
   ucl <- mr_lims$ucl_mr
@@ -87,8 +87,8 @@ get_mr_limits <- function(mr,
   ))
 }
 
-mr_lims_calc <- function(mr,
-                         mr_screen_max_loops) {
+mr_limits <- function(mr,
+                      mr_screen_max_loops) {
   
   # Calculation of limits for mr chart
   mean_mr <- mean(mr,

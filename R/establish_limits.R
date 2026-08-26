@@ -5,7 +5,7 @@
 #'
 #' @return autospc_chart object, with `chart$result$table` set
 #' @noRd
-run_limit_algorithm <- function(chart) {
+establish_limits <- function(chart) {
 
   #set counter to one
   counter <- 1
@@ -63,7 +63,7 @@ run_limit_algorithm <- function(chart) {
           # Identify the next rule break to consider as a triggering rule break:
           # Check whether counter is part way through a rule 2 break already,
           # with at least [shift_rule_threshold] rule 2 break points following.
-          if(counter_at_rule_break(df = limits_table,
+          if(counter_at_rule_break(table = limits_table,
                                    counter = counter,
                                    shift_rule_threshold =
                                      chart$shift_rule_threshold)
@@ -111,7 +111,7 @@ run_limit_algorithm <- function(chart) {
                                          "moved to shift rule break")
             counter <- rule2_break_position
             triggering_rule_break_direction <-
-              limits_table$aboveOrBelowCl[counter]
+              limits_table$above_or_below_cl[counter]
             
             
             # [6] Check whether there are enough points after the counter to
@@ -259,7 +259,7 @@ run_limit_algorithm <- function(chart) {
       dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl)) 
     
     chart$result$table <- add_period_columns(limits_table)
-    chart$result$re_establish_rows <- which(limits_table$breakPoint)
+    chart$result$re_establish_rows <- which(limits_table$break_point)
     chart$result$exclusions <- which(limits_table$excluded)
     chart$result$table$log <- render_log(chart)
 

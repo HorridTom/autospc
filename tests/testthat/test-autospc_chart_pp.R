@@ -282,8 +282,8 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
                       ucl = c(rep(25, 3), rep(NA_real_, 2)),
                       lcl = c(rep(5, 3), rep(NA_real_, 2)),
                       cl = c(rep(15, 3), rep(NA_real_, 2)),
-                      periodType = c(rep("calculation", 3),
-                                     rep(NA_character_, 2)))
+                      period_type = c(rep("calculation", 3),
+                                      rep(NA_character_, 2)))
 
   extended <- extend_display_limits(chart_pp(pp_pre_agg_data), table, counter = 4)
 
@@ -293,7 +293,7 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
 
   # the centre line is carried forward, and the calculated rows are untouched
   expect_identical(extended$cl, rep(15, 5))
-  expect_identical(extended$periodType,
+  expect_identical(extended$period_type,
                    c(rep("calculation", 3), rep("display", 2)))
 
 })
@@ -308,8 +308,8 @@ test_that("extend_display_limits clamps the recomputed limits to 0 and 100", {
                       ucl = c(rep(80, 3), rep(NA_real_, 2)),
                       lcl = c(rep(20, 3), rep(NA_real_, 2)),
                       cl = c(rep(50, 3), rep(NA_real_, 2)),
-                      periodType = c(rep("calculation", 3),
-                                     rep(NA_character_, 2)))
+                      period_type = c(rep("calculation", 3),
+                                      rep(NA_character_, 2)))
 
   extended <- extend_display_limits(chart_pp(pp_pre_agg_data), table, counter = 4)
 

@@ -12,10 +12,10 @@ test_that("Calculation period is correct length",{
                                      no_regrets = TRUE)
   
   calculation_period_lengths <- algorithm_results %>% 
-    dplyr::filter(periodType == "calculation") %>% 
-    dplyr::group_by(plotPeriod) %>% 
-    dplyr::summarise(calcPeriodLength = dplyr::n()) %>% 
-    dplyr::pull(calcPeriodLength)
+    dplyr::filter(period_type == "calculation") %>% 
+    dplyr::group_by(plot_period) %>% 
+    dplyr::summarise(calc_period_length = dplyr::n()) %>% 
+    dplyr::pull(calc_period_length)
   
   correct_lengths <- rep(period_min,
                          times = length(calculation_period_lengths))

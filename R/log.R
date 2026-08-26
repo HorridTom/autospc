@@ -30,82 +30,87 @@ interpret_log_entry <- function(entry,
   # Form log entry interpretation string based on log entry components
   switch (step,
           "01" = {
-            eis <- "Counter initialised to 1."
+            interpretation <- "Counter initialised to 1."
           },
           "02" = {
             if(branch == "00") {
-              eis <- "Sufficient data to form at least one period."
+              interpretation <- "Sufficient data to form at least one period."
             } else if(branch == "10") {
-              eis <- "Insufficient data to form control limits."
+              interpretation <- "Insufficient data to form control limits."
             } else {
-              eis <- "Undefined branch at step 02."
+              interpretation <- "Undefined branch at step 02."
             }
           },
           "03" = {
-            eis <- "Main algorithm loop commenced."
+            interpretation <- "Main algorithm loop commenced."
           },
           "04" = {
             if(stringr::str_sub(branch,
                                 1L,
                                 1L) == "0") {
-              eis <- "Sufficient data to proceed."
+              interpretation <- "Sufficient data to proceed."
             } else if(stringr::str_sub(branch,
                                        1L,
                                        1L) == "1") {
-              eis <- paste("Insufficient remaining data for further",
-                           "re-establishment of limits.")
+              interpretation <- paste("Insufficient remaining data for further",
+                                      "re-establishment of limits.")
             } else {
-              eis <- "Undefined branch at step 04."
+              interpretation <- "Undefined branch at step 04."
             }
             
             if(!is.na(entry_data) & stringr::str_sub(branch,
                                                      2L,
                                                      2L) == "1"){
-              eis <- paste0(eis,
-                            " Moving counter to the next shift rule break,",
-                            " commencing at point ",
-                            entry_data,
-                            ".")
+              interpretation <- paste0(
+                interpretation,
+                " Moving counter to the next shift rule break,",
+                " commencing at point ",
+                entry_data,
+                ".")
             }
           },
           "05" = {
             if(branch == "00") {
-              eis <- "There is a shift rule break commencing here,"
+              interpretation <- "There is a shift rule break commencing here,"
               
               switch(entry_data,
                      "01" = {
-                       eis <- paste(eis,
-                                    "downwards from the current centre line.")
+                       interpretation <- paste(
+                         interpretation,
+                         "downwards from the current centre line.")
                      },
                      "10" = {
-                       eis <- paste(eis,
-                                    "upwards from the current centre line.")
+                       interpretation <- paste(
+                         interpretation,
+                         "upwards from the current centre line.")
                      },
                      {
-                       eis <- paste(eis,
-                                    "information on its direction is missing.")
+                       interpretation <- paste(
+                         interpretation,
+                         "information on its direction is missing.")
                      })
               
             } else if(branch == "10") {
-              eis <- paste("There are no subsequent shift rule breaks.")
+              interpretation <- paste(
+                "There are no subsequent shift rule breaks.")
             } else {
-              eis <- "Undefined branch at step 05."
+              interpretation <- "Undefined branch at step 05."
             }
           },
           "06" = {
             if(branch == "00") {
               if(verbosity > 1) {
-                eis <- "Sufficient data to proceed."
+                interpretation <- "Sufficient data to proceed."
               } else {
-                eis <- ""
+                interpretation <- ""
               }
-              eis <- paste(eis,
-                           "Forming candidate limits.")
+              interpretation <- paste(interpretation,
+                                      "Forming candidate limits.")
             } else if(branch == "10") {
-              eis <- paste("Insufficient remaining data for further",
-                           "re-establishment of limits.")
+              interpretation <- paste("Insufficient remaining data for further",
+                                      "re-establishment of limits.")
             } else {
-              eis <- "Undefined branch at step 06."
+              interpretation <- "Undefined branch at step 06."
             }
             
             if(!is.na(entry_data)){
@@ -133,35 +138,36 @@ interpret_log_entry <- function(entry,
                       "prevailing centre line.")
               } else {""}
               
-              eis <- paste(eis,
-                           opp_str,
-                           frp_str)
+              interpretation <- paste(interpretation,
+                                      opp_str,
+                                      frp_str)
               
             }
             
           },
           "07" = {
             if(branch == "00") {
-              eis <- "Candidate limits accepted, limits re-established."
+              interpretation <- paste("Candidate limits accepted, limits",
+                                      "re-established.")
             } else if(branch == "10") {
-              eis <- paste("Candidate limits rejected, prevailing limits",
-                           "retained.")
+              interpretation <- paste("Candidate limits rejected, prevailing",
+                                      "limits retained.")
             } else {
-              eis <- "Undefined branch at step 07."
+              interpretation <- "Undefined branch at step 07."
             }
           },
           {interpretation <- "Undefined log entry"}
   )
   
-  return(eis)
+  return(interpretation)
   
 }
 
 
-create_log_dataframe <- function(df,
+create_log_dataframe <- function(table,
                                  verbosity) {
   
-  df <- df %>% 
+  table <- table %>% 
     dplyr::select(x,
                   log_entry = log) %>% 
     tibble::rowid_to_column("counter") %>%
@@ -175,18 +181,18 @@ create_log_dataframe <- function(df,
     as.data.frame()
   
   
-  return(df)
+  return(table)
   
 }
 
 
-interpret_log <- function(df,
+interpret_log <- function(table,
                           verbosity) {
   
-  log_df <- create_log_dataframe(df,
-                                 verbosity = verbosity)
+  log_table <- create_log_dataframe(table,
+                                    verbosity = verbosity)
   
-  log_df <- log_df %>%
+  log_table <- log_table %>%
     dplyr::filter(!(trimws(interpretation) == "")) %>%
     dplyr::group_by(counter) %>%
     dplyr::mutate(interpretation = stringr::str_wrap(interpretation,
@@ -197,7 +203,7 @@ interpret_log <- function(df,
                      interpretation = paste0("- ", interpretation),
                      .groups = "drop")
   
-  log_txt <- log_df %>%
+  log_txt <- log_table %>%
     dplyr::mutate(log_txt = paste0("Counter at ",
                                    counter,
                                    ", ",
@@ -317,12 +323,12 @@ too_few_points_message <- function(subject) {
 #'
 #' @return invisible TRUE
 #' @noRd
-log_output <- function(df,
+log_output <- function(table,
                        verbosity,
                        chart_type) {
 
   if(verbosity > 0){
-    log_text <- interpret_log(df,
+    log_text <- interpret_log(table,
                               verbosity = verbosity)
     cat(paste0("\n",
                chart_type,
@@ -357,12 +363,12 @@ write_log_file <- function(logs,
     return(invisible(FALSE))
   }
 
-  log_df <- lapply(logs,
-                   create_log_dataframe,
-                   verbosity = 2L)
+  log_table <- lapply(logs,
+                      create_log_dataframe,
+                      verbosity = 2L)
 
-  log_df <- as.data.frame(dplyr::bind_rows(log_df,
-                                           .id = "chart"))
+  log_table <- as.data.frame(dplyr::bind_rows(log_table,
+                                              .id = "chart"))
 
   fext <- tools::file_ext(log_file_path)
 
@@ -370,7 +376,7 @@ write_log_file <- function(logs,
 
     tryCatch(
       expr = {
-        saveRDS(log_df,
+        saveRDS(log_table,
                 file = log_file_path)
       },
       error = function(cnd){
@@ -383,7 +389,7 @@ write_log_file <- function(logs,
 
     tryCatch(
       expr = {
-        utils::write.csv(log_df,
+        utils::write.csv(log_table,
                          file = log_file_path)
       },
       error = function(cnd){

@@ -51,31 +51,31 @@ find_extremes <- function(data,
       centre_line_tolerance = chart$centre_line_tolerance,
       shift_rule_threshold = chart$shift_rule_threshold)
     calculation_period <- calculation_period %>% 
-      dplyr::mutate(aboveCl = ifelse(y > cl,
-                                     TRUE,
-                                     ifelse(y < cl,
-                                            FALSE,
-                                            NA))) %>%
-      dplyr::mutate(rule1Distance = ifelse(rule1 & aboveCl,
-                                           y - ucl, 
-                                           ifelse(rule1 & !aboveCl,
-                                                  lcl - y,
-                                                  NA))) %>%
+      dplyr::mutate(above_cl = ifelse(y > cl,
+                                      TRUE,
+                                      ifelse(y < cl,
+                                             FALSE,
+                                             NA))) %>%
+      dplyr::mutate(rule1_distance = ifelse(rule1 & above_cl,
+                                            y - ucl, 
+                                            ifelse(rule1 & !above_cl,
+                                                   lcl - y,
+                                                   NA))) %>%
       # Set already established extremes as NA
-      dplyr::mutate(rule1Distance = ifelse(dplyr::row_number() %in% 
-                                             exclusion_points,
-                                           NA,
-                                           rule1Distance))
+      dplyr::mutate(rule1_distance = ifelse(dplyr::row_number() %in%
+                                              exclusion_points,
+                                            NA,
+                                            rule1_distance))
     
-    if(sum(!is.na(calculation_period$rule1Distance)) == 0) {
+    if(sum(!is.na(calculation_period$rule1_distance)) == 0) {
       # If no extremes, set furthest_extreme to -Inf
       furthest_extreme <- -Inf
     } else {
       # Otherwise, set furthest extreme to the greatest distance from limit
-      furthest_extreme <- max(calculation_period$rule1Distance, na.rm = T)
+      furthest_extreme <- max(calculation_period$rule1_distance, na.rm = T)
     }
     exclusion_point <- which(
-      calculation_period$rule1Distance == furthest_extreme)
+      calculation_period$rule1_distance == furthest_extreme)
     
     # Add next exclusion point and furthest extreme to the vectors
     furthest_extremes <- c(furthest_extremes, furthest_extreme)
@@ -104,13 +104,13 @@ rule2_break_start_positions <- function(limits_table, counter){
   # Add a column for start of rule 2 breaks - i.e. if there is a rule 2
   # highlight and that is not preceded by a rule 2 highlight
   limits_table <- limits_table %>% 
-    dplyr::mutate(startOfRule2Break = rule2 & 
+    dplyr::mutate(start_of_rule2_break = rule2 & 
                     (rule2 != dplyr::lag(rule2) |
-                       different_cl_side(aboveOrBelowCl,
-                                         dplyr::lag(aboveOrBelowCl))))
+                       different_cl_side(above_or_below_cl,
+                                         dplyr::lag(above_or_below_cl))))
   
   next_rule_break_positions <-
-    (which(limits_table$startOfRule2Break[
+    (which(limits_table$start_of_rule2_break[
       counter:nrow(limits_table)
     ] == T)) + counter - 1
   
@@ -154,13 +154,14 @@ identify_opposite_break <- function(limits_table,
   
   limits_table_candidate <- limits_table_candidate %>%
     dplyr::mutate(
-      laggedAOBC = dplyr::lag(aboveOrBelowCl),
-      newRun = dplyr::if_else((is.na(laggedAOBC) |
-                                 (aboveOrBelowCl != 0 &
-                                    aboveOrBelowCl != laggedAOBC)),
-                              TRUE,
-                              FALSE),
-      runCount = cumsum(newRun))
+      lagged_above_or_below_cl = dplyr::lag(above_or_below_cl),
+      new_run = dplyr::if_else(
+        (is.na(lagged_above_or_below_cl) |
+           (above_or_below_cl != 0 &
+              above_or_below_cl != lagged_above_or_below_cl)),
+        TRUE,
+        FALSE),
+      run_count = cumsum(new_run))
   
   #looks for a rule break in the opposite direction within the candidate period
   # Don't consider the first run as a potential opposite rule break. If it is
@@ -168,9 +169,9 @@ identify_opposite_break <- function(limits_table,
   # and if it is in the opposite direction, it just represents a transition on
   # the way to the new level
   limits_table_candidate <- limits_table_candidate %>% 
-    dplyr::mutate(oppositeBreak = dplyr::if_else(
-      rule2 & (aboveOrBelowCl != triggering_rule_break_direction) &
-        runCount > 1, 
+    dplyr::mutate(opposite_break = dplyr::if_else(
+      rule2 & (above_or_below_cl != triggering_rule_break_direction) &
+        run_count > 1, 
       TRUE, 
       FALSE))
   
@@ -178,7 +179,7 @@ identify_opposite_break <- function(limits_table,
     
     limits_table_tail <- limits_table[(candidate_end + 1L):nrow(limits_table),]
     limits_table_tail <- limits_table_tail %>% 
-      dplyr::mutate(oppositeBreak = FALSE)
+      dplyr::mutate(opposite_break = FALSE)
     
     limits_table_candidate <- limits_table_candidate %>%
       dplyr::bind_rows(limits_table_tail)
@@ -187,17 +188,17 @@ identify_opposite_break <- function(limits_table,
   #return list containing: boolean of whether there is an opposite break, 
   #the next rule break position if applicable,
   #the candidate table
-  if(all(limits_table_candidate$oppositeBreak == FALSE)){
+  if(all(limits_table_candidate$opposite_break == FALSE)){
     #if there are no further rule breaks
     output <- list(FALSE, NA, limits_table_candidate)
     
   }else{
     
     next_rule_break_position <- min(
-      which(limits_table_candidate$oppositeBreak == TRUE )) + counter - 1
+      which(limits_table_candidate$opposite_break == TRUE )) + counter - 1
     
     last_point_in_calc_period <- tail(
-      which(limits_table_candidate$periodType == "calculation"),
+      which(limits_table_candidate$period_type == "calculation"),
       n = 1L) + counter - 1
     
     if(next_rule_break_position > last_point_in_calc_period){
@@ -221,22 +222,22 @@ final_run_prevents_re_establishment <- function(
   # Filter data to exclude everything prior to the last calculation period 
   data <- candidate_limits_table
   data <- data %>%
-    dplyr::mutate(laggedPeriodType = dplyr::lag(periodType),
-                  newPeriod = dplyr::if_else(
-                    (is.na(laggedPeriodType) |
-                       laggedPeriodType != periodType), TRUE, FALSE),
-                  periodCount = cumsum(newPeriod)
+    dplyr::mutate(lagged_period_type = dplyr::lag(period_type),
+                  new_period = dplyr::if_else(
+                    (is.na(lagged_period_type) |
+                       lagged_period_type != period_type), TRUE, FALSE),
+                  period_count = cumsum(new_period)
     )
   period_table <- data %>%
-    dplyr::distinct(periodType, periodCount)
+    dplyr::distinct(period_type, period_count)
   
   last_calc_period <- period_table %>%
-    dplyr::filter(periodType == "calculation") %>%
-    dplyr::pull(periodCount) %>%
+    dplyr::filter(period_type == "calculation") %>%
+    dplyr::pull(period_count) %>%
     max()
   
   data <- data %>%
-    dplyr::filter(periodCount >= last_calc_period)
+    dplyr::filter(period_count >= last_calc_period)
   
   #handles NA value that appears sometimes at the end of the data 
   if(is.na(data$y[nrow(data)])){
@@ -246,8 +247,8 @@ final_run_prevents_re_establishment <- function(
   # identify the row number of the last point, in the last calculation period,
   # that is not on the centre line
   last_point_in_last_calc_period <- tail(
-    which(data$periodType == "calculation" &
-            data$aboveOrBelowCl != 0),
+    which(data$period_type == "calculation" &
+            data$above_or_below_cl != 0),
     n = 1L)
   
   if(length(last_point_in_last_calc_period) != 1L) {
@@ -256,7 +257,7 @@ final_run_prevents_re_establishment <- function(
   }
   
   final_direction <- data[last_point_in_last_calc_period,
-                          "aboveOrBelowCl"]
+                          "above_or_below_cl"]
   
   if(final_direction == triggering_rule_break_direction) {
     # the last point in the final calculation period is in the same direction
@@ -271,8 +272,8 @@ final_run_prevents_re_establishment <- function(
     # is the final run of the final calculation period the final run overall?
     final_calc_run_is_final_run <- data %>%
       dplyr::filter(dplyr::row_number() >= last_point_in_last_calc_period,
-                    aboveOrBelowCl != 0) %>%
-      dplyr::pull(aboveOrBelowCl) %>%
+                    above_or_below_cl != 0) %>%
+      dplyr::pull(above_or_below_cl) %>%
       is_numeric_vector_constant()
     
     if(final_calc_run_is_final_run) {
@@ -297,7 +298,7 @@ final_run_prevents_re_establishment <- function(
 
 # Function to add rule breaks to data with many periods. Avoids issues with
 # highlighting across periods. NB this function counts actual break points, not
-# period starts, hence it relies on the breakPoint column not being TRUE on the
+# period starts, hence it relies on the break_point column not being TRUE on the
 # first row.
 add_rule_breaks_respecting_periods <- function(limits_table,
                                                counter,
@@ -305,7 +306,7 @@ add_rule_breaks_respecting_periods <- function(limits_table,
                                                shift_rule_threshold){
   
   #get breakpoint positions
-  breakpoints <- which(limits_table$breakPoint)
+  breakpoints <- which(limits_table$break_point)
   
   
   if(counter == 1 | length(breakpoints) == 0L) {
@@ -379,7 +380,7 @@ is_numeric_vector_constant <- function(x) {
 
 
 # Helper function to fill in NA values with previous non-NA value
-fill_NA <- function(x) {
+fill_na <- function(x) {
   which.na <- c(which(!is.na(x)), length(x) + 1)
   values <- na.omit(x)
   
@@ -393,13 +394,13 @@ fill_NA <- function(x) {
 }
 
 
-# Check whether a floating median is required, and add a column to df providing
-# its values if so
-floating_median_column <- function(df,
+# Check whether a floating median is required, and if so add a column to the
+# table holding its values
+floating_median_column <- function(table,
                                    floating_median,
                                    floating_median_n) {
   
-  median_from_x <- df %>%
+  median_from_x <- table %>%
     dplyr::mutate(non_missing_y = !is.na(y)) %>%
     dplyr::arrange(dplyr::desc(x)) %>%
     dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing_y)) %>%
@@ -410,18 +411,18 @@ floating_median_column <- function(df,
   addfloating_median <- switch(
     EXPR = floating_median,
     yes = TRUE,
-    auto = any(df %>%
+    auto = any(table %>%
                  dplyr::filter(x >= median_from_x) %>% 
                  dplyr::pull(rule2)),
     FALSE)
   
   if(addfloating_median) {
     
-    df <- df %>%
+    table <- table %>%
       dplyr::mutate(
         median =
           dplyr::if_else(x >= median_from_x,
-                         median(df %>%
+                         median(table %>%
                                   dplyr::filter(x >= median_from_x) %>%
                                   dplyr::pull(y),
                                 na.rm = TRUE),
@@ -429,7 +430,7 @@ floating_median_column <- function(df,
     
   }
   
-  return(df)
+  return(table)
   
 }
 
@@ -445,11 +446,11 @@ sign_chr <- function(x) {
 }
 
 
-counter_at_rule_break <- function(df,
+counter_at_rule_break <- function(table,
                                   counter,
                                   shift_rule_threshold) {
   
-  if(!(df %>%
+  if(!(table %>%
        dplyr::filter(dplyr::row_number() == counter) %>%
        dplyr::pull(rule2))) {
     
@@ -457,15 +458,15 @@ counter_at_rule_break <- function(df,
     
   }
   
-  start_of_next_run <- df %>%
-    dplyr::mutate(rowNumber = dplyr::row_number()) %>%
-    dplyr::filter(rowNumber >= counter,
-                  runStart) %>%
+  start_of_next_run <- table %>%
+    dplyr::mutate(row_index = dplyr::row_number()) %>%
+    dplyr::filter(row_index >= counter,
+                  run_start) %>%
     dplyr::slice_head(n = 1L) %>%
-    dplyr::pull(rowNumber)
+    dplyr::pull(row_index)
   
   if(length(start_of_next_run) == 0L) {
-    start_of_next_run <- nrow(df) + 1L
+    start_of_next_run <- nrow(table) + 1L
   }
   
   result <- start_of_next_run - counter >= shift_rule_threshold
@@ -495,7 +496,7 @@ baseline_period_length <- function(chart,
 #' changed, where each period starts, an identifier for the period, and the
 #' direction the centre line moved at each change.
 #'
-#' `plotPeriod` is re-derived by `extend_limits()` for any rows it adds beyond
+#' `plot_period` is re-derived by `extend_limits()` for any rows it adds beyond
 #' the end of the data.
 #'
 #' @return `data`, with the four columns added
@@ -503,21 +504,21 @@ baseline_period_length <- function(chart,
 add_period_columns <- function(data) {
 
   data <- data %>%
-    dplyr::mutate(limitChange = ifelse(periodType == dplyr::lag(periodType),
-                                       FALSE,
-                                       TRUE))
+    dplyr::mutate(limit_change = ifelse(period_type == dplyr::lag(period_type),
+                                        FALSE,
+                                        TRUE))
 
   data <- data %>%
-    dplyr::mutate(periodStart = dplyr::if_else(limitChange == TRUE |
-                                                 is.na(limitChange) |
-                                                 breakPoint == TRUE,
-                                               dplyr::row_number(),
-                                               NA_integer_))
+    dplyr::mutate(period_start = dplyr::if_else(limit_change == TRUE |
+                                                  is.na(limit_change) |
+                                                  break_point == TRUE,
+                                                dplyr::row_number(),
+                                                NA_integer_))
 
-  data$periodStart <- fill_NA(data$periodStart)
+  data$period_start <- fill_na(data$period_start)
 
   data <- data %>%
-    dplyr::mutate(plotPeriod = paste0(periodType, periodStart),
+    dplyr::mutate(plot_period = paste0(period_type, period_start),
                   cl_change = sign(cl - dplyr::lag(cl)))
 
   return(data)

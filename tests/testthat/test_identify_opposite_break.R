@@ -44,31 +44,31 @@ test_that("Rule 2 break within candidate period in opposite direction identified
   test_op_break1 <- autospc(test_op_break1_data,
                                   chart_type = "C'",
                                   plot_chart = F)
-  test_op_break1_break_pos <- which(test_op_break1$breakPoint == TRUE)
+  test_op_break1_break_pos <- which(test_op_break1$break_point == TRUE)
   
   testthat::expect_equal(test_op_break1_break_pos, integer(0))
   
   #should not re-establish due to break in op direction
   test_op_break2 <- autospc(test_op_break2_data, chart_type = "C'", plot_chart = F)
-  test_op_break2_break_pos <- which(test_op_break2$breakPoint == TRUE)
+  test_op_break2_break_pos <- which(test_op_break2$break_point == TRUE)
   
   testthat::expect_equal(test_op_break2_break_pos, integer(0))
   
   #should not re-establish due to break in op direction
   test_op_break3 <- autospc(test_op_break3_data, chart_type = "C'", plot_chart = F)
-  test_op_break3_break_pos <- which(test_op_break3$breakPoint == TRUE)
+  test_op_break3_break_pos <- which(test_op_break3$break_point == TRUE)
   
   testthat::expect_equal(test_op_break3_break_pos, integer(0))
   
   #should re-establish
   test_op_break4 <- autospc(test_op_break4_data, chart_type = "C'", plot_chart = F)
-  test_op_break4_break_pos <- which(test_op_break4$breakPoint == TRUE)
+  test_op_break4_break_pos <- which(test_op_break4$break_point == TRUE)
   
   testthat::expect_equal(test_op_break4_break_pos, 22)
   
   #should re-establish
   test_op_break5 <- autospc(test_op_break5_data, chart_type = "C'", plot_chart = F)
-  test_op_break5_break_pos <- which(test_op_break5$breakPoint == TRUE)
+  test_op_break5_break_pos <- which(test_op_break5$break_point == TRUE)
   
   testthat::expect_equal(test_op_break5_break_pos, 22)
   
@@ -82,7 +82,7 @@ test_that("Opposite rule break after candidate calc period doesn't prevent re-es
                                   chart_type = "C'",
                                   plot_chart = FALSE)
   
-  test_op_break6_break_pos <- which(test_op_break6$breakPoint == TRUE)
+  test_op_break6_break_pos <- which(test_op_break6$break_point == TRUE)
   
   testthat::expect_equal(test_op_break6_break_pos, 31L)
 })

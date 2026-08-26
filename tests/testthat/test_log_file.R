@@ -24,20 +24,20 @@ written_log <- function(...) {
 
 test_that("a single chart writes its log to the file", {
 
-  log_df <- written_log(chart_type = "C")
+  log_table <- written_log(chart_type = "C")
 
-  expect_s3_class(log_df, "data.frame")
+  expect_s3_class(log_table, "data.frame")
 
-  expect_identical(unique(log_df$chart), "C")
+  expect_identical(unique(log_table$chart), "C")
 
 })
 
 
 test_that("an XmR pair writes both halves to one file", {
 
-  log_df <- written_log(chart_type = "XMR")
+  log_table <- written_log(chart_type = "XMR")
 
-  expect_identical(unique(log_df$chart), c("X", "MR"))
+  expect_identical(unique(log_table$chart), c("X", "MR"))
 
 })
 
@@ -80,9 +80,9 @@ test_that("a faceted chart writes one entry per stage", {
                  log_file_path = path)
   )
 
-  log_df <- readRDS(path)
+  log_table <- readRDS(path)
 
-  expect_identical(unique(log_df$chart), c("1", "2", "3"))
+  expect_identical(unique(log_table$chart), c("1", "2", "3"))
 
 })
 
@@ -99,9 +99,9 @@ test_that("named split_rows name the stages in the log", {
                  log_file_path = path)
   )
 
-  log_df <- readRDS(path)
+  log_table <- readRDS(path)
 
-  expect_identical(unique(log_df$chart), c("first", "second", "third"))
+  expect_identical(unique(log_table$chart), c("first", "second", "third"))
 
 })
 
@@ -116,9 +116,9 @@ test_that("a csv log file is written too", {
             plot_chart = FALSE, log_file_path = path)
   )
 
-  log_df <- utils::read.csv(path)
+  log_table <- utils::read.csv(path)
 
-  expect_setequal(unique(log_df$chart), c("X", "MR"))
+  expect_setequal(unique(log_table$chart), c("X", "MR"))
 
 })
 

@@ -11,7 +11,7 @@ analysed_2a <- function(keep_candidate_tables = TRUE) {
                          y = "y",
                          keep_candidate_tables = keep_candidate_tables)
   chart <- prepare_data(chart)
-  run_limit_algorithm(chart)
+  establish_limits(chart)
 }
 
 
@@ -96,7 +96,7 @@ test_that("baseline extent is recorded only when baseline_length is set", {
                          x = "x",
                          y = "y",
                          baseline_length = 25L)
-  analysed <- run_limit_algorithm(prepare_data(chart))
+  analysed <- establish_limits(prepare_data(chart))
 
   expect_identical(analysed$history$baseline$length, 25L)
   expect_identical(analysed$history$baseline$rows, 1:25)
@@ -122,7 +122,7 @@ test_that("the result lists the points excluded as extremes", {
   ed <- data.frame(x = ed_attendances_monthly$month_start,
                    y = ed_attendances_monthly$att_all)
   chart <- autospc_chart(chart_type = "C\'", data = ed, x = "x", y = "y")
-  analysed <- run_limit_algorithm(prepare_data(chart))
+  analysed <- establish_limits(prepare_data(chart))
 
   expect_identical(analysed$result$exclusions,
                    c(1L, 2L, 3L, 33L, 38L, 58L, 59L, 60L, 81L))
@@ -138,7 +138,7 @@ test_that("the run records why it stopped looking for further periods", {
 
   analyse <- function(d, ...) {
     chart <- autospc_chart(chart_type = "C\'", data = d, x = "x", y = "y", ...)
-    run_limit_algorithm(prepare_data(chart))
+    establish_limits(prepare_data(chart))
   }
 
   expect_identical(analyse(example_series_2a)$history$stopped$reason,
@@ -167,7 +167,7 @@ test_that("the stop is recorded at the counter the run reached", {
 
   chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
                          x = "x", y = "y")
-  analysed <- run_limit_algorithm(prepare_data(chart))
+  analysed <- establish_limits(prepare_data(chart))
 
   expect_identical(analysed$history$stopped$counter, 33L)
 
@@ -181,7 +181,7 @@ test_that("every identified break is recorded, with where it was found", {
 
   chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
                          x = "x", y = "y")
-  breaks <- run_limit_algorithm(prepare_data(chart))$history$breaks
+  breaks <- establish_limits(prepare_data(chart))$history$breaks
 
   expect_identical(breaks$counter, c(22L, 23L, 24L, 25L))
   expect_identical(breaks$position, c(22L, 23L, 24L, 33L))
@@ -197,7 +197,7 @@ test_that("a break is against the prevailing limits, not a candidate's", {
   chart <- autospc_chart(chart_type = "C\'", data = example_series_2c,
                          x = "x", y = "y",
                          keep_candidate_tables = TRUE)
-  analysed <- run_limit_algorithm(prepare_data(chart))
+  analysed <- establish_limits(prepare_data(chart))
   breaks <- analysed$history$breaks
   rejected <- analysed$history$candidates[[1]]
 

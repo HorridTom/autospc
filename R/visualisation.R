@@ -24,31 +24,31 @@ create_spc_plot <- function(plot_data,
   main <- plot_data[[1]]
 
   chart   <- main$chart
-  data    <- main$table
-  derived <- main$derived
+  table    <- main$table
+  axis_extents <- main$axis_extents
 
   pair <- is_xmr_pair(lapply(plot_data, function(each) each$chart))
 
   chart_type <- if(pair) "XMR" else chart_type_label(chart)
 
-  df_long <- data %>%
+  long_table <- table %>%
     tidyr::pivot_longer(cols = c(y, cl, ucl, lcl),
                         names_to = "series",
                         values_to = "value")
   
-  df_long <- df_long %>%
+  long_table <- long_table %>%
     dplyr::select(x,
                   series,
                   value,
                   everything())
   
-  df_long <- add_limit_connectors(df_long)
+  long_table <- add_limit_connectors(long_table)
   
   # Create initial plot object without formatting
-  pct <- ggplot2::ggplot(df_long %>%
-                           dplyr::filter(!is.na(value)),
-                         ggplot2::aes(x = x,
-                                      y = value))
+  plot_unformatted <- ggplot2::ggplot(long_table %>%
+                                        dplyr::filter(!is.na(value)),
+                                      ggplot2::aes(x = x,
+                                                   y = value))
   
   if(visualisation_params$use_caption) {
     caption <- paste(chart_type,
@@ -68,35 +68,37 @@ create_spc_plot <- function(plot_data,
   }
   
   # Apply autospc formatting
-  p <- format_SPC(pct,
-                  df_long = df_long,
-                  r1_col = visualisation_params$r1_col,
-                  r2_col = visualisation_params$r2_col,
-                  point_size = visualisation_params$point_size,
-                  rule_title = rule_title,
-                  line_width_sf = visualisation_params$line_width_sf) +
+  spc_plot <- format_spc_plot(
+    plot_unformatted,
+    long_table = long_table,
+    r1_col = visualisation_params$r1_col,
+    r2_col = visualisation_params$r2_col,
+    point_size = visualisation_params$point_size,
+    rule_title = rule_title,
+    line_width_sf = visualisation_params$line_width_sf) +
     ggplot2::ggtitle(visualisation_params$title,
                      subtitle = visualisation_params$subtitle) +
     ggplot2::labs(x = visualisation_params$override_x_title,
                   y = visualisation_params$override_y_title,
                   caption = paste0(caption)) +
-    ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
+    ggplot2::scale_y_continuous(limits = c(axis_extents$ylimlow,
+                                           axis_extents$ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::label_number(big.mark = ","))
   
   # Add floating median to chart if needed
-  if("median" %in% colnames(data)) {
-    p <- add_floating_median(p = p,
-                             df = df_long,
-                             floating_median_n = chart$floating_median_n)
+  if("median" %in% colnames(table)) {
+    spc_plot <- add_floating_median(spc_plot = spc_plot,
+                                    table = long_table,
+                                    floating_median_n = chart$floating_median_n)
   }
   
   # Add annotations to chart if needed
   if(visualisation_params$include_annotations == TRUE){
 
-    p <- add_annotations_to_plot(
-      p = p,
-      df = df_long,
+    spc_plot <- add_annotations_to_plot(
+      spc_plot = spc_plot,
+      table = long_table,
       basic_annotations = visualisation_params$basic_annotations,
       annotation_size = visualisation_params$annotation_size,
       annotation_arrows = visualisation_params$annotation_arrows,
@@ -104,16 +106,16 @@ create_spc_plot <- function(plot_data,
   }
   
   # Format x-axis depending on x type
-  p <- format_x_axis(p = p,
-                     xType = class(data$x),
-                     x_break = visualisation_params$x_break,
-                     x_date_format = visualisation_params$x_date_format,
-                     start_x = derived$start_x,
-                     end_x = derived$end_x)
+  spc_plot <- format_x_axis(spc_plot = spc_plot,
+                            x_class = class(table$x),
+                            x_break = visualisation_params$x_break,
+                            x_date_format = visualisation_params$x_date_format,
+                            start_x = axis_extents$start_x,
+                            end_x = axis_extents$end_x)
   
   # Facet by stages if needed
   if(!is.null(split_rows)) {
-    p <- p +
+    spc_plot <- spc_plot +
       ggplot2::facet_wrap(facets = ggplot2::vars(stage),
                           ncol = 1L)
     
@@ -121,7 +123,7 @@ create_spc_plot <- function(plot_data,
   
   # Combine X and MR charts if needed
   if(pair) {
-    p <- p + 
+    spc_plot <- spc_plot + 
       ggplot2::labs(caption = NULL,
                     x = NULL) + 
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), 
@@ -131,15 +133,15 @@ create_spc_plot <- function(plot_data,
                           visualisation_params = visualisation_params) +
       ggplot2::labs(caption = caption)
     
-    legend <- cowplot::get_legend(p)
+    legend <- cowplot::get_legend(spc_plot)
     
-    p_no_legend <- p + 
+    spc_plot_no_legend <- spc_plot + 
       ggplot2::theme(legend.position = "none")
     p_mr_no_legend <- p_mr + 
       ggplot2::theme(legend.position = "none")
     
-    p <- cowplot::plot_grid(
-      cowplot::plot_grid(p_no_legend, p_mr_no_legend, 
+    spc_plot <- cowplot::plot_grid(
+      cowplot::plot_grid(spc_plot_no_legend, p_mr_no_legend, 
                          ncol = 1, 
                          align = "v"),
       legend,
@@ -149,7 +151,7 @@ create_spc_plot <- function(plot_data,
     
   }
   
-  return(p)
+  return(spc_plot)
   
 }
 
@@ -175,9 +177,9 @@ draw_mr_panel <- function(plot_data,
 
   if(!centre_line_present(plot_data$table)) {
 
-    return(create_timeseries_plot(data = plot_data$table,
+    return(create_timeseries_plot(table = plot_data$table,
                                   visualisation_params = visualisation_params,
-                                  derived = plot_data$derived))
+                                  axis_extents = plot_data$axis_extents))
 
   }
 
@@ -194,11 +196,11 @@ draw_mr_panel <- function(plot_data,
 #'
 #' @return A ggplot.
 #' @noRd
-create_timeseries_plot <- function(data,
+create_timeseries_plot <- function(table,
                                    visualisation_params,
-                                   derived) {
+                                   axis_extents) {
 
-  time_series_plot <- ggplot2::ggplot(data, 
+  time_series_plot <- ggplot2::ggplot(table, 
                                       ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_line(colour = "black",
                        linewidth = 0.5*visualisation_params$line_width_sf) +
@@ -209,7 +211,8 @@ create_timeseries_plot <- function(data,
                      subtitle = visualisation_params$subtitle) +
     ggplot2::labs(x = visualisation_params$override_x_title,
                   y = visualisation_params$override_y_title) +
-    ggplot2::scale_y_continuous(limits = c(derived$ylimlow, derived$ylimhigh),
+    ggplot2::scale_y_continuous(limits = c(axis_extents$ylimlow,
+                                           axis_extents$ylimhigh),
                                 breaks = scales::breaks_pretty(),
                                 labels = scales::number_format(accuracy = 1,
                                                                big.mark = ","))
@@ -218,15 +221,15 @@ create_timeseries_plot <- function(data,
 }
 
 
-format_SPC <- function(cht,
-                       df_long,
-                       r1_col,
-                       r2_col,
-                       point_size,
-                       line_width_sf,
-                       rule_title,
-                       ymin,
-                       ymax) {
+format_spc_plot <- function(plot_unformatted,
+                            long_table,
+                            r1_col,
+                            r2_col,
+                            point_size,
+                            line_width_sf,
+                            rule_title,
+                            ymin,
+                            ymax) {
   point_colours <- c("Rule 1" = r1_col,
                      "Rule 2" = r2_col, 
                      "None" = "black",
@@ -236,7 +239,7 @@ format_SPC <- function(cht,
                     "Display" = "grey50")
   
   # Prepare information on plot periods
-  plot_periods <- df_long$plotPeriod
+  plot_periods <- long_table$plot_period
   
   first_display_period <- plot_periods[grep("display",
                                             plot_periods)[1]]
@@ -252,10 +255,10 @@ format_SPC <- function(cht,
   names(linecolour_scale) <- list_of_plot_periods
   
   # Create spc plot components
-  cht <- cht + 
+  plot_unformatted <- plot_unformatted + 
     ggplot2::geom_line(data = . %>% dplyr::filter(
       series %in% c("cl", "ucl", "lcl")),
-      ggplot2::aes(colour = plotPeriod,
+      ggplot2::aes(colour = plot_period,
                    linetype = series,
                    linewidth = series),
       na.rm = TRUE) + 
@@ -293,7 +296,7 @@ format_SPC <- function(cht,
                                 values = point_colours) + 
     theme_autospc()
   
-  return(cht)
+  return(plot_unformatted)
 }
 
 
@@ -324,22 +327,22 @@ theme_autospc <- function(){
 }
 
 
-format_x_axis <- function(p,
-                          xType,
+format_x_axis <- function(spc_plot,
+                          x_class,
                           x_break,
                           x_date_format,
                           start_x,
                           end_x) {
   
-  if(any(xType == "Date")) {
+  if(any(x_class == "Date")) {
     if(is.null(x_break)) {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
                               breaks = scales::breaks_pretty(),
                               limits = c(as.Date(start_x),
                                          as.Date(end_x)))
     } else {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_date(labels = scales::date_format(x_date_format),
                               breaks = seq(as.Date(start_x),
                                            as.Date(end_x),
@@ -347,23 +350,23 @@ format_x_axis <- function(p,
                               limits = c(as.Date(start_x),
                                          as.Date(end_x)))
     }
-  } else if(any(xType == "integer")) {
+  } else if(any(x_class == "integer")) {
     if(is.null(x_break)) {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
                                     limits = c(start_x,
                                                end_x))
     } else {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_continuous(breaks = seq(start_x,
                                                  end_x,
                                                  x_break),
                                     limits = c(start_x,
                                                end_x))
     }
-  } else if(any(xType == "POSIXct")) {
+  } else if(any(x_class == "POSIXct")) {
     if(is.null(x_break)) {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_datetime(breaks = scales::breaks_pretty(),
                                   limits = c(start_x, end_x))
     } else {
@@ -371,23 +374,23 @@ format_x_axis <- function(p,
         rlang::abort(paste("Please specify x_break as a difftime object when",
                            "x is POSIXct."))
       }
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_datetime(breaks = seq(start_x, end_x, x_break),
                                   limits = c(start_x, end_x))
     }
   } else {
     if(is.null(x_break)) {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_continuous(breaks = scales::breaks_extended(),
                                     limits = c(start_x, end_x))
     } else {
-      p <- p + 
+      spc_plot <- spc_plot + 
         ggplot2::scale_x_continuous(breaks = seq(start_x, end_x, x_break),
                                     limits = c(start_x, end_x))
     }
   }
   
-  return(p)
+  return(spc_plot)
   
 }
 
@@ -414,9 +417,9 @@ word_for_number <- function(n) {
 }
 
 
-add_limit_connectors <- function(df_long) {
+add_limit_connectors <- function(long_table) {
   
-  x_sequence <- df_long %>%
+  x_sequence <- long_table %>%
     dplyr::distinct(x) %>%
     dplyr::arrange(x) %>%
     dplyr::pull(x)
@@ -424,27 +427,27 @@ add_limit_connectors <- function(df_long) {
   # Dataframe listing each display period in the data, with information on
   # first x value in period, and previous x value to that, along with series
   # values for that previous point
-  display_periods <- df_long %>%
-    dplyr::filter(periodType == "display") %>%
-    dplyr::distinct(plotPeriod,
+  display_periods <- long_table %>%
+    dplyr::filter(period_type == "display") %>%
+    dplyr::distinct(plot_period,
                     x) %>%
-    dplyr::group_by(plotPeriod) %>%
+    dplyr::group_by(plot_period) %>%
     dplyr::summarise(x = dplyr::first(x)) %>%
     dplyr::rowwise() %>%
     dplyr::mutate(prev_x = x_sequence[which(x_sequence == x) - 1L]) %>%
     dplyr::ungroup() %>%
-    dplyr::left_join(df_long %>%
+    dplyr::left_join(long_table %>%
                        dplyr::distinct(x, series, value) %>%
                        dplyr::rename(prev_value = value),
                      by = c("prev_x" = "x")) 
   
-  # Create additional rows to be added into df_long with series values at the 
-  # point immediately before the start of each display period. This has the
+  # Create additional rows to be added into long_table, with series values at
+  # the point immediately before the start of each display period. This has the
   # effect of creating an additional point for the control limits and centre
   # line to connect with the preceding calculation period limits and centre line
-  display_starts <- df_long %>%
+  display_starts <- long_table %>%
     dplyr::inner_join(display_periods %>%
-                        dplyr::select(-plotPeriod),
+                        dplyr::select(-plot_period),
                       by = c("x" = "x",
                              "series" = "series")) %>%
     dplyr::filter(series %in% c("cl", "ucl", "lcl")) %>%
@@ -454,11 +457,11 @@ add_limit_connectors <- function(df_long) {
                   -prev_value)
   
   # Add the extra rows into the data, and sort into x order
-  df_long <- df_long %>% 
+  long_table <- long_table %>% 
     dplyr::bind_rows(display_starts) %>%
     dplyr::arrange(x,
                    series)
   
-  return(df_long)
+  return(long_table)
   
 }

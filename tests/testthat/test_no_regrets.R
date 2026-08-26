@@ -35,11 +35,11 @@ test_that("No regrets = TRUE",{
   output_no_regrets5 <- autospc::autospc(test_data5, no_regrets = T, chart_type = "C'", plot_chart = F)
 
   #expect no breakpoint (no re-establishment)
-  testthat::expect_equal(sum(output_no_regrets$breakPoint, na.rm = T), 0)
-  testthat::expect_equal(sum(output_no_regrets2$breakPoint, na.rm = T), 0)
-  testthat::expect_equal(sum(output_no_regrets3$breakPoint, na.rm = T), 0)
-  testthat::expect_equal(sum(output_no_regrets4$breakPoint, na.rm = T), 0)
-  testthat::expect_equal(sum(output_no_regrets5$breakPoint, na.rm = T), 1)
+  testthat::expect_equal(sum(output_no_regrets$break_point, na.rm = T), 0)
+  testthat::expect_equal(sum(output_no_regrets2$break_point, na.rm = T), 0)
+  testthat::expect_equal(sum(output_no_regrets3$break_point, na.rm = T), 0)
+  testthat::expect_equal(sum(output_no_regrets4$break_point, na.rm = T), 0)
+  testthat::expect_equal(sum(output_no_regrets5$break_point, na.rm = T), 1)
   
 })
 
@@ -53,11 +53,11 @@ test_that("No regrets = FALSE",{
   output_regrets5 <- autospc::autospc(test_data5, no_regrets = F, chart_type = "C'", plot_chart = F)
   
   #expect no breakpoint (no re-establishment)
-  testthat::expect_equal(sum(output_regrets$breakPoint, na.rm = T), 1)
-  testthat::expect_equal(sum(output_regrets2$breakPoint, na.rm = T), 1)
-  testthat::expect_equal(sum(output_regrets3$breakPoint, na.rm = T), 1)
-  testthat::expect_equal(sum(output_regrets4$breakPoint, na.rm = T), 0)
-  testthat::expect_equal(sum(output_regrets5$breakPoint, na.rm = T), 1)
+  testthat::expect_equal(sum(output_regrets$break_point, na.rm = T), 1)
+  testthat::expect_equal(sum(output_regrets2$break_point, na.rm = T), 1)
+  testthat::expect_equal(sum(output_regrets3$break_point, na.rm = T), 1)
+  testthat::expect_equal(sum(output_regrets4$break_point, na.rm = T), 0)
+  testthat::expect_equal(sum(output_regrets5$break_point, na.rm = T), 1)
   
 })
 

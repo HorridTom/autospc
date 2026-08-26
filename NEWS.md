@@ -4,6 +4,27 @@
 
 ### Breaking changes
 
+* Seven columns of the table `autospc(plot_chart = FALSE)` and
+  `facet_stages(plot_chart = FALSE)` return have been renamed from camelCase to
+  snake_case, so that every column of the table is named the same way:
+
+  | Was | Is now |
+  |---|---|
+  | `periodType` | `period_type` |
+  | `breakPoint` | `break_point` |
+  | `aboveOrBelowCl` | `above_or_below_cl` |
+  | `runStart` | `run_start` |
+  | `limitChange` | `limit_change` |
+  | `periodStart` | `period_start` |
+  | `plotPeriod` | `plot_period` |
+
+  The values are unchanged. Code that reads these columns by name — filtering
+  on `periodType == "calculation"`, for one — needs the new name. The columns
+  that were already snake_case (`cl_change`, `cl_label`, `annotation_level`,
+  `annotation_curvature`, `highlight`, `excluded`) are unaffected, as are `x`,
+  `y`, `n`, `cl`, `ucl`, `lcl` and the moving range columns `mr`, `amr`, `url`
+  and `lrl`.
+
 * `autospc(override_annotation_dist)` and `autospc(override_annotation_dist_P)`
   are now defunct. They have warned since 0.0.0.9010; supplying either is now an
   error. Use `upper_annotation_sf` and `lower_annotation_sf` instead — the
@@ -84,7 +105,7 @@
   already drawn once; this makes the two agree.
 
 * `autospc(plot_chart = FALSE, show_limits = FALSE)` now returns the four
-  columns describing the periods — `limitChange`, `periodStart`, `plotPeriod`
+  columns describing the periods — `limit_change`, `period_start`, `plot_period`
   and `cl_change` — which it previously returned only when `show_limits` was
   `TRUE`.
 

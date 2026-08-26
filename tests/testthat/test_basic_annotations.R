@@ -1,5 +1,5 @@
 
-test_that("Annotation is completed regardless of basicAnnotation", {
+test_that("Annotation is completed regardless of basic_annotations", {
 
   result_f <- autospc(example_series_1,
                           chart_type = "XMR",

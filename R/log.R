@@ -213,6 +213,99 @@ interpret_log <- function(df,
 }
 
 
+#' Report what the analysis found
+#'
+#' One warning for the call where any chart was short of points, the log of each
+#' chart printed, and one log file for the call. Called by `autospc()` and by
+#' `facet_stages()`, between the analysis and the output.
+#'
+#' @param charts A list of analysed `autospc_chart` objects.
+#' @param labels One label per chart, naming it in the log file and in the
+#'   warning: the chart type for a chart, the stage for a facet.
+#' @param short_message A function taking the labels of the charts that were
+#'   short of points, and giving the warning to raise about them.
+#'
+#' @return invisible NULL
+#' @noRd
+report_analysis <- function(charts,
+                            labels,
+                            show_limits,
+                            verbosity,
+                            log_file_path,
+                            short_message = series_short_message) {
+
+  short <- vapply(charts,
+                  function(chart) !centre_line_present(chart$result$table),
+                  logical(1L))
+
+  if(show_limits && any(short)) {
+    warning(short_message(labels[short]))
+  }
+
+  for(chart in charts) {
+    log_output(chart$result$table,
+               verbosity = verbosity,
+               chart_type = chart_type_label(chart))
+  }
+
+  logs <- lapply(charts, function(chart) chart$result$table)
+  names(logs) <- labels
+
+  write_log_file(logs = logs,
+                 log_file_path = log_file_path)
+
+  invisible(NULL)
+
+}
+
+
+#' The warning where a series has too few points for limits
+#'
+#' The halves of an XmR pair are short together, so neither is named.
+#'
+#' @return A string.
+#' @noRd
+series_short_message <- function(labels) {
+
+  return(too_few_points_message("The input data has"))
+
+}
+
+
+#' The warning where the stages of a faceted chart have too few points for limits
+#'
+#' @param labels The stages that are short of points.
+#'
+#' @return A string.
+#' @noRd
+stages_short_message <- function(labels) {
+
+  subject <- paste("Stages", paste(labels, collapse = ", "), "have")
+
+  if(length(labels) == 1L) {
+    subject <- paste("Stage", labels, "has")
+  }
+
+  return(too_few_points_message(subject))
+
+}
+
+
+#' The sentence both warnings end with
+#'
+#' @param subject What the sentence is about, ending in has or have.
+#'
+#' @return A string.
+#' @noRd
+too_few_points_message <- function(subject) {
+
+  return(paste(subject, "fewer than the minimum number of points needed to",
+               "calculate one period. Timeseries data without limits has been",
+               "displayed."))
+
+}
+
+
 #' Print the log for one chart
 #'
 #' Called once per chart, so an XmR pair prints two logs and a faceted chart one

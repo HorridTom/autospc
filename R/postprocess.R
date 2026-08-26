@@ -104,8 +104,8 @@ faceted_plot_data <- function(plot_data,
 #'
 #' @return A data frame.
 #' @noRd
-combined_plot_data <- function(charts,
-                               parameters) {
+charts_as_table <- function(charts,
+                            parameters) {
 
   return(combine_plot_data(plot_data = build_plot_data(charts, parameters),
                            parameters = parameters))

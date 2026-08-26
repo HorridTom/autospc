@@ -52,6 +52,19 @@ test_that("Charts with show_limits = FALSE behave as expected",{
 })
 
 
+test_that("the warning is about the input data, not about named charts", {
+
+  # a faceted chart names the stages that are short; a single chart or a pair
+  # has only the one series to talk about
+  expect_warning(
+    autospc(test_data, plot_chart = FALSE, chart_type = "XMR",
+            period_min = 21L),
+    "^The input data has fewer than the minimum number of points"
+  )
+
+})
+
+
 test_that("centre_line_present answers whether a table carries a centre line", {
 
   expect_true(centre_line_present(data.frame(x = 1, y = 1, cl = 1)))

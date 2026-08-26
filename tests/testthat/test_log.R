@@ -83,6 +83,20 @@ test_that("log is interpreted correctly (regression)", {
 })
 
 
+test_that("each printed log is headed by the chart type it came from", {
+
+  printed <- capture.output(
+    autospc(test_data, chart_type = "XMR", period_min = 21L,
+            plot_chart = FALSE, verbosity = 1L)
+  )
+
+  expect_true("X:" %in% printed)
+
+  expect_true("MR:" %in% printed)
+
+})
+
+
 test_that("the log frame is a plain data frame", {
 
   log_df <- autospc:::create_log_dataframe(log_out,

@@ -323,37 +323,18 @@ autospc <- function(data,
   parameters <- resolve_default_parameters(parameters = parameters,
                                            chart = charts[[1]])
 
-  charts_with_limits <- vapply(charts,
-                               function(chart) {
-                                 centre_line_present(chart$result$table)
-                               },
-                               logical(1L))
-
-  # One warning for the call, however many charts were short of points
-  if(show_limits && !all(charts_with_limits)) {
-    warning(paste("The input data has fewer than the minimum number of",
-                  "points needed to calculate one period. Timeseries data",
-                  "without limits has been displayed."))
-  }
-
-  # One log entry per chart, named for the chart type
-  logs <- lapply(charts, function(chart) chart$result$table)
-  names(logs) <- vapply(charts,
-                        function(chart) chart_type_label(chart),
-                        character(1L))
-
-  for(chart in charts) {
-    log_output(chart$result$table,
-               verbosity = verbosity,
-               chart_type = chart_type_label(chart))
-  }
-
-  write_log_file(logs = logs,
-                 log_file_path = log_file_path)
+  # Each chart is named for its chart type in the warning and the log file
+  report_analysis(charts = charts,
+                  labels = vapply(charts,
+                                  function(chart) chart_type_label(chart),
+                                  character(1L)),
+                  show_limits = show_limits,
+                  verbosity = verbosity,
+                  log_file_path = log_file_path)
 
   if(!plot_chart) {
-    return(combined_plot_data(charts = charts,
-                              parameters = parameters))
+    return(charts_as_table(charts = charts,
+                           parameters = parameters))
   }
 
   return(autospc_plot(charts = charts,

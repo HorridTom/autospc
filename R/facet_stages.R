@@ -134,43 +134,17 @@ facet_stages <- function(data,
     stage_names <- as.character(seq_along(charts))
   }
 
-  short <- vapply(charts,
-                  function(chart) !centre_line_present(chart$result$table),
-                  logical(1L))
-
-  # One warning for the call, naming the stages that are short of points
-  if(parameters$show_limits && any(short)) {
-
-    subject <- paste("Stages", paste(stage_names[short], collapse = ", "),
-                     "have")
-
-    if(sum(short) == 1L) {
-      subject <- paste("Stage", stage_names[short], "has")
-    }
-
-    warning(paste(subject, "fewer than the minimum number of points needed to",
-                  "calculate one period. Timeseries data without limits has",
-                  "been displayed."))
-
-  }
-
-  for(chart in charts) {
-    log_output(chart$result$table,
-               verbosity = arguments$verbosity,
-               chart_type = chart_type)
-  }
-
-  # One file for the call, with one entry per facet, rather than each facet
-  # writing over the one before.
-  logs <- lapply(charts, function(chart) chart$result$table)
-  names(logs) <- stage_names
-
-  write_log_file(logs = logs,
-                 log_file_path = arguments$log_file_path)
+  # Each facet is named for its stage in the warning and the log file
+  report_analysis(charts = charts,
+                  labels = stage_names,
+                  show_limits = parameters$show_limits,
+                  verbosity = arguments$verbosity,
+                  log_file_path = arguments$log_file_path,
+                  short_message = stages_short_message)
 
   if(!plot_chart) {
-    return(combined_plot_data(charts = charts,
-                              parameters = parameters))
+    return(charts_as_table(charts = charts,
+                           parameters = parameters))
   }
 
   return(autospc_plot(charts = charts,

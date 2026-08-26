@@ -1,4 +1,4 @@
-#' Plot SPC charts with automated limit recalculation
+#' Plot SPC charts, re-establishing control limits automatically
 #' 
 #' `autospc()` creates a statistical process control chart from a
 #' data frame. Control limits are re-established according to specified rules,
@@ -44,9 +44,9 @@
 #' @param no_regrets Boolean signifying which version of the algorithm should be
 #' used. Defines whether limits can change as more data is added or not.
 #' @param overhanging_reversions Boolean determining whether rule breaks in the
-#' opposite direction to a rule break triggering a candidate recalculation
-#' prevent recalculation even if they overhang the end of the candidate
-#' calculation period. Set to FALSE only with no_regrets = FALSE.
+#' opposite direction to a rule break triggering a candidate re-establishment
+#' prevent limits being re-established, even where they overhang the end of the
+#' candidate calculation period. Set to FALSE only with no_regrets = FALSE.
 #' 
 #' ## SPC Parameters
 #' Parameters that control how centre line and control limits are established

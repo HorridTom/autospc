@@ -3,8 +3,8 @@ test_data7 <- readRDS("testdata/test_rulelength_data/test_e2e_data_7.rds")
 test_data8 <- readRDS("testdata/test_rulelength_data/test_e2e_data_8.rds")
 test_data9 <- readRDS("testdata/test_rulelength_data/test_e2e_data_9.rds")
 
-# these tests use the "limitChange" column to check whether limits are 
-# recalculated after 21 points, or if they become display limits, 
+# these tests use the "limitChange" column to check whether limits are
+# re-established after 21 points, or if they become display limits,
 # based on different shift_rule_thresholds
 test_that("check rule length for run of 6", {
   

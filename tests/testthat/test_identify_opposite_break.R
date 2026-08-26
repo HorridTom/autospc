@@ -21,14 +21,14 @@ test_op_break3_data <- structure(list(x = 1:46, y = c(10L, 14L, 5L, 13L, 11L, 6L
                                                       15L, 14L, 14L, 14L, 16L, 12L, 16L, 15L, 13L, 15L)), 
                                  row.names = c(NA, -46L), class = "data.frame")
 
-#normal rule break with expected recalculation
+#normal rule break with expected re-establishment
 test_op_break4_data <- structure(list(x = 1:46, y = c(8L, 8L, 13L, 5L, 12L, 13L, 10L, 
                                                       8L, 6L, 12L, 11L, 4L, 8L, 9L, 7L, 10L, 12L, 5L, 11L, 9L, 11L, 
                                                       16L, 14L, 14L, 15L, 14L, 15L, 14L, 15L, 15L, 13L, 13L, 16L, 15L, 
                                                       15L, 12L, 15L, 14L, 15L, 14L, 16L, 17L, 13L, 15L, 14L, 14L)), 
                                  row.names = c(NA, -46L), class = "data.frame")
 
-#rule break with further rule break in direction of triggering rule break - expected recalc
+#rule break with further rule break in direction of triggering rule break - expected re-establishment
 test_op_break5_data <- structure(list(x = 1:46, y = c(8L, 8L, 13L, 5L, 12L, 13L, 10L, 
                                                       8L, 6L, 12L, 11L, 4L, 8L, 9L, 7L, 10L, 12L, 5L, 11L, 9L, 11L, 
                                                       16L, 14L, 14L, 15L, 14L, 15L, 14L, 15L, 15L, 13L, 13L, 16L, 15L, 
@@ -40,7 +40,7 @@ test_op_break6_data <- readRDS("testdata/test_oppositeRuleBreak_later.rds")
 
 test_that("Rule 2 break within candidate period in opposite direction identified correctly",{
   
-  #should not recalc due to break in op direction
+  #should not re-establish due to break in op direction
   test_op_break1 <- autospc(test_op_break1_data,
                                   chart_type = "C'",
                                   plot_chart = F)
@@ -48,25 +48,25 @@ test_that("Rule 2 break within candidate period in opposite direction identified
   
   testthat::expect_equal(test_op_break1_break_pos, integer(0))
   
-  #should not recalc due to break in op direction
+  #should not re-establish due to break in op direction
   test_op_break2 <- autospc(test_op_break2_data, chart_type = "C'", plot_chart = F)
   test_op_break2_break_pos <- which(test_op_break2$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break2_break_pos, integer(0))
   
-  #should not recalc due to break in op direction
+  #should not re-establish due to break in op direction
   test_op_break3 <- autospc(test_op_break3_data, chart_type = "C'", plot_chart = F)
   test_op_break3_break_pos <- which(test_op_break3$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break3_break_pos, integer(0))
   
-  #should recalc
+  #should re-establish
   test_op_break4 <- autospc(test_op_break4_data, chart_type = "C'", plot_chart = F)
   test_op_break4_break_pos <- which(test_op_break4$breakPoint == TRUE)
   
   testthat::expect_equal(test_op_break4_break_pos, 22)
   
-  #should recalc
+  #should re-establish
   test_op_break5 <- autospc(test_op_break5_data, chart_type = "C'", plot_chart = F)
   test_op_break5_break_pos <- which(test_op_break5$breakPoint == TRUE)
   
@@ -75,8 +75,8 @@ test_that("Rule 2 break within candidate period in opposite direction identified
 })
 
 
-test_that("Opposite rule break after candidate calc period doesn't prevent recalculation",{
-  #should recalc
+test_that("Opposite rule break after candidate calc period doesn't prevent re-establishment",{
+  #should re-establish
   test_op_break6 <- autospc(test_op_break6_data,
                                   no_regrets = TRUE,
                                   chart_type = "C'",

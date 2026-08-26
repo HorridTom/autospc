@@ -41,7 +41,8 @@ run_limit_algorithm <- function(chart) {
     chart <- record_counter_move(chart, 1L, counter, "first period established")
     
     if(!chart$baseline_only){
-      # [3] Algorithm loop starts - unless user specified no recalculations
+      # [3] Algorithm loop starts - unless the caller asked for no
+      # re-establishment
       while(counter < nrow(chart$data)){
         
         # [4] Check whether enough points after the counter to form new period
@@ -150,7 +151,7 @@ run_limit_algorithm <- function(chart) {
               
               # Establish whether (for no regrets) the final run in the
               # candidate calculation period prevents re-establishment of limits
-              final_run_prevents <- final_run_of_calc_period_prevents_recalc(
+              final_run_prevents <- final_run_prevents_re_establishment(
                 candidate_limits_table,
                 triggering_rule_break_direction)
               

@@ -2,7 +2,7 @@
 % Please edit documentation in R/autospc.R
 \name{autospc}
 \alias{autospc}
-\title{Plot SPC charts with automated limit recalculation}
+\title{Plot SPC charts, re-establishing control limits automatically}
 \usage{
 autospc(
   data,
@@ -110,9 +110,9 @@ Algorithm and simply re-establish limits at every shift rule break
 used. Defines whether limits can change as more data is added or not.}
 
 \item{overhanging_reversions}{Boolean determining whether rule breaks in the
-opposite direction to a rule break triggering a candidate recalculation
-prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with no_regrets = FALSE.
+opposite direction to a rule break triggering a candidate re-establishment
+prevent limits being re-established, even where they overhang the end of the
+candidate calculation period. Set to FALSE only with no_regrets = FALSE.
 \subsection{SPC Parameters}{
 
 Parameters that control how centre line and control limits are established

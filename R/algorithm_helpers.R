@@ -213,8 +213,8 @@ identify_opposite_break <- function(limits_table,
 
 
 # Function to establish whether the final run in the candidate calculation
-# period prevents the recalculation (for no regrets)
-final_run_of_calc_period_prevents_recalc <- function(
+# period prevents limits being re-established (for no regrets)
+final_run_prevents_re_establishment <- function(
     candidate_limits_table,
     triggering_rule_break_direction) {
   
@@ -285,8 +285,8 @@ final_run_of_calc_period_prevents_recalc <- function(
       # The final run in the final calculation period is not the final run in
       # the data. There are two cases: either a) it is a rbr, b) it is not.
       # (a) in this case, identify_opposite_break will identify it and prevent
-      # the recalculation at the triggering rule break.
-      # (b) in this case, there is no reason to prevent the recalculation
+      # limits being re-established at the triggering rule break.
+      # (b) in this case, there is no reason to prevent re-establishment
       return(FALSE)
     }
     

@@ -156,6 +156,17 @@
 
 ## Bug fixes
 
+* `autospc()` no longer warns where a column named `x`, `y` or `n` is present in
+  the data and the matching argument is also given (#85). The warning said that
+  the column named in the argument would be used, so it told the caller only 
+  that the package had done as it was asked. It warned even where the argument 
+  named the same column — `x = x` on data whose column is already called `x` —
+  which is the case the issue reported. There were three of these, one each for 
+  `x`, `y` and `n`. All three have gone, including where the argument names a
+  different column from the one already called `x`: the column named in the
+  argument is the one used, and `$data_original` holds every column exactly as
+  it was passed.
+
 * `log_file_path` now writes one file per call, holding every chart the call
   analysed, with a `chart` column saying which each entry came from. An XmR run
   wrote the file twice — once for the X chart and once for the moving range

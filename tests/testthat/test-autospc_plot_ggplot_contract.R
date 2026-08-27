@@ -37,7 +37,9 @@ test_that("adding a theme keeps the class and the slots", {
 
   expect_length(autospc_plot_charts(themed), 1L)
 
-  expect_identical(autospc_plot_visualisation_params(themed, "point_size"), 4)
+  expect_identical(
+    autospc_plot_visualisation_params(themed, parameter = "point_size"),
+    4)
 
 })
 
@@ -52,7 +54,9 @@ test_that("adding a layer keeps the class and the slots", {
 
   expect_length(autospc_plot_charts(layered), 1L)
 
-  expect_identical(autospc_plot_visualisation_params(layered, "point_size"), 4)
+  expect_identical(
+    autospc_plot_visualisation_params(layered, parameter = "point_size"),
+    4)
 
 })
 

@@ -118,7 +118,9 @@ test_that("a single visualisation parameter can be read by name", {
   plot <- test_plot(visualisation_params = list(show_limits = FALSE,
                                                 point_size = 4))
 
-  expect_identical(autospc_plot_visualisation_params(plot, "point_size"), 4)
+  expect_identical(
+    autospc_plot_visualisation_params(plot, parameter = "point_size"),
+    4)
 
 })
 
@@ -126,7 +128,8 @@ test_that("a single visualisation parameter can be read by name", {
 test_that("a visualisation parameter that was not supplied reads as NULL", {
 
   # the plot records what it was drawn with, not the renderer's defaults
-  expect_null(autospc_plot_visualisation_params(test_plot(), "point_size"))
+  expect_null(autospc_plot_visualisation_params(test_plot(),
+                                                 parameter = "point_size"))
 
 })
 
@@ -269,13 +272,13 @@ test_that("the plot carries the values worked out for the drawing", {
 
   expect_identical(autospc_plot_axis_extents(plot), values)
 
-  expect_identical(autospc_plot_axis_extents(plot, "ylimhigh"), 110)
+  expect_identical(autospc_plot_axis_extents(plot, value = "ylimhigh"), 110)
 
 })
 
 
 test_that("an axis extent that was not worked out reads as NULL", {
 
-  expect_null(autospc_plot_axis_extents(test_plot(), "ylimhigh"))
+  expect_null(autospc_plot_axis_extents(test_plot(), value = "ylimhigh"))
 
 })

@@ -124,7 +124,7 @@ test_that("aggregate_data leaves data_original untouched", {
 test_that("calculate_limits matches get_cp_limits", {
 
   expect_identical(
-    calculate_limits(test_chart_cp(), count_period_data,
+    calculate_limits(test_chart_cp(), period = count_period_data,
                      exclusion_points = NULL),
     get_cp_limits(y = count_period_data$y,
                   exclusion_points = NULL,
@@ -137,7 +137,7 @@ test_that("calculate_limits matches get_cp_limits", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(test_chart_cp(), count_period_data,
+    calculate_limits(test_chart_cp(), period = count_period_data,
                      exclusion_points = 6L),
     get_cp_limits(y = count_period_data$y,
                   exclusion_points = 6L,
@@ -146,8 +146,12 @@ test_that("calculate_limits passes exclusion_points through", {
 
   # excluding the high point must actually lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
-  expect_lt(calculate_limits(test_chart_cp(), count_period_data, 6L)$cl[1],
-            calculate_limits(test_chart_cp(), count_period_data, NULL)$cl[1])
+  expect_lt(calculate_limits(test_chart_cp(),
+                             period = count_period_data,
+                             exclusion_points = 6L)$cl[1],
+            calculate_limits(test_chart_cp(),
+                             period = count_period_data,
+                             exclusion_points = NULL)$cl[1])
 
 })
 
@@ -159,7 +163,7 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   chart <- test_chart_cp(mr_screen_max_loops = 0L)
 
   expect_identical(
-    calculate_limits(chart, screening_data, exclusion_points = NULL),
+    calculate_limits(chart, period = screening_data, exclusion_points = NULL),
     get_cp_limits(y = screening_data$y,
                   exclusion_points = NULL,
                   mr_screen_max_loops = 0L)
@@ -169,9 +173,11 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   # comparison above would pass even if the field were ignored
   expect_false(
     identical(calculate_limits(test_chart_cp(mr_screen_max_loops = 0L),
-                               screening_data, NULL),
+                               period = screening_data,
+                               exclusion_points = NULL),
               calculate_limits(test_chart_cp(mr_screen_max_loops = 1L),
-                               screening_data, NULL))
+                               period = screening_data,
+                               exclusion_points = NULL))
   )
 
 })
@@ -179,7 +185,7 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
 
 test_that("the C' chart y axis leaves headroom above the upper limit", {
 
-  expect_identical(y_axis_range(test_chart_cp(), limits_data),
+  expect_identical(y_axis_range(test_chart_cp(), data = limits_data),
                    list(low = 0, high = 18 + 18 / 10 + 10))
 
 })

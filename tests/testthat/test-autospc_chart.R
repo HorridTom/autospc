@@ -70,7 +70,7 @@ test_that("calculate_limits has no method for a bare autospc_chart", {
                                                     y = "y"))
 
   expect_error(
-    calculate_limits(bare_chart, test_data, exclusion_points = NULL),
+    calculate_limits(bare_chart, period = test_data, exclusion_points = NULL),
     "no applicable method"
   )
 
@@ -214,7 +214,8 @@ test_that("n_effective_points counts the non-missing values of y", {
                          x = "x",
                          y = "y")
 
-  expect_identical(n_effective_points(chart, data.frame(y = c(1, NA, 3, 4))),
+  expect_identical(n_effective_points(chart,
+                                       data = data.frame(y = c(1, NA, 3, 4))),
                    3L)
 
 })
@@ -231,7 +232,8 @@ test_that("the classes other than MR count the rows as they are", {
                            x = "x",
                            y = "y")
 
-    expect_identical(n_effective_points(chart, counted), 3L, info = chart_type)
+    expect_identical(n_effective_points(chart,
+                                         data = counted), 3L, info = chart_type)
 
   }
 
@@ -259,7 +261,9 @@ test_that("the default carries the last calculated limits forward", {
                          x = "x",
                          y = "y")
 
-  extended <- extend_display_limits(chart, display_table, counter = 4)
+  extended <- extend_display_limits(chart,
+                                    limits_table = display_table,
+                                    counter = 4)
 
   expect_identical(extended$ucl, rep(18, 6))
   expect_identical(extended$lcl, rep(4, 6))
@@ -277,7 +281,9 @@ test_that("the calculated rows are left alone", {
                          x = "x",
                          y = "y")
 
-  extended <- extend_display_limits(chart, display_table, counter = 4)
+  extended <- extend_display_limits(chart,
+                                    limits_table = display_table,
+                                    counter = 4)
 
   expect_identical(extended[1:3, ], display_table[1:3, ])
 
@@ -293,7 +299,9 @@ test_that("the classes with no override inherit the carry-forward default", {
                            x = "x",
                            y = "y")
 
-    extended <- extend_display_limits(chart, display_table, counter = 4)
+    extended <- extend_display_limits(chart,
+                                      limits_table = display_table,
+                                      counter = 4)
 
     expect_identical(extended$ucl, rep(18, 6), info = chart_type)
 
@@ -317,7 +325,7 @@ test_that("the default averages the final period's limits", {
                          x = "x",
                          y = "y")
 
-  expect_identical(extrapolate_limits(chart, final_period),
+  expect_identical(extrapolate_limits(chart, period = final_period),
                    list(cl = 11, lcl = 4, ucl = 18))
 
 })
@@ -334,7 +342,7 @@ test_that("the default ignores missing limit values", {
                          x = "x",
                          y = "y")
 
-  expect_identical(extrapolate_limits(chart, final_period),
+  expect_identical(extrapolate_limits(chart, period = final_period),
                    list(cl = 11, lcl = 4, ucl = 18))
 
 })
@@ -354,7 +362,7 @@ test_that("the default averages, rather than taking a single row", {
                          x = "x",
                          y = "y")
 
-  expect_identical(extrapolate_limits(chart, final_period),
+  expect_identical(extrapolate_limits(chart, period = final_period),
                    list(cl = 15, lcl = 3, ucl = 27))
 
 })
@@ -371,7 +379,7 @@ test_that("the classes with no override inherit the averaging default", {
                            x = "x",
                            y = "y")
 
-    expect_identical(extrapolate_limits(chart, final_period),
+    expect_identical(extrapolate_limits(chart, period = final_period),
                      list(cl = 11, lcl = 4, ucl = 18),
                      info = chart_type)
 
@@ -532,7 +540,7 @@ test_that("the default y axis range is a percentage scale", {
                                                      x = "x",
                                                      y = "y"))
 
-  expect_identical(y_axis_range(bare_chart, limits_data),
+  expect_identical(y_axis_range(bare_chart, data = limits_data),
                    list(low = 0, high = 110))
 
 })

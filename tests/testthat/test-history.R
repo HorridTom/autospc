@@ -8,8 +8,14 @@ new_chart <- function(...) {
 
 test_that("a counter move is appended to the path", {
 
-  chart <- record_counter_move(new_chart(), 1L, 22L, "first period established")
-  chart <- record_counter_move(chart, 22L, 23L, "candidate rejected")
+  chart <- record_counter_move(new_chart(),
+                               from = 1L,
+                               to = 22L,
+                               reason = "first period established")
+  chart <- record_counter_move(chart,
+                               from = 22L,
+                               to = 23L,
+                               reason = "candidate rejected")
 
   expect_identical(nrow(chart$history$counter_path), 2L)
   expect_identical(chart$history$counter_path$from, c(1L, 22L))
@@ -20,7 +26,10 @@ test_that("a counter move is appended to the path", {
 
 test_that("a move to where the counter already is is not recorded", {
 
-  chart <- record_counter_move(new_chart(), 22L, 22L, "moved to shift rule break")
+  chart <- record_counter_move(new_chart(),
+                               from = 22L,
+                               to = 22L,
+                               reason = "moved to shift rule break")
 
   expect_null(chart$history$counter_path)
 
@@ -29,7 +38,9 @@ test_that("a move to where the counter already is is not recorded", {
 
 test_that("the stop reason replaces rather than accumulates", {
 
-  chart <- record_stop(new_chart(), 44, "reached the end of the series")
+  chart <- record_stop(new_chart(),
+                       counter = 44,
+                       reason = "reached the end of the series")
 
   expect_identical(chart$history$stopped$counter, 44L)
   expect_identical(chart$history$stopped$reason, "reached the end of the series")

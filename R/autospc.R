@@ -296,9 +296,9 @@ autospc <- function(data,
 
   }
 
-  x_name <- resolve_column_name(rlang::enquo(x), "x")
-  y_name <- resolve_column_name(rlang::enquo(y), "y")
-  n_name <- resolve_column_name(rlang::enquo(n), "n")
+  x_name <- resolve_column_name(rlang::enquo(x), fallback = "x")
+  y_name <- resolve_column_name(rlang::enquo(y), fallback = "y")
+  n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")
 
   check_x_type(data[[x_name]])
 

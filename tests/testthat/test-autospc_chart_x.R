@@ -118,7 +118,7 @@ test_that("aggregate_data leaves an X chart untouched", {
 test_that("calculate_limits matches get_x_limits", {
 
   expect_identical(
-    calculate_limits(test_chart_x(), count_period_data,
+    calculate_limits(test_chart_x(), period = count_period_data,
                      exclusion_points = NULL),
     get_x_limits(y = count_period_data$y,
                  mr_screen_max_loops = 1L,
@@ -131,7 +131,7 @@ test_that("calculate_limits matches get_x_limits", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(test_chart_x(), count_period_data,
+    calculate_limits(test_chart_x(), period = count_period_data,
                      exclusion_points = 6L),
     get_x_limits(y = count_period_data$y,
                  mr_screen_max_loops = 1L,
@@ -140,8 +140,12 @@ test_that("calculate_limits passes exclusion_points through", {
 
   # excluding the high point must actually lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
-  expect_lt(calculate_limits(test_chart_x(), count_period_data, 6L)$cl[1],
-            calculate_limits(test_chart_x(), count_period_data, NULL)$cl[1])
+  expect_lt(calculate_limits(test_chart_x(),
+                             period = count_period_data,
+                             exclusion_points = 6L)$cl[1],
+            calculate_limits(test_chart_x(),
+                             period = count_period_data,
+                             exclusion_points = NULL)$cl[1])
 
 })
 
@@ -151,7 +155,7 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   chart <- test_chart_x(mr_screen_max_loops = 0L)
 
   expect_identical(
-    calculate_limits(chart, screening_data, exclusion_points = NULL),
+    calculate_limits(chart, period = screening_data, exclusion_points = NULL),
     get_x_limits(y = screening_data$y,
                  mr_screen_max_loops = 0L,
                  exclusion_points = NULL)
@@ -161,9 +165,11 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   # comparison above would pass even if the field were ignored
   expect_false(
     identical(calculate_limits(test_chart_x(mr_screen_max_loops = 0L),
-                               screening_data, NULL),
+                               period = screening_data,
+                               exclusion_points = NULL),
               calculate_limits(test_chart_x(mr_screen_max_loops = 1L),
-                               screening_data, NULL))
+                               period = screening_data,
+                               exclusion_points = NULL))
   )
 
 })
@@ -178,7 +184,7 @@ test_that("X chart labels are rounded to the scale of the axis", {
 
 test_that("the X chart y axis follows the data below as well as above", {
 
-  expect_identical(y_axis_range(test_chart_x(), limits_data),
+  expect_identical(y_axis_range(test_chart_x(), data = limits_data),
                    list(low = 6 * 0.9, high = 18 * 1.1))
 
 })
@@ -189,6 +195,7 @@ test_that("a negative X chart lower limit is padded downwards", {
   below_zero <- limits_data
   below_zero$lcl <- -4
 
-  expect_identical(y_axis_range(test_chart_x(), below_zero)$low, -4 * 1.1)
+  expect_identical(y_axis_range(test_chart_x(), data = below_zero)$low,
+                    -4 * 1.1)
 
 })

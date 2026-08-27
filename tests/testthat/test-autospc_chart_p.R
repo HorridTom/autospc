@@ -215,7 +215,7 @@ test_that("aggregate_data returns a chart and leaves data_original untouched", {
 test_that("calculate_limits matches get_p_limits", {
 
   expect_identical(
-    calculate_limits(chart_p(pre_agg_data), proportion_period_data,
+    calculate_limits(chart_p(pre_agg_data), period = proportion_period_data,
                      exclusion_points = NULL),
     get_p_limits(y = proportion_period_data$y_numerator,
                  n = proportion_period_data$n,
@@ -231,7 +231,8 @@ test_that("calculate_limits uses y_numerator, not the percentage column y", {
   # the y column holds percentages; using it would give a centre line of 85
   # rather than the true 17%, with no error raised
   limits <- calculate_limits(chart_p(pre_agg_data),
-                             proportion_period_data, NULL)
+                             period = proportion_period_data,
+                             exclusion_points = NULL)
 
   expect_equal(limits$cl[1],
                sum(proportion_period_data$y_numerator) /
@@ -243,7 +244,7 @@ test_that("calculate_limits uses y_numerator, not the percentage column y", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(chart_p(pre_agg_data), proportion_period_data,
+    calculate_limits(chart_p(pre_agg_data), period = proportion_period_data,
                      exclusion_points = 4L),
     get_p_limits(y = proportion_period_data$y_numerator,
                  n = proportion_period_data$n,
@@ -254,9 +255,11 @@ test_that("calculate_limits passes exclusion_points through", {
   # excluding the highest point must lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
   with_excl <- calculate_limits(chart_p(pre_agg_data),
-                                proportion_period_data, 4L)
+                                period = proportion_period_data,
+                                exclusion_points = 4L)
   without   <- calculate_limits(chart_p(pre_agg_data),
-                                proportion_period_data, NULL)
+                                period = proportion_period_data,
+                                exclusion_points = NULL)
 
   expect_lt(with_excl$cl[1], without$cl[1])
 
@@ -288,7 +291,9 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
                       period_type = c(rep("calculation", 3),
                                       rep(NA_character_, 2)))
 
-  extended <- extend_display_limits(chart_p(pre_agg_data), table, counter = 4)
+  extended <- extend_display_limits(chart_p(pre_agg_data),
+                                    limits_table = table,
+                                    counter = 4)
 
   # constant = (25 - 15) * sqrt(100) = 100, so the half-width is 100/sqrt(n)
   expect_equal(extended$ucl[4], 15 + 100 / sqrt(25))
@@ -314,7 +319,9 @@ test_that("extend_display_limits clamps the recomputed limits to 0 and 100", {
                       period_type = c(rep("calculation", 3),
                                       rep(NA_character_, 2)))
 
-  extended <- extend_display_limits(chart_p(pre_agg_data), table, counter = 4)
+  extended <- extend_display_limits(chart_p(pre_agg_data),
+                                    limits_table = table,
+                                    counter = 4)
 
   expect_true(all(extended$ucl[4:5] <= 100))
   expect_true(all(extended$lcl[4:5] >= 0))
@@ -334,7 +341,7 @@ test_that("extrapolate_limits recalculates from the final period", {
                              lcl = rep(99, 5),            # so a method that
                              ucl = rep(99, 5))            # echoes them fails
 
-  limits <- extrapolate_limits(chart_p(pre_agg_data), final_period)
+  limits <- extrapolate_limits(chart_p(pre_agg_data), period = final_period)
 
   expect_named(limits, c("cl", "ucl", "lcl"), ignore.order = TRUE)
   expect_length(limits$cl, 1L)
@@ -363,8 +370,9 @@ test_that("extrapolate_limits leaves out the excluded points", {
   excluded_period <- base_period
   excluded_period$excluded <- c(FALSE, FALSE, FALSE, TRUE, FALSE)
 
-  with_spike <- extrapolate_limits(chart_p(pre_agg_data), base_period)
-  without_spike <- extrapolate_limits(chart_p(pre_agg_data), excluded_period)
+  with_spike <- extrapolate_limits(chart_p(pre_agg_data), period = base_period)
+  without_spike <- extrapolate_limits(chart_p(pre_agg_data),
+                                       period = excluded_period)
 
   expect_lt(without_spike$cl, with_spike$cl)
 

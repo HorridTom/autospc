@@ -188,7 +188,7 @@ test_that("chart_type_label returns the C chart label", {
 test_that("calculate_limits matches get_c_limits", {
 
   expect_identical(
-    calculate_limits(test_chart_c(), count_period_data,
+    calculate_limits(test_chart_c(), period = count_period_data,
                      exclusion_points = NULL),
     get_c_limits(y = count_period_data$y, exclusion_points = NULL)
   )
@@ -199,22 +199,26 @@ test_that("calculate_limits matches get_c_limits", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(test_chart_c(), count_period_data,
+    calculate_limits(test_chart_c(), period = count_period_data,
                      exclusion_points = 6L),
     get_c_limits(y = count_period_data$y, exclusion_points = 6L)
   )
 
   # excluding the high point must actually lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
-  expect_lt(calculate_limits(test_chart_c(), count_period_data, 6L)$cl[1],
-            calculate_limits(test_chart_c(), count_period_data, NULL)$cl[1])
+  expect_lt(calculate_limits(test_chart_c(),
+                             period = count_period_data,
+                             exclusion_points = 6L)$cl[1],
+            calculate_limits(test_chart_c(),
+                             period = count_period_data,
+                             exclusion_points = NULL)$cl[1])
 
 })
 
 
 test_that("the C chart y axis leaves headroom above the upper limit", {
 
-  expect_identical(y_axis_range(test_chart_c(), limits_data),
+  expect_identical(y_axis_range(test_chart_c(), data = limits_data),
                    list(low = 0, high = 18 + 18 / 10 + 10))
 
 })

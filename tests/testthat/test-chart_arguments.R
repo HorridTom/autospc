@@ -130,7 +130,8 @@ test_that("every visualisation parameter reaches the plot object", {
                   !!!given)
     )
 
-    expect_identical(autospc_plot_visualisation_params(drawn_with, parameter),
+    expect_identical(autospc_plot_visualisation_params(drawn_with,
+                                                        parameter = parameter),
                      given[[parameter]],
                      info = parameter)
 

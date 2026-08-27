@@ -94,9 +94,9 @@ facet_stages <- function(data,
   # of them affects chart$data.
   whole_series <- autospc_chart(chart_type = chart_type,
                                 data = data,
-                                x = column_name_of(xyn_exprs, "x"),
-                                y = column_name_of(xyn_exprs, "y"),
-                                n = column_name_of(xyn_exprs, "n"))
+                                x = column_name_of(xyn_exprs, field = "x"),
+                                y = column_name_of(xyn_exprs, field = "y"),
+                                n = column_name_of(xyn_exprs, field = "n"))
 
   df_rn <- whole_series$data
 

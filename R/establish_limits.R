@@ -31,14 +31,17 @@ establish_limits <- function(chart) {
     
     # Set counter to first point after end of first period
     if(counter == 1L & !is.null(chart$baseline_length)) {
-      baseline_rows <- baseline_period_length(chart, chart$data)
+      baseline_rows <- baseline_period_length(chart, data = chart$data)
       chart$history$baseline <- list(length = baseline_rows,
                                      rows = 1:baseline_rows)
       counter <- counter + baseline_rows
     } else {
       counter <- counter + chart$period_min
     }
-    chart <- record_counter_move(chart, 1L, counter, "first period established")
+    chart <- record_counter_move(chart,
+                                 from = 1L,
+                                 to = counter,
+                                 reason = "first period established")
     
     if(!chart$baseline_only){
       # [3] Algorithm loop starts - unless the caller asked for no
@@ -50,8 +53,8 @@ establish_limits <- function(chart) {
                                        counter = counter,
                                        chart = chart)) {        
           
-          chart <- record_stop(chart, counter,
-                               "not enough data for a further period")
+          chart <- record_stop(chart, counter = counter,
+                               reason = "not enough data for a further period")
           
           break
           
@@ -72,7 +75,9 @@ establish_limits <- function(chart) {
             rule2_break_positions <- NA
             rule2_break_position <- counter
             
-            chart <- record_break(chart, counter, rule2_break_position,
+            chart <- record_break(chart,
+                                  counter = counter,
+                                  position = rule2_break_position,
                                   already_at_break = TRUE,
                                   limits_table = limits_table)
 
@@ -86,7 +91,9 @@ establish_limits <- function(chart) {
             
             rule2_break_position <- rule2_break_positions[1]
             
-            chart <- record_break(chart, counter, rule2_break_position,
+            chart <- record_break(chart,
+                                  counter = counter,
+                                  position = rule2_break_position,
                                   already_at_break = FALSE,
                                   limits_table = limits_table)
 
@@ -96,8 +103,8 @@ establish_limits <- function(chart) {
           if(is.na(rule2_break_position) |
              rule2_break_position >= nrow(chart$data)){
             # [5b] If not, then there can be no more additional periods
-            chart <- record_stop(chart, counter,
-                                 "no further shift rule breaks")
+            chart <- record_stop(chart, counter = counter,
+                                 reason = "no further shift rule breaks")
             
             break
             
@@ -107,8 +114,11 @@ establish_limits <- function(chart) {
             
             # [5a] Set counter to the next rule break position and record the
             # direction of the rule break
-            chart <- record_counter_move(chart, counter, rule2_break_position,
-                                         "moved to shift rule break")
+            chart <- record_counter_move(
+              chart,
+              from = counter,
+              to = rule2_break_position,
+              reason = "moved to shift rule break")
             counter <- rule2_break_position
             triggering_rule_break_direction <-
               limits_table$above_or_below_cl[counter]
@@ -121,8 +131,10 @@ establish_limits <- function(chart) {
                                            counter = counter,
                                            chart = chart)){
               
-              chart <- record_stop(chart, counter,
-                                   "too few points after the shift rule break")
+              chart <- record_stop(
+                chart,
+                counter = counter,
+                reason = "too few points after the shift rule break")
               
               break
               
@@ -142,9 +154,10 @@ establish_limits <- function(chart) {
               
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
-                counter,
-                chart$period_min,
-                triggering_rule_break_direction,
+                counter = counter,
+                period_min = chart$period_min,
+                triggering_rule_break_direction =
+                  triggering_rule_break_direction,
                 centre_line_tolerance = chart$centre_line_tolerance,
                 shift_rule_threshold = chart$shift_rule_threshold,
                 overhanging_reversions = chart$overhanging_reversions)[[1]]
@@ -153,7 +166,8 @@ establish_limits <- function(chart) {
               # candidate calculation period prevents re-establishment of limits
               final_run_prevents <- final_run_prevents_re_establishment(
                 candidate_limits_table,
-                triggering_rule_break_direction)
+                triggering_rule_break_direction =
+                  triggering_rule_break_direction)
               
               # Check whether either we re-establish at every shift OR:
               # 1) There is no opposing rule break AND
@@ -201,9 +215,9 @@ establish_limits <- function(chart) {
                 
                 # and set the counter to the first point after the end of the
                 # new calculation period
-                chart <- record_counter_move(chart, counter,
-                                             counter + chart$period_min,
-                                             "limits re-established")
+                chart <- record_counter_move(chart, from = counter,
+                                             to = counter + chart$period_min,
+                                             reason = "limits re-established")
                 counter <- counter + chart$period_min
                 
               } else {
@@ -224,15 +238,18 @@ establish_limits <- function(chart) {
                    )){
                   
                   # If so, advance the counter by 1
-                  chart <- record_counter_move(chart, counter, counter + 1,
-                                               "candidate rejected")
+                  chart <- record_counter_move(
+                    chart,
+                    from = counter,
+                    to = counter + 1,
+                    reason = "candidate rejected")
                   counter <- counter + 1
                   
                 } else {
                   # If not, move counter to the start of the next rule 2 break 
-                  chart <- record_counter_move(chart, counter,
-                                               rule2_break_positions[2],
-                                               "candidate rejected")
+                  chart <- record_counter_move(chart, from = counter,
+                                               to = rule2_break_positions[2],
+                                               reason = "candidate rejected")
                   counter <- rule2_break_positions[2]
                 }
               } # end of: [7b] candidate limits rejected
@@ -243,12 +260,14 @@ establish_limits <- function(chart) {
 
       # the loop can also end by its own condition, having reached the series
       if(is.null(chart$history$stopped)) {
-        chart <- record_stop(chart, counter, "reached the end of the series")
+        chart <- record_stop(chart,
+                             counter = counter,
+                             reason = "reached the end of the series")
       }
 
     } else {
 
-      chart <- record_stop(chart, counter, "baseline only")
+      chart <- record_stop(chart, counter = counter, reason = "baseline only")
 
     } # end of: [3] !baseline_only
     

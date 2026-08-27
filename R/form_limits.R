@@ -5,7 +5,7 @@ form_calculation_limits <- function(data,
                                     chart){
 
   if(counter == 1L & !is.null(chart$baseline_length)) {
-    period_length <- baseline_period_length(chart, data)
+    period_length <- baseline_period_length(chart, data = data)
   } else {
     period_length <- chart$period_min
   }
@@ -120,7 +120,7 @@ form_calculation_and_display_limits <- function(
   #extend display limits to end 
   
   if(counter_at_period_start == 1L & !is.null(chart$baseline_length)) {
-    period_length <- baseline_period_length(chart, data)
+    period_length <- baseline_period_length(chart, data = data)
   } else {
     period_length <- chart$period_min
   }

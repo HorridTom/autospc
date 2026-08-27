@@ -8,7 +8,7 @@
 # resolve_column_name() takes a quosure, so it is called through a wrapper that
 # applies rlang::enquo() to its argument, as in autospc().
 resolve <- function(column, fallback = "x") {
-  resolve_column_name(rlang::enquo(column), fallback)
+  resolve_column_name(rlang::enquo(column), fallback = fallback)
 }
 
 

@@ -120,7 +120,7 @@ test_that("aggregate_data leaves an MR chart untouched", {
 test_that("calculate_limits matches get_mr_limits", {
 
   expect_identical(
-    calculate_limits(test_chart_mr(), count_period_data,
+    calculate_limits(test_chart_mr(), period = count_period_data,
                      exclusion_points = NULL),
     get_mr_limits(mr = count_period_data$y,
                   mr_screen_max_loops = 0L,
@@ -133,7 +133,7 @@ test_that("calculate_limits matches get_mr_limits", {
 test_that("calculate_limits passes exclusion_points through", {
 
   expect_identical(
-    calculate_limits(test_chart_mr(), count_period_data,
+    calculate_limits(test_chart_mr(), period = count_period_data,
                      exclusion_points = 6L),
     get_mr_limits(mr = count_period_data$y,
                   mr_screen_max_loops = 0L,
@@ -142,8 +142,12 @@ test_that("calculate_limits passes exclusion_points through", {
 
   # excluding the high point must actually lower the centre line, otherwise the
   # comparison above would pass even if the argument were ignored
-  expect_lt(calculate_limits(test_chart_mr(), count_period_data, 6L)$cl[1],
-            calculate_limits(test_chart_mr(), count_period_data, NULL)$cl[1])
+  expect_lt(calculate_limits(test_chart_mr(),
+                             period = count_period_data,
+                             exclusion_points = 6L)$cl[1],
+            calculate_limits(test_chart_mr(),
+                             period = count_period_data,
+                             exclusion_points = NULL)$cl[1])
 
 })
 
@@ -156,9 +160,9 @@ test_that("calculate_limits ignores mr_screen_max_loops on the chart", {
   # identical limits.
   expect_identical(
     calculate_limits(test_chart_mr(mr_screen_max_loops = 5L),
-                     screening_data, exclusion_points = NULL),
+                     period = screening_data, exclusion_points = NULL),
     calculate_limits(test_chart_mr(mr_screen_max_loops = 0L),
-                     screening_data, exclusion_points = NULL)
+                     period = screening_data, exclusion_points = NULL)
   )
 
   # screening_data is chosen because screening would change the answer here if
@@ -182,7 +186,7 @@ test_that("n_effective_points adds one to the moving ranges", {
   # underlying series
   counted <- data.frame(y = c(NA, 3, 6, 7))
 
-  expect_identical(n_effective_points(test_chart_mr(), counted), 4L)
+  expect_identical(n_effective_points(test_chart_mr(), data = counted), 4L)
 
 })
 
@@ -221,7 +225,7 @@ test_that("MR chart labels are rounded to the scale of the axis", {
 
 test_that("the MR chart y axis starts at zero", {
 
-  expect_identical(y_axis_range(test_chart_mr(), limits_data),
+  expect_identical(y_axis_range(test_chart_mr(), data = limits_data),
                    list(low = 0, high = 18 * 1.1))
 
 })

@@ -436,14 +436,14 @@ render_log <- function(chart) {
 
   if(!("cl" %in% colnames(spc_table))) {
     add(1L, "0210")
-    return(collect_log_entries(rows, codes, n_rows))
+    return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
   }
 
   add(1L, "0200")
 
   stopped <- chart$history$stopped
   if(identical(stopped$reason, "baseline only")) {
-    return(collect_log_entries(rows, codes, n_rows))
+    return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
   }
 
   add(chart$history$counter_path$to[1], "0300")
@@ -483,7 +483,7 @@ render_log <- function(chart) {
     add(stopped$counter, stop_code)
   }
 
-  return(collect_log_entries(rows, codes, n_rows))
+  return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
 
 }
 

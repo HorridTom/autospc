@@ -345,16 +345,20 @@ test_that("it records the axis extents it was drawn with", {
   # what is recorded is what the y scale was given, before ggplot expands it
   limits <- ggplot2::ggplot_build(plot)$layout$panel_scales_y[[1]]$limits
 
-  expect_identical(limits, c(autospc_plot_axis_extents(plot, "ylimlow"),
-                             autospc_plot_axis_extents(plot, "ylimhigh")))
+  expect_identical(limits, c(autospc_plot_axis_extents(plot, value = "ylimlow"),
+                             autospc_plot_axis_extents(plot,
+                                                        value = "ylimhigh")))
 
   drawn <- faceted_plot(plot_chart = FALSE)
 
-  expect_identical(autospc_plot_axis_extents(plot, "start_x"), min(drawn$x))
+  expect_identical(autospc_plot_axis_extents(plot, value = "start_x"),
+                    min(drawn$x))
 
-  expect_identical(autospc_plot_axis_extents(plot, "x_max"), max(drawn$x))
+  expect_identical(autospc_plot_axis_extents(plot, value = "x_max"),
+                    max(drawn$x))
 
-  expect_identical(autospc_plot_axis_extents(plot, "end_x"), max(drawn$x))
+  expect_identical(autospc_plot_axis_extents(plot, value = "end_x"),
+                    max(drawn$x))
 
 })
 
@@ -436,11 +440,13 @@ test_that("the plot object records the titles it was drawn with", {
 
   plot <- faceted_plot()
 
-  expect_identical(autospc_plot_visualisation_params(plot, "override_x_title"),
-                   plot$labels$x)
+  expect_identical(
+    autospc_plot_visualisation_params(plot, parameter = "override_x_title"),
+    plot$labels$x)
 
-  expect_identical(autospc_plot_visualisation_params(plot, "override_y_title"),
-                   plot$labels$y)
+  expect_identical(
+    autospc_plot_visualisation_params(plot, parameter = "override_y_title"),
+    plot$labels$y)
 
 })
 
@@ -452,13 +458,14 @@ test_that("the plot object records the annotation scale factors it was drawn wit
   plot <- faceted_plot()
 
   expect_identical(
-    autospc_plot_visualisation_params(plot, "upper_annotation_sf"),
+    autospc_plot_visualisation_params(plot, parameter = "upper_annotation_sf"),
     upper_annotation_sf_default(autospc_plot_charts(plot)[[1]])
   )
 
   expect_identical(
-    autospc_plot_visualisation_params(plot, "lower_annotation_sf"),
-    2 - autospc_plot_visualisation_params(plot, "upper_annotation_sf")
+    autospc_plot_visualisation_params(plot, parameter = "lower_annotation_sf"),
+    2 - autospc_plot_visualisation_params(plot,
+                                           parameter = "upper_annotation_sf")
   )
 
 })

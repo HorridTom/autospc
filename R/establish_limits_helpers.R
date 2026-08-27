@@ -107,7 +107,7 @@ rule2_break_start_positions <- function(limits_table, counter){
     dplyr::mutate(start_of_rule2_break = rule2 & 
                     (rule2 != dplyr::lag(rule2) |
                        different_cl_side(above_or_below_cl,
-                                         dplyr::lag(above_or_below_cl))))
+                                         y = dplyr::lag(above_or_below_cl))))
   
   next_rule_break_positions <-
     (which(limits_table$start_of_rule2_break[

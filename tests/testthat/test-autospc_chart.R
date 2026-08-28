@@ -79,6 +79,24 @@ test_that("calculate_limits has no method for a bare autospc_chart", {
 })
 
 
+# Catch deviations between autospc_chart_elements() (validation) and
+# autospc_chart_list() (creation via helper)
+
+test_that("autospc_chart_list assembles exactly the chart elements", {
+  bare_list <- autospc_chart_list(data = test_data, x = "x", y = "y")
+
+  expect_setequal(names(bare_list), autospc_chart_elements())
+})
+
+
+test_that("every autospc_chart_list argument is a chart element", {
+  expect_identical(
+    setdiff(names(formals(autospc_chart_list)), autospc_chart_elements()),
+    character(0)
+  )
+})
+
+
 # autospc_chart()
 
 test_that("autospc_chart returns the right class for every type it handles", {

@@ -270,7 +270,7 @@ autospc <- function(data,
 
   if (lifecycle::is_present(write_table)) {
     lifecycle::deprecate_warn(
-      when = "0.0.0.9051",
+      when = "0.1.0",
       what = "autospc(write_table)",
       details = paste(
         "Save the results yourself instead:",
@@ -285,7 +285,7 @@ autospc <- function(data,
 
   if (lifecycle::is_present(show_mr)) {
     lifecycle::deprecate_warn(
-      when = "0.0.0.9051",
+      when = "0.1.0",
       what = "autospc(show_mr)",
       with = "autospc(chart_type)",
       details = paste(

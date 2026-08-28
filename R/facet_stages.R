@@ -48,7 +48,7 @@ facet_stages <- function(data,
     }
 
     lifecycle::deprecate_warn(
-      when = "0.0.0.9051",
+      when = "0.1.0",
       what = "facet_stages(show_mr)",
       with = "facet_stages(chart_type)",
       details = paste(

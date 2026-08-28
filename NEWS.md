@@ -1,4 +1,4 @@
-# autospc (development version)
+# autospc 0.1.0
 
 ## Lifecycle changes
 

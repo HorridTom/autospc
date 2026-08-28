@@ -1,16 +1,15 @@
-#load in test data
+# load in test data
 test_data <- readRDS("testdata/test_data_rule2_break.rds")
 
-test_that("Start of subsequent rule 2 breaks identified correctly",{
-  
+test_that("Start of subsequent rule 2 breaks identified correctly", {
   test_data <- add_rule_breaks(test_data,
-                               centre_line_tolerance = 0,
-                               shift_rule_threshold = 8L)
-  
+    centre_line_tolerance = 0,
+    shift_rule_threshold = 8L
+  )
+
   results <- rule2_break_start_positions(test_data, counter = 22)
-  
+
   correct_answers <- c(22, 36, 123, 161, 176, 218)
-  
+
   testthat::expect_equal(results, correct_answers)
-  
 })

@@ -18,12 +18,11 @@
 #' @return The default value of that argument.
 #' @noRd
 autospc_default <- function(name) {
-
   default <- formals(autospc)[[name]]
 
   return(eval(default,
-              envir = asNamespace("autospc")))
-
+    envir = asNamespace("autospc")
+  ))
 }
 
 
@@ -34,15 +33,15 @@ autospc_default <- function(name) {
 #' @return A character vector of argument names.
 #' @noRd
 autospc_deprecated_arguments <- function() {
-
   defaults <- formals(autospc)
 
-  is_deprecated <- vapply(defaults,
-                          function(default) {
-                            identical(default, quote(deprecated()))
-                          },
-                          logical(1L))
+  is_deprecated <- vapply(
+    defaults,
+    function(default) {
+      identical(default, quote(deprecated()))
+    },
+    logical(1L)
+  )
 
   return(names(defaults)[is_deprecated])
-
 }

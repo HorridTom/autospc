@@ -18,8 +18,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=7,
-  fig.height=5
+  fig.width = 7,
+  fig.height = 5
 )
 ```
 
@@ -54,9 +54,9 @@ arguments.
 
 ```{r example-c-prime, fig.cap="Example C' chart", fig.show='hide', message=FALSE}
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all
 )
 ```
@@ -179,24 +179,32 @@ type.
 
 ```{r summary-table, echo=FALSE}
 summary_df <- data.frame(
-  `Chart type` = c("X / MR / XMR",
-                   "C / C'",
-                   "P / P' (observation level)",
-                   "P / P' (aggregated)"),
+  `Chart type` = c(
+    "X / MR / XMR",
+    "C / C'",
+    "P / P' (observation level)",
+    "P / P' (aggregated)"
+  ),
   `y type(s) accepted` = c(
     "`integer`, `double`",
-    paste("`integer`, `double` (whole numbers only; non-integer doubles are",
-          "rounded with a warning)"),
+    paste(
+      "`integer`, `double` (whole numbers only; non-integer doubles are",
+      "rounded with a warning)"
+    ),
     "`logical`",
-    paste("`integer`, `double` (whole numbers only; non-integer doubles are",
-          "rounded with a warning)")
+    paste(
+      "`integer`, `double` (whole numbers only; non-integer doubles are",
+      "rounded with a warning)"
+    )
   ),
   `n type(s) accepted` = c(
     "not used",
     "not used",
     "not used",
-    paste("`integer`, `double` (whole numbers only; non-integer doubles are",
-          "rounded with a warning)")
+    paste(
+      "`integer`, `double` (whole numbers only; non-integer doubles are",
+      "rounded with a warning)"
+    )
   ),
   check.names = FALSE
 )

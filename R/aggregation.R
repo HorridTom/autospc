@@ -16,7 +16,6 @@
 #' @noRd
 aggregate_ratios <- function(chart,
                              allow_individual_observations) {
-
   any_multiple_x <- chart$data %>%
     dplyr::group_by(x) %>%
     dplyr::summarise(num_rows = dplyr::n()) %>%
@@ -26,9 +25,9 @@ aggregate_ratios <- function(chart,
 
   # Check if data fully pre-aggregated, return with the same column signature
   # as the aggregated route if so
-  if(("n" %in% colnames(chart$data)) &&
-     is.numeric(chart$data$y) &&
-     !any_multiple_x) {
+  if (("n" %in% colnames(chart$data)) &&
+    is.numeric(chart$data$y) &&
+    !any_multiple_x) {
     chart$data <- chart$data %>%
       dplyr::select(x, y, n)
 
@@ -36,18 +35,19 @@ aggregate_ratios <- function(chart,
   }
 
   # Set up n for aggregation if data provided as individual binary observations
-  if(allow_individual_observations &&
-     !("n" %in% colnames(chart$data)) &&
-     is.logical(chart$data$y)) {
+  if (allow_individual_observations &&
+    !("n" %in% colnames(chart$data)) &&
+    is.logical(chart$data$y)) {
     chart$data <- chart$data %>%
       dplyr::mutate(n = 1L)
   }
 
   chart$data <- chart$data %>%
     dplyr::group_by(x) %>%
-    dplyr::summarise(y = sum(y),
-                     n = sum(n))
+    dplyr::summarise(
+      y = sum(y),
+      n = sum(n)
+    )
 
   return(chart)
-
 }

@@ -272,28 +272,28 @@ data frame. Control limits are re-established according to specified rules,
 by default the Stable Shift Algorithm.
 }
 \examples{
-# Using a C' chart to track changes in the count of monthly attendance 
+# Using a C' chart to track changes in the count of monthly attendance
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all
 )
-   
-#Using a P' chart to track changes in the percentage admitted within 4 hours
+
+# Using a P' chart to track changes in the percentage admitted within 4 hours
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "P'", 
-  x = month_start, 
-  y = within_4h, 
+  ed_attendances_monthly,
+  chart_type = "P'",
+  x = month_start,
+  y = within_4h,
   n = att_all
 )
 
-#using a shift_rule_threshold of 7 when tracking monthly attendance
+# using a shift_rule_threshold of 7 when tracking monthly attendance
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all,
   shift_rule_threshold = 7
 )

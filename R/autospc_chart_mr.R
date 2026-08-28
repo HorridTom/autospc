@@ -5,12 +5,11 @@
 #' @return An object of class `c("autospc_chart_mr", "autospc_chart")`.
 #' @noRd
 new_autospc_chart_mr <- function(x) {
-
   return(
     new_autospc_chart(x,
-                      class = "autospc_chart_mr")
+      class = "autospc_chart_mr"
+    )
   )
-
 }
 
 
@@ -21,26 +20,32 @@ new_autospc_chart_mr <- function(x) {
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
 validate_autospc_chart_mr <- function(x) {
-
-  if(!inherits(x, "autospc_chart_mr")) {
+  if (!inherits(x, "autospc_chart_mr")) {
     stop("Not an autospc_chart_mr object.", call. = FALSE)
   }
 
   x <- validate_autospc_chart(x)
 
-  require_column(data = x$data,
-                 column = "y",
-                 message = paste("y not specified. For X, MR and XMR charts, y",
-                                 "must be specified."))
+  require_column(
+    data = x$data,
+    column = "y",
+    message = paste(
+      "y not specified. For X, MR and XMR charts, y",
+      "must be specified."
+    )
+  )
 
-  require_column_type(data = x$data,
-                      column = "y",
-                      types = c("integer", "double"),
-                      message = paste("For X, MR and XMR charts, y must be of",
-                                      "type integer or double."))
+  require_column_type(
+    data = x$data,
+    column = "y",
+    types = c("integer", "double"),
+    message = paste(
+      "For X, MR and XMR charts, y must be of",
+      "type integer or double."
+    )
+  )
 
   return(x)
-
 }
 
 
@@ -54,14 +59,16 @@ autospc_chart_mr <- function(data,
                              x,
                              y,
                              ...) {
-
-  autospc_chart_mr_l <- autospc_chart_list(data = data,
-                                           x = x,
-                                           y = y,
-                                           ...)
+  autospc_chart_mr_l <- autospc_chart_list(
+    data = data,
+    x = x,
+    y = y,
+    ...
+  )
 
   autospc_chart_mr_l <- normalise_columns(autospc_chart_mr_l,
-                                          fields = c("x", "y"))
+    fields = c("x", "y")
+  )
 
   autospc_chart_mr_object <- new_autospc_chart_mr(autospc_chart_mr_l)
 
@@ -70,7 +77,6 @@ autospc_chart_mr <- function(data,
   autospc_chart_mr_object <- round_counts(autospc_chart_mr_object)
 
   return(autospc_chart_mr_object)
-
 }
 
 
@@ -91,14 +97,12 @@ autospc_chart_mr <- function(data,
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart_mr <- function(chart) {
-
   mrs <- moving_ranges(y = chart$data$y)
 
   chart$data <- chart$data %>%
     dplyr::mutate(y = mrs)
 
   return(chart)
-
 }
 
 
@@ -113,11 +117,9 @@ prepare_data.autospc_chart_mr <- function(chart) {
 #' @noRd
 n_effective_points.autospc_chart_mr <- function(chart,
                                                 data) {
-
   points <- NextMethod() + 1L
 
   return(points)
-
 }
 
 
@@ -137,14 +139,14 @@ n_effective_points.autospc_chart_mr <- function(chart,
 calculate_limits.autospc_chart_mr <- function(chart,
                                               period,
                                               exclusion_points) {
-
   # period$y holds the moving ranges, put there by prepare_data()
-  limits <- get_mr_limits(mr = period$y,
-                          mr_screen_max_loops = 0L,
-                          exclusion_points = exclusion_points)
+  limits <- get_mr_limits(
+    mr = period$y,
+    mr_screen_max_loops = 0L,
+    exclusion_points = exclusion_points
+  )
 
   return(limits)
-
 }
 
 # Presentation methods
@@ -165,9 +167,7 @@ chart_type_label.autospc_chart_mr <- function(chart) {
 #' @return integer, row number
 #' @noRd
 first_label_row.autospc_chart_mr <- function(chart) {
-
   return(2L)
-
 }
 
 
@@ -180,11 +180,9 @@ first_label_row.autospc_chart_mr <- function(chart) {
 #' @noRd
 label_accuracy.autospc_chart_mr <- function(chart,
                                             ylimhigh) {
-
   accuracy <- 10^(ceiling(log10(ylimhigh)) - 4)
 
   return(accuracy)
-
 }
 
 
@@ -196,9 +194,7 @@ label_accuracy.autospc_chart_mr <- function(chart,
 #' @return TRUE or FALSE
 #' @noRd
 labels_stay_above.autospc_chart_mr <- function(chart) {
-
   return(TRUE)
-
 }
 
 
@@ -208,14 +204,15 @@ labels_stay_above.autospc_chart_mr <- function(chart) {
 #' @noRd
 y_axis_range.autospc_chart_mr <- function(chart,
                                           data) {
-
   high <- max(data$ucl,
-              data$y,
-              na.rm = TRUE) * 1.1
+    data$y,
+    na.rm = TRUE
+  ) * 1.1
 
-  return(list(low = 0,
-              high = high))
-
+  return(list(
+    low = 0,
+    high = high
+  ))
 }
 
 

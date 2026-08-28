@@ -5,12 +5,11 @@
 #' @return An object of class `c("autospc_chart_p", "autospc_chart")`.
 #' @noRd
 new_autospc_chart_p <- function(x) {
-  
   return(
     new_autospc_chart(x,
-                      class = "autospc_chart_p")
+      class = "autospc_chart_p"
+    )
   )
-  
 }
 
 
@@ -21,8 +20,7 @@ new_autospc_chart_p <- function(x) {
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
 validate_autospc_chart_p <- function(x) {
-  
-  if(!inherits(x, "autospc_chart_p")) {
+  if (!inherits(x, "autospc_chart_p")) {
     stop("Not an autospc_chart_p object.", call. = FALSE)
   }
 
@@ -32,48 +30,64 @@ validate_autospc_chart_p <- function(x) {
 
   element_check <- autospc_chart_p_elements() %in% element_names
 
-  if(!all(element_check)) {
-    stop(paste("Malformed autospc_chart_p object - element(s) not present:",
-               paste(autospc_chart_p_elements()[!element_check],
-                     collapse = ", ")),
-         call. = FALSE)
+  if (!all(element_check)) {
+    stop(
+      paste(
+        "Malformed autospc_chart_p object - element(s) not present:",
+        paste(autospc_chart_p_elements()[!element_check],
+          collapse = ", "
+        )
+      ),
+      call. = FALSE
+    )
   }
 
-  require_column(data = x$data,
-                 column = "y",
-                 message = paste("y not specified. For P and P' charts, y must",
-                                 "be specified."))
+  require_column(
+    data = x$data,
+    column = "y",
+    message = paste(
+      "y not specified. For P and P' charts, y must",
+      "be specified."
+    )
+  )
 
-  if(!"n" %in% colnames(x$data)) {
-
+  if (!"n" %in% colnames(x$data)) {
     # No denominator column: the numerator has to be individual binary
     # observations, one row per observation.
-    require_column_type(data = x$data,
-                        column = "y",
-                        types = "logical",
-                        message = paste("n is not specified and y is not of",
-                                        "type logical. For P and P' charts, if",
-                                        "n is not specified, y must be of type",
-                                        "logical."))
-
+    require_column_type(
+      data = x$data,
+      column = "y",
+      types = "logical",
+      message = paste(
+        "n is not specified and y is not of",
+        "type logical. For P and P' charts, if",
+        "n is not specified, y must be of type",
+        "logical."
+      )
+    )
   } else {
+    require_column_type(
+      data = x$data,
+      column = "y",
+      types = c("integer", "double"),
+      message = paste(
+        "For a P or P' chart with n specified,",
+        "y must be of type integer or double."
+      )
+    )
 
-    require_column_type(data = x$data,
-                        column = "y",
-                        types = c("integer", "double"),
-                        message = paste("For a P or P' chart with n specified,",
-                                        "y must be of type integer or double."))
-
-    require_column_type(data = x$data,
-                        column = "n",
-                        types = c("integer", "double"),
-                        message = paste("For a P or P' chart with n specified,",
-                                        "n must be of type integer or double."))
-
+    require_column_type(
+      data = x$data,
+      column = "n",
+      types = c("integer", "double"),
+      message = paste(
+        "For a P or P' chart with n specified,",
+        "n must be of type integer or double."
+      )
+    )
   }
 
   return(x)
-
 }
 
 
@@ -85,13 +99,11 @@ validate_autospc_chart_p <- function(x) {
 #' @return A character vector of element names.
 #' @noRd
 autospc_chart_p_elements <- function() {
-  
   chart_elements <- c(
     "n"
   )
-  
+
   return(chart_elements)
-  
 }
 
 
@@ -106,25 +118,28 @@ autospc_chart_p <- function(data,
                             y,
                             n,
                             ...) {
-  
-  autospc_chart_p_l <- autospc_chart_list(data = data,
-                                          x = x,
-                                          y = y,
-                                          ...)
-  autospc_chart_p_l <- c(autospc_chart_p_l,
-                         list(n = n))
-  
+  autospc_chart_p_l <- autospc_chart_list(
+    data = data,
+    x = x,
+    y = y,
+    ...
+  )
+  autospc_chart_p_l <- c(
+    autospc_chart_p_l,
+    list(n = n)
+  )
+
   autospc_chart_p_l <- normalise_columns(autospc_chart_p_l,
-                                         fields = c("x", "y", "n"))
+    fields = c("x", "y", "n")
+  )
 
   autospc_chart_p_object <- new_autospc_chart_p(autospc_chart_p_l)
-  
+
   autospc_chart_p_object <- validate_autospc_chart_p(autospc_chart_p_object)
 
   autospc_chart_p_object <- round_counts(autospc_chart_p_object)
 
   return(autospc_chart_p_object)
-  
 }
 
 
@@ -140,36 +155,38 @@ autospc_chart_p <- function(data,
 #' @return autospc_chart_p object
 #' @noRd
 round_counts.autospc_chart_p <- function(chart) {
-
-  if(!"n" %in% colnames(chart$data)) {
+  if (!"n" %in% colnames(chart$data)) {
     return(chart)
   }
 
   chart$data <- round_count_column(
     data = chart$data,
     column = "y",
-    message = paste("At least one element of y has non-zero",
-                    "fractional part. Rounding to the nearest whole",
-                    "number.\nP and P' charts with n specified",
-                    "require y to be a count, i.e. whole numbers only.")
+    message = paste(
+      "At least one element of y has non-zero",
+      "fractional part. Rounding to the nearest whole",
+      "number.\nP and P' charts with n specified",
+      "require y to be a count, i.e. whole numbers only."
+    )
   )
 
   chart$data <- round_count_column(
     data = chart$data,
     column = "n",
-    message = paste("At least one element of n has non-zero",
-                    "fractional part. Rounding to the nearest whole",
-                    "number.\nP and P' charts with n specified",
-                    "require n to be a count, i.e. whole numbers only.")
+    message = paste(
+      "At least one element of n has non-zero",
+      "fractional part. Rounding to the nearest whole",
+      "number.\nP and P' charts with n specified",
+      "require n to be a count, i.e. whole numbers only."
+    )
   )
 
   return(chart)
-
 }
 
 
 #' Aggregate data for analysis
-#' 
+#'
 #' Sums y and n (counts) over x (subgroup) as needed for P-chart analysis.
 #' Data may be provided as either pre-aggregated counts for y and n or
 #' individual binary observations
@@ -177,12 +194,11 @@ round_counts.autospc_chart_p <- function(chart) {
 #' @return autospc_chart_p object
 #' @noRd
 aggregate_data.autospc_chart_p <- function(chart) {
-
   return(
     aggregate_ratios(chart,
-                     allow_individual_observations = TRUE)
+      allow_individual_observations = TRUE
+    )
   )
-
 }
 
 
@@ -195,21 +211,20 @@ aggregate_data.autospc_chart_p <- function(chart) {
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart_p <- function(chart) {
-
   chart$data <- chart$data %>%
     dplyr::mutate(y_numerator = y) %>%
     dplyr::mutate(y = y * 100 / n) %>%
     dplyr::mutate(y = dplyr::if_else(is.nan(y) | is.infinite(y),
-                                     as.numeric(NA),
-                                     y))
+      as.numeric(NA),
+      y
+    ))
 
   return(chart)
-
 }
 
 
 #' Calculate control limits for a subset of P-chart data
-#' 
+#'
 #' Centre line and limits are established using standard formulae based on the
 #' Binomial distribution (see e.g. Provost and Murray) for non-excluded data
 #' points
@@ -219,14 +234,14 @@ prepare_data.autospc_chart_p <- function(chart) {
 calculate_limits.autospc_chart_p <- function(chart,
                                              period,
                                              exclusion_points) {
-  
-  limits <- get_p_limits(y = period$y_numerator,
-                         n = period$n,
-                         exclusion_points = exclusion_points,
-                         multiply = 100)
-  
+  limits <- get_p_limits(
+    y = period$y_numerator,
+    n = period$n,
+    exclusion_points = exclusion_points,
+    multiply = 100
+  )
+
   return(limits)
-  
 }
 
 
@@ -238,9 +253,7 @@ calculate_limits.autospc_chart_p <- function(chart,
 #' @return character vector
 #' @noRd
 limits_table_columns.autospc_chart_p <- function(chart) {
-
   return(c("n", "y_numerator"))
-
 }
 
 
@@ -256,10 +269,9 @@ limits_table_columns.autospc_chart_p <- function(chart) {
 extend_display_limits.autospc_chart_p <- function(chart,
                                                   limits_table,
                                                   counter) {
-
-  #constant from P' chart calc = (UCL - CL)sqrt(n)
+  # constant from P' chart calc = (UCL - CL)sqrt(n)
   constant <- (limits_table[(counter - 1), "ucl"] -
-                 limits_table[(counter - 1), "cl"]) *
+    limits_table[(counter - 1), "cl"]) *
     sqrt(limits_table[(counter - 1), "n"])
   pbar <- limits_table[(counter - 1), "cl"]
 
@@ -267,28 +279,29 @@ extend_display_limits.autospc_chart_p <- function(chart,
     limits_table[(counter - 1), "cl"]
   limits_table[counter:nrow(limits_table), "period_type"] <- "display"
 
-  #splits limits table to just the section that we want
-  limits_table_top <- limits_table[1:(counter - 1),]
-  limits_table_bottom <- limits_table[counter:nrow(limits_table),]
+  # splits limits table to just the section that we want
+  limits_table_top <- limits_table[1:(counter - 1), ]
+  limits_table_bottom <- limits_table[counter:nrow(limits_table), ]
 
   limits_table_bottom <- limits_table_bottom %>%
     dplyr::mutate(constant = as.numeric(constant)) %>%
     dplyr::mutate(pbar = as.numeric(pbar)) %>%
-    dplyr::mutate(ucl_display = pbar + (constant/sqrt(n)) ) %>%
-    dplyr::mutate(lcl_display = pbar - (constant/sqrt(n)) ) %>%
+    dplyr::mutate(ucl_display = pbar + (constant / sqrt(n))) %>%
+    dplyr::mutate(lcl_display = pbar - (constant / sqrt(n))) %>%
     dplyr::mutate(ucl = dplyr::if_else(period_type == "display",
-                                       ucl_display,
-                                       ucl)) %>%
+      ucl_display,
+      ucl
+    )) %>%
     dplyr::mutate(lcl = dplyr::if_else(period_type == "display",
-                                       lcl_display,
-                                       lcl)) %>%
+      lcl_display,
+      lcl
+    )) %>%
     dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl)) %>%
     dplyr::mutate(lcl = dplyr::if_else(lcl <= 0, 0, lcl))
 
   limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
 
   return(limits_table)
-
 }
 
 
@@ -303,26 +316,30 @@ extend_display_limits.autospc_chart_p <- function(chart,
 #' @noRd
 extrapolate_limits.autospc_chart_p <- function(chart,
                                                period) {
-
   ext_calc_data <- period %>%
-    dplyr::mutate(y = (y/100)*n,
-                  n = dplyr::if_else(is.na(n),
-                                     NA_real_,
-                                     mean(n,
-                                          na.rm = TRUE)))
+    dplyr::mutate(
+      y = (y / 100) * n,
+      n = dplyr::if_else(is.na(n),
+        NA_real_,
+        mean(n,
+          na.rm = TRUE
+        )
+      )
+    )
 
   exclusion_points <- ext_calc_data %>%
     dplyr::pull(excluded) %>%
     which()
 
-  limits <- get_p_limits(y = ext_calc_data$y,
-                         n = ext_calc_data$n,
-                         exclusion_points = exclusion_points,
-                         multiply = 100) %>%
+  limits <- get_p_limits(
+    y = ext_calc_data$y,
+    n = ext_calc_data$n,
+    exclusion_points = exclusion_points,
+    multiply = 100
+  ) %>%
     lapply("[[", 1L)
 
   return(limits)
-
 }
 
 # Presentation methods
@@ -335,14 +352,15 @@ extrapolate_limits.autospc_chart_p <- function(chart,
 #' @return character
 #' @noRd
 centre_line_label.autospc_chart_p <- function(chart,
-                                    cl,
-                                    ylimhigh) {
-
+                                              cl,
+                                              ylimhigh) {
   return(scales::number(cl,
-                        accuracy = label_accuracy(chart = chart,
-                                                  ylimhigh = ylimhigh),
-                        suffix = "%"))
-
+    accuracy = label_accuracy(
+      chart = chart,
+      ylimhigh = ylimhigh
+    ),
+    suffix = "%"
+  ))
 }
 
 
@@ -361,9 +379,7 @@ chart_type_label.autospc_chart_p <- function(chart) {
 #' @noRd
 label_accuracy.autospc_chart_p <- function(chart,
                                            ylimhigh) {
-
   return(0.1)
-
 }
 
 
@@ -376,9 +392,7 @@ label_accuracy.autospc_chart_p <- function(chart,
 #' @return number, the scale factor applied to the upper control limit
 #' @noRd
 upper_annotation_sf_default.autospc_chart_p <- function(chart) {
-
   return(1.04)
-
 }
 
 

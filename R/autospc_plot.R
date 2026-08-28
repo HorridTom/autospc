@@ -30,14 +30,12 @@
 new_autospc_plot <- function(plot,
                              charts,
                              presentation) {
-
   plot$charts <- charts
   plot$presentation <- presentation
 
   class(plot) <- c("autospc_plot", class(plot))
 
   return(plot)
-
 }
 
 
@@ -57,92 +55,124 @@ new_autospc_plot <- function(plot,
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
 validate_autospc_plot <- function(x) {
-
-  if(!inherits(x, "autospc_plot")) {
+  if (!inherits(x, "autospc_plot")) {
     stop("Not an autospc_plot object.", call. = FALSE)
   }
 
-  if(!inherits(x, "ggplot")) {
+  if (!inherits(x, "ggplot")) {
     stop("Malformed autospc_plot object - it is not a ggplot.", call. = FALSE)
   }
 
-  if(!identical(class(x)[1], "autospc_plot")) {
-    stop(paste("Malformed autospc_plot object - autospc_plot must come first",
-               "in the class vector."),
-         call. = FALSE)
+  if (!identical(class(x)[1], "autospc_plot")) {
+    stop(
+      paste(
+        "Malformed autospc_plot object - autospc_plot must come first",
+        "in the class vector."
+      ),
+      call. = FALSE
+    )
   }
 
-  if(sum(class(x) == "autospc_plot") != 1L) {
-    stop(paste("Malformed autospc_plot object - autospc_plot appears more than",
-               "once in the class vector."),
-         call. = FALSE)
+  if (sum(class(x) == "autospc_plot") != 1L) {
+    stop(
+      paste(
+        "Malformed autospc_plot object - autospc_plot appears more than",
+        "once in the class vector."
+      ),
+      call. = FALSE
+    )
   }
 
   # Read with [[ rather than names(): from ggplot2 4.0.0 a ggplot is an S7
   # object, whose names() is empty even though [[ still reads what is there.
-  element_check <- vapply(autospc_plot_elements(),
-                          function(element) !is.null(x[[element]]),
-                          logical(1))
+  element_check <- vapply(
+    autospc_plot_elements(),
+    function(element) !is.null(x[[element]]),
+    logical(1)
+  )
 
-  if(!all(element_check)) {
-    stop(paste("Malformed autospc_plot object - element(s) not present:",
-               paste(autospc_plot_elements()[!element_check],
-                     collapse = ", ")),
-         call. = FALSE)
+  if (!all(element_check)) {
+    stop(
+      paste(
+        "Malformed autospc_plot object - element(s) not present:",
+        paste(autospc_plot_elements()[!element_check],
+          collapse = ", "
+        )
+      ),
+      call. = FALSE
+    )
   }
 
-  if(!is.list(x$charts) || length(x$charts) < 1L) {
+  if (!is.list(x$charts) || length(x$charts) < 1L) {
     stop("Malformed autospc_plot object - charts must be a list of at least one.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
 
-  chart_check <- vapply(x$charts,
-                        function(chart) inherits(chart, "autospc_chart"),
-                        logical(1))
+  chart_check <- vapply(
+    x$charts,
+    function(chart) inherits(chart, "autospc_chart"),
+    logical(1)
+  )
 
-  if(!all(chart_check)) {
-    stop(paste("Malformed autospc_plot object - every element of charts must",
-               "be an autospc_chart."),
-         call. = FALSE)
+  if (!all(chart_check)) {
+    stop(
+      paste(
+        "Malformed autospc_plot object - every element of charts must",
+        "be an autospc_chart."
+      ),
+      call. = FALSE
+    )
   }
 
-  if(!is.list(x$presentation)) {
+  if (!is.list(x$presentation)) {
     stop("Malformed autospc_plot object - presentation must be a list.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
 
   presentation_check <- autospc_plot_presentation_elements() %in%
     names(x$presentation)
 
-  if(!all(presentation_check)) {
-    stop(paste("Malformed autospc_plot object - presentation element(s) not",
-               "present:",
-               paste(autospc_plot_presentation_elements()[!presentation_check],
-                     collapse = ", ")),
-         call. = FALSE)
+  if (!all(presentation_check)) {
+    stop(
+      paste(
+        "Malformed autospc_plot object - presentation element(s) not",
+        "present:",
+        paste(autospc_plot_presentation_elements()[!presentation_check],
+          collapse = ", "
+        )
+      ),
+      call. = FALSE
+    )
   }
 
-  for(half in autospc_plot_presentation_elements()) {
-
+  for (half in autospc_plot_presentation_elements()) {
     values <- x$presentation[[half]]
 
-    if(!is.list(values)) {
-      stop(paste0("Malformed autospc_plot object - presentation$", half,
-                  " must be a list."),
-           call. = FALSE)
+    if (!is.list(values)) {
+      stop(
+        paste0(
+          "Malformed autospc_plot object - presentation$", half,
+          " must be a list."
+        ),
+        call. = FALSE
+      )
     }
 
-    if(length(values) > 0L &&
-       (is.null(names(values)) || any(names(values) == ""))) {
-      stop(paste0("Malformed autospc_plot object - presentation$", half,
-                  " must be named."),
-           call. = FALSE)
+    if (length(values) > 0L &&
+      (is.null(names(values)) || any(names(values) == ""))) {
+      stop(
+        paste0(
+          "Malformed autospc_plot object - presentation$", half,
+          " must be named."
+        ),
+        call. = FALSE
+      )
     }
-
   }
 
   return(x)
-
 }
 
 
@@ -151,14 +181,12 @@ validate_autospc_plot <- function(x) {
 #' @return A character vector of element names.
 #' @noRd
 autospc_plot_elements <- function() {
-
   plot_elements <- c(
     "charts",
     "presentation"
   )
 
   return(plot_elements)
-
 }
 
 
@@ -174,14 +202,12 @@ autospc_plot_elements <- function() {
 #' @return A character vector of element names.
 #' @noRd
 autospc_plot_presentation_elements <- function() {
-
   presentation_elements <- c(
     "visualisation_params",
     "axis_extents"
   )
 
   return(presentation_elements)
-
 }
 
 
@@ -198,7 +224,6 @@ autospc_plot_presentation_elements <- function() {
 #' @return A character vector of parameter names.
 #' @noRd
 visualisation_param_names <- function() {
-
   parameter_names <- c(
     "show_limits",
     "title",
@@ -228,7 +253,6 @@ visualisation_param_names <- function() {
   )
 
   return(parameter_names)
-
 }
 
 
@@ -246,18 +270,18 @@ visualisation_param_names <- function() {
 titles_from_data <- function(data,
                              title = NULL,
                              subtitle = NULL) {
-
-  if(is.null(title) & "title" %in% colnames(data)) {
+  if (is.null(title) & "title" %in% colnames(data)) {
     title <- data$title[1]
   }
 
-  if(is.null(subtitle) & "subtitle" %in% colnames(data)) {
+  if (is.null(subtitle) & "subtitle" %in% colnames(data)) {
     subtitle <- data$subtitle[1]
   }
 
-  return(list(title = title,
-              subtitle = subtitle))
-
+  return(list(
+    title = title,
+    subtitle = subtitle
+  ))
 }
 
 
@@ -275,29 +299,29 @@ titles_from_data <- function(data,
 #' @noRd
 resolve_default_visualisation_params <- function(visualisation_params,
                                                  chart) {
-
-  titles <- titles_from_data(data = chart$data_original,
-                             title = visualisation_params$title,
-                             subtitle = visualisation_params$subtitle)
+  titles <- titles_from_data(
+    data = chart$data_original,
+    title = visualisation_params$title,
+    subtitle = visualisation_params$subtitle
+  )
 
   # Assigned as single-element lists so that a NULL sets the element rather than
   # deleting it.
-  visualisation_params["title"]    <- list(titles$title)
+  visualisation_params["title"] <- list(titles$title)
   visualisation_params["subtitle"] <- list(titles$subtitle)
 
   # The lower factor is the mirror image of the upper about 1.
-  if(is.null(visualisation_params$upper_annotation_sf)) {
+  if (is.null(visualisation_params$upper_annotation_sf)) {
     visualisation_params$upper_annotation_sf <-
       upper_annotation_sf_default(chart)
   }
 
-  if(is.null(visualisation_params$lower_annotation_sf)) {
+  if (is.null(visualisation_params$lower_annotation_sf)) {
     visualisation_params$lower_annotation_sf <-
       2 - visualisation_params$upper_annotation_sf
   }
 
   return(visualisation_params)
-
 }
 
 
@@ -331,17 +355,22 @@ resolve_default_visualisation_params <- function(visualisation_params,
 autospc_plot <- function(charts,
                          visualisation_params,
                          split_rows = NULL) {
-
-  if(inherits(charts, "autospc_chart")) {
-    stop(paste("charts must be a list of autospc_chart objects, not a single",
-               "chart."),
-         call. = FALSE)
+  if (inherits(charts, "autospc_chart")) {
+    stop(
+      paste(
+        "charts must be a list of autospc_chart objects, not a single",
+        "chart."
+      ),
+      call. = FALSE
+    )
   }
 
-  plot_data <- build_plot_data(charts = charts,
-                               visualisation_params = visualisation_params)
+  plot_data <- build_plot_data(
+    charts = charts,
+    visualisation_params = visualisation_params
+  )
 
-  if(!is.null(split_rows)) {
+  if (!is.null(split_rows)) {
     plot_data <- list(faceted_plot_data(
       plot_data = plot_data,
       visualisation_params = visualisation_params
@@ -356,34 +385,35 @@ autospc_plot <- function(charts,
   limits_drawn <- isTRUE(visualisation_params$show_limits) &&
     centre_line_present(main$table)
 
-  if(!limits_drawn && is.null(split_rows)) {
-
+  if (!limits_drawn && is.null(split_rows)) {
     charts <- charts[1]
     plot_data <- plot_data[1]
 
-    plot <- create_timeseries_plot(table = main$table,
-                                   visualisation_params = visualisation_params,
-                                   axis_extents = main$axis_extents)
-
+    plot <- create_timeseries_plot(
+      table = main$table,
+      visualisation_params = visualisation_params,
+      axis_extents = main$axis_extents
+    )
   } else {
-
-    plot <- create_spc_plot(plot_data = plot_data,
-                            visualisation_params = visualisation_params,
-                            split_rows = split_rows)
-
+    plot <- create_spc_plot(
+      plot_data = plot_data,
+      visualisation_params = visualisation_params,
+      split_rows = split_rows
+    )
   }
 
   autospc_plot_object <- new_autospc_plot(
     plot = plot,
     charts = charts,
-    presentation = list(visualisation_params = visualisation_params,
-                        axis_extents = main$axis_extents)
+    presentation = list(
+      visualisation_params = visualisation_params,
+      axis_extents = main$axis_extents
+    )
   )
 
   autospc_plot_object <- validate_autospc_plot(autospc_plot_object)
 
   return(autospc_plot_object)
-
 }
 
 
@@ -392,9 +422,7 @@ autospc_plot <- function(charts,
 #' @return A list of `autospc_chart` objects.
 #' @noRd
 autospc_plot_charts <- function(plot) {
-
   return(plot$charts)
-
 }
 
 
@@ -404,9 +432,7 @@ autospc_plot_charts <- function(plot) {
 #'   `axis_extents`.
 #' @noRd
 autospc_plot_presentation <- function(plot) {
-
   return(plot$presentation)
-
 }
 
 
@@ -419,13 +445,11 @@ autospc_plot_presentation <- function(plot) {
 #' @noRd
 autospc_plot_visualisation_params <- function(plot,
                                               parameter = NULL) {
-
-  if(is.null(parameter)) {
+  if (is.null(parameter)) {
     return(plot$presentation$visualisation_params)
   }
 
   return(plot$presentation$visualisation_params[[parameter]])
-
 }
 
 
@@ -445,13 +469,11 @@ autospc_plot_visualisation_params <- function(plot,
 #' @noRd
 autospc_plot_axis_extents <- function(plot,
                                       value = NULL) {
-
-  if(is.null(value)) {
+  if (is.null(value)) {
     return(plot$presentation$axis_extents)
   }
 
   return(plot$presentation$axis_extents[[value]])
-
 }
 
 
@@ -477,21 +499,23 @@ autospc_plot_axis_extents <- function(plot,
 #' @return A data frame.
 #' @export
 as.data.frame.autospc_plot <- function(x, ...) {
-
   charts <- autospc_plot_charts(x)
 
-  results <- lapply(charts,
-                    function(chart) chart$result$table)
+  results <- lapply(
+    charts,
+    function(chart) chart$result$table
+  )
 
-  if(length(results) == 1L) {
+  if (length(results) == 1L) {
     return(as.data.frame(results[[1]]))
   }
 
-  if(is_xmr_pair(charts)) {
-    return(as.data.frame(join_mr_columns(x_table = results[[1]],
-                                         mr_table = results[[2]])))
+  if (is_xmr_pair(charts)) {
+    return(as.data.frame(join_mr_columns(
+      x_table = results[[1]],
+      mr_table = results[[2]]
+    )))
   }
 
   return(as.data.frame(dplyr::bind_rows(results, .id = "stage")))
-
 }

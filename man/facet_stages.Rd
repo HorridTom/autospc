@@ -41,7 +41,7 @@ facet_stages(
   split_rows = c(30L, 60L, 90L),
   chart_type = "C'",
   x = month_start,
-  y = att_all, 
+  y = att_all,
   x_break = 365
 )
 

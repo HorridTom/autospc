@@ -10,20 +10,21 @@ record_counter_move <- function(chart,
                                 from,
                                 to,
                                 reason) {
-
   # the counter can already be at the destination
-  if(isTRUE(from == to)) {
+  if (isTRUE(from == to)) {
     return(chart)
   }
 
   chart$history$counter_path <- rbind(
     chart$history$counter_path,
-    data.frame(from = as.integer(from),
-               to = as.integer(to),
-               reason = reason))
+    data.frame(
+      from = as.integer(from),
+      to = as.integer(to),
+      reason = reason
+    )
+  )
 
   return(chart)
-
 }
 
 
@@ -34,12 +35,12 @@ record_counter_move <- function(chart,
 record_stop <- function(chart,
                         counter,
                         reason) {
-
-  chart$history$stopped <- list(counter = as.integer(counter),
-                                reason = reason)
+  chart$history$stopped <- list(
+    counter = as.integer(counter),
+    reason = reason
+  )
 
   return(chart)
-
 }
 
 
@@ -58,20 +59,24 @@ record_break <- function(chart,
                          position,
                          already_at_break,
                          limits_table) {
-
   position <- as.integer(position)
 
   chart$history$breaks <- rbind(
     chart$history$breaks,
-    data.frame(counter = as.integer(counter),
-               position = position,
-               direction = if(is.na(position)) NA_integer_ else
-                 limits_table$above_or_below_cl[position],
-               already_at_break = already_at_break,
-               cl = if(is.na(position)) NA_real_ else limits_table$cl[position],
-               ucl = if(is.na(position)) NA_real_ else limits_table$ucl[position],
-               lcl = if(is.na(position)) NA_real_ else limits_table$lcl[position]))
+    data.frame(
+      counter = as.integer(counter),
+      position = position,
+      direction = if (is.na(position)) {
+        NA_integer_
+      } else {
+        limits_table$above_or_below_cl[position]
+      },
+      already_at_break = already_at_break,
+      cl = if (is.na(position)) NA_real_ else limits_table$cl[position],
+      ucl = if (is.na(position)) NA_real_ else limits_table$ucl[position],
+      lcl = if (is.na(position)) NA_real_ else limits_table$lcl[position]
+    )
+  )
 
   return(chart)
-
 }

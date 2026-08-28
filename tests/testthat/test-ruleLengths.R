@@ -7,166 +7,160 @@ test_data9 <- readRDS("testdata/test_rulelength_data/test_e2e_data_9.rds")
 # re-established after 21 points, or if they become display limits,
 # based on different shift_rule_thresholds
 test_that("check rule length for run of 6", {
-  
   results6 <- autospc(
-    test_data6, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 6, 
+    test_data6,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 6,
     period_min = 21
-    )
+  )
   results7 <- autospc(
-    test_data6, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 7, 
+    test_data6,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 7,
     period_min = 21
-    )
+  )
   results8 <- autospc(
-    test_data6, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 8, 
+    test_data6,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 8,
     period_min = 21
-    )
+  )
   results9 <- autospc(
-    test_data6, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 9, 
+    test_data6,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 9,
     period_min = 21
-    )
-  resultslist <- unlist(c(results6[22,"limit_change"], 
-                          results7[22,"limit_change"], 
-                          results8[22,"limit_change"], 
-                          results9[22,"limit_change"]
-                          ))
-  names(resultslist) <- NULL 
-  #removes column names so the comparison can be carried out
-  
+  )
+  resultslist <- unlist(c(
+    results6[22, "limit_change"],
+    results7[22, "limit_change"],
+    results8[22, "limit_change"],
+    results9[22, "limit_change"]
+  ))
+  names(resultslist) <- NULL
+  # removes column names so the comparison can be carried out
+
   expect_equal(resultslist, !c(TRUE, FALSE, FALSE, FALSE))
 })
 
-#Tests are repeated for data sets that include increasing run lengths
+# Tests are repeated for data sets that include increasing run lengths
 test_that("check rule length for run of 7", {
-  
   results6 <- autospc(
-    test_data7, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 6, 
+    test_data7,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 6,
     period_min = 21
-    )
+  )
   results7 <- autospc(
-    test_data7, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 7, 
+    test_data7,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 7,
     period_min = 21
-    )
+  )
   results8 <- autospc(
-    test_data7, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 8, 
+    test_data7,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 8,
     period_min = 21
-    )
+  )
   results9 <- autospc(
-    test_data7, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 9, 
+    test_data7,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 9,
     period_min = 21
-    )
-  resultslist <- unlist(c(results6[22,"limit_change"], 
-                          results7[22,"limit_change"], 
-                          results8[22,"limit_change"], 
-                          results9[22,"limit_change"]
-                          ))
+  )
+  resultslist <- unlist(c(
+    results6[22, "limit_change"],
+    results7[22, "limit_change"],
+    results8[22, "limit_change"],
+    results9[22, "limit_change"]
+  ))
   names(resultslist) <- NULL
   expect_equal(resultslist, !c(TRUE, TRUE, FALSE, FALSE))
 })
 
 test_that("check rule length for run of 8", {
-  
   results6 <- autospc(
-    test_data8, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 6, 
+    test_data8,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 6,
     period_min = 21
-    )
+  )
   results7 <- autospc(
-    test_data8, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 7, 
+    test_data8,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 7,
     period_min = 21
-    )
+  )
   results8 <- autospc(
-    test_data8, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 8, 
+    test_data8,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 8,
     period_min = 21
-    )
+  )
   results9 <- autospc(
-    test_data8, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 9, 
+    test_data8,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 9,
     period_min = 21
-    )
-  resultslist <- unlist(c(results6[22,"limit_change"], 
-                          results7[22,"limit_change"], 
-                          results8[22,"limit_change"], 
-                          results9[22,"limit_change"]
-                          ))
+  )
+  resultslist <- unlist(c(
+    results6[22, "limit_change"],
+    results7[22, "limit_change"],
+    results8[22, "limit_change"],
+    results9[22, "limit_change"]
+  ))
   names(resultslist) <- NULL
   expect_equal(resultslist, !c(TRUE, TRUE, TRUE, FALSE))
 })
 
 test_that("rule length change for run of 9", {
-  
   results6 <- autospc(
-    test_data9, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 6, 
+    test_data9,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 6,
     period_min = 21
-    )
+  )
   results7 <- autospc(
-    test_data9, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 7, 
+    test_data9,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 7,
     period_min = 21
-    )
+  )
   results8 <- autospc(
-    test_data9, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 8, 
+    test_data9,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 8,
     period_min = 21
-    )
+  )
   results9 <- autospc(
-    test_data9, 
-    chart_type = "XMR", 
-    plot_chart = FALSE, 
-    shift_rule_threshold = 9, 
+    test_data9,
+    chart_type = "XMR",
+    plot_chart = FALSE,
+    shift_rule_threshold = 9,
     period_min = 21
-    )
-  resultslist <- unlist(c(results6[22,"limit_change"], 
-                          results7[22,"limit_change"], 
-                          results8[22,"limit_change"], 
-                          results9[22,"limit_change"]
-                          ))
+  )
+  resultslist <- unlist(c(
+    results6[22, "limit_change"],
+    results7[22, "limit_change"],
+    results8[22, "limit_change"],
+    results9[22, "limit_change"]
+  ))
   names(resultslist) <- NULL
   expect_equal(resultslist, !c(TRUE, TRUE, TRUE, TRUE))
 })
-
-
-
-
-
-

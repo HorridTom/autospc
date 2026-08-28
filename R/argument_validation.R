@@ -1,4 +1,3 @@
-
 #' Validate chart_type argument
 #'
 #' Checks that `chart_type` is a single, non-NULL character string corresponding
@@ -9,21 +8,22 @@
 #' @return Invisibly returns TRUE if valid; otherwise errors.
 #' @noRd
 validate_chart_type <- function(chart_type) {
-  
   allowed_chart_types <- autospc_chart_types()
-  
+
   # NULL check
   if (is.null(chart_type)) {
-    
     lifecycle::deprecate_stop(
       when = "0.0.0.9008",
       what = I("chart_type  = NULL"),
-      details = I(paste("Please explicitly pass the desired chart type.",
-                        "Available chart types are: ",
-                        paste(allowed_chart_types, collapse = ", "),
-                        ".")))
+      details = I(paste(
+        "Please explicitly pass the desired chart type.",
+        "Available chart types are: ",
+        paste(allowed_chart_types, collapse = ", "),
+        "."
+      ))
+    )
   }
-  
+
   # Length check
   if (length(chart_type) != 1) {
     stop(
@@ -34,7 +34,7 @@ validate_chart_type <- function(chart_type) {
       call. = FALSE
     )
   }
-  
+
   # Type check (defensive)
   if (!is.character(chart_type)) {
     stop(
@@ -42,7 +42,7 @@ validate_chart_type <- function(chart_type) {
       call. = FALSE
     )
   }
-  
+
   # Value check
   if (!chart_type %in% allowed_chart_types) {
     stop(
@@ -54,7 +54,7 @@ validate_chart_type <- function(chart_type) {
       call. = FALSE
     )
   }
-  
+
   invisible(TRUE)
 }
 
@@ -77,23 +77,23 @@ validate_chart_type <- function(chart_type) {
 #' @return invisible TRUE
 #' @noRd
 check_x_type <- function(x) {
-
-  if(is.null(x)) {
+  if (is.null(x)) {
     return(invisible(TRUE))
   }
 
   x_class <- class(x)
 
-  if(all(x_class != "Date") &
-     all(x_class!= c("POSIXct", "POSIXt")) &
-     all(x_class != "numeric") &
-     all(x_class != "integer")) {
-    warning(paste("Please make sure that your x column is a",
-                  "'Date', 'POSIXct', 'numeric' or 'integer' type."))
+  if (all(x_class != "Date") &
+    all(x_class != c("POSIXct", "POSIXt")) &
+    all(x_class != "numeric") &
+    all(x_class != "integer")) {
+    warning(paste(
+      "Please make sure that your x column is a",
+      "'Date', 'POSIXct', 'numeric' or 'integer' type."
+    ))
   }
 
   invisible(TRUE)
-
 }
 
 
@@ -112,20 +112,18 @@ check_x_type <- function(x) {
 #' @return `arguments`, with any value the checks changed.
 #' @noRd
 validate_algorithm_parameters <- function(arguments) {
-
-  if(arguments$no_regrets & !arguments$overhanging_reversions) {
-
-    warning(paste0("Setting no_regrets = TRUE and overhanging_reversions = ",
-                   "FALSE does not make sense, since no_regrets requires ",
-                   "consideration of overhanging reversions. Changing ",
-                   "overhanging_reversions to TRUE."))
+  if (arguments$no_regrets & !arguments$overhanging_reversions) {
+    warning(paste0(
+      "Setting no_regrets = TRUE and overhanging_reversions = ",
+      "FALSE does not make sense, since no_regrets requires ",
+      "consideration of overhanging reversions. Changing ",
+      "overhanging_reversions to TRUE."
+    ))
 
     arguments$overhanging_reversions <- TRUE
-
   }
 
   return(arguments)
-
 }
 
 
@@ -139,13 +137,11 @@ validate_algorithm_parameters <- function(arguments) {
 require_column <- function(data,
                            column,
                            message) {
-
-  if(!column %in% colnames(data)) {
+  if (!column %in% colnames(data)) {
     stop(message, call. = FALSE)
   }
 
   invisible(TRUE)
-
 }
 
 
@@ -160,20 +156,17 @@ require_column_type <- function(data,
                                 column,
                                 types,
                                 message) {
-
-  if(!typeof(data[[column]]) %in% types) {
+  if (!typeof(data[[column]]) %in% types) {
     stop(message, call. = FALSE)
   }
 
   invisible(TRUE)
-
 }
 
 
 is_whole_number <- function(x,
-                            tol = .Machine$double.eps^0.5)  {
+                            tol = .Machine$double.eps^0.5) {
   return(abs(x - round(x)) < tol)
-
 }
 
 
@@ -187,10 +180,9 @@ is_whole_number <- function(x,
 round_count_column <- function(data,
                                column,
                                message) {
-
   values <- data[[column]]
 
-  if(typeof(values) != "double" || !any(!is_whole_number(values), na.rm = TRUE)) {
+  if (typeof(values) != "double" || !any(!is_whole_number(values), na.rm = TRUE)) {
     return(data)
   }
 
@@ -199,5 +191,4 @@ round_count_column <- function(data,
   warning(message, call. = FALSE)
 
   return(data)
-
 }

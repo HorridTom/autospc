@@ -56,10 +56,12 @@ on this dataset see `?ed_attendances_monthly`.
 facet_stages(
   ed_attendances_monthly %>%
     filter(row_number() <= 32L),
-  split_rows = c("Baseline" = 24L,
-                 "Data added beyond baseline" = 28L,
-                 "Further data added" = 32L),
-  x = month_start, 
+  split_rows = c(
+    "Baseline" = 24L,
+    "Data added beyond baseline" = 28L,
+    "Further data added" = 32L
+  ),
+  x = month_start,
   y = att_all,
   chart_type = "C'",
   period_min = 24,
@@ -106,11 +108,13 @@ figure shows a C-chart for the first 35 data points of the simulated
 section we shall interpret as daily values of a count measure of interest.
 
 ```{r example-1, fig.width=7, fig.height=5, fig.cap="Example 1"}
-autospc(example_series_2a %>%
-                filter(row_number() <= 35L),
-              override_y_title = "Count",
-              chart_type = "C",
-              extend_limits_to = 47L)
+autospc(
+  example_series_2a %>%
+    filter(row_number() <= 35L),
+  override_y_title = "Count",
+  chart_type = "C",
+  extend_limits_to = 47L
+)
 ```
 
 
@@ -175,17 +179,19 @@ the triggering rule break, i.e. day 22.
 
 ```{r example-2, fig.width=7, fig.height=5, fig.cap="Example 2"}
 autospc(example_series_2a,
-              override_y_title = "Count",
-              chart_type = "C",
-              baseline_only = TRUE,
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  baseline_only = TRUE,
+  extend_limits_to = 47L
+)
 ```
 
 ```{r example-3, fig.width=7, fig.height=5, fig.cap="Example 3"}
 autospc(example_series_2a,
-              override_y_title = "Count",
-              chart_type = "C",
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  extend_limits_to = 47L
+)
 ```
 
 ### Opposing rule break
@@ -205,18 +211,20 @@ Figure \@ref(fig:example-5), commencing on day 31.
 
 ```{r example-4, fig.width=7, fig.height=5, fig.cap="Example 4"}
 autospc(example_series_2b,
-              override_y_title = "Count",
-              chart_type = "C",
-              baseline_only = TRUE,
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  baseline_only = TRUE,
+  extend_limits_to = 47L
+)
 ```
 
 ```{r example-5, fig.width=7, fig.height=5, fig.cap="Example 5"}
 autospc(example_series_2b,
-              override_y_title = "Count",
-              chart_type = "C",
-              establish_every_shift = TRUE,
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  establish_every_shift = TRUE,
+  extend_limits_to = 47L
+)
 ```
 
 
@@ -228,9 +236,10 @@ overhanging reversion commencing on day 40, against the candidate limits.
 
 ```{r example-6, fig.width=7, fig.height=5, fig.cap="Example 6"}
 autospc(example_series_2c,
-              override_y_title = "Count",
-              chart_type = "C",
-              establish_every_shift = TRUE)
+  override_y_title = "Count",
+  chart_type = "C",
+  establish_every_shift = TRUE
+)
 ```
 
 ### Minimum period length
@@ -326,9 +335,9 @@ detail).
 
 ```{r 6.1, fig.width=7, fig.height=4.3}
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all,
   verbosity = 1,
   x_break = 365,
@@ -373,7 +382,7 @@ log_exp_tab <- autospc:::log_explanation_table
 ```
 
 ```{r 6.3}
-log_exp_tab %>% 
+log_exp_tab %>%
   knitr::kable()
 ```
  

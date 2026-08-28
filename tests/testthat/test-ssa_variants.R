@@ -1,116 +1,135 @@
 # Tests for variants of SSA selected using overhanging_reversions and no_regrets
 
 calc_period_starts <- function(df) {
-  
   cps <- df %>%
-    dplyr::group_by(period_start,
-                    period_type) %>%
-    dplyr::summarise(npoints = dplyr::n(),
-                     .groups = "drop") %>%
+    dplyr::group_by(
+      period_start,
+      period_type
+    ) %>%
+    dplyr::summarise(
+      npoints = dplyr::n(),
+      .groups = "drop"
+    ) %>%
     dplyr::filter(period_type == "calculation") %>%
     dplyr::arrange(period_start) %>%
     dplyr::pull(period_start)
-  
+
   return(cps)
-  
 }
 
 
 test_that(
-  "SSA variants perform correctly on first 96 points of example_series_1", {
-    
-    result_ssa <- autospc(example_series_1[1:96,],
-                          chart_type = "XMR",
-                          plot_chart = FALSE,
-                          no_regrets = TRUE,
-                          overhanging_reversions = TRUE)
-    
-    result_nRF_oRT <- autospc(example_series_1[1:96,],
-                              chart_type = "XMR",
-                              plot_chart = FALSE,
-                              no_regrets = FALSE,
-                              overhanging_reversions = TRUE)
-    
-    result_nRF_oRF <- autospc(example_series_1[1:96,],
-                              chart_type = "XMR",
-                              plot_chart = FALSE,
-                              no_regrets = FALSE,
-                              overhanging_reversions = FALSE)
-    
+  "SSA variants perform correctly on first 96 points of example_series_1",
+  {
+    result_ssa <- autospc(example_series_1[1:96, ],
+      chart_type = "XMR",
+      plot_chart = FALSE,
+      no_regrets = TRUE,
+      overhanging_reversions = TRUE
+    )
+
+    result_nRF_oRT <- autospc(example_series_1[1:96, ],
+      chart_type = "XMR",
+      plot_chart = FALSE,
+      no_regrets = FALSE,
+      overhanging_reversions = TRUE
+    )
+
+    result_nRF_oRF <- autospc(example_series_1[1:96, ],
+      chart_type = "XMR",
+      plot_chart = FALSE,
+      no_regrets = FALSE,
+      overhanging_reversions = FALSE
+    )
+
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
-    
+
     calc_period_starts_nRF_oRT <- result_nRF_oRT %>%
       calc_period_starts()
-    
+
     calc_period_starts_nRF_oRF <- result_nRF_oRF %>%
       calc_period_starts()
-    
-    expect_equal(calc_period_starts_ssa,
-                 c(1, 53))
-    
-    expect_equal(calc_period_starts_nRF_oRT,
-                 c(1, 53, 74))
-    
-    expect_equal(calc_period_starts_nRF_oRF,
-                 c(1, 31, 52, 74))
-    
-  })
+
+    expect_equal(
+      calc_period_starts_ssa,
+      c(1, 53)
+    )
+
+    expect_equal(
+      calc_period_starts_nRF_oRT,
+      c(1, 53, 74)
+    )
+
+    expect_equal(
+      calc_period_starts_nRF_oRF,
+      c(1, 31, 52, 74)
+    )
+  }
+)
 
 
 test_that(
-  "SSA variants perform correctly on full example_series_1", {
-    
+  "SSA variants perform correctly on full example_series_1",
+  {
     result_ssa <- autospc(example_series_1,
-                          chart_type = "XMR",
-                          plot_chart = FALSE,
-                          no_regrets = TRUE,
-                          overhanging_reversions = TRUE)
-    
+      chart_type = "XMR",
+      plot_chart = FALSE,
+      no_regrets = TRUE,
+      overhanging_reversions = TRUE
+    )
+
     result_nRF_oRT <- autospc(example_series_1,
-                              chart_type = "XMR",
-                              plot_chart = FALSE,
-                              no_regrets = FALSE,
-                              overhanging_reversions = TRUE)
-    
+      chart_type = "XMR",
+      plot_chart = FALSE,
+      no_regrets = FALSE,
+      overhanging_reversions = TRUE
+    )
+
     result_nRF_oRF <- autospc(example_series_1,
-                              chart_type = "XMR",
-                              plot_chart = FALSE,
-                              no_regrets = FALSE,
-                              overhanging_reversions = FALSE)
-    
+      chart_type = "XMR",
+      plot_chart = FALSE,
+      no_regrets = FALSE,
+      overhanging_reversions = FALSE
+    )
+
     calc_period_starts_ssa <- result_ssa %>%
       calc_period_starts()
-    
+
     calc_period_starts_nRF_oRT <- result_nRF_oRT %>%
       calc_period_starts()
-    
+
     calc_period_starts_nRF_oRF <- result_nRF_oRF %>%
       calc_period_starts()
-    
-    expect_equal(calc_period_starts_ssa,
-                 c(1, 53, 74))
-    
-    expect_equal(calc_period_starts_nRF_oRT,
-                 c(1, 53, 74))
-    
-    expect_equal(calc_period_starts_nRF_oRF,
-                 c(1, 31, 52, 74, 98))
-    
-  })
+
+    expect_equal(
+      calc_period_starts_ssa,
+      c(1, 53, 74)
+    )
+
+    expect_equal(
+      calc_period_starts_nRF_oRT,
+      c(1, 53, 74)
+    )
+
+    expect_equal(
+      calc_period_starts_nRF_oRF,
+      c(1, 31, 52, 74, 98)
+    )
+  }
+)
 
 
 test_that("warning is issued if incompatible variant requested", {
-  
   expect_warning(
     autospc(
-      ed_attendances_monthly, 
-      chart_type = "C'", 
-      x = month_start, 
+      ed_attendances_monthly,
+      chart_type = "C'",
+      x = month_start,
       y = att_all,
       no_regrets = TRUE,
       overhanging_reversions = FALSE
     ),
-    "no_regrets requires consideration of overhanging reversions")
-  
+    "no_regrets requires consideration of overhanging reversions"
+  )
 })

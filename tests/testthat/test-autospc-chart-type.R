@@ -1,5 +1,4 @@
 test_that("autospc errors informatively for invalid chart_type", {
-  
   expect_error(
     autospc(
       ed_attendances_monthly,
@@ -9,7 +8,6 @@ test_that("autospc errors informatively for invalid chart_type", {
     ),
     "Available chart types are"
   )
-  
 })
 
 test_that("autospc errors when chart_type is NULL", {

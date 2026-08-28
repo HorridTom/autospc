@@ -11,9 +11,7 @@
 #' @return A list of `autospc_chart` objects, each with `chart$result` set.
 #' @noRd
 analyse_charts <- function(charts) {
-
   analysed <- lapply(charts, function(chart) {
-
     chart <- aggregate_data(chart)
     chart <- order_series(chart)
     chart <- prepare_data(chart)
@@ -21,11 +19,9 @@ analyse_charts <- function(charts) {
     chart <- establish_limits(chart)
 
     return(chart)
-
   })
 
   return(analysed)
-
 }
 
 
@@ -50,11 +46,9 @@ analyse_charts <- function(charts) {
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 order_series <- function(chart) {
-
   chart$data <- chart$data %>%
     dplyr::arrange(x) %>%
     as.data.frame()
 
   return(chart)
-
 }

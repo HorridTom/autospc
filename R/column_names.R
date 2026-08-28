@@ -18,13 +18,11 @@
 #' @noRd
 resolve_column_name <- function(column,
                                 fallback) {
-
-  if(rlang::quo_is_missing(column)) {
+  if (rlang::quo_is_missing(column)) {
     return(fallback)
   }
 
   return(rlang::as_name(column))
-
 }
 
 
@@ -40,13 +38,11 @@ resolve_column_name <- function(column,
 #' @noRd
 column_name_of <- function(exprs,
                            field) {
-
-  if(!field %in% names(exprs)) {
+  if (!field %in% names(exprs)) {
     return(field)
   }
 
   return(rlang::as_name(exprs[[field]]))
-
 }
 
 
@@ -69,16 +65,18 @@ column_name_of <- function(exprs,
 #' @noRd
 normalise_columns <- function(chart_list,
                               fields) {
+  sources <- vapply(
+    fields,
+    function(field) chart_list[[field]],
+    character(1)
+  )
 
-  sources <- vapply(fields,
-                    function(field) chart_list[[field]],
-                    character(1))
-
-  chart_list$data <- select_named_columns(data = chart_list$data,
-                                          sources = sources)
+  chart_list$data <- select_named_columns(
+    data = chart_list$data,
+    sources = sources
+  )
 
   return(chart_list)
-
 }
 
 
@@ -97,17 +95,17 @@ normalise_columns <- function(chart_list,
 #' @noRd
 select_named_columns <- function(data,
                                  sources) {
-
-  wanted <- vapply(seq_along(sources),
-                   function(i) {
-                     sources[[i]] != names(sources)[[i]] ||
-                       sources[[i]] %in% colnames(data)
-                   },
-                   logical(1))
+  wanted <- vapply(
+    seq_along(sources),
+    function(i) {
+      sources[[i]] != names(sources)[[i]] ||
+        sources[[i]] %in% colnames(data)
+    },
+    logical(1)
+  )
 
   data <- data %>%
     dplyr::select(dplyr::all_of(sources[wanted]))
 
   return(data)
-
 }

@@ -2,63 +2,65 @@
 # data has columns x and y
 form_calculation_limits <- function(data,
                                     counter,
-                                    chart){
-
-  if(counter == 1L & !is.null(chart$baseline_length)) {
+                                    chart) {
+  if (counter == 1L & !is.null(chart$baseline_length)) {
     period_length <- baseline_period_length(chart, data = data)
   } else {
     period_length <- chart$period_min
   }
-  
+
   exclusion_points <- find_extremes(
     data = data,
     chart = chart,
     counter = counter,
-    period_length = period_length)
-  
-  calculation_period <- data[counter:(counter + period_length - 1),]
-  
+    period_length = period_length
+  )
+
+  calculation_period <- data[counter:(counter + period_length - 1), ]
+
   # Calculation of limits excluding extremes for selected section of data
-  limits_list <- calculate_limits(chart = chart,
-                                  period = calculation_period,
-                                  exclusion_points = exclusion_points)
-  
+  limits_list <- calculate_limits(
+    chart = chart,
+    period = calculation_period,
+    exclusion_points = exclusion_points
+  )
+
   calculation_period$cl <- limits_list$cl
   calculation_period$ucl <- limits_list$ucl
   calculation_period$lcl <- limits_list$lcl
-  
+
   extra_columns <- limits_table_columns(chart)
 
   calculation_period <- calculation_period %>%
-    dplyr::select(x, y, ucl,lcl, cl) %>%
+    dplyr::select(x, y, ucl, lcl, cl) %>%
     dplyr::mutate(period_type = "calculation") %>%
     dplyr::mutate(excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F))
-  
-  
+
+
   # First period does not already have the additional columns
-  if(counter == 1){
-    
+  if (counter == 1) {
     # Joins limits to the existing data
     limits_table <- data %>%
       dplyr::left_join(calculation_period, by = "x") %>%
-      dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) 
-    
+      dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y))
+
     limits_table <- limits_table %>%
-      dplyr::select(x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
-                    period_type, excluded,
-                    dplyr::any_of("log"))
+      dplyr::select(
+        x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
+        period_type, excluded,
+        dplyr::any_of("log")
+      )
     # Add the break_point column to keep track of break points as they are
     # added. For compatibility with (at least)
-    # add_rule_breaks_respecting_periods, the first point is not classed as a 
+    # add_rule_breaks_respecting_periods, the first point is not classed as a
     # break point.
     limits_table <- limits_table %>%
       dplyr::mutate(break_point = dplyr::if_else(dplyr::row_number() == counter,
-                                                 NA,
-                                                 FALSE))
-    
+        NA,
+        FALSE
+      ))
   } else {
-    
-    #joins limits to the existing data, overwriting display limits 
+    # joins limits to the existing data, overwriting display limits
     limits_table <- data %>%
       dplyr::left_join(calculation_period, by = "x") %>%
       dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) %>%
@@ -66,39 +68,42 @@ form_calculation_limits <- function(data,
       dplyr::mutate(lcl = dplyr::if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
       dplyr::mutate(cl = dplyr::if_else(is.na(cl.y), cl.x, cl.y)) %>%
       dplyr::mutate(period_type = dplyr::if_else(is.na(period_type.y), period_type.x, period_type.y)) %>%
-      dplyr::mutate(excluded = dplyr::if_else(is.na(excluded.y), excluded.x, excluded.y)) 
-    
-    limits_table <- limits_table %>% 
-      dplyr::mutate(break_point = (break_point |
-                                     dplyr::row_number() == counter))
-    
+      dplyr::mutate(excluded = dplyr::if_else(is.na(excluded.y), excluded.x, excluded.y))
+
     limits_table <- limits_table %>%
-      dplyr::select(x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
-                    period_type, excluded,
-                    dplyr::contains("break_point"),
-                    dplyr::contains("rule"),
-                    dplyr::contains("above_or_below"),
-                    dplyr::contains("highlight"),
-                    dplyr::contains("run"),
-                    dplyr::any_of("log"))
+      dplyr::mutate(break_point = (break_point |
+        dplyr::row_number() == counter))
+
+    limits_table <- limits_table %>%
+      dplyr::select(
+        x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
+        period_type, excluded,
+        dplyr::contains("break_point"),
+        dplyr::contains("rule"),
+        dplyr::contains("above_or_below"),
+        dplyr::contains("highlight"),
+        dplyr::contains("run"),
+        dplyr::any_of("log")
+      )
   }
-  
+
   return(limits_table)
 }
 
 
 # Function to form display limits (period extension)
-form_display_limits <- function(limits_table, counter, chart){
-  
-  if(counter > nrow(limits_table)) {
+form_display_limits <- function(limits_table, counter, chart) {
+  if (counter > nrow(limits_table)) {
     # No display limits needed - no data beyond calculation period
     return(limits_table)
   }
-  
-  limits_table <- extend_display_limits(chart = chart,
-                                        limits_table = limits_table,
-                                        counter = counter)
-  
+
+  limits_table <- extend_display_limits(
+    chart = chart,
+    limits_table = limits_table,
+    counter = counter
+  )
+
   return(limits_table)
 }
 
@@ -106,37 +111,41 @@ form_display_limits <- function(limits_table, counter, chart){
 # Function to create limits for new calculation and display period with rule
 # breaks
 form_calculation_and_display_limits <- function(
-    data, 
-    counter_at_period_start, 
-    chart){
-  
-  #form calculation limits for first period
+  data,
+  counter_at_period_start,
+  chart
+) {
+  # form calculation limits for first period
   limits_table <- form_calculation_limits(
     data = data,
     counter = counter_at_period_start,
-    chart = chart)
-  
-  
-  #extend display limits to end 
-  
-  if(counter_at_period_start == 1L & !is.null(chart$baseline_length)) {
+    chart = chart
+  )
+
+
+  # extend display limits to end
+
+  if (counter_at_period_start == 1L & !is.null(chart$baseline_length)) {
     period_length <- baseline_period_length(chart, data = data)
   } else {
     period_length <- chart$period_min
   }
-  
-  limits_table <- form_display_limits(limits_table = limits_table, 
-                                      counter = counter_at_period_start +
-                                        period_length,
-                                      chart = chart)
-  
-  #add rule breaks considering where periods are
+
+  limits_table <- form_display_limits(
+    limits_table = limits_table,
+    counter = counter_at_period_start +
+      period_length,
+    chart = chart
+  )
+
+  # add rule breaks considering where periods are
   limits_table <- add_rule_breaks_respecting_periods(
-    limits_table = limits_table, 
+    limits_table = limits_table,
     counter = counter_at_period_start,
     centre_line_tolerance = chart$centre_line_tolerance,
-    shift_rule_threshold = chart$shift_rule_threshold)
-  
+    shift_rule_threshold = chart$shift_rule_threshold
+  )
+
   return(limits_table)
 }
 
@@ -145,66 +154,72 @@ extend_limits <- function(table,
                           chart,
                           extend_limits_to,
                           x_max) {
-  
-  if(!is.null(extend_limits_to)) {
-    
-    if(extend_limits_to <= x_max) {
+  if (!is.null(extend_limits_to)) {
+    if (extend_limits_to <= x_max) {
       stop("Limits can only be extended to a point beyond the end of the data.")
     }
-    
+
     last_calc_period <- table %>%
       dplyr::filter(period_type == "calculation") %>%
       dplyr::slice_tail(n = 1L) %>%
       dplyr::pull(plot_period)
-    
+
     final_period <- table %>%
       dplyr::filter(plot_period == last_calc_period)
-    
-    ext_limits <- extrapolate_limits(chart = chart,
-                                     period = final_period)
-    
+
+    ext_limits <- extrapolate_limits(
+      chart = chart,
+      period = final_period
+    )
+
     ext_first_row <- table %>%
-      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
-      dplyr::mutate(x = x_max + 1,
-                    y = NA_real_,
-                    cl = ext_limits$cl,
-                    lcl = ext_limits$lcl,
-                    ucl = ext_limits$ucl,
-                    period_type = "display",
-                    excluded = NA,
-                    break_point = FALSE,
-                    rule1 = FALSE,
-                    rule2 = FALSE,
-                    above_or_below_cl = 0,
-                    highlight = "None")
-    
+      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>%
+      dplyr::mutate(
+        x = x_max + 1,
+        y = NA_real_,
+        cl = ext_limits$cl,
+        lcl = ext_limits$lcl,
+        ucl = ext_limits$ucl,
+        period_type = "display",
+        excluded = NA,
+        break_point = FALSE,
+        rule1 = FALSE,
+        rule2 = FALSE,
+        above_or_below_cl = 0,
+        highlight = "None"
+      )
+
     ext_last_row <- table %>%
-      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>% 
-      dplyr::mutate(x = extend_limits_to,
-                    y = NA_real_,
-                    cl = ext_limits$cl,
-                    lcl = ext_limits$lcl,
-                    ucl = ext_limits$ucl,
-                    period_type = "display",
-                    excluded = NA,
-                    break_point = FALSE,
-                    rule1 = FALSE,
-                    rule2 = FALSE,
-                    above_or_below_cl = 0,
-                    highlight = "None")
-    
-    table <- table %>% 
-      dplyr::bind_rows(ext_first_row,
-                       ext_last_row)
+      dplyr::filter(dplyr::row_number() == max(dplyr::row_number())) %>%
+      dplyr::mutate(
+        x = extend_limits_to,
+        y = NA_real_,
+        cl = ext_limits$cl,
+        lcl = ext_limits$lcl,
+        ucl = ext_limits$ucl,
+        period_type = "display",
+        excluded = NA,
+        break_point = FALSE,
+        rule1 = FALSE,
+        rule2 = FALSE,
+        above_or_below_cl = 0,
+        highlight = "None"
+      )
+
+    table <- table %>%
+      dplyr::bind_rows(
+        ext_first_row,
+        ext_last_row
+      )
   }
-  
+
   # Re-derive plot_period so that it is consistent with the extension's
   # period type display
   table <- table %>%
-    dplyr::mutate(plot_period = paste0(period_type,
-                                       period_start))
-  
+    dplyr::mutate(plot_period = paste0(
+      period_type,
+      period_start
+    ))
+
   return(table)
 }
-
-

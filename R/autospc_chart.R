@@ -6,15 +6,16 @@
 #' @noRd
 new_autospc_chart <- function(x = list(),
                               class = character()) {
-  
   stopifnot(is.list(x))
-  
+
   return(
     structure(x,
-              class = c(class,
-                        "autospc_chart"))
+      class = c(
+        class,
+        "autospc_chart"
+      )
+    )
   )
-  
 }
 
 
@@ -44,24 +45,27 @@ new_autospc_chart <- function(x = list(),
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
 validate_autospc_chart <- function(x) {
-  
-  if(!inherits(x, "autospc_chart")) {
+  if (!inherits(x, "autospc_chart")) {
     stop("Not an autospc_chart object.", call. = FALSE)
   }
-  
+
   element_names <- names(x)
-  
-  
+
+
   element_check <- autospc_chart_elements() %in% element_names
-  if(!all(element_check)) {
-    stop(paste("Malformed autospc_chart object - element(s) not present:",
-               paste(autospc_chart_elements()[!element_check],
-                     collapse = ", ")),
-         call. = FALSE)
+  if (!all(element_check)) {
+    stop(
+      paste(
+        "Malformed autospc_chart object - element(s) not present:",
+        paste(autospc_chart_elements()[!element_check],
+          collapse = ", "
+        )
+      ),
+      call. = FALSE
+    )
   }
-  
+
   return(x)
-  
 }
 
 
@@ -69,14 +73,13 @@ validate_autospc_chart <- function(x) {
 #'
 #' These names are duplicated by `autospc_chart_list()`, which assembles
 #' exactly these elements - adding one means adding it in both places.
-#' 
+#'
 #' data_original is a derived field retaining (by convention only) a copy of the
 #' data passed by the user
 #'
 #' @return A character vector of element names.
 #' @noRd
 autospc_chart_elements <- function() {
-  
   chart_elements <- c(
     "data",
     "x",
@@ -99,9 +102,8 @@ autospc_chart_elements <- function() {
     "result",
     "history"
   )
-  
+
   return(chart_elements)
-  
 }
 
 
@@ -112,11 +114,9 @@ autospc_chart_elements <- function() {
 #' @return A character vector of chart types.
 #' @noRd
 autospc_chart_types <- function() {
-
   chart_types <- c("XMR", "X", "MR", "C", "C'", "P", "P'")
 
   return(chart_types)
-
 }
 
 
@@ -129,11 +129,13 @@ autospc_chart_types <- function() {
 #' @return A character vector of parameter names.
 #' @noRd
 autospc_chart_parameters <- function() {
-
-  return(setdiff(autospc_chart_elements(),
-                 c("data", "x", "y", "n",
-                   "data_original", "result", "history")))
-
+  return(setdiff(
+    autospc_chart_elements(),
+    c(
+      "data", "x", "y", "n",
+      "data_original", "result", "history"
+    )
+  ))
 }
 
 
@@ -163,26 +165,24 @@ build_charts <- function(chart_type,
                          y,
                          n,
                          ...) {
-
-  if(identical(chart_type, "XMR")) {
+  if (identical(chart_type, "XMR")) {
     chart_types <- c(location = "X", dispersion = "MR")
   } else {
     chart_types <- chart_type
   }
 
   charts <- lapply(chart_types, function(type) {
-
-    autospc_chart(chart_type = type,
-                  data = data,
-                  x = x,
-                  y = y,
-                  n = n,
-                  ...)
-
+    autospc_chart(
+      chart_type = type,
+      data = data,
+      x = x,
+      y = y,
+      n = n,
+      ...
+    )
   })
 
   return(charts)
-
 }
 
 
@@ -196,14 +196,12 @@ build_charts <- function(chart_type,
 #' @return TRUE or FALSE
 #' @noRd
 is_xmr_pair <- function(charts) {
-
-  if(length(charts) != 2L) {
+  if (length(charts) != 2L) {
     return(FALSE)
   }
 
   return(inherits(charts[[1]], "autospc_chart_x") &&
-           inherits(charts[[2]], "autospc_chart_mr"))
-
+    inherits(charts[[2]], "autospc_chart_mr"))
 }
 
 
@@ -223,20 +221,17 @@ autospc_chart <- function(chart_type,
                           y,
                           n,
                           ...) {
-
-  autospc_chart_object <- switch(
-    chart_type,
-    "C"  = autospc_chart_c(data = data, x = x, y = y, ...),
+  autospc_chart_object <- switch(chart_type,
+    "C" = autospc_chart_c(data = data, x = x, y = y, ...),
     "C'" = autospc_chart_cp(data = data, x = x, y = y, ...),
-    "P"  = autospc_chart_p(data = data, x = x, y = y, n = n, ...),
+    "P" = autospc_chart_p(data = data, x = x, y = y, n = n, ...),
     "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
-    "X"  = autospc_chart_x(data = data, x = x, y = y, ...),
+    "X" = autospc_chart_x(data = data, x = x, y = y, ...),
     "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
     stop("No autospc_chart class for chart_type: ", chart_type, call. = FALSE)
   )
 
   return(autospc_chart_object)
-
 }
 
 
@@ -255,23 +250,23 @@ autospc_chart <- function(chart_type,
 #'   `autospc_chart_elements()`.
 #' @noRd
 autospc_chart_list <- function(
-    data,
-    x,
-    y,
-    period_min = autospc_default("period_min"),
-    baseline_length = autospc_default("baseline_length"),
-    shift_rule_threshold = autospc_default("shift_rule_threshold"),
-    baseline_only = autospc_default("baseline_only"),
-    establish_every_shift = autospc_default("establish_every_shift"),
-    no_regrets = autospc_default("no_regrets"),
-    overhanging_reversions = autospc_default("overhanging_reversions"),
-    max_exclusions = autospc_default("max_exclusions"),
-    mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
-    centre_line_tolerance = autospc_default("centre_line_tolerance"),
-    floating_median = autospc_default("floating_median"),
-    floating_median_n = autospc_default("floating_median_n"),
-    keep_candidate_tables = autospc_default("keep_candidate_tables")) {
-  
+  data,
+  x,
+  y,
+  period_min = autospc_default("period_min"),
+  baseline_length = autospc_default("baseline_length"),
+  shift_rule_threshold = autospc_default("shift_rule_threshold"),
+  baseline_only = autospc_default("baseline_only"),
+  establish_every_shift = autospc_default("establish_every_shift"),
+  no_regrets = autospc_default("no_regrets"),
+  overhanging_reversions = autospc_default("overhanging_reversions"),
+  max_exclusions = autospc_default("max_exclusions"),
+  mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
+  centre_line_tolerance = autospc_default("centre_line_tolerance"),
+  floating_median = autospc_default("floating_median"),
+  floating_median_n = autospc_default("floating_median_n"),
+  keep_candidate_tables = autospc_default("keep_candidate_tables")
+) {
   autospc_chart_l <- list(
     data = data,
     x = x,
@@ -295,9 +290,8 @@ autospc_chart_list <- function(
     result = list(),
     history = list()
   )
-  
+
   return(autospc_chart_l)
-  
 }
 
 
@@ -313,23 +307,19 @@ autospc_chart_list <- function(
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 round_counts.autospc_chart <- function(chart) {
-
   return(chart)
-
 }
 
 
 #' Aggregate data for analysis
-#' 
+#'
 #' Returns the chart object unchanged, this reflects that the default behaviour
 #' is no aggregation, unless overridden by specific subclass methods
 #'
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 aggregate_data.autospc_chart <- function(chart) {
-
   return(chart)
-
 }
 
 
@@ -341,9 +331,7 @@ aggregate_data.autospc_chart <- function(chart) {
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart <- function(chart) {
-
   return(chart)
-
 }
 
 
@@ -355,13 +343,11 @@ prepare_data.autospc_chart <- function(chart) {
 #' @noRd
 n_effective_points.autospc_chart <- function(chart,
                                              data) {
-
   points <- data %>%
     dplyr::filter(!is.na(y)) %>%
     nrow()
 
   return(points)
-
 }
 
 
@@ -373,9 +359,7 @@ n_effective_points.autospc_chart <- function(chart,
 #' @return character vector, possibly empty
 #' @noRd
 limits_table_columns.autospc_chart <- function(chart) {
-
   return(character(0))
-
 }
 
 
@@ -389,7 +373,6 @@ limits_table_columns.autospc_chart <- function(chart) {
 extend_display_limits.autospc_chart <- function(chart,
                                                 limits_table,
                                                 counter) {
-
   display_rows <- counter:nrow(limits_table)
   last_calculated <- counter - 1
 
@@ -399,7 +382,6 @@ extend_display_limits.autospc_chart <- function(chart,
   limits_table[display_rows, "period_type"] <- "display"
 
   return(limits_table)
-
 }
 
 
@@ -412,16 +394,17 @@ extend_display_limits.autospc_chart <- function(chart,
 #' @noRd
 extrapolate_limits.autospc_chart <- function(chart,
                                              period) {
-
   limits <- period %>%
     dplyr::select(cl, lcl, ucl) %>%
-    dplyr::summarise(dplyr::across(dplyr::everything(),
-                                   ~ mean(.x,
-                                          na.rm = TRUE))) %>%
+    dplyr::summarise(dplyr::across(
+      dplyr::everything(),
+      ~ mean(.x,
+        na.rm = TRUE
+      )
+    )) %>%
     as.list()
 
   return(limits)
-
 }
 
 
@@ -437,12 +420,13 @@ extrapolate_limits.autospc_chart <- function(chart,
 centre_line_label.autospc_chart <- function(chart,
                                             cl,
                                             ylimhigh) {
-
   return(scales::number(cl,
-                        big.mark = ",",
-                        accuracy = label_accuracy(chart = chart,
-                                                  ylimhigh = ylimhigh)))
-
+    big.mark = ",",
+    accuracy = label_accuracy(
+      chart = chart,
+      ylimhigh = ylimhigh
+    )
+  ))
 }
 
 
@@ -451,9 +435,7 @@ centre_line_label.autospc_chart <- function(chart,
 #' @return integer, row number
 #' @noRd
 first_label_row.autospc_chart <- function(chart) {
-
   return(1L)
-
 }
 
 
@@ -466,9 +448,7 @@ first_label_row.autospc_chart <- function(chart) {
 #' @noRd
 label_accuracy.autospc_chart <- function(chart,
                                          ylimhigh) {
-
   return(1)
-
 }
 
 
@@ -479,9 +459,7 @@ label_accuracy.autospc_chart <- function(chart,
 #' @return TRUE or FALSE
 #' @noRd
 labels_stay_above.autospc_chart <- function(chart) {
-
   return(FALSE)
-
 }
 
 
@@ -494,9 +472,7 @@ labels_stay_above.autospc_chart <- function(chart) {
 #' @return number, the scale factor applied to the upper control limit
 #' @noRd
 upper_annotation_sf_default.autospc_chart <- function(chart) {
-
   return(1.1)
-
 }
 
 
@@ -509,10 +485,10 @@ upper_annotation_sf_default.autospc_chart <- function(chart) {
 #' @noRd
 y_axis_range.autospc_chart <- function(chart,
                                        data) {
-
-  return(list(low = 0,
-              high = 110))
-
+  return(list(
+    low = 0,
+    high = 110
+  ))
 }
 
 
@@ -529,19 +505,20 @@ y_axis_range.autospc_chart <- function(chart,
 #' @return `x`, invisibly.
 #' @export
 print.autospc_chart <- function(x, ...) {
+  cat(sprintf(
+    "<%s> %s chart, %d points, period_min = %d\n",
+    class(x)[1],
+    chart_type_label(x),
+    nrow(x$data),
+    x$period_min
+  ))
 
-  cat(sprintf("<%s> %s chart, %d points, period_min = %d\n",
-              class(x)[1],
-              chart_type_label(x),
-              nrow(x$data),
-              x$period_min))
-
-  if(length(x$result) == 0L) {
+  if (length(x$result) == 0L) {
     cat("\nNot analysed.\n")
     return(invisible(x))
   }
 
-  if(!centre_line_present(x$result$table)) {
+  if (!centre_line_present(x$result$table)) {
     cat("\nNo limits: too few points to form a calculation period.\n")
     return(invisible(x))
   }
@@ -549,36 +526,45 @@ print.autospc_chart <- function(x, ...) {
   cat("\nCalculation periods\n")
   cat(format_calculation_periods(x$result$table), sep = "\n")
 
-  if(length(x$result$re_establish_rows) > 0L) {
-    cat(sprintf("\nLimits re-established at %s\n",
-                paste(x$result$re_establish_rows, collapse = ", ")))
+  if (length(x$result$re_establish_rows) > 0L) {
+    cat(sprintf(
+      "\nLimits re-established at %s\n",
+      paste(x$result$re_establish_rows, collapse = ", ")
+    ))
   }
 
-  if(length(x$result$exclusions) > 0L) {
-    cat(sprintf("%d point%s excluded from the limit calculations\n",
-                length(x$result$exclusions),
-                if(length(x$result$exclusions) == 1L) "" else "s"))
+  if (length(x$result$exclusions) > 0L) {
+    cat(sprintf(
+      "%d point%s excluded from the limit calculations\n",
+      length(x$result$exclusions),
+      if (length(x$result$exclusions) == 1L) "" else "s"
+    ))
   }
 
   candidates <- x$history$candidates
-  if(length(candidates) > 0L) {
-    accepted <- sum(vapply(candidates,
-                           function(candidate) isTRUE(candidate$accepted),
-                           logical(1)))
-    cat(sprintf("%d candidate period%s considered, %d accepted\n",
-                length(candidates),
-                if(length(candidates) == 1L) "" else "s",
-                accepted))
+  if (length(candidates) > 0L) {
+    accepted <- sum(vapply(
+      candidates,
+      function(candidate) isTRUE(candidate$accepted),
+      logical(1)
+    ))
+    cat(sprintf(
+      "%d candidate period%s considered, %d accepted\n",
+      length(candidates),
+      if (length(candidates) == 1L) "" else "s",
+      accepted
+    ))
   }
 
-  if(!is.null(x$history$stopped)) {
-    cat(sprintf("Stopped at row %d: %s\n",
-                x$history$stopped$counter,
-                x$history$stopped$reason))
+  if (!is.null(x$history$stopped)) {
+    cat(sprintf(
+      "Stopped at row %d: %s\n",
+      x$history$stopped$counter,
+      x$history$stopped$reason
+    ))
   }
 
   return(invisible(x))
-
 }
 
 
@@ -591,27 +577,25 @@ print.autospc_chart <- function(x, ...) {
 #' @noRd
 format_calculation_periods <- function(table,
                                        max_shown = 10L) {
-
   periods <- unique(table$plot_period[table$period_type == "calculation"])
 
   lines <- vapply(periods, function(period) {
-
     rows <- which(table$plot_period == period)
 
-    sprintf("  rows %4d-%4d   cl = %s",
-            min(rows),
-            max(rows),
-            format(signif(table$cl[rows[1]], 6)))
-
+    sprintf(
+      "  rows %4d-%4d   cl = %s",
+      min(rows),
+      max(rows),
+      format(signif(table$cl[rows[1]], 6))
+    )
   }, character(1))
 
-  if(length(lines) > max_shown) {
-
-    lines <- c(lines[seq_len(max_shown)],
-               sprintf("  ... and %d more", length(lines) - max_shown))
-
+  if (length(lines) > max_shown) {
+    lines <- c(
+      lines[seq_len(max_shown)],
+      sprintf("  ... and %d more", length(lines) - max_shown)
+    )
   }
 
   return(unname(lines))
-
 }

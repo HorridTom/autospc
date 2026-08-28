@@ -1,5 +1,3 @@
-
-
 #' Round the count columns to whole numbers
 #'
 #' Called at construction, so that the counts are whole numbers before any
@@ -51,7 +49,7 @@ n_effective_points <- function(chart,
 
 
 #' Calculate control limits for a subset of the chart data
-#' 
+#'
 #' @param period a dataframe providing the subset of the data to use as
 #' calculation period
 #' @param exclusion_points vector of row numbers, relative to period, to exclude
@@ -195,4 +193,3 @@ y_axis_range <- function(chart, data) {
 y_axis_title <- function(chart) {
   UseMethod("y_axis_title")
 }
-

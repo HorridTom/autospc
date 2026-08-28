@@ -11,11 +11,10 @@
 #' @noRd
 build_plot_data <- function(charts,
                             visualisation_params) {
-
   return(lapply(charts,
-                plot_data_for_chart,
-                visualisation_params = visualisation_params))
-
+    plot_data_for_chart,
+    visualisation_params = visualisation_params
+  ))
 }
 
 
@@ -43,27 +42,29 @@ build_plot_data <- function(charts,
 #' @noRd
 plot_data_for_chart <- function(chart,
                                 visualisation_params) {
-
   table <- chart$result$table
 
-  axes <- axis_specifications(table = table,
-                              chart = chart,
-                              visualisation_params = visualisation_params)
+  axes <- axis_specifications(
+    table = table,
+    chart = chart,
+    visualisation_params = visualisation_params
+  )
 
-  if(visualisation_params$show_limits && centre_line_present(table)) {
-
-    table <- add_plot_columns(table = table,
-                              chart = chart,
-                              visualisation_params = visualisation_params,
-                              axis_extents = axes$axis_extents)
-
+  if (visualisation_params$show_limits && centre_line_present(table)) {
+    table <- add_plot_columns(
+      table = table,
+      chart = chart,
+      visualisation_params = visualisation_params,
+      axis_extents = axes$axis_extents
+    )
   }
 
-  return(list(chart = chart,
-              table = table,
-              axis_extents = axes$axis_extents,
-              axis_titles = axes$axis_titles))
-
+  return(list(
+    chart = chart,
+    table = table,
+    axis_extents = axes$axis_extents,
+    axis_titles = axes$axis_titles
+  ))
 }
 
 
@@ -78,22 +79,26 @@ plot_data_for_chart <- function(chart,
 #' @noRd
 faceted_plot_data <- function(plot_data,
                               visualisation_params) {
-
-  table <- combine_plot_data(plot_data = plot_data,
-                             visualisation_params = visualisation_params)
+  table <- combine_plot_data(
+    plot_data = plot_data,
+    visualisation_params = visualisation_params
+  )
 
   # Every facet is the same kind of chart, so the axes are taken from the last.
   chart <- plot_data[[length(plot_data)]]$chart
 
-  axes <- axis_specifications(table = table,
-                              chart = chart,
-                              visualisation_params = visualisation_params)
+  axes <- axis_specifications(
+    table = table,
+    chart = chart,
+    visualisation_params = visualisation_params
+  )
 
-  return(list(chart = chart,
-              table = table,
-              axis_extents = axes$axis_extents,
-              axis_titles = axes$axis_titles))
-
+  return(list(
+    chart = chart,
+    table = table,
+    axis_extents = axes$axis_extents,
+    axis_titles = axes$axis_titles
+  ))
 }
 
 
@@ -108,13 +113,15 @@ faceted_plot_data <- function(plot_data,
 #' @noRd
 charts_as_table <- function(charts,
                             visualisation_params) {
+  plot_data <- build_plot_data(
+    charts = charts,
+    visualisation_params = visualisation_params
+  )
 
-  plot_data <- build_plot_data(charts = charts,
-                               visualisation_params = visualisation_params)
-
-  return(combine_plot_data(plot_data = plot_data,
-                           visualisation_params = visualisation_params))
-
+  return(combine_plot_data(
+    plot_data = plot_data,
+    visualisation_params = visualisation_params
+  ))
 }
 
 
@@ -132,42 +139,39 @@ charts_as_table <- function(charts,
 #' @noRd
 combine_plot_data <- function(plot_data,
                               visualisation_params) {
-
   charts <- lapply(plot_data, function(each) each$chart)
 
-  if(length(plot_data) > 1L && !is_xmr_pair(charts)) {
+  if (length(plot_data) > 1L && !is_xmr_pair(charts)) {
     # Faceted plot
     stages <- lapply(plot_data, function(each) {
-      
-      if(visualisation_params$show_limits && centre_line_present(each$table)) {
+      if (visualisation_params$show_limits && centre_line_present(each$table)) {
         return(dplyr::filter(each$table, !is.na(x)))
       }
-      
+
       return(each$table)
-      
     })
     # Return for faceted plot
     return(dplyr::bind_rows(stages, .id = "stage"))
-    
   }
-  
+
   # The facets have returned above, so what is left is one chart, or the
   # location half of a pair with the dispersion half joined on.
   main <- plot_data[[1]]
 
   data <- main$table
 
-  if(!(visualisation_params$show_limits && centre_line_present(data))) {
+  if (!(visualisation_params$show_limits && centre_line_present(data))) {
     return(data)
   }
 
-  if(is_xmr_pair(charts)) {
-    data <- join_mr_columns(x_table = data,
-                            mr_table = plot_data$dispersion$table)
+  if (is_xmr_pair(charts)) {
+    data <- join_mr_columns(
+      x_table = data,
+      mr_table = plot_data$dispersion$table
+    )
   }
 
   return(dplyr::filter(data, !is.na(x)))
-
 }
 
 
@@ -180,23 +184,26 @@ combine_plot_data <- function(plot_data,
 #' @return A data frame.
 #' @noRd
 join_mr_columns <- function(x_table,
-                           mr_table) {
-
+                            mr_table) {
   joined <- x_table %>%
-    dplyr::left_join(mr_table %>%
-                       dplyr::filter(!is.na(x)) %>%
-                       dplyr::select(x,
-                                    mr = y,
-                                    amr = cl,
-                                    url = ucl,
-                                    lrl = lcl),
-                     by = c("x" = "x")) %>%
-    dplyr::select(x, y, cl, ucl, lcl,
-                  mr, amr, url, lrl,
-                  dplyr::everything())
+    dplyr::left_join(
+      mr_table %>%
+        dplyr::filter(!is.na(x)) %>%
+        dplyr::select(x,
+          mr = y,
+          amr = cl,
+          url = ucl,
+          lrl = lcl
+        ),
+      by = c("x" = "x")
+    ) %>%
+    dplyr::select(
+      x, y, cl, ucl, lcl,
+      mr, amr, url, lrl,
+      dplyr::everything()
+    )
 
   return(joined)
-
 }
 
 
@@ -214,10 +221,9 @@ join_mr_columns <- function(x_table,
 axis_specifications <- function(table,
                                 chart,
                                 visualisation_params) {
-
   x_pad_end <- visualisation_params$x_pad_end
 
-  if(!is.null(visualisation_params$extend_limits_to) && is.null(x_pad_end)) {
+  if (!is.null(visualisation_params$extend_limits_to) && is.null(x_pad_end)) {
     x_pad_end <- visualisation_params$extend_limits_to
   }
 
@@ -225,17 +231,19 @@ axis_specifications <- function(table,
   x_max <- max(table$x, na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
 
-  if(!centre_line_present(table)) {
+  if (!centre_line_present(table)) {
     ylimlow <- min(table$y, na.rm = TRUE)
     ylimhigh <- max(table$y, na.rm = TRUE)
   } else {
-    y_range <- y_axis_range(chart = chart,
-                            data = table)
+    y_range <- y_axis_range(
+      chart = chart,
+      data = table
+    )
     ylimlow <- y_range$low
     ylimhigh <- y_range$high
   }
 
-  if(!is.null(visualisation_params$override_y_lim)) {
+  if (!is.null(visualisation_params$override_y_lim)) {
     ylimhigh <- visualisation_params$override_y_lim
   }
 
@@ -244,18 +252,23 @@ axis_specifications <- function(table,
   x_title <- visualisation_params$override_x_title
   y_title <- visualisation_params$override_y_title
 
-  if(is.null(y_title)) {
+  if (is.null(y_title)) {
     y_title <- y_axis_title(chart)
   }
 
-  return(list(axis_extents = list(start_x = start_x,
-                                  x_max = x_max,
-                                  end_x = end_x,
-                                  ylimlow = ylimlow,
-                                  ylimhigh = ylimhigh),
-              axis_titles = list(x = x_title,
-                                 y = y_title)))
-
+  return(list(
+    axis_extents = list(
+      start_x = start_x,
+      x_max = x_max,
+      end_x = end_x,
+      ylimlow = ylimlow,
+      ylimhigh = ylimhigh
+    ),
+    axis_titles = list(
+      x = x_title,
+      y = y_title
+    )
+  ))
 }
 
 
@@ -275,18 +288,20 @@ add_plot_columns <- function(table,
                              chart,
                              visualisation_params,
                              axis_extents) {
-
-  if(visualisation_params$highlight_exclusions) {
+  if (visualisation_params$highlight_exclusions) {
     table <- table %>% dplyr::mutate(
       highlight = ifelse(excluded & !is.na(excluded),
-                         "Excluded from limits calculation",
-                         highlight)
+        "Excluded from limits calculation",
+        highlight
+      )
     )
   }
 
-  table <- floating_median_column(table = table,
-                                  floating_median = chart$floating_median,
-                                  floating_median_n = chart$floating_median_n)
+  table <- floating_median_column(
+    table = table,
+    floating_median = chart$floating_median,
+    floating_median_n = chart$floating_median_n
+  )
 
   table <- add_annotation_data(
     table = table,
@@ -296,16 +311,18 @@ add_plot_columns <- function(table,
     flip_labels = visualisation_params$flip_labels,
     upper_annotation_sf = visualisation_params$upper_annotation_sf,
     lower_annotation_sf = visualisation_params$lower_annotation_sf,
-    annotation_arrow_curve = visualisation_params$annotation_arrow_curve)
+    annotation_arrow_curve = visualisation_params$annotation_arrow_curve
+  )
 
-  table <- extend_limits(table = table,
-                         chart = chart,
-                         extend_limits_to =
-                          visualisation_params$extend_limits_to,
-                         x_max = axis_extents$x_max)
+  table <- extend_limits(
+    table = table,
+    chart = chart,
+    extend_limits_to =
+      visualisation_params$extend_limits_to,
+    x_max = axis_extents$x_max
+  )
 
   return(table)
-
 }
 
 
@@ -318,7 +335,5 @@ add_plot_columns <- function(table,
 #' @return TRUE or FALSE
 #' @noRd
 centre_line_present <- function(data) {
-  
   return("cl" %in% colnames(data))
-  
 }

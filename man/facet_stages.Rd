@@ -2,7 +2,7 @@
 % Please edit documentation in R/facet_stages.R
 \name{facet_stages}
 \alias{facet_stages}
-\title{facet_stages}
+\title{Plot SPC charts at successive stages of a series}
 \usage{
 facet_stages(data, split_rows, plot_chart = TRUE, ...)
 }
@@ -14,17 +14,25 @@ facet_stages(data, split_rows, plot_chart = TRUE, ...)
 results at. Names specify facet strip labels.}
 
 \item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
-data is returned with centre line, control limits and other analytic output
-appended as columns.}
+subgroup-aggregated data is returned with centre line, control limits and
+other analytic output appended as columns.}
 
 \item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
 }
 \value{
-Faceted plot showing results of \code{\link[=autospc]{autospc()}} at
-different stages as specified by split_rows
+With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: one
+ggplot, faceted by stage, which also carries the analysed chart behind each
+facet and the parameters it was drawn with.
+
+With \code{plot_chart = FALSE}, a data frame holding every stage, with \code{stage}
+saying which each row belongs to.
 }
 \description{
-facet_stages
+\code{facet_stages()} analyses the same series in stages, each time using more of
+it, and plots the results side by side - one facet per stage. Each facet is
+what \code{autospc()} would have drawn from the data available at that point, so
+the set of them shows how the chart, and the control limits, developed as the
+data arrived.
 }
 \examples{
 # Show progression of C' chart for count of monthly attendances over time
@@ -33,7 +41,7 @@ facet_stages(
   split_rows = c(30L, 60L, 90L),
   chart_type = "C'",
   x = month_start,
-  y = att_all, 
+  y = att_all,
   x_break = 365
 )
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/autospc.R
 \name{autospc}
 \alias{autospc}
-\title{Plot SPC charts with automated limit recalculation}
+\title{Plot SPC charts, re-establishing control limits automatically}
 \usage{
 autospc(
   data,
@@ -10,14 +10,14 @@ autospc(
   y,
   n,
   chart_type = NULL,
-  period_min = 21,
+  period_min = 21L,
   baseline_length = NULL,
   shift_rule_threshold = 8L,
   baseline_only = FALSE,
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
-  max_exclusions = 3,
+  max_exclusions = 3L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
@@ -25,10 +25,11 @@ autospc(
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
-  show_mr = TRUE,
-  write_table = FALSE,
+  show_mr = deprecated(),
+  write_table = deprecated(),
   verbosity = 0L,
   log_file_path = NULL,
+  keep_candidate_tables = FALSE,
   title = NULL,
   subtitle = NULL,
   use_caption = TRUE,
@@ -52,8 +53,8 @@ autospc(
   lower_annotation_sf = NULL,
   annotation_arrows = FALSE,
   annotation_arrow_curve = 0.3,
-  override_annotation_dist = NULL,
-  override_annotation_dist_P = NULL
+  override_annotation_dist = deprecated(),
+  override_annotation_dist_P = deprecated()
 )
 }
 \arguments{
@@ -79,8 +80,8 @@ denominator for P and P' charts.
 See \code{vignette("data-requirements", package = "autospc")} for more
 details.}
 
-\item{chart_type}{The type of chart you wish to plot. Must must have length one.
-Available options are: "XMR", "MR", "C", "C'", "P", "P'".
+\item{chart_type}{The type of chart you wish to plot. Must must have length
+one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
 Parameters that control behaviour of the algorithm used to re-establish
@@ -90,14 +91,16 @@ control limits.
 \item{period_min}{The minimum number of points (subgroups) per period,
 i.e. the minimum number of points required to form control limits.}
 
-\item{baseline_length}{Integer, overrides period_min for the first
-calculation period only, if specified}
+\item{baseline_length}{Integer, the number of points used to form the first
+calculation period. Defaults to period_min. Where the series has fewer points
+than this, all of them are used. period_min remains the minimum number of
+points needed to form limits.}
 
 \item{shift_rule_threshold}{The minimum number of consecutive points above or
 below the centre line constituting a shift (or "rule 2") break.}
 
-\item{baseline_only}{Boolean - if TRUE, do not recalculate control limits,
-instead extend limits calculated from the first period_min points.}
+\item{baseline_only}{Boolean - if TRUE, do not re-establish control limits,
+instead extend the limits calculated from the first calculation period.}
 
 \item{establish_every_shift}{Boolean - whether to bypass the Stable Shift
 Algorithm and simply re-establish limits at every shift rule break
@@ -107,12 +110,12 @@ Algorithm and simply re-establish limits at every shift rule break
 used. Defines whether limits can change as more data is added or not.}
 
 \item{overhanging_reversions}{Boolean determining whether rule breaks in the
-opposite direction to a rule break triggering a candidate recalculation
-prevent recalculation even if they overhang the end of the candidate
-calculation period. Set to FALSE only with no_regrets = FALSE.
+opposite direction to a rule break triggering a candidate re-establishment
+prevent limits being re-established, even where they overhang the end of the
+candidate calculation period. Set to FALSE only with no_regrets = FALSE.
 \subsection{SPC Parameters}{
 
-Parameters that control how cetnre line and control limits are established
+Parameters that control how centre line and control limits are established
 for each period, and details of how SPC rules are applied
 }}
 
@@ -129,7 +132,7 @@ limit on the mr chart.}
 
 \item{centre_line_tolerance}{Minimum difference between a point's vertical
 position and the centre line to count as "on the centre line" for the
-purposes ofshift rule breaks}
+purposes of shift rule breaks}
 
 \item{floating_median}{Whether to add a floating median line to the chart,
 calculated based on the final floating_median_n data points on the chart:
@@ -147,17 +150,21 @@ Arguments that control how the result is outputted
 }}
 
 \item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
-data is returned with centre line, control limits and other analytic output
-appended as columns.}
+subgroup-aggregated data is returned with centre line, control limits and
+other analytic output appended as columns.}
 
 \item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
 
-\item{show_mr}{Logical controlling whether the moving range chart is included
-in XMR chart}
+\item{show_mr}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{chart_type} instead.
+\code{chart_type = "XMR"} draws the pair and \code{chart_type = "X"} draws the X
+chart on its own, which is what \code{show_mr = FALSE} did.}
 
-\item{write_table}{Boolean specifying whether to save the data as a CSV
-(useful for doing lots of charts at a time).}
+\item{write_table}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Save the results
+yourself instead. \code{autospc(plot_chart = FALSE)} returns them as a data frame,
+and \code{as.data.frame()} on the \code{autospc_plot} object \code{autospc()} returns does
+the same, either of which can be written to a path of your choosing with
+e.g. \code{write.csv()}.}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
 standard output log; the higher the number the more information is provided,
@@ -165,15 +172,21 @@ none if 0.}
 
 \item{log_file_path}{if not NULL (the default), path to save log file to.
 The file extension provided (.rds or .csv) determines the type of file the
-log data is saved to. Full log data is saved, regardless of verbosity.
+log data is saved to. Full log data is saved, regardless of verbosity.}
+
+\item{keep_candidate_tables}{Boolean specifying whether to retain the table
+of limits for each candidate calculation period the algorithm considers. The
+candidates themselves are recorded either way, with the reasons they were
+accepted or rejected; this is the full table of limits for each, and
+therefore makes an analysed chart several times larger.
 \subsection{Chart Appearance}{
 
 Arguments that control aspects of chart visualisation
 }}
 
-\item{title}{Optional string specifying chart title. Overrides df$title.}
+\item{title}{Optional string specifying chart title. Overrides data$title.}
 
-\item{subtitle}{Optional string specifying subtitle. Overrides df$subtitle.}
+\item{subtitle}{Optional string specifying subtitle. Overrides data$subtitle.}
 
 \item{use_caption}{Boolean controlling whether the caption is displayed.}
 
@@ -233,41 +246,54 @@ connecting centre line labels to the centre line they refer to}
 
 \item{annotation_arrow_curve}{Numeric curvature of the annotation arrows}
 
-\item{override_annotation_dist}{Deprecated}
+\item{override_annotation_dist}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{upper_annotation_sf} and \code{lower_annotation_sf} instead. The equivalent
+scale factor is \code{1 + 1/override_annotation_dist}, so
+\code{override_annotation_dist = 10} becomes \code{upper_annotation_sf = 1.1}.}
 
-\item{override_annotation_dist_P}{Deprecated}
+\item{override_annotation_dist_P}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{upper_annotation_sf} and \code{lower_annotation_sf} instead. These apply to
+every chart type, so a P or P' chart no longer needs an argument of its own.}
 }
 \value{
-An SPC ggplot or corresponding data
+With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: a ggplot
+of the chart, or of the pair for \code{chart_type = "XMR"}, which also carries the
+analysed chart objects it was drawn from and the parameters it was drawn
+with. Anything that works on a ggplot works on it, including \code{+}, \code{print()}
+and \code{ggplot2::ggsave()}, and \code{as.data.frame()} gives the analysis behind it.
+
+With \code{plot_chart = FALSE}, a data frame: the subgroup-aggregated data with
+the centre line, the control limits and the rest of the analytic output
+appended as columns.
 }
 \description{
 \code{autospc()} creates a statistical process control chart from a
-dataframe, applying the Stable Shift Algorithm to automate recalculation of
-control limits.
+data frame. Control limits are re-established according to specified rules,
+by default the Stable Shift Algorithm.
 }
 \examples{
-# Using a C' chart to track changes in the count of monthly attendance 
+# Using a C' chart to track changes in the count of monthly attendance
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all
 )
-   
-#Using a P' chart to track changes in the percentage admitted within 4 hours
+
+# Using a P' chart to track changes in the percentage admitted within 4 hours
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "P'", 
-  x = month_start, 
-  y = within_4h, 
+  ed_attendances_monthly,
+  chart_type = "P'",
+  x = month_start,
+  y = within_4h,
   n = att_all
 )
 
-#using a shift_rule_threshold of 7 when tracking monthly attendance
+# using a shift_rule_threshold of 7 when tracking monthly attendance
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all,
   shift_rule_threshold = 7
 )

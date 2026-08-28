@@ -1,16 +1,16 @@
 #' Deprecated
-#' 
-#' `plot_auto_SPC()` 
-#' 
+#'
+#' `plot_auto_SPC()`
+#'
 #' This function was renamed. Please use [autospc::autospc()], plot_auto_SPC()
 #' is deprecated. See the 'autospc 0.0.0.9040' entry in NEWS.md for details of
 #' these changes, including all changes in the argument names.
 #' Plot SPC charts with automated limit recalculation
-#' 
+#'
 #' Creates a statistical process control chart from a
 #' dataframe, applying the Stable Shift Algorithm to automate recalculation of
 #' control limits.
-#' 
+#'
 #' @param df A data frame. For an XMR, C or C' chart, must have columns for:
 #' \itemize{
 #'  \item the subgrouping variable, to be plotted on the horizontal axis, (x);
@@ -37,12 +37,12 @@
 #' denominator for P and P' charts.
 #' @param chartType The type of chart you wish to plot. Available options are:
 #' "XMR", "MR", "C", "C'", "P", "P'".
-#' 
+#'
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish
 #' control limits.
 #' @param periodMin The minimum number of points (subgroups) per period,
-#' i.e. the minimum number of points required to form control limits. 
+#' i.e. the minimum number of points required to form control limits.
 #' @param baseline Integer, overrides periodMin for the first calculation period
 #' only, if specified
 #' @param runRuleLength The minimum number of consecutive points above or below
@@ -58,11 +58,11 @@
 #' opposite direction to a rule break triggering a candidate recalculation
 #' prevent recalculation even if they overhang the end of the candidate
 #' calculation period. Set to FALSE only with noRegrets = FALSE.
-#' 
+#'
 #' ## SPC Parameters
 #' Parameters that control how cetnre line and control limits are established
 #' for each period, and details of how SPC rules are applied
-#' @param maxNoOfExclusions The maximum number of extreme points to exclude from 
+#' @param maxNoOfExclusions The maximum number of extreme points to exclude from
 #' limit calculations.
 #' @param highlightExclusions Boolean signifying whether excluded points are
 #' greyed out.
@@ -71,7 +71,7 @@
 #' xmr limits. Note this does not affect the calculation of the upper range
 #' limit on the mr chart.
 #' @param rule2Tolerance Minimum difference between a point's vertical position
-#' and the centre line to count as "on the centre line" for the purposes of 
+#' and the centre line to count as "on the centre line" for the purposes of
 #' shift rule breaks
 #' @param floatingMedian Whether to add a floating median line to the chart,
 #' calculated based on the final floatingMedian_n data points on the chart:
@@ -92,7 +92,7 @@
 #' and control limits
 #' @param showMR Logical controlling whether the moving range chart is included
 #' in XMR chart
-#' @param writeTable Boolean specifying whether to save the data as a CSV 
+#' @param writeTable Boolean specifying whether to save the data as a CSV
 #' (useful for doing lots of charts at a time).
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
@@ -100,9 +100,9 @@
 #' @param log_file_path if not NULL (the default), path to save log file to.
 #' The file extension provided (.rds or .csv) determines the type of file the
 #' log data is saved to. Full log data is saved, regardless of verbosity.
-#' 
+#'
 #' ## Chart Appearance
-#' Arguments that control aspects of chart visualisation 
+#' Arguments that control aspects of chart visualisation
 #' @param title Optional string specifying chart title. Overrides df$title.
 #' @param subtitle Optional string specifying subtitle. Overrides df$subtitle.
 #' @param use_caption Boolean controlling whether the caption is displayed.
@@ -122,7 +122,7 @@
 #' @param r2_col Highlight colour for breaks of rule 2 (shifts)
 #' @param point_size Size of plot points, defaults to 2. See
 #' \link[ggplot2]{aes_linetype_size_shape} for more details.
-#' @param line_width_sf Numeric scale factor for plot line widths. 
+#' @param line_width_sf Numeric scale factor for plot line widths.
 #' @param includeAnnotations Boolean specifying whether to show centre line
 #' labels
 #' @param basicAnnotations Boolean specifying whether to force use of basic
@@ -145,38 +145,41 @@
 #' @param override_annotation_dist Deprecated
 #' @param override_annotation_dist_P Deprecated
 #'
-#' @return An SPC ggplot or corresponding data 
+#' @return An SPC ggplot or corresponding data
 #'
-#' @examples 
-#' # Using a C' chart to track changes in the count of monthly attendance 
-#' \dontrun{plot_auto_SPC(
-#'   ed_attendances_monthly, 
-#'   chartType = "C'", 
-#'   x = Month_Start, 
+#' @examples
+#' # Using a C' chart to track changes in the count of monthly attendance
+#' \dontrun{
+#' plot_auto_SPC(
+#'   ed_attendances_monthly,
+#'   chartType = "C'",
+#'   x = Month_Start,
 #'   y = Att_All
 #' )
 #' }
-#'    
-#' #Using a P' chart to track changes in the percentage admitted within 4 hours
-#' \dontrun{plot_auto_SPC(
-#'   ed_attendances_monthly, 
-#'   chartType = "P'", 
-#'   x = Month_Start, 
-#'   y = Within_4h, 
+#'
+#' # Using a P' chart to track changes in the percentage admitted within 4 hours
+#' \dontrun{
+#' plot_auto_SPC(
+#'   ed_attendances_monthly,
+#'   chartType = "P'",
+#'   x = Month_Start,
+#'   y = Within_4h,
 #'   n = Att_All
 #' )
 #' }
 #'
-#' #using a runRuleLength of 7 when tracking monthly attendance
-#' \dontrun{plot_auto_SPC(
-#'   ed_attendances_monthly, 
-#'   chartType = "C'", 
-#'   x = Month_Start, 
+#' # using a runRuleLength of 7 when tracking monthly attendance
+#' \dontrun{
+#' plot_auto_SPC(
+#'   ed_attendances_monthly,
+#'   chartType = "C'",
+#'   x = Month_Start,
 #'   y = Att_All,
 #'   runRuleLength = 7
 #' )
 #' }
-#' 
+#'
 #' @export
 plot_auto_SPC <- function(df,
                           x,
@@ -221,7 +224,7 @@ plot_auto_SPC <- function(df,
                           point_size = 2,
                           line_width_sf = 1,
                           includeAnnotations = TRUE,
-                          basicAnnotations = getRversion() < '4.3.0',
+                          basicAnnotations = getRversion() < "4.3.0",
                           annotation_size = 3,
                           align_labels = FALSE,
                           flip_labels = FALSE,
@@ -230,14 +233,14 @@ plot_auto_SPC <- function(df,
                           annotation_arrows = FALSE,
                           annotation_arrow_curve = 0.3,
                           override_annotation_dist = NULL,
-                          override_annotation_dist_P = NULL
-) {
-  
+                          override_annotation_dist_P = NULL) {
   lifecycle::deprecate_stop("0.0.0.9040",
-                            "plot_auto_SPC()",
-                            "autospc()",
-                            details = paste("See the 'autospc 0.0.0.9040'",
-                            "entry in NEWS.md for details of these changes,",
-                            "including all changes in the argument names."))
-  
+    "plot_auto_SPC()",
+    "autospc()",
+    details = paste(
+      "See the 'autospc 0.0.0.9040'",
+      "entry in NEWS.md for details of these changes,",
+      "including all changes in the argument names."
+    )
+  )
 }

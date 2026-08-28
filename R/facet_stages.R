@@ -1,12 +1,22 @@
-
-#' facet_stages
+#' Plot SPC charts at successive stages of a series
+#'
+#' `facet_stages()` analyses the same series in stages, each time using more of
+#' it, and plots the results side by side - one facet per stage. Each facet is
+#' what `autospc()` would have drawn from the data available at that point, so
+#' the set of them shows how the chart, and the control limits, developed as the
+#' data arrived.
+#'
 #' @inheritParams autospc
 #' @param split_rows A vector of row numbers specifying the stages to display
 #' results at. Names specify facet strip labels.
 #' @param ... Arguments passed to [autospc::autospc()]
 #'
-#' @returns Faceted plot showing results of [autospc::autospc()] at
-#' different stages as specified by split_rows
+#' @returns With `plot_chart = TRUE` (the default), an `autospc_plot`: one
+#' ggplot, faceted by stage, which also carries the analysed chart behind each
+#' facet and the parameters it was drawn with.
+#'
+#' With `plot_chart = FALSE`, a data frame holding every stage, with `stage`
+#' saying which each row belongs to.
 #'
 #' @examples
 #' # Show progression of C' chart for count of monthly attendances over time
@@ -15,140 +25,203 @@
 #'   split_rows = c(30L, 60L, 90L),
 #'   chart_type = "C'",
 #'   x = month_start,
-#'   y = att_all, 
+#'   y = att_all,
 #'   x_break = 365
 #' )
-#' 
-#' @export  
+#'
+#' @export
 facet_stages <- function(data,
                          split_rows,
                          plot_chart = TRUE,
                          ...) {
-  
+  caller <- parent.frame()
+
   dots_exprs <- rlang::exprs(...)
-  
-  if(dots_exprs$chart_type == "XMR") {
-    if(!("show_mr" %in% names(dots_exprs))) {
-      
-      dots_exprs$show_mr <- FALSE
-      
-    } else if (dots_exprs$show_mr) {
-      warning(paste("`facet_stages()` does not support `show_mr = TRUE`.",
-                    "Setting `show_mr` to `FALSE`. To facet an MR chart by",
-                    "stages use `facet_stages()` with `chart_type = MR`."))
-      
-      dots_exprs$show_mr <- FALSE
+
+  if ("show_mr" %in% names(dots_exprs)) {
+    if (isTRUE(dots_exprs$show_mr)) {
+      warning(paste(
+        "`facet_stages()` does not support `show_mr = TRUE`.",
+        "The X chart is faceted on its own. To facet an MR chart",
+        "by stages use `facet_stages()` with `chart_type = MR`."
+      ))
     }
+
+    lifecycle::deprecate_warn(
+      when = "0.1.0",
+      what = "facet_stages(show_mr)",
+      with = "facet_stages(chart_type)",
+      details = paste(
+        'chart_type = "X" facets the X chart on its own, which',
+        "is what facet_stages() has always drawn for",
+        'chart_type = "XMR".'
+      )
+    )
+
+    dots_exprs$show_mr <- NULL
   }
-  
-  dots_exprs$plot_chart <- FALSE
-  
+
+  # facet_stages() has never drawn the moving range chart, so chart_type =
+  # "XMR" is faceted as an X chart.
+  if (identical(dots_exprs$chart_type, "XMR")) {
+    dots_exprs$chart_type <- "X"
+  }
+
   xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
-  
-  df_rn <- eval(rlang::call2("rename_columns",
-                             df = data,
-                             !!!xyn_exprs))
-  
-  preprocess_inputs_args <- names(formals(autospc:::preprocess_inputs))
-  ppi_args <- dots_exprs[which(names(dots_exprs) %in% preprocess_inputs_args)]
-  
-  # Preprocess inputs
-  preprocessed_vars <- eval(rlang::call2("preprocess_inputs",
-                                         df = df_rn,
-                                         !!!ppi_args))
-  
-  chart_type           <- preprocessed_vars$chart_type
-  title               <- preprocessed_vars$title
-  subtitle            <- preprocessed_vars$subtitle
-  xType               <- preprocessed_vars$xType
-  upper_annotation_sf <- preprocessed_vars$upper_annotation_sf
-  lower_annotation_sf <- preprocessed_vars$lower_annotation_sf
-  
+
+  # x, y and n name columns and must not be evaluated. Everything else is a
+  # value, and takes its default from autospc() where the caller gave none.
+  given <- lapply(dots_exprs[which(!names(dots_exprs) %in% c("x", "y", "n"))],
+    eval,
+    envir = caller
+  )
+
+  arguments <- autospc_argument_values(given)
+
+  arguments <- validate_algorithm_parameters(arguments)
+
+  chart_args <- arguments[autospc_chart_parameters()]
+  visualisation_params <- arguments[visualisation_param_names()]
+
+  chart_type <- arguments$chart_type
+
+  validate_chart_type(chart_type)
+
+  # Construct one chart from the whole series. It is not analysed: it is
+  # constructed for chart$data, which has the columns renamed to x, y and n, has
+  # been checked against the column requirements for the chart type, and has any
+  # counts rounded. Doing this here means each of those happens once per call
+  # rather than once per facet. The chart parameters are not passed because none
+  # of them affects chart$data.
+  whole_series <- autospc_chart(
+    chart_type = chart_type,
+    data = data,
+    x = column_name_of(xyn_exprs, field = "x"),
+    y = column_name_of(xyn_exprs, field = "y"),
+    n = column_name_of(xyn_exprs, field = "n")
+  )
+
+  df_rn <- whole_series$data
+
+  check_x_type(df_rn$x)
+
+  # Resolved once for the call, from the chart of the whole series.
+  visualisation_params <- resolve_default_visualisation_params(
+    visualisation_params = visualisation_params,
+    chart = whole_series
+  )
+
   split_rows <- sort(split_rows)
-  
+
   # Ensure the last split row is the end of the data
-  if(split_rows[length(split_rows)] != nrow(data)) {
-    split_rows <- c(split_rows,
-                    nrow(data))
+  if (split_rows[length(split_rows)] != nrow(data)) {
+    split_rows <- c(
+      split_rows,
+      nrow(data)
+    )
   }
-  
-  
-  data_splits_list <- create_splits_list(df = data,
-                                         split_rows = split_rows)
-  
-  results_splits_list <- lapply(
+
+  data_splits_list <- create_splits_list(
+    data = df_rn,
+    split_rows = split_rows
+  )
+
+  charts <- lapply(
     data_splits_list,
-    function(x) {
-      eval(rlang::call2("autospc",
-                        data = x,
-                        !!!dots_exprs))
+    function(split) {
+      # The split came from the chart of the whole series, so its columns are
+      # already named x, y and n.
+      facet <- rlang::exec(build_charts,
+        chart_type = chart_type,
+        data = split,
+        x = "x",
+        y = "y",
+        n = "n",
+        !!!chart_args
+      )
+
+      return(analyse_charts(facet)[[1]])
     }
   )
-  
-  results_data <- dplyr::bind_rows(
-    results_splits_list,
-    .id = "stage"
+
+  # The facets take their names from split_rows where it has them, and their
+  # positions where it does not.
+  stage_names <- names(charts)
+
+  if (is.null(stage_names)) {
+    stage_names <- as.character(seq_along(charts))
+  }
+
+  # A facet is named for its stage rather than for its chart type
+  report_analysis(
+    charts = charts,
+    show_limits = visualisation_params$show_limits,
+    verbosity = arguments$verbosity,
+    log_file_path = arguments$log_file_path,
+    labels = stage_names,
+    short_message = stages_short_message
   )
-  
-  if(!plot_chart) {
-    return(results_data)
+
+  if (!plot_chart) {
+    return(charts_as_table(
+      charts = charts,
+      visualisation_params = visualisation_params
+    ))
   }
-  
-  postprocess_args <- names(formals(autospc:::postprocess))
-  pp_args <- dots_exprs[which(names(dots_exprs) %in% postprocess_args)]
-  
-  # Postprocess data
-  postprocessing_vars <- eval(rlang::call2("postprocess",
-                                           df = results_data,
-                                           xType = xType,
-                                           !!!pp_args))
-  
-  override_x_title   <- postprocessing_vars$override_x_title
-  override_y_title   <- postprocessing_vars$override_y_title
-  num_non_missing_y  <- postprocessing_vars$num_non_missing_y
-  start_x            <- postprocessing_vars$start_x
-  x_max              <- postprocessing_vars$x_max
-  end_x              <- postprocessing_vars$end_x
-  ylimhigh           <- postprocessing_vars$ylimhigh
-  ylimlow            <- postprocessing_vars$ylimlow
-  
-  csp_args <- names(formals(autospc:::create_spc_plot))
-  c_args <- dots_exprs[which(names(dots_exprs) %in% csp_args)]
-  
-  # Create SPC plot
-  sp <- eval(rlang::call2("create_spc_plot",
-                          df = results_data,
-                          split_rows = split_rows,
-                          ylimlow = ylimlow,
-                          ylimhigh = ylimhigh,
-                          xType = xType,
-                          x_max = x_max,
-                          start_x = start_x,
-                          end_x = end_x,
-                          num_non_missing_y = num_non_missing_y,
-                          !!!c_args))
-  
-  return(sp)
-  
+
+  return(autospc_plot(
+    charts = charts,
+    visualisation_params = visualisation_params,
+    split_rows = split_rows
+  ))
 }
 
 
-create_splits_list <- function(df,
+create_splits_list <- function(data,
                                split_rows) {
-  
-  if(is.null(split_rows)) {
-    
-    data_splits <- list(df)
-    
+  if (is.null(split_rows)) {
+    data_splits <- list(data)
   } else {
-    
-    data_splits <- lapply(split_rows,
-                          function(x) {
-                            df[1:x,]
-                          })
+    data_splits <- lapply(
+      split_rows,
+      function(x) {
+        data[1:x, ]
+      }
+    )
   }
-  
+
   return(data_splits)
-  
 }
 
+
+#' The value each autospc() argument takes for one call
+#'
+#' One element per `autospc()` argument: the value the caller gave it, or the
+#' default from `autospc()`'s signature where the caller gave none.
+#'
+#' `data`, `x`, `y` and `n` are not among them. `data` is the data itself, and
+#' the other three hold column names rather than values. The deprecated
+#' arguments are not among them either: their default is a sentinel rather than
+#' a value, and `facet_stages()` deals with the one it supports before this is
+#' called.
+#'
+#' @param given A named list of the argument values the caller supplied.
+#'
+#' @return A named list of values, one per argument.
+#' @noRd
+autospc_argument_values <- function(given) {
+  names_wanted <- setdiff(
+    names(formals(autospc)),
+    c(
+      "data", "x", "y", "n",
+      autospc_deprecated_arguments()
+    )
+  )
+
+  values <- lapply(names_wanted, autospc_default)
+  names(values) <- names_wanted
+
+  values[names(given)] <- given
+
+  return(values)
+}

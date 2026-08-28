@@ -1,8 +1,7 @@
 get_algorithm_flow_chart_string <- function() {
-  
   diagram_string <- "
       digraph {
-      
+
   # graph attributes
   graph [overlap = true]
   rankdir=TB
@@ -45,11 +44,11 @@ get_algorithm_flow_chart_string <- function() {
   L -> N;
   M -> N;
   N -> D
-  
+
   {rank = same; L; M}
-  
+
       }
-  
+
    [1]: paste0('(1) Initialise Algorithm\\n','Counter = 1')
    [2]: paste0('(2) Sufficient data for\\n', 'at least one period?')
    [3]: paste0('End')
@@ -65,53 +64,68 @@ get_algorithm_flow_chart_string <- function() {
   [13]: paste0('Reject candidate limits')
   [14]: paste0('Set counter to next\\n','rule-breaking run')
   "
-  
+
   return(diagram_string)
-  
 }
 
 
 get_log_explanation_table <- function() {
-  
   log_exp_tab <- tibble::tribble(
     ~algorithm_step, ~shorthand, ~explanation,
-    "1"            , "0100"    , "Initialise algorithm. Counter = 1.",
-    "2"            , "02xx"    , paste0("Check whether there are sufficient",
-                                        " data to form at least one set of",
-                                        " limits."),
-    ""             , ""        , "x = 00: Yes",
-    ""             , ""        , "x = 10: No",
-    "3"            , "0300"    , "Main algorithm loop begins.",
-    "4"            , "04xxyy"  , paste0("Check whether there are sufficient",
-                                        " data to proceed (Yes/No), and find",
-                                        " subsequent rule breaks."),
-    ""             , ""        , paste0("xx = 00: Yes - next rule break within",
-                                        " current run"),
-    ""             , ""        , paste0("xx = 01: Yes - next rule break",
-                                        " beyond current run"),
-    ""             , ""        , "xx = 10: No",
-    ""             , ""        , "yy = position of next rule break.",
-    "5"            , "05xxyy"  , paste0("Check whether there are any",
-                                        " subsequent rule breaks."),
-    ""             , ""        ,  "xx = 00: Yes",
-    ""             , ""        ,  "xx = 10: No",
-    ""             , ""        ,  "yy = 01: Next rule break downwards",
-    ""             , ""        ,  "yy = 10: Next rule break upwards",
-    "6"            , "06xxyz"  , paste0("Check whether there are sufficient",
-                                        " data to proceed."),
-    ""             , ""        , "xx = 00: Yes",
-    ""             , ""        , "xx =10: No",
-    ""             , ""        , "Examine candidate limits.",
-    ""             , ""        , "y = 0: No opposing rule break",
-    ""             , ""        , "y = 1: At least one opposing rule break.",
-    ""             , ""        , paste0("z = 0: Final run does not prevent",
-                                        " re-establishment of limits"),
-    ""             , ""        , paste0("z = 1: Final run prevents",
-                                        " re-establishment of limits."),
-    "7"            , "07xx"    , paste0("Decide whether to re-establish",
-                                        " limits. xx = 00: Yes, xx = 10: No.")
+    "1", "0100", "Initialise algorithm. Counter = 1.",
+    "2", "02xx", paste0(
+      "Check whether there are sufficient",
+      " data to form at least one set of",
+      " limits."
+    ),
+    "", "", "x = 00: Yes",
+    "", "", "x = 10: No",
+    "3", "0300", "Main algorithm loop begins.",
+    "4", "04xxyy", paste0(
+      "Check whether there are sufficient",
+      " data to proceed (Yes/No), and find",
+      " subsequent rule breaks."
+    ),
+    "", "", paste0(
+      "xx = 00: Yes - next rule break within",
+      " current run"
+    ),
+    "", "", paste0(
+      "xx = 01: Yes - next rule break",
+      " beyond current run"
+    ),
+    "", "", "xx = 10: No",
+    "", "", "yy = position of next rule break.",
+    "5", "05xxyy", paste0(
+      "Check whether there are any",
+      " subsequent rule breaks."
+    ),
+    "", "", "xx = 00: Yes",
+    "", "", "xx = 10: No",
+    "", "", "yy = 01: Next rule break downwards",
+    "", "", "yy = 10: Next rule break upwards",
+    "6", "06xxyz", paste0(
+      "Check whether there are sufficient",
+      " data to proceed."
+    ),
+    "", "", "xx = 00: Yes",
+    "", "", "xx = 10: No",
+    "", "", "Examine candidate limits.",
+    "", "", "y = 0: No opposing rule break",
+    "", "", "y = 1: At least one opposing rule break.",
+    "", "", paste0(
+      "z = 0: Final run does not prevent",
+      " re-establishment of limits"
+    ),
+    "", "", paste0(
+      "z = 1: Final run prevents",
+      " re-establishment of limits."
+    ),
+    "7", "07xx", paste0(
+      "Decide whether to re-establish",
+      " limits. xx = 00: Yes, xx = 10: No."
+    )
   )
-  
 }
 
 algorithm_flow_chart_string <- get_algorithm_flow_chart_string()
@@ -121,4 +135,3 @@ log_explanation_table <- get_log_explanation_table()
 #                   log_explanation_table,
 #                   internal = TRUE,
 #                   overwrite = TRUE)
-

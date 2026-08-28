@@ -5,7 +5,7 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Changelog"><meta property="og:image" content="https://horridtom.github.io/autospc/logo.png"></head><body>
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Changelog"><meta property="og:image" content="https://horridtom.github.io/autospc/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9051</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,93 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="autospc-development-version">autospc (development version)<a class="anchor" aria-label="anchor" href="#autospc-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="autospc-010">autospc 0.1.0<a class="anchor" aria-label="anchor" href="#autospc-010"></a></h2>
+<div class="section level3">
+<h3 id="lifecycle-changes-0-1-0">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-0-1-0"></a></h3>
+<div class="section level4">
+<h4 id="breaking-changes-0-1-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-1-0"></a></h4>
+<ul><li>
+<p>Seven columns of the table <code>autospc(plot_chart = FALSE)</code> and <code>facet_stages(plot_chart = FALSE)</code> return have been renamed from camelCase to snake_case, so that every column of the table is named the same way:</p>
+<table class="table"><thead><tr><th>Was</th>
+<th>Is now</th>
+</tr></thead><tbody><tr><td><code>periodType</code></td>
+<td><code>period_type</code></td>
+</tr><tr><td><code>breakPoint</code></td>
+<td><code>break_point</code></td>
+</tr><tr><td><code>aboveOrBelowCl</code></td>
+<td><code>above_or_below_cl</code></td>
+</tr><tr><td><code>runStart</code></td>
+<td><code>run_start</code></td>
+</tr><tr><td><code>limitChange</code></td>
+<td><code>limit_change</code></td>
+</tr><tr><td><code>periodStart</code></td>
+<td><code>period_start</code></td>
+</tr><tr><td><code>plotPeriod</code></td>
+<td><code>plot_period</code></td>
+</tr></tbody></table><p>The values are unchanged. Code that reads these columns by name — filtering on <code>periodType == "calculation"</code>, for one — needs the new name. The columns that were already snake_case (<code>cl_change</code>, <code>cl_label</code>, <code>annotation_level</code>, <code>annotation_curvature</code>, <code>highlight</code>, <code>excluded</code>) are unaffected, as are <code>x</code>, <code>y</code>, <code>n</code>, <code>cl</code>, <code>ucl</code>, <code>lcl</code> and the moving range columns <code>mr</code>, <code>amr</code>, <code>url</code> and <code>lrl</code>.</p>
+</li>
+<li>
+<p><code>autospc(override_annotation_dist)</code> and <code>autospc(override_annotation_dist_P)</code> are now defunct. They have warned since 0.0.0.9010; supplying either is now an error. Use <code>upper_annotation_sf</code> and <code>lower_annotation_sf</code> instead — the equivalent scale factor is <code>1 + 1/x</code>, so <code>override_annotation_dist = 10</code> becomes <code>upper_annotation_sf = 1.1</code>, and <code>lower_annotation_sf</code> defaults to its mirror image, <code>2 - upper_annotation_sf</code>. The two arguments remain in the signature so that the error can name their replacement, and will be removed in a later release.</p>
+<p><code>upper_annotation_sf</code> and <code>lower_annotation_sf</code> apply to every chart type, so there is no replacement specific to P and P′ charts.</p>
+</li>
+<li>
+<p><code>create_SPC_auto_limits_table()</code> is no longer exported. It was an internal step of <code><a href="../reference/autospc.html">autospc()</a></code> that had been made public without a documented reason, and holding it to a public interface was preventing the simplification of the package’s internals.</p>
+<p><code><a href="../reference/autospc.html">autospc()</a></code> does the same work and is the supported way to do it. For the results as data rather than a plot, use <code>autospc(plot_chart = FALSE)</code>, which returns the same limits, rule breaks and period boundaries with the additional columns needed for plotting.</p>
+<p>If you were calling <code>create_SPC_auto_limits_table()</code> directly and <code>autospc(plot_chart = FALSE)</code> does not meet your needs, please open an issue at <a href="https://github.com/HorridTom/autospc/issues" class="external-link uri">https://github.com/HorridTom/autospc/issues</a> — we are happy to help you move across.</p>
+</li>
+</ul></div>
+<div class="section level4">
+<h4 id="deprecations-0-1-0">Deprecations<a class="anchor" aria-label="anchor" href="#deprecations-0-1-0"></a></h4>
+<ul><li>
+<p><code>autospc(write_table)</code> is deprecated, and no longer writes a file. Save the results yourself instead: <code>autospc(plot_chart = FALSE)</code> returns them as a data frame, and <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on a chart does the same. This is more flexible, giving you the choice of what type of file, how to save it, where to save it, etc.</p>
+<p>Note that there was also a bug that meant the feature did not work: <code>write_table = TRUE</code> failed. Supplying the argument now warns, and returns the results as <code>plot_chart = FALSE</code> would.</p>
+</li>
+<li>
+<p><code>autospc(show_mr)</code> is deprecated. Use <code>chart_type</code> instead: <code>chart_type = "X"</code> draws the X chart on its own, which is what <code>show_mr = FALSE</code> did, and <code>chart_type = "XMR"</code> draws the pair. Supplying <code>show_mr</code> still works and still does what it did, but now warns.</p>
+<p>Note that the caption names the chart type, so a chart drawn with <code>chart_type = "X"</code> is captioned “X Shewhart Chart” where the same chart drawn with <code>chart_type = "XMR", show_mr = FALSE</code> was captioned “XMR Shewhart Chart”.</p>
+</li>
+<li><p><code>facet_stages(show_mr)</code> is deprecated for the same reason. <code><a href="../reference/facet_stages.html">facet_stages()</a></code> has never drawn the moving range chart, so an <code>XMR</code> request is now faceted as an <code>X</code> chart — including its caption, which changes from “XMR Shewhart Chart” to “X Shewhart Chart”. Nothing else about the chart changes.</p></li>
+</ul></div>
+<div class="section level4">
+<h4 id="other-changes-0-1-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-0"></a></h4>
+<ul><li><p>A chart has no x axis title unless you give one. The default was <code>"Day"</code>, whatever the x column held, so a chart of monthly or weekly data was labelled “Day” as well. Use <code>override_x_title</code> for a title of your own. The y axis is unchanged: where you give no <code>override_y_title</code> it still takes one from the chart type.</p></li>
+<li><p><code>chart_type = "X"</code> draws the X chart on its own, without the moving range chart beneath it. It gives the same result as <code>chart_type = "XMR"</code> with <code>show_mr = FALSE</code>.</p></li>
+<li>
+<p><code><a href="../reference/autospc.html">autospc()</a></code> returns a plot object that is still a ggplot — printing, <code>ggsave()</code> and adding ggplot2 layers all work as before — and additionally carries the analysed chart it was drawn from. <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on it returns the analysis.</p>
+<p>An XmR chart carries both halves of the pair, the X chart first and the moving range chart second. <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on one returns them joined side by side, with the moving range and its limits as <code>mr</code>, <code>amr</code>, <code>url</code> and <code>lrl</code> — the same shape <code>autospc(plot_chart = FALSE)</code> returns.</p>
+<p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> returns the same kind of object, carrying one analysed chart per facet in stage order. Where <code>split_rows</code> is named, the charts take those names. <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on one stacks the facets, with <code>stage</code> saying which each row came from — the same column <code>facet_stages(plot_chart = FALSE)</code> returns.</p>
+</li>
+<li><p>A <code>title</code> or <code>subtitle</code> column in the data is no longer repeated over the moving range chart of an XmR pair. The pair is one chart in two panels, so its title is drawn once, above the X chart. A title given as an argument was already drawn once; this makes the two agree.</p></li>
+<li><p><code>autospc(plot_chart = FALSE, show_limits = FALSE)</code> now returns the four columns describing the periods — <code>limit_change</code>, <code>period_start</code>, <code>plot_period</code> and <code>cl_change</code> — which it previously returned only when <code>show_limits</code> was <code>TRUE</code>.</p></li>
+<li>
+<p><code>autospc(plot_chart = FALSE)</code> and <code>facet_stages(plot_chart = FALSE)</code> always return a plain data frame. Previously the class depended on the chart type: given a data frame, C and C′ charts returned a tibble and the other chart types returned a data frame; given a tibble, every chart type returned a tibble. The same now applies to the frames a chart object carries — the analysis in <code>$result$table</code> and the tables in <code>$history</code>. <code>$data_original</code>, which is the data as you passed it, is unchanged and keeps its class.</p>
+<p>Add <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">tibble::as_tibble()</a></code> to the result if you want a tibble.</p>
+</li>
+<li><p>The analysed columns keep the type they were supplied with. <code>y</code>, and <code>n</code> for a P or P′ chart, were coerced to double inside the algorithm, so integer counts came back as doubles; they now come back as integers. The limits — <code>cl</code>, <code>ucl</code> and <code>lcl</code> — are doubles as before, whatever the counts they were computed from. Values are unchanged.</p></li>
+<li><p>Columns other than those a chart uses are now dropped consistently. Previously the aggregation step was skipped entirely when no <code>x</code> value was repeated, so extra columns survived into the output for a series with one row per subgroup and were dropped for one without. They are now dropped in both cases.</p></li>
+<li><p><code>autospc(keep_candidate_tables)</code> is a new argument, <code>FALSE</code> by default. The algorithm considers a candidate calculation period at each point where it might re-establish the limits, and records each one it forms. Setting this to <code>TRUE</code> additionally records, for each candidate, the full table of limits it would have produced. It is off by default because those tables are several times the size of everything else the chart holds: for a 600-point chart that re-establishes its limits nine times, the chart object measured 111 KB with the default and 534 KB with <code>keep_candidate_tables = TRUE</code>.</p></li>
+<li><p>The default values of <code>period_min</code> and <code>max_exclusions</code> are now the integers <code>21L</code> and <code>3L</code>, where they were the doubles <code>21</code> and <code>3</code>. Both are counts of data points. Passing a double still works.</p></li>
+<li><p>A rounding warning is no longer given for data that is then rejected. A P or P′ chart given a numerator with fractional values and a denominator of the wrong type warned that it was rounding the numerator before erroring on the denominator; it now raises the error without the warning.</p></li>
+</ul></div>
+</div>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0"></a></h3>
+<ul><li><p><code><a href="../reference/autospc.html">autospc()</a></code> no longer warns where a column named <code>x</code>, <code>y</code> or <code>n</code> is present in the data and the matching argument is also given (#85). The warning said that the column named in the argument would be used, so it told the caller only that the package had done as it was asked. It warned even where the argument named the same column — <code>x = x</code> on data whose column is already called <code>x</code> — which is the case the issue reported. There were three of these, one each for <code>x</code>, <code>y</code> and <code>n</code>. All three have gone, including where the argument names a different column from the one already called <code>x</code>: the column named in the argument is the one used, and <code>$data_original</code> holds every column exactly as it was passed.</p></li>
+<li>
+<p><code>log_file_path</code> now writes one file per call, holding every chart the call analysed, with a <code>chart</code> column saying which each entry came from. An XmR run wrote the file twice — once for the X chart and once for the moving range chart, the second overwriting the first — so the X chart’s log was lost. A faceted run did the same once per facet, leaving only the last stage. For an XmR pair <code>chart</code> holds the chart type, <code>"X"</code> or <code>"MR"</code>; for a faceted chart it holds the stage, named from <code>split_rows</code> where it has names and numbered where it does not. A run of a single chart writes the same shape, with one value in that column.</p>
+<p>The log written to file is also a plain data frame now, where it was a rowwise tibble.</p>
+</li>
+<li><p>The console log of the X chart of an XmR pair is headed <code>X</code> rather than <code>XMR</code>. It is the X chart’s log; the moving range chart’s log follows it, headed <code>MR</code>.</p></li>
+<li><p>Setting <code>no_regrets = TRUE</code> with <code>overhanging_reversions = FALSE</code> warns once per call. An XmR run warned twice, and a faceted run once per facet, because the check ran once per chart constructed.</p></li>
+<li><p>An x column of a type the chart cannot be drawn against — anything other than <code>Date</code>, <code>POSIXct</code>, numeric or integer — warns once per call. A faceted run warned once per facet and once more for the series as a whole.</p></li>
+<li><p>Data holding a column called <code>x</code>, <code>y</code> or <code>n</code> no longer prevents a different column being used for that argument. <code>autospc(data, x = month, y = count)</code>, where <code>data</code> also has a column called <code>x</code>, failed with <code>Names must be unique</code>; the column named in the argument is now used and the column called <code>x</code> is dropped, along with the other columns the analysis does not use. The data as supplied is unaffected. <code><a href="../reference/facet_stages.html">facet_stages()</a></code> warned in the same situation and then failed the same way; it now behaves as <code><a href="../reference/autospc.html">autospc()</a></code> does.</p></li>
+<li><p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> now labels its axes. It resolved the axis titles and then never passed them to the drawing, so a faceted chart had no axis labels at all, where the same data through <code><a href="../reference/autospc.html">autospc()</a></code> was labelled. A <code>title</code> or <code>subtitle</code> column in the data was dropped the same way and now reaches the chart. Titles given as arguments were unaffected and still win.</p></li>
+<li><p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> without a <code>chart_type</code> now says so. It failed with <code>argument is of length zero</code> before reaching the check that names the argument and lists the chart types available.</p></li>
+<li><p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> now uses the same annotation positioning as <code><a href="../reference/autospc.html">autospc()</a></code> on R below 4.3. <code>basic_annotations</code> defaults to <code>getRversion() &lt; "4.3.0"</code> in <code><a href="../reference/autospc.html">autospc()</a></code>, but the faceted path never passed the default on, so a faceted chart fell back to the positioning that needs ggrepel and ggpp. On R 4.3 and later nothing changes.</p></li>
+<li><p><code>chart_type = "XMR"</code> no longer fails when <code><a href="../reference/autospc.html">autospc()</a></code> is called from a wrapper that forwards its arguments — <code>function(...) autospc(...)</code> — which raised <code>'...' used in an incorrect context</code>. The XmR pair was the only chart type that re-invoked <code><a href="../reference/autospc.html">autospc()</a></code> through the call it had been given, and it no longer does: both halves are analysed directly.</p></li>
+<li><p>The series is now sorted by <code>x</code> before limits are calculated. The algorithm works through the points in order, so data supplied out of <code>x</code> order produced different limits from the same data supplied in order, and was plotted against a scrambled series. Charts that aggregate over <code>x</code> — C, C′, P and P′ — were usually protected by the aggregation step, which sorts as a side effect; X and MR charts were affected whatever the data. Results will change for any series that was not already in <code>x</code> order.</p></li>
+<li><p>P and P′ charts accepting individual binary observations no longer fail when every subgroup holds exactly one observation. The run stopped with <code>object 'n' not found</code>, because the denominator is materialised during aggregation and aggregation was skipped when no <code>x</code> value was repeated. Note that such a series is degenerate — every proportion is 0% or 100%.</p></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.0.9040" id="autospc-0009040">autospc 0.0.0.9040<a class="anchor" aria-label="anchor" href="#autospc-0009040"></a></h2>
@@ -288,7 +374,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

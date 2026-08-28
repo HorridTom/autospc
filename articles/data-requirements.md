@@ -3,7 +3,6 @@
 ``` r
 
 library(autospc)
-library(dplyr)
 ```
 
 For each type of Statistical Process Control (SPC) chart supported by
@@ -37,9 +36,9 @@ position, and the rest are passed as named arguments.
 ``` r
 
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all
 )
 ```
@@ -58,9 +57,9 @@ plotted on the horizontal axis (i.e. ordering the data) on the chart.
 Object classes that are currently supported for `x` are: `Date`,
 `POSIXct`, `numeric`, and `integer`.
 
-## 2 XMR charts
+## 2 XMR charts (and their components, X and MR charts)
 
-The data columns required for the XMR chart are as follows:
+The data columns required for XMR, X and MR charts are as follows:
 
 - The subgrouping variable, to be plotted on the horizontal axis, `x`
 - The variable of interest, to be plotted on the vertical axis, `y`.
@@ -68,8 +67,8 @@ The data columns required for the XMR chart are as follows:
 
 Unlike C/C’ charts (see Section [3](#c-and-c-charts)), XMR charts place
 no further restriction on `y`: non-whole-number doubles are accepted
-without modification or warning, since XMR charts are suitable for
-continuous measurements as well as counts.
+without modification or warning, since they are suitable for continuous
+measurements as well as counts.
 
 ## 3 C and C’ charts
 
@@ -171,7 +170,7 @@ each chart type.
 
 | Chart type | y type(s) accepted | n type(s) accepted |
 |:---|:---|:---|
-| XMR / MR | `integer`, `double` | not used |
+| X / MR / XMR | `integer`, `double` | not used |
 | C / C’ | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | not used |
 | P / P’ (observation level) | `logical` | not used |
 | P / P’ (aggregated) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) |

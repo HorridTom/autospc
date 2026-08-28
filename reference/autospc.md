@@ -1,8 +1,8 @@
-# Plot SPC charts with automated limit recalculation
+# Plot SPC charts, re-establishing control limits automatically
 
-`autospc()` creates a statistical process control chart from a
-dataframe, applying the Stable Shift Algorithm to automate recalculation
-of control limits.
+`autospc()` creates a statistical process control chart from a data
+frame. Control limits are re-established according to specified rules,
+by default the Stable Shift Algorithm.
 
 ## Usage
 
@@ -13,14 +13,14 @@ autospc(
   y,
   n,
   chart_type = NULL,
-  period_min = 21,
+  period_min = 21L,
   baseline_length = NULL,
   shift_rule_threshold = 8L,
   baseline_only = FALSE,
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
-  max_exclusions = 3,
+  max_exclusions = 3L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
@@ -28,10 +28,11 @@ autospc(
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
-  show_mr = TRUE,
-  write_table = FALSE,
+  show_mr = deprecated(),
+  write_table = deprecated(),
   verbosity = 0L,
   log_file_path = NULL,
+  keep_candidate_tables = FALSE,
   title = NULL,
   subtitle = NULL,
   use_caption = TRUE,
@@ -55,8 +56,8 @@ autospc(
   lower_annotation_sf = NULL,
   annotation_arrows = FALSE,
   annotation_arrow_curve = 0.3,
-  override_annotation_dist = NULL,
-  override_annotation_dist_P = NULL
+  override_annotation_dist = deprecated(),
+  override_annotation_dist_P = deprecated()
 )
 ```
 
@@ -98,7 +99,7 @@ autospc(
 - chart_type:
 
   The type of chart you wish to plot. Must must have length one.
-  Available options are: "XMR", "MR", "C", "C'", "P", "P'".
+  Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 
   ### Algorithm Parameters
 
@@ -112,8 +113,10 @@ autospc(
 
 - baseline_length:
 
-  Integer, overrides period_min for the first calculation period only,
-  if specified
+  Integer, the number of points used to form the first calculation
+  period. Defaults to period_min. Where the series has fewer points than
+  this, all of them are used. period_min remains the minimum number of
+  points needed to form limits.
 
 - shift_rule_threshold:
 
@@ -122,8 +125,8 @@ autospc(
 
 - baseline_only:
 
-  Boolean - if TRUE, do not recalculate control limits, instead extend
-  limits calculated from the first period_min points.
+  Boolean - if TRUE, do not re-establish control limits, instead extend
+  the limits calculated from the first calculation period.
 
 - establish_every_shift:
 
@@ -138,13 +141,14 @@ autospc(
 - overhanging_reversions:
 
   Boolean determining whether rule breaks in the opposite direction to a
-  rule break triggering a candidate recalculation prevent recalculation
-  even if they overhang the end of the candidate calculation period. Set
-  to FALSE only with no_regrets = FALSE.
+  rule break triggering a candidate re-establishment prevent limits
+  being re-established, even where they overhang the end of the
+  candidate calculation period. Set to FALSE only with no_regrets =
+  FALSE.
 
   ### SPC Parameters
 
-  Parameters that control how cetnre line and control limits are
+  Parameters that control how centre line and control limits are
   established for each period, and details of how SPC rules are applied
 
 - max_exclusions:
@@ -166,7 +170,7 @@ autospc(
 - centre_line_tolerance:
 
   Minimum difference between a point's vertical position and the centre
-  line to count as "on the centre line" for the purposes ofshift rule
+  line to count as "on the centre line" for the purposes of shift rule
   breaks
 
 - floating_median:
@@ -189,9 +193,9 @@ autospc(
 
 - plot_chart:
 
-  Boolean specifying whether to plot the chart. If not, the data is
-  returned with centre line, control limits and other analytic output
-  appended as columns.
+  Boolean specifying whether to plot the chart. If not, the
+  subgroup-aggregated data is returned with centre line, control limits
+  and other analytic output appended as columns.
 
 - show_limits:
 
@@ -200,13 +204,18 @@ autospc(
 
 - show_mr:
 
-  Logical controlling whether the moving range chart is included in XMR
-  chart
+  **\[deprecated\]** Use `chart_type` instead. `chart_type = "XMR"`
+  draws the pair and `chart_type = "X"` draws the X chart on its own,
+  which is what `show_mr = FALSE` did.
 
 - write_table:
 
-  Boolean specifying whether to save the data as a CSV (useful for doing
-  lots of charts at a time).
+  **\[deprecated\]** Save the results yourself instead.
+  `autospc(plot_chart = FALSE)` returns them as a data frame, and
+  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on the
+  `autospc_plot` object `autospc()` returns does the same, either of
+  which can be written to a path of your choosing with e.g.
+  [`write.csv()`](https://rdrr.io/r/utils/write.table.html).
 
 - verbosity:
 
@@ -220,17 +229,25 @@ autospc(
   extension provided (.rds or .csv) determines the type of file the log
   data is saved to. Full log data is saved, regardless of verbosity.
 
+- keep_candidate_tables:
+
+  Boolean specifying whether to retain the table of limits for each
+  candidate calculation period the algorithm considers. The candidates
+  themselves are recorded either way, with the reasons they were
+  accepted or rejected; this is the full table of limits for each, and
+  therefore makes an analysed chart several times larger.
+
   ### Chart Appearance
 
   Arguments that control aspects of chart visualisation
 
 - title:
 
-  Optional string specifying chart title. Overrides df\$title.
+  Optional string specifying chart title. Overrides data\$title.
 
 - subtitle:
 
-  Optional string specifying subtitle. Overrides df\$subtitle.
+  Optional string specifying subtitle. Overrides data\$subtitle.
 
 - use_caption:
 
@@ -332,24 +349,40 @@ autospc(
 
 - override_annotation_dist:
 
-  Deprecated
+  **\[deprecated\]** Use `upper_annotation_sf` and `lower_annotation_sf`
+  instead. The equivalent scale factor is
+  `1 + 1/override_annotation_dist`, so `override_annotation_dist = 10`
+  becomes `upper_annotation_sf = 1.1`.
 
 - override_annotation_dist_P:
 
-  Deprecated
+  **\[deprecated\]** Use `upper_annotation_sf` and `lower_annotation_sf`
+  instead. These apply to every chart type, so a P or P' chart no longer
+  needs an argument of its own.
 
 ## Value
 
-An SPC ggplot or corresponding data
+With `plot_chart = TRUE` (the default), an `autospc_plot`: a ggplot of
+the chart, or of the pair for `chart_type = "XMR"`, which also carries
+the analysed chart objects it was drawn from and the parameters it was
+drawn with. Anything that works on a ggplot works on it, including `+`,
+[`print()`](https://rdrr.io/r/base/print.html) and
+[`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html),
+and [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) gives
+the analysis behind it.
+
+With `plot_chart = FALSE`, a data frame: the subgroup-aggregated data
+with the centre line, the control limits and the rest of the analytic
+output appended as columns.
 
 ## Examples
 
 ``` r
-# Using a C' chart to track changes in the count of monthly attendance 
+# Using a C' chart to track changes in the count of monthly attendance
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all
 )
 #> Registered S3 methods overwritten by 'ggpp':
@@ -357,22 +390,22 @@ autospc(
 #>   heightDetails.titleGrob ggplot2
 #>   widthDetails.titleGrob  ggplot2
 
-   
-#Using a P' chart to track changes in the percentage admitted within 4 hours
+
+# Using a P' chart to track changes in the percentage admitted within 4 hours
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "P'", 
-  x = month_start, 
-  y = within_4h, 
+  ed_attendances_monthly,
+  chart_type = "P'",
+  x = month_start,
+  y = within_4h,
   n = att_all
 )
 
 
-#using a shift_rule_threshold of 7 when tracking monthly attendance
+# using a shift_rule_threshold of 7 when tracking monthly attendance
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all,
   shift_rule_threshold = 7
 )

@@ -9,9 +9,9 @@
 <url><loc>https://horridtom.github.io/autospc/authors.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/index.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/news/index.html</loc></url>
+<url><loc>https://horridtom.github.io/autospc/reference/as.data.frame.autospc_plot.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/autospc-package.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/autospc.html</loc></url>
-<url><loc>https://horridtom.github.io/autospc/reference/create_SPC_auto_limits_table.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/ed_attendances_monthly.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/example_series_1.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/example_series_2a.html</loc></url>
@@ -21,5 +21,6 @@
 <url><loc>https://horridtom.github.io/autospc/reference/index.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/pipe.html</loc></url>
 <url><loc>https://horridtom.github.io/autospc/reference/plot_auto_SPC.html</loc></url>
+<url><loc>https://horridtom.github.io/autospc/reference/print.autospc_chart.html</loc></url>
 </urlset>
 

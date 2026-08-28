@@ -12,7 +12,6 @@ library(dplyr)
 #> The following objects are masked from 'package:base':
 #> 
 #>     intersect, setdiff, setequal, union
-library(scales)
 # library(DiagrammeR)
 ```
 
@@ -48,10 +47,12 @@ information on this dataset see
 facet_stages(
   ed_attendances_monthly %>%
     filter(row_number() <= 32L),
-  split_rows = c("Baseline" = 24L,
-                 "Data added beyond baseline" = 28L,
-                 "Further data added" = 32L),
-  x = month_start, 
+  split_rows = c(
+    "Baseline" = 24L,
+    "Data added beyond baseline" = 28L,
+    "Further data added" = 32L
+  ),
+  x = month_start,
   y = att_all,
   chart_type = "C'",
   period_min = 24,
@@ -110,11 +111,13 @@ count measure of interest.
 
 ``` r
 
-autospc(example_series_2a %>%
-                filter(row_number() <= 35L),
-              override_y_title = "Count",
-              chart_type = "C",
-              extend_limits_to = 47L)
+autospc(
+  example_series_2a %>%
+    filter(row_number() <= 35L),
+  override_y_title = "Count",
+  chart_type = "C",
+  extend_limits_to = 47L
+)
 ```
 
 ![Example 1](stable-shift-algorithm_files/figure-html/example-1-1.png)
@@ -134,9 +137,9 @@ period, the period over which they are extended is referred to as the
 
 In charts produced by *autospc*, limits are displayed as black dashed
 lines over their calculation period, and grey dashed lines over their
-display period. For example, in [3.1](#fig:example-1), there is one
-calculation period, covering days 1 to 21 inclusive, extended into its
-display period covering day 22 onwards.
+display period. For example, in Figure [3.1](#fig:example-1), there is
+one calculation period, covering days 1 to 21 inclusive, extended into
+its display period covering day 22 onwards.
 
 #### 3.2.2 Rule-breaking run
 
@@ -144,13 +147,13 @@ A *rule-breaking run* is a run whose length is greater than or equal to
 the threshold for a shift rule break (`shift_rule_threshold`), set to
 \\8\\ by default in
 [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md).
-In [3.1](#fig:example-1), there is a rule-breaking run of length 10
-starting on day 22. By default, rule-breaking runs are highlighted in
+In Figure [3.1](#fig:example-1), there is a rule-breaking run of length
+10 starting on day 22. By default, rule-breaking runs are highlighted in
 blue by `autospc`.
 
 Runs that are subsets of longer runs with the same end point count here,
 so for example with the default `shift_rule_threshold = 8`, the run of
-length 10 in [3.1](#fig:example-1) actually comprises three
+length 10 in Figure [3.1](#fig:example-1) actually comprises three
 rule-breaking runs, commencing at the first, second and third points in
 the length 10 run. In this example, the first rule-breaking run starts
 on day 22 and has length 10, the second starts on day 23 and has length
@@ -164,7 +167,7 @@ In the SSA, a rule-breaking run commencing during a display period
 triggers consideration of whether to re-establish limits. Such a run is
 referred to as a *triggering rule break*.
 
-In [3.1](#fig:example-1) the highlighted rule-breaking run is a
+In Figure [3.1](#fig:example-1) the highlighted rule-breaking run is a
 triggering rule break.
 
 #### 3.2.4 Candidate limits
@@ -183,18 +186,19 @@ so it is not possible to re-establish limits at day 22, and there are no
 candidate limits to consider.
 
 In Figure [3.2](#fig:example-2) we imagine rolling time forward, so that
-we have more data to add to the chart in [3.1](#fig:example-1). Figure
-[3.2](#fig:example-2) shows the data against the (baseline) calculation
-limits. Figure [3.3](#fig:example-3) shows candidate limits established
-at the start of the triggering rule break, i.e. day 22.
+we have more data to add to the chart in Figure [3.1](#fig:example-1).
+Figure [3.2](#fig:example-2) shows the data against the (baseline)
+calculation limits. Figure [3.3](#fig:example-3) shows candidate limits
+established at the start of the triggering rule break, i.e. day 22.
 
 ``` r
 
 autospc(example_series_2a,
-              override_y_title = "Count",
-              chart_type = "C",
-              baseline_only = TRUE,
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  baseline_only = TRUE,
+  extend_limits_to = 47L
+)
 ```
 
 ![Example 2](stable-shift-algorithm_files/figure-html/example-2-1.png)
@@ -204,9 +208,10 @@ Figure 3.2: Example 2
 ``` r
 
 autospc(example_series_2a,
-              override_y_title = "Count",
-              chart_type = "C",
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  extend_limits_to = 47L
+)
 ```
 
 ![Example 3](stable-shift-algorithm_files/figure-html/example-3-1.png)
@@ -234,10 +239,11 @@ break, i.e. from day 22. There is an opposing rule break in Figure
 ``` r
 
 autospc(example_series_2b,
-              override_y_title = "Count",
-              chart_type = "C",
-              baseline_only = TRUE,
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  baseline_only = TRUE,
+  extend_limits_to = 47L
+)
 ```
 
 ![Example 4](stable-shift-algorithm_files/figure-html/example-4-1.png)
@@ -247,10 +253,11 @@ Figure 3.4: Example 4
 ``` r
 
 autospc(example_series_2b,
-              override_y_title = "Count",
-              chart_type = "C",
-              establish_every_shift = TRUE,
-              extend_limits_to = 47L)
+  override_y_title = "Count",
+  chart_type = "C",
+  establish_every_shift = TRUE,
+  extend_limits_to = 47L
+)
 ```
 
 ![Example 5](stable-shift-algorithm_files/figure-html/example-5-1.png)
@@ -267,9 +274,10 @@ candidate limits.
 ``` r
 
 autospc(example_series_2c,
-              override_y_title = "Count",
-              chart_type = "C",
-              establish_every_shift = TRUE)
+  override_y_title = "Count",
+  chart_type = "C",
+  establish_every_shift = TRUE
+)
 ```
 
 ![Example 6](stable-shift-algorithm_files/figure-html/example-6-1.png)
@@ -381,9 +389,9 @@ to either `1` (for basic log information) or `2` (for full detail).
 ``` r
 
 autospc(
-  ed_attendances_monthly, 
-  chart_type = "C'", 
-  x = month_start, 
+  ed_attendances_monthly,
+  chart_type = "C'",
+  x = month_start,
   y = att_all,
   verbosity = 1,
   x_break = 365,
@@ -446,10 +454,14 @@ rds file, if it ends `".csv"` the log will be saved to a csv file.
 The data frame that is saved has one row for each log entry, and
 contains the following columns:
 
-- `counter` : the counter value (row number of the dataframe passed to
-  the `data` argument of
-  [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md))
-  that the log entry refers to
+- `chart` : which chart the entry came from - the chart type for a
+  single chart, `"X"` or `"MR"` for the two halves of an XmR pair, and
+  the stage for a faceted chart
+- `counter` : the counter value that the log entry refers to. This is
+  the row of the series the algorithm analysed, which is the data passed
+  to the `data` argument of
+  [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+  after it has been aggregated over `x` and put in `x` order
 - `x` : the value of the `x` column at this counter value (the column
   passed as `x` to
   [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md))
@@ -473,7 +485,7 @@ log_exp_tab <- autospc:::log_explanation_table
 
 ``` r
 
-log_exp_tab %>% 
+log_exp_tab %>%
   knitr::kable()
 ```
 
@@ -496,7 +508,7 @@ log_exp_tab %>%
 |  |  | yy = 10: Next rule break upwards |
 | 6 | 06xxyz | Check whether there are sufficient data to proceed. |
 |  |  | xx = 00: Yes |
-|  |  | xx =10: No |
+|  |  | xx = 10: No |
 |  |  | Examine candidate limits. |
 |  |  | y = 0: No opposing rule break |
 |  |  | y = 1: At least one opposing rule break. |

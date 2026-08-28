@@ -363,32 +363,35 @@ the Stable Shift Algorithm to automate recalculation of control limits.
 ## Examples
 
 ``` r
-# Using a C' chart to track changes in the count of monthly attendance 
-if (FALSE) plot_auto_SPC(
-  ed_attendances_monthly, 
-  chartType = "C'", 
-  x = Month_Start, 
+# Using a C' chart to track changes in the count of monthly attendance
+if (FALSE) { # \dontrun{
+plot_auto_SPC(
+  ed_attendances_monthly,
+  chartType = "C'",
+  x = Month_Start,
   y = Att_All
 )
- # \dontrun{}
-   
-#Using a P' chart to track changes in the percentage admitted within 4 hours
-if (FALSE) plot_auto_SPC(
-  ed_attendances_monthly, 
-  chartType = "P'", 
-  x = Month_Start, 
-  y = Within_4h, 
+} # }
+
+# Using a P' chart to track changes in the percentage admitted within 4 hours
+if (FALSE) { # \dontrun{
+plot_auto_SPC(
+  ed_attendances_monthly,
+  chartType = "P'",
+  x = Month_Start,
+  y = Within_4h,
   n = Att_All
 )
- # \dontrun{}
+} # }
 
-#using a runRuleLength of 7 when tracking monthly attendance
-if (FALSE) plot_auto_SPC(
-  ed_attendances_monthly, 
-  chartType = "C'", 
-  x = Month_Start, 
+# using a runRuleLength of 7 when tracking monthly attendance
+if (FALSE) { # \dontrun{
+plot_auto_SPC(
+  ed_attendances_monthly,
+  chartType = "C'",
+  x = Month_Start,
   y = Att_All,
   runRuleLength = 7
 )
- # \dontrun{}
+} # }
 ```

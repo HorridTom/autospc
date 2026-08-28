@@ -18,8 +18,8 @@
     }
   };
 </script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="The Stable Shift Algorithm">
 </head>
@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9051</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,6 @@
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
 <span><span class="co"># library(DiagrammeR)</span></span></code></pre></div>
 <div class="section level2" number="1">
 <h2 id="introduction">
@@ -119,10 +118,12 @@ on this dataset see <code><a href="../reference/ed_attendances_monthly.html">?ed
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/facet_stages.html">facet_stages</a></span><span class="op">(</span></span>
 <span>  <span class="va">ed_attendances_monthly</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">32L</span><span class="op">)</span>,</span>
-<span>  split_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Baseline"</span> <span class="op">=</span> <span class="fl">24L</span>,</span>
-<span>                 <span class="st">"Data added beyond baseline"</span> <span class="op">=</span> <span class="fl">28L</span>,</span>
-<span>                 <span class="st">"Further data added"</span> <span class="op">=</span> <span class="fl">32L</span><span class="op">)</span>,</span>
-<span>  x <span class="op">=</span> <span class="va">month_start</span>, </span>
+<span>  split_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Baseline"</span> <span class="op">=</span> <span class="fl">24L</span>,</span>
+<span>    <span class="st">"Data added beyond baseline"</span> <span class="op">=</span> <span class="fl">28L</span>,</span>
+<span>    <span class="st">"Further data added"</span> <span class="op">=</span> <span class="fl">32L</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">month_start</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">att_all</span>,</span>
 <span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
 <span>  period_min <span class="op">=</span> <span class="fl">24</span>,</span>
@@ -177,11 +178,13 @@ figure shows a C-chart for the first 35 data points of the simulated
 <code>example_series_2a</code> data included with <code>autospc</code>, which for the purpose of this
 section we shall interpret as daily values of a count measure of interest.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>                <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">35L</span><span class="op">)</span>,</span>
-<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span></span>
+<span>  <span class="va">example_series_2a</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">35L</span><span class="op">)</span>,</span>
+<span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-1"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-1-1.png" alt="Example 1"><p class="caption">
@@ -199,9 +202,9 @@ of time is referred to as the <em>calculation period</em> of the limits.</p>
 the period over which they are extended is referred to as the <em>display period</em>.</p>
 <p>In charts produced by <em>autospc</em>, limits are displayed as black dashed lines over
 their calculation period, and grey dashed lines over their display period. For
-example, in <a href="#fig:example-1">3.1</a>, there is one calculation period, covering
-days 1 to 21 inclusive, extended into its display period covering day 22
-onwards.</p>
+example, in Figure <a href="#fig:example-1">3.1</a>, there is one calculation period,
+covering days 1 to 21 inclusive, extended into its display period covering
+day 22 onwards.</p>
 </div>
 <div class="section level4" number="3.2.2">
 <h4 id="rule-breaking-run">
@@ -209,12 +212,13 @@ onwards.</p>
 </h4>
 <p>A <em>rule-breaking run</em> is a run whose length is greater than or equal to the
 threshold for a shift rule break (<code>shift_rule_threshold</code>), set to <span class="math inline">\(8\)</span> by default in
-<code><a href="../reference/autospc.html">autospc()</a></code>. In <a href="#fig:example-1">3.1</a>, there is a rule-breaking run of
-length 10 starting on day 22. By default, rule-breaking runs are highlighted in
-blue by <code>autospc</code>.</p>
+<code><a href="../reference/autospc.html">autospc()</a></code>. In Figure <a href="#fig:example-1">3.1</a>, there is a rule-breaking run of
+length 10 starting on day 22. By default, rule-breaking runs are highlighted
+in blue by <code>autospc</code>.</p>
 <p>Runs that are subsets of longer runs with the same end point count here, so for
 example with the default <code>shift_rule_threshold = 8</code>, the run of length 10 in
-<a href="#fig:example-1">3.1</a> actually comprises three rule-breaking runs, commencing at
+Figure <a href="#fig:example-1">3.1</a> actually comprises three rule-breaking runs,
+commencing at
 the first, second and third points in the length 10 run. In this example, the
 first rule-breaking run starts on day 22 and has length 10, the second starts on
 day 23 and has length 9, and the third starts on day 24 and has length 8. The
@@ -228,8 +232,8 @@ rule-breaking, since it is of length 7 only.</p>
 <p>In the SSA, a rule-breaking run commencing during a display period triggers
 consideration of whether to re-establish limits. Such a run is referred to as a
 <em>triggering rule break</em>.</p>
-<p>In <a href="#fig:example-1">3.1</a> the highlighted rule-breaking run is a triggering rule
-break.</p>
+<p>In Figure <a href="#fig:example-1">3.1</a> the highlighted rule-breaking run is a
+triggering rule break.</p>
 </div>
 <div class="section level4" number="3.2.4">
 <h4 id="candidate-limits">
@@ -245,17 +249,18 @@ period is referred to as the <em>candidate calculation period</em>.</p>
 points on or after the start of the triggering rule break (day 22), so it is not
 possible to re-establish limits at day 22, and there are no candidate limits to
 consider.</p>
-<p>In Figure <a href="#fig:example-2">3.2</a> we imagine rolling time forward, so that we have
-more data to add to the chart in <a href="#fig:example-1">3.1</a>. Figure
+<p>In Figure <a href="#fig:example-2">3.2</a> we imagine rolling time forward, so that we
+have more data to add to the chart in Figure <a href="#fig:example-1">3.1</a>. Figure
 <a href="#fig:example-2">3.2</a> shows the data against the (baseline) calculation limits.
 Figure <a href="#fig:example-3">3.3</a> shows candidate limits established at the start of
 the triggering rule break, i.e. day 22.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
-<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              baseline_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  baseline_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-2"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-2-1.png" alt="Example 2"><p class="caption">
@@ -264,9 +269,10 @@ Figure 3.2: Example 2
 </div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
-<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-3"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-3-1.png" alt="Example 3"><p class="caption">
@@ -292,10 +298,11 @@ triggering rule break, i.e. from day 22. There is an opposing rule break in
 Figure <a href="#fig:example-5">3.5</a>, commencing on day 31.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
-<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              baseline_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  baseline_only <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-4"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-4-1.png" alt="Example 4"><p class="caption">
@@ -304,10 +311,11 @@ Figure 3.4: Example 4
 </div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
-<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>              extend_limits_to <span class="op">=</span> <span class="fl">47L</span><span class="op">)</span></span></code></pre></div>
+<span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-5"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-5-1.png" alt="Example 5"><p class="caption">
@@ -321,9 +329,10 @@ continuation of our example time series, this time showing an
 overhanging reversion commencing on day 40, against the candidate limits.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2c</span>,</span>
-<span>              override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
-<span>              chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
-<span>              establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <span style="display:block;" id="fig:example-6"></span>
 <img src="stable-shift-algorithm_files/figure-html/example-6-1.png" alt="Example 6"><p class="caption">
@@ -426,9 +435,9 @@ given timeseries, there are two ways you can do this.</p>
 detail).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span></span>
-<span>  <span class="va">ed_attendances_monthly</span>, </span>
-<span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>, </span>
-<span>  x <span class="op">=</span> <span class="va">month_start</span>, </span>
+<span>  <span class="va">ed_attendances_monthly</span>,</span>
+<span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">month_start</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">att_all</span>,</span>
 <span>  verbosity <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  x_break <span class="op">=</span> <span class="fl">365</span>,</span>
@@ -490,8 +499,14 @@ csv file.</p>
 following columns:</p>
 <ul>
 <li>
-<code>counter</code> : the counter value (row number of the dataframe
-passed to the <code>data</code> argument of <code><a href="../reference/autospc.html">autospc()</a></code>) that the log entry refers to</li>
+<code>chart</code> : which chart the entry came from - the chart type for a
+single chart, <code>"X"</code> or <code>"MR"</code> for the two halves of an XmR pair, and the
+stage for a faceted chart</li>
+<li>
+<code>counter</code> : the counter value that the log entry refers to. This is
+the row of the series the algorithm analysed, which is the data passed to the
+<code>data</code> argument of <code><a href="../reference/autospc.html">autospc()</a></code> after it has been aggregated over <code>x</code> and put
+in <code>x</code> order</li>
 <li>
 <code>x</code> : the value of the <code>x</code> column at this counter value (the
 column passed as <code>x</code> to <code><a href="../reference/autospc.html">autospc()</a></code>)</li>
@@ -513,7 +528,7 @@ described in the following table. This shorthand forms the content of the
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_exp_tab</span> <span class="op">&lt;-</span> <span class="fu">autospc</span><span class="fu">:::</span><span class="va">log_explanation_table</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">log_exp_tab</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">log_exp_tab</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
@@ -615,7 +630,7 @@ described in the following table. This shorthand forms the content of the
 <tr class="even">
 <td align="left"></td>
 <td align="left"></td>
-<td align="left">xx =10: No</td>
+<td align="left">xx = 10: No</td>
 </tr>
 <tr class="odd">
 <td align="left"></td>
@@ -662,7 +677,7 @@ described in the following table. This shorthand forms the content of the
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -30,6 +30,12 @@ create_spc_plot <- function(plot_data,
 
   chart_type <- if (pair) "XMR" else chart_type_label(chart)
 
+  # A stage without limits carries no highlight, so its points take the
+  # unhighlighted colour rather than the colour for a missing value.
+  if ("highlight" %in% colnames(table)) {
+    table$highlight[is.na(table$highlight)] <- "None"
+  }
+
   long_table <- table %>%
     tidyr::pivot_longer(
       cols = c(y, cl, ucl, lcl),
@@ -200,7 +206,7 @@ draw_mr_panel <- function(plot_data,
   visualisation_params["override_x_title"] <- list(plot_data$axis_titles$x)
   visualisation_params["override_y_title"] <- list(plot_data$axis_titles$y)
 
-  if (!centre_line_present(plot_data$table)) {
+  if (!enough_data_for_limits(plot_data$chart)) {
     return(create_timeseries_plot(
       table = plot_data$table,
       visualisation_params = visualisation_params,
@@ -224,7 +230,8 @@ draw_mr_panel <- function(plot_data,
 #' @noRd
 create_timeseries_plot <- function(table,
                                    visualisation_params,
-                                   axis_extents) {
+                                   axis_extents,
+                                   split_rows = NULL) {
   time_series_plot <- ggplot2::ggplot(
     table,
     ggplot2::aes(x = x, y = y)
@@ -256,6 +263,24 @@ create_timeseries_plot <- function(table,
         big.mark = ","
       )
     )
+
+  time_series_plot <- format_x_axis(
+    spc_plot = time_series_plot,
+    x_class = class(table$x),
+    x_break = visualisation_params$x_break,
+    x_date_format = visualisation_params$x_date_format,
+    start_x = axis_extents$start_x,
+    end_x = axis_extents$end_x
+  )
+
+  if (!is.null(split_rows)) {
+    time_series_plot <- time_series_plot +
+      ggplot2::facet_wrap(
+        facets = ggplot2::vars(stage),
+        ncol = 1L
+      )
+  }
+
   return(time_series_plot)
 }
 

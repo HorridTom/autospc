@@ -70,10 +70,66 @@ test_that("the warning is about the input data, not about named charts", {
 })
 
 
-test_that("centre_line_present answers whether a table carries a centre line", {
-  expect_true(centre_line_present(data.frame(x = 1, y = 1, cl = 1)))
+chart_of_length <- function(rows, chart_type = "C", period_min = 21L) {
+  autospc_chart(
+    chart_type = chart_type,
+    data = data.frame(
+      x = seq_len(rows),
+      y = rep(c(10L, 12L, 11L), length.out = rows)
+    ),
+    x = "x",
+    y = "y",
+    period_min = period_min
+  )
+}
 
-  expect_false(centre_line_present(data.frame(x = 1, y = 1)))
+
+test_that("enough_data_for_limits compares the series with period_min", {
+  expect_true(enough_data_for_limits(chart_of_length(21L)))
+
+  expect_false(enough_data_for_limits(chart_of_length(20L)))
+})
+
+
+test_that("an MR chart has as much data for limits as its own series", {
+  # the moving ranges are one shorter than the series they come from, and
+  # n_effective_points() adds that point back
+  long_enough <- prepare_data(chart_of_length(21L, chart_type = "MR"))
+  one_short <- prepare_data(chart_of_length(20L, chart_type = "MR"))
+
+  expect_true(enough_data_for_limits(long_enough))
+
+  expect_false(enough_data_for_limits(one_short))
+})
+
+
+test_that("a chart with no limits formats its x axis", {
+  plot <- suppressWarnings(autospc(test_data,
+    chart_type = "C", period_min = 21L, x_break = 2L
+  ))
+
+  expect_identical(
+    ggplot2::layer_scales(plot)$x$get_breaks(),
+    seq(1L, 9L, 2L)
+  )
+})
+
+
+test_that("a chart with no limits formats a date x axis", {
+  dated <- data.frame(
+    x = seq(as.Date("2020-01-01"), by = "month", length.out = 10L),
+    y = test_data$y
+  )
+
+  plot <- suppressWarnings(autospc(dated,
+    chart_type = "C", period_min = 21L, x_break = 90,
+    x_date_format = "%b %Y"
+  ))
+
+  expect_identical(
+    ggplot2::layer_scales(plot)$x$get_labels(),
+    c("Jan 2020", "Mar 2020", "Jun 2020", "Sep 2020")
+  )
 })
 
 
@@ -94,7 +150,7 @@ test_that("a series without limits does not take the limits path", {
     autospc(test_data, plot_chart = FALSE, chart_type = "C", period_min = 21)
   )
 
-  expect_false(centre_line_present(result))
+  expect_false("cl" %in% colnames(result))
 
   expect_false("limit_change" %in% colnames(result))
 })

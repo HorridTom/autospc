@@ -298,7 +298,7 @@ report_analysis <- function(charts,
                             short_message = series_short_message) {
   short <- vapply(
     charts,
-    function(chart) !centre_line_present(chart$result$table),
+    function(chart) !enough_data_for_limits(chart),
     logical(1L)
   )
 
@@ -481,7 +481,7 @@ render_log <- function(chart) {
 
   add(1L, "0100")
 
-  if (!("cl" %in% colnames(spc_table))) {
+  if (!enough_data_for_limits(chart)) {
     add(1L, "0210")
     return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
   }

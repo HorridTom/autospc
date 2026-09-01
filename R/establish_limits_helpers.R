@@ -17,6 +17,22 @@ enough_data_for_new_period <- function(data,
 }
 
 
+#' Can this chart have limits?
+#'
+#' Whether the prepared series is long enough for the algorithm to form one
+#' calculation period. Read from `chart$data` and the chart's parameters.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+enough_data_for_limits <- function(chart) {
+  return(enough_data_for_new_period(
+    data = chart$data,
+    counter = 1L,
+    chart = chart
+  ))
+}
+
+
 # Function to find most extreme points outside of control limits and return
 # their positions
 # period_length is the length of *this* period, which is baseline_length for

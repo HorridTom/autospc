@@ -383,16 +383,21 @@ autospc_plot <- function(charts,
   visualisation_params["override_y_title"] <- list(main$axis_titles$y)
 
   limits_drawn <- isTRUE(visualisation_params$show_limits) &&
-    centre_line_present(main$table)
+    enough_data_for_limits(main$chart)
 
-  if (!limits_drawn && is.null(split_rows)) {
-    charts <- charts[1]
-    plot_data <- plot_data[1]
+  if (!limits_drawn) {
+    # A pair without limits is drawn as the location chart alone. A faceted
+    # plot keeps every facet, and its plot data is already one element.
+    if (is.null(split_rows)) {
+      charts <- charts[1]
+      plot_data <- plot_data[1]
+    }
 
     plot <- create_timeseries_plot(
       table = main$table,
       visualisation_params = visualisation_params,
-      axis_extents = main$axis_extents
+      axis_extents = main$axis_extents,
+      split_rows = split_rows
     )
   } else {
     plot <- create_spc_plot(

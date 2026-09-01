@@ -56,7 +56,7 @@ test_that("both halves of a pair are short of points together", {
 
     vapply(
       charts,
-      function(chart) centre_line_present(chart$result$table),
+      function(chart) enough_data_for_limits(chart),
       logical(1L)
     )
   }

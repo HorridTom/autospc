@@ -536,17 +536,58 @@ test_that("no stage short of points gives no warning", {
 })
 
 
-test_that("a faceted chart with no limits errors - CLEAN UP #35", {
-  # the pinned behaviour is a bug: the plot data has no limits columns to draw
-  # from, and the fix is CLEAN UP #35
+geoms_of <- function(plot) {
+  return(vapply(plot$layers,
+    function(layer) class(layer$geom)[1],
+    character(1L)
+  ))
+}
+
+
+point_colours_of <- function(plot) {
+  points <- ggplot2::ggplot_build(plot)$data[[which(geoms_of(plot) ==
+    "GeomPoint")]]
+
+  return(unique(points$colour))
+}
+
+
+test_that("a faceted chart with no limits draws a plain time series", {
   short <- data.frame(x = 1:10, y = rep(c(10L, 12L), 5L))
 
-  expect_error(
-    suppressWarnings(facet_stages(short,
-      split_rows = c(5L, 10L),
-      chart_type = "C", period_min = 21L
-    ))
+  plot <- suppressWarnings(facet_stages(short,
+    split_rows = c(5L, 10L),
+    chart_type = "C", period_min = 21L
+  ))
+
+  expect_identical(geoms_of(plot), c("GeomLine", "GeomPoint"))
+
+  expect_s3_class(plot$facet, "FacetWrap")
+
+  expect_length(levels(ggplot2::ggplot_build(plot)$data[[1]]$PANEL), 2L)
+})
+
+
+test_that("a faceted chart drawn without limits draws a plain time series", {
+  plot <- facet_stages(short_facet_data,
+    split_rows = c(20L, 40L), chart_type = "C", period_min = 5L,
+    show_limits = FALSE
   )
+
+  expect_identical(geoms_of(plot), c("GeomLine", "GeomPoint"))
+
+  expect_s3_class(plot$facet, "FacetWrap")
+})
+
+
+test_that("the points of a stage without limits are drawn black", {
+  # grey is the colour of a point excluded from the limits calculation, so a
+  # stage without limits must not take it
+  plot <- suppressWarnings(facet_stages(short_facet_data,
+    split_rows = c(10L, 40L), chart_type = "C", period_min = 21L
+  ))
+
+  expect_identical(point_colours_of(plot), "black")
 })
 
 

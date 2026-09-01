@@ -50,7 +50,7 @@ plot_data_for_chart <- function(chart,
     visualisation_params = visualisation_params
   )
 
-  if (visualisation_params$show_limits && centre_line_present(table)) {
+  if (visualisation_params$show_limits && enough_data_for_limits(chart)) {
     table <- add_plot_columns(
       table = table,
       chart = chart,
@@ -144,7 +144,8 @@ combine_plot_data <- function(plot_data,
   if (length(plot_data) > 1L && !is_xmr_pair(charts)) {
     # Faceted plot
     stages <- lapply(plot_data, function(each) {
-      if (visualisation_params$show_limits && centre_line_present(each$table)) {
+      if (visualisation_params$show_limits &&
+        enough_data_for_limits(each$chart)) {
         return(dplyr::filter(each$table, !is.na(x)))
       }
 
@@ -160,7 +161,8 @@ combine_plot_data <- function(plot_data,
 
   data <- main$table
 
-  if (!(visualisation_params$show_limits && centre_line_present(data))) {
+  if (!(visualisation_params$show_limits &&
+    enough_data_for_limits(main$chart))) {
     return(data)
   }
 
@@ -231,7 +233,7 @@ axis_specifications <- function(table,
   x_max <- max(table$x, na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
 
-  if (!centre_line_present(table)) {
+  if (!enough_data_for_limits(chart)) {
     ylimlow <- min(table$y, na.rm = TRUE)
     ylimhigh <- max(table$y, na.rm = TRUE)
   } else {
@@ -325,15 +327,3 @@ add_plot_columns <- function(table,
   return(table)
 }
 
-
-#' Does this table carry a centre line?
-#'
-#' The algorithm returns a table with no `cl`, `ucl` or `lcl` when there were
-#' too few points to form a period, so the presence of `cl` answers whether it
-#' produced anything to draw.
-#'
-#' @return TRUE or FALSE
-#' @noRd
-centre_line_present <- function(data) {
-  return("cl" %in% colnames(data))
-}

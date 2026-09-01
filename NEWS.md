@@ -1,3 +1,21 @@
+# autospc 0.1.0.9000
+
+## Bug fixes
+
+* `facet_stages()` no longer fails when no stage has enough points for control
+  limits. It draws each stage as a plain time series, which is what `autospc()`
+  draws for a series with no limits. The same fault stopped
+  `facet_stages(show_limits = FALSE)` drawing at all; that works now too.
+
+* In a faceted chart where some stages have limits and some do not, the points
+  of a stage without limits were drawn grey, which is the colour of a point
+  excluded from the limits calculation. They are now drawn black, like the
+  points of any series shown without limits.
+
+* A chart drawn without control limits now honours `x_break`, `x_date_format`
+  and `x_pad_end`. They were ignored, because the plain time series was drawn
+  without formatting its x axis.
+
 # autospc 0.1.0
 
 ## Lifecycle changes

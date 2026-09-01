@@ -518,7 +518,7 @@ print.autospc_chart <- function(x, ...) {
     return(invisible(x))
   }
 
-  if (!centre_line_present(x$result$table)) {
+  if (!enough_data_for_limits(x)) {
     cat("\nNo limits: too few points to form a calculation period.\n")
     return(invisible(x))
   }

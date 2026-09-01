@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,15 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9001" id="autospc-0109001">autospc 0.1.0.9001<a class="anchor" aria-label="anchor" href="#autospc-0109001"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-0-9001">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0-9001"></a></h3>
+<ul><li><p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> no longer fails when no stage has enough points for control limits. It draws each stage as a plain time series, which is what <code><a href="../reference/autospc.html">autospc()</a></code> draws for a series with no limits. The same fault stopped <code>facet_stages(show_limits = FALSE)</code> drawing at all; that works now too.</p></li>
+<li><p>In a faceted chart where some stages have limits and some do not, the points of a stage without limits were drawn grey, which is the colour of a point excluded from the limits calculation. They are now drawn black, like the points of any series shown without limits.</p></li>
+<li><p>A chart drawn without control limits now honours <code>x_break</code>, <code>x_date_format</code> and <code>x_pad_end</code>. They were ignored, because the plain time series was drawn without formatting its x axis.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="autospc-010">autospc 0.1.0<a class="anchor" aria-label="anchor" href="#autospc-010"></a></h2>
 <div class="section level3">

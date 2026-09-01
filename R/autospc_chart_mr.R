@@ -82,8 +82,9 @@ autospc_chart_mr <- function(data,
 
 # Analysis methods
 
-# No aggregate_data() method: MR charts plot one moving range per observation, so
-# the superclass default - return the chart unchanged - is the correct behaviour.
+# No aggregate_data() method: MR charts plot one moving range per
+# observation, so the superclass default - return the chart unchanged - is
+# the correct behaviour.
 
 #' Turn the aggregated data into the series the algorithm analyses
 #'

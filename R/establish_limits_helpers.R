@@ -220,7 +220,7 @@ identify_opposite_break <- function(limits_table,
       which(limits_table_candidate$opposite_break == TRUE)
     ) + counter - 1
 
-    last_point_in_calc_period <- tail(
+    last_point_in_calc_period <- utils::tail(
       which(limits_table_candidate$period_type == "calculation"),
       n = 1L
     ) + counter - 1
@@ -272,7 +272,7 @@ final_run_prevents_re_establishment <- function(
 
   # identify the row number of the last point, in the last calculation period,
   # that is not on the centre line
-  last_point_in_last_calc_period <- tail(
+  last_point_in_last_calc_period <- utils::tail(
     which(data$period_type == "calculation" &
       data$above_or_below_cl != 0),
     n = 1L
@@ -417,7 +417,7 @@ is_numeric_vector_constant <- function(x) {
 # Helper function to fill in NA values with previous non-NA value
 fill_na <- function(x) {
   which.na <- c(which(!is.na(x)), length(x) + 1)
-  values <- na.omit(x)
+  values <- stats::na.omit(x)
 
   if (which.na[1] != 1) {
     which.na <- c(1, which.na)
@@ -456,7 +456,7 @@ floating_median_column <- function(table,
       dplyr::mutate(
         median =
           dplyr::if_else(x >= median_from_x,
-            median(
+            stats::median(
               table %>%
                 dplyr::filter(x >= median_from_x) %>%
                 dplyr::pull(y),

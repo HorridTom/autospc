@@ -34,7 +34,9 @@ form_calculation_limits <- function(data,
   calculation_period <- calculation_period %>%
     dplyr::select(x, y, ucl, lcl, cl) %>%
     dplyr::mutate(period_type = "calculation") %>%
-    dplyr::mutate(excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F))
+    dplyr::mutate(
+      excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F)
+    )
 
 
   # First period does not already have the additional columns
@@ -67,8 +69,12 @@ form_calculation_limits <- function(data,
       dplyr::mutate(ucl = dplyr::if_else(is.na(ucl.y), ucl.x, ucl.y)) %>%
       dplyr::mutate(lcl = dplyr::if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
       dplyr::mutate(cl = dplyr::if_else(is.na(cl.y), cl.x, cl.y)) %>%
-      dplyr::mutate(period_type = dplyr::if_else(is.na(period_type.y), period_type.x, period_type.y)) %>%
-      dplyr::mutate(excluded = dplyr::if_else(is.na(excluded.y), excluded.x, excluded.y))
+      dplyr::mutate(period_type = dplyr::if_else(
+        is.na(period_type.y), period_type.x, period_type.y
+      )) %>%
+      dplyr::mutate(excluded = dplyr::if_else(
+        is.na(excluded.y), excluded.x, excluded.y
+      ))
 
     limits_table <- limits_table %>%
       dplyr::mutate(break_point = (break_point |

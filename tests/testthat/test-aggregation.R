@@ -1,7 +1,7 @@
 # The P and P' methods delegate here, so the aggregation behaviour itself is
-# covered by their test files. What is tested here is the part no class exercises
-# yet: allow_individual_observations = FALSE, which is what the rate charts
-# (u and u') will pass when they exist.
+# covered by their test files. What is tested here is the part no class
+# exercises yet: allow_individual_observations = FALSE, which is what the rate
+# charts (u and u') will pass when they exist.
 
 ratio_binary_data <- data.frame(
   x = rep(1:5, each = 4),

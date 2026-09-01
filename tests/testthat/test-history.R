@@ -42,7 +42,9 @@ test_that("the stop reason replaces rather than accumulates", {
   )
 
   expect_identical(chart$history$stopped$counter, 44L)
-  expect_identical(chart$history$stopped$reason, "reached the end of the series")
+  expect_identical(
+    chart$history$stopped$reason, "reached the end of the series"
+  )
 })
 
 

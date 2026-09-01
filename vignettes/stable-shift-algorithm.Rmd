@@ -135,10 +135,10 @@ day 22 onwards.
 
 ### Rule-breaking run
 A *rule-breaking run* is a run whose length is greater than or equal to the
-threshold for a shift rule break (`shift_rule_threshold`), set to \(8\) by default in
-`autospc()`. In Figure \@ref(fig:example-1), there is a rule-breaking run of
-length 10 starting on day 22. By default, rule-breaking runs are highlighted
-in blue by `autospc`.
+threshold for a shift rule break (`shift_rule_threshold`), set to \(8\) by
+default in `autospc()`. In Figure \@ref(fig:example-1), there is a
+rule-breaking run of length 10 starting on day 22. By default, rule-breaking
+runs are highlighted in blue by `autospc`.
 
 Runs that are subsets of longer runs with the same end point count here, so for
 example with the default `shift_rule_threshold = 8`, the run of length 10 in
@@ -228,8 +228,8 @@ autospc(example_series_2b,
 ```
 
 
-If an opposing rule break only reaches the `shift_rule_threshold` threshold after the
-end of the candidate calculation period, it is referred to as an
+If an opposing rule break only reaches the `shift_rule_threshold` threshold
+after the end of the candidate calculation period, it is referred to as an
 *overhanging reversion*. Figure \@ref(fig:example-6) shows another alternative 
 continuation of our example time series, this time showing an
 overhanging reversion commencing on day 40, against the candidate limits.
@@ -244,11 +244,11 @@ autospc(example_series_2c,
 
 ### Minimum period length
 The SSA requires specification of a minimum number of data points to be used 
-for calculation of control limits, \(n_{min}\). Whilst those using SPC in practice
-may not often make such a minimum explicit, in a way it is always there
-implicitly - nobody would compute control limits from two data points would
-they? In fact, various authors offer guidance on what such a minimum should be,
-with values ranging from 17 to 25 points.
+for calculation of control limits, \(n_{min}\). Whilst those using SPC in
+practice may not often make such a minimum explicit, in a way it is always
+there implicitly - nobody would compute control limits from two data points
+would they? In fact, various authors offer guidance on what such a minimum
+should be, with values ranging from 17 to 25 points.
 
 In `autospc()`, \(n_{min}\) is specified by the `period_min` argument,
 defaulting to 21. This default is above the commonly recommended minimum values
@@ -294,10 +294,11 @@ points beginning at the counter.
 
 7. Decide whether to accept or reject the candidate limits:
 
-    i. If there is at least one opposing rule break commencing within the candidate
-    calculation period, then the candidate limits are rejected, the counter is
-    set to the next rule-breaking run (after the triggering rule break) against
-    the prevailing limits, and the algorithm continues from (3).
+    i. If there is at least one opposing rule break commencing within the
+    candidate calculation period, then the candidate limits are rejected, the
+    counter is set to the next rule-breaking run (after the triggering rule
+    break) against the prevailing limits, and the algorithm continues from
+    (3).
 
     ii. If the final run of the candidate calculation period could become an
     opposing rule break with the addition of more data to the time series, then 

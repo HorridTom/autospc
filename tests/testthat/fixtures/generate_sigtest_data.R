@@ -214,7 +214,9 @@ make_data_column_validation_data <- function() {
     )
 
     res_df <- val_res %>%
-      purrr::imap(\(df, name) dplyr::rename_with(df, \(col) paste(name, col, sep = "_"))) %>%
+      purrr::imap(
+        \(df, name) dplyr::rename_with(df, \(col) paste(name, col, sep = "_"))
+      ) %>%
       dplyr::bind_cols()
 
 

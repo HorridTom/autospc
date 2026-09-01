@@ -11,7 +11,8 @@ test_data[15, 2] <- 150
 #                                                 data = test_data,
 #                                                 chart = 'i',
 #                                                 exclude = c(6, 15),
-#                                                 return.data = TRUE)                                         return.data = TRUE)
+#                                                 return.data = TRUE)
+#                                         return.data = TRUE)
 # qicharts2 v.0.7.2
 test_ichart_exclusions_answer <- readRDS(
   file.path(

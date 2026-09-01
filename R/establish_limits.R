@@ -254,8 +254,9 @@ establish_limits <- function(chart) {
                 # [shift_rule_threshold] points of the run following
                 if (is.na(rule2_break_positions[2]) |
                   all(
-                    limits_table$rule2[counter:(counter + chart$shift_rule_threshold
-                      - 1)]
+                    limits_table$rule2[
+                      counter:(counter + chart$shift_rule_threshold - 1)
+                    ]
                   )) {
                   # If so, advance the counter by 1
                   chart <- record_counter_move(

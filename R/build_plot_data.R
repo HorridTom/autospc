@@ -333,4 +333,3 @@ add_plot_columns <- function(table,
 
   return(table)
 }
-

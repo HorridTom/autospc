@@ -520,7 +520,10 @@ test_that("one warning names every stage that is short of points", {
 
   expect_length(given, 1L)
 
-  expect_match(given, "Stages 1, 2 have fewer than the minimum number of points")
+  expect_match(
+    given,
+    "Stages 1, 2 have fewer than the minimum number of points"
+  )
 })
 
 
@@ -628,7 +631,10 @@ test_that("a rounding warning is given once for the call, not once per facet", {
     }
   )
 
-  rounding <- grepl("Rounding to the nearest whole", warnings_given, fixed = TRUE)
+  rounding <- grepl(
+    "Rounding to the nearest whole", warnings_given,
+    fixed = TRUE
+  )
 
   expect_identical(sum(rounding), 1L)
 })

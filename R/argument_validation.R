@@ -182,7 +182,8 @@ round_count_column <- function(data,
                                message) {
   values <- data[[column]]
 
-  if (typeof(values) != "double" || !any(!is_whole_number(values), na.rm = TRUE)) {
+  if (typeof(values) != "double" ||
+    !any(!is_whole_number(values), na.rm = TRUE)) {
     return(data)
   }
 

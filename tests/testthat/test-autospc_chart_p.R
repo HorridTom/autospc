@@ -392,7 +392,9 @@ test_that("prepare_data turns counts into percentages and keeps the count", {
     n = c(100, 200, 100, 200)
   )
 
-  prepared <- prepare_data(autospc_chart_p(data = counts, x = "x", y = "y", n = "n"))
+  prepared <- prepare_data(
+    autospc_chart_p(data = counts, x = "x", y = "y", n = "n")
+  )
 
   expect_identical(prepared$data$y, c(10, 10, 30, 20))
   expect_identical(prepared$data$y_numerator, counts$y)
@@ -410,7 +412,9 @@ test_that("prepare_data gives NA for a zero or missing denominator", {
     n = c(100, 0, NA_real_)
   )
 
-  prepared <- prepare_data(autospc_chart_p(data = counts, x = "x", y = "y", n = "n"))
+  prepared <- prepare_data(
+    autospc_chart_p(data = counts, x = "x", y = "y", n = "n")
+  )
 
   expect_identical(prepared$data$y, c(10, NA_real_, NA_real_))
 })

@@ -20,7 +20,9 @@ test_that("Display period is formed correctly for C chart", {
   correct_answer_ucl <- rep(test_data$ucl[21], nrow(test_data) - 21)
   correct_answer_cl <- rep(test_data$cl[21], nrow(test_data) - 21)
   correct_answer_lcl <- rep(test_data$lcl[21], nrow(test_data) - 21)
-  correct_answers <- list(correct_answer_ucl, correct_answer_cl, correct_answer_lcl)
+  correct_answers <- list(
+    correct_answer_ucl, correct_answer_cl, correct_answer_lcl
+  )
 
   testthat::expect_equal(results, correct_answers)
 })

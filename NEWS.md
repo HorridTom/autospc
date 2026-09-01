@@ -1,3 +1,17 @@
+# autospc 0.1.0.9002
+
+## Bug fixes
+
+* The `month_start` column of `ed_attendances_monthly` is now the first day of
+  each month, for 109 consecutive months from June 2015. It previously wrote
+  each month either as its first day or as the last day of the month before, so
+  the dates looked as though they drifted through the calendar. The counts are
+  unchanged and no row has moved to a different month. Charts drawn from this
+  dataset shift by up to a day on the x axis.
+* The help page for `ed_attendances_monthly` said the data had 9 columns where
+  it has 7, and listed `e_adm_via_ed` before `e_adm_over_4h` while the data has
+  them the other way round. Both are corrected.
+
 # autospc 0.1.0.9001
 
 ## Bug fixes

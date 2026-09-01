@@ -11,7 +11,7 @@ ed_attendances_monthly
 
 ## Format
 
-A data frame with 109 rows and 9 columns
+A data frame with 109 rows and 7 columns
 
 - month_start:
 
@@ -33,13 +33,13 @@ A data frame with 109 rows and 9 columns
 
   Percentage of attendances within 4 hours
 
-- e_adm_via_ed:
-
-  Total emergency admissions via emergency department
-
 - e_adm_over_4h:
 
   Total \> 4 hours from decision to admit to admission
+
+- e_adm_via_ed:
+
+  Total emergency admissions via emergency department
 
 ## Source
 

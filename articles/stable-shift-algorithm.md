@@ -401,7 +401,7 @@ autospc(
 #> 
 #> C':
 #> 
-#> Counter at 1, 2015-05-31:
+#> Counter at 1, 2015-06-01:
 #> - Counter initialised to 1.
 #> - Sufficient data to form at least one period.
 #> 
@@ -410,7 +410,7 @@ autospc(
 #> - Sufficient data to proceed. Moving counter to the next shift
 #> rule break, commencing at point 23.
 #> 
-#> Counter at 23, 2017-03-31:
+#> Counter at 23, 2017-04-01:
 #> - There is a shift rule break commencing here, upwards from
 #> the current centre line.
 #> - Forming candidate limits.
@@ -430,7 +430,7 @@ autospc(
 #> - Sufficient data to proceed. Moving counter to the next shift
 #> rule break, commencing at point 71.
 #> 
-#> Counter at 71, 2021-03-31:
+#> Counter at 71, 2021-04-01:
 #> - There is a shift rule break commencing here, upwards from
 #> the current centre line.
 #> - Forming candidate limits.

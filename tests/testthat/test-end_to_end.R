@@ -23,10 +23,18 @@ test_data <- structure(
 ) %>%
   tibble::as_tibble()
 
-correct_answer_C <- readRDS("testdata/test_data_end_to_end/correct_answer_C.rds")
-correct_answer_CP <- readRDS("testdata/test_data_end_to_end/correct_answer_CP.rds")
-correct_answer_P <- readRDS("testdata/test_data_end_to_end/correct_answer_P.rds")
-correct_answer_PP <- readRDS("testdata/test_data_end_to_end/correct_answer_PP.rds")
+correct_answer_C <- readRDS(
+  "testdata/test_data_end_to_end/correct_answer_C.rds"
+)
+correct_answer_CP <- readRDS(
+  "testdata/test_data_end_to_end/correct_answer_CP.rds"
+)
+correct_answer_P <- readRDS(
+  "testdata/test_data_end_to_end/correct_answer_P.rds"
+)
+correct_answer_PP <- readRDS(
+  "testdata/test_data_end_to_end/correct_answer_PP.rds"
+)
 
 # The stored answers were saved when autospc() returned a tibble for some chart
 # types. They hold the expected values, which have not changed; as.data.frame()

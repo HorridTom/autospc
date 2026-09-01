@@ -1,4 +1,5 @@
-# dataset with second rule break pulling the mean down from triggering rule break
+# dataset with second rule break pulling the mean down from triggering rule
+# break
 test_op_break1_data <- structure(
   list(x = 1:46, y = c(
     11L, 13L,
@@ -43,7 +44,8 @@ test_op_break4_data <- structure(
   row.names = c(NA, -46L), class = "data.frame"
 )
 
-# rule break with further rule break in direction of triggering rule break - expected re-establishment
+# rule break with further rule break in direction of triggering rule break -
+# expected re-establishment
 test_op_break5_data <- structure(
   list(x = 1:46, y = c(
     8L, 8L, 13L, 5L, 12L, 13L, 10L,
@@ -54,7 +56,8 @@ test_op_break5_data <- structure(
   row.names = c(NA, -46L), class = "data.frame"
 )
 
-# opposite rule break commencing after the end of the candidate calculation period
+# opposite rule break commencing after the end of the candidate calculation
+# period
 test_op_break6_data <- readRDS("testdata/test_oppositeRuleBreak_later.rds")
 
 test_that("Rule 2 break within candidate period in opposite direction identified correctly", {
@@ -68,25 +71,37 @@ test_that("Rule 2 break within candidate period in opposite direction identified
   testthat::expect_equal(test_op_break1_break_pos, integer(0))
 
   # should not re-establish due to break in op direction
-  test_op_break2 <- autospc(test_op_break2_data, chart_type = "C'", plot_chart = F)
+  test_op_break2 <- autospc(
+    test_op_break2_data,
+    chart_type = "C'", plot_chart = F
+  )
   test_op_break2_break_pos <- which(test_op_break2$break_point == TRUE)
 
   testthat::expect_equal(test_op_break2_break_pos, integer(0))
 
   # should not re-establish due to break in op direction
-  test_op_break3 <- autospc(test_op_break3_data, chart_type = "C'", plot_chart = F)
+  test_op_break3 <- autospc(
+    test_op_break3_data,
+    chart_type = "C'", plot_chart = F
+  )
   test_op_break3_break_pos <- which(test_op_break3$break_point == TRUE)
 
   testthat::expect_equal(test_op_break3_break_pos, integer(0))
 
   # should re-establish
-  test_op_break4 <- autospc(test_op_break4_data, chart_type = "C'", plot_chart = F)
+  test_op_break4 <- autospc(
+    test_op_break4_data,
+    chart_type = "C'", plot_chart = F
+  )
   test_op_break4_break_pos <- which(test_op_break4$break_point == TRUE)
 
   testthat::expect_equal(test_op_break4_break_pos, 22)
 
   # should re-establish
-  test_op_break5 <- autospc(test_op_break5_data, chart_type = "C'", plot_chart = F)
+  test_op_break5 <- autospc(
+    test_op_break5_data,
+    chart_type = "C'", plot_chart = F
+  )
   test_op_break5_break_pos <- which(test_op_break5$break_point == TRUE)
 
   testthat::expect_equal(test_op_break5_break_pos, 22)

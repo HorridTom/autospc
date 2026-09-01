@@ -104,7 +104,8 @@ validate_autospc_plot <- function(x) {
   }
 
   if (!is.list(x$charts) || length(x$charts) < 1L) {
-    stop("Malformed autospc_plot object - charts must be a list of at least one.",
+    stop(
+      "Malformed autospc_plot object - charts must be a list of at least one.",
       call. = FALSE
     )
   }

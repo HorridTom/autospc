@@ -43,7 +43,9 @@ test_that("a missing element is caught on the constructor path", {
 
 test_that("validate_autospc_chart_cp rejects a bare autospc_chart object", {
   expect_error(
-    validate_autospc_chart_cp(new_autospc_chart(autospc_chart_list(data = test_data, x = "x", y = "y"))),
+    validate_autospc_chart_cp(new_autospc_chart(autospc_chart_list(
+      data = test_data, x = "x", y = "y"
+    ))),
     "Not an autospc_chart_cp object"
   )
 })

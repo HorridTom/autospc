@@ -336,7 +336,8 @@ series_short_message <- function(labels) {
 }
 
 
-#' The warning where the stages of a faceted chart have too few points for limits
+#' The warning where the stages of a faceted chart have too few points for
+#' limits
 #'
 #' @param labels The stages that are short of points.
 #'

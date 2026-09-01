@@ -537,9 +537,12 @@ test_that("no stage short of points gives no warning", {
 
 
 geoms_of <- function(plot) {
+  # ggplot2 4 names the layer list, so the names are dropped here rather than
+  # written into every expectation
   return(vapply(plot$layers,
     function(layer) class(layer$geom)[1],
-    character(1L)
+    character(1L),
+    USE.NAMES = FALSE
   ))
 }
 

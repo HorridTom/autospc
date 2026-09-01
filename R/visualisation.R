@@ -48,7 +48,7 @@ create_spc_plot <- function(plot_data,
       x,
       series,
       value,
-      everything()
+      dplyr::everything()
     )
 
   long_table <- add_limit_connectors(long_table)

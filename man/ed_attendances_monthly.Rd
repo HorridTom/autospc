@@ -5,15 +5,15 @@
 \alias{ed_attendances_monthly}
 \title{Emergency Department Attendances Monthly data}
 \format{
-A data frame with 109 rows and 9 columns
+A data frame with 109 rows and 7 columns
 \describe{
 \item{month_start}{First date of the month in question}
 \item{att_all}{Total emergency attendances in the month in question}
 \item{within_4h}{Total attendances that were < 4 hours}
 \item{over_4h}{Total attendances that were > 4 hours}
 \item{percent_in_4h}{Percentage of attendances within 4 hours}
-\item{e_adm_via_ed}{Total emergency admissions via emergency department}
 \item{e_adm_over_4h}{Total > 4 hours from decision to admit to admission}
+\item{e_adm_via_ed}{Total emergency admissions via emergency department}
 }
 }
 \source{

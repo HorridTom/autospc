@@ -1,5 +1,25 @@
 # Changelog
 
+## autospc 0.1.0.9003
+
+### Bug fixes
+
+- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+  no longer fails when `split_rows` asks for a single stage. Passing the
+  last row of the data, as in
+  `facet_stages(data, split_rows = nrow(data))`, failed on drawing with
+  `At least one layer must contain all faceting variables`. It now draws
+  one facet.
+
+- A `split_rows` value beyond the end of the data is now taken as the
+  last row, and warns. It previously produced a repeated stage: on 43
+  rows of data, `split_rows = 44` gave two facets of the same series and
+  `split_rows = c(44, 45)` gave three.
+
+- `facet_stages(plot_chart = FALSE)` now always returns a `stage`
+  column. Where there was a single stage it returned a table with no
+  `stage` column at all.
+
 ## autospc 0.1.0.9002
 
 ### Bug fixes

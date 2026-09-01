@@ -42,6 +42,15 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9003" id="autospc-0109003">autospc 0.1.0.9003<a class="anchor" aria-label="anchor" href="#autospc-0109003"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-0-9003">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0-9003"></a></h3>
+<ul><li><p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> no longer fails when <code>split_rows</code> asks for a single stage. Passing the last row of the data, as in <code>facet_stages(data, split_rows = nrow(data))</code>, failed on drawing with <code>At least one layer must contain all faceting variables</code>. It now draws one facet.</p></li>
+<li><p>A <code>split_rows</code> value beyond the end of the data is now taken as the last row, and warns. It previously produced a repeated stage: on 43 rows of data, <code>split_rows = 44</code> gave two facets of the same series and <code>split_rows = c(44, 45)</code> gave three.</p></li>
+<li><p><code>facet_stages(plot_chart = FALSE)</code> now always returns a <code>stage</code> column. Where there was a single stage it returned a table with no <code>stage</code> column at all.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9002" id="autospc-0109002">autospc 0.1.0.9002<a class="anchor" aria-label="anchor" href="#autospc-0109002"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-1-0-9002">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0-9002"></a></h3>

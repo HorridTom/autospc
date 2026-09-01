@@ -111,15 +111,10 @@ facet_stages <- function(data,
     chart = whole_series
   )
 
-  split_rows <- sort(split_rows)
-
-  # Ensure the last split row is the end of the data
-  if (split_rows[length(split_rows)] != nrow(data)) {
-    split_rows <- c(
-      split_rows,
-      nrow(data)
-    )
-  }
+  split_rows <- normalise_split_rows(
+    split_rows = split_rows,
+    n_rows = nrow(df_rn)
+  )
 
   data_splits_list <- create_splits_list(
     data = df_rn,
@@ -165,7 +160,8 @@ facet_stages <- function(data,
   if (!plot_chart) {
     return(charts_as_table(
       charts = charts,
-      visualisation_params = visualisation_params
+      visualisation_params = visualisation_params,
+      faceted = TRUE
     ))
   }
 
@@ -174,6 +170,40 @@ facet_stages <- function(data,
     visualisation_params = visualisation_params,
     split_rows = split_rows
   ))
+}
+
+
+#' The split rows a call is run with
+#'
+#' Sorted, with any value beyond the end of the data taken as the last row,
+#' duplicates removed, and the last row added if it is not already there. Facet
+#' names are kept.
+#'
+#' @param split_rows The `split_rows` the caller gave.
+#' @param n_rows The number of rows being split.
+#'
+#' @return An integer vector of row numbers.
+#' @noRd
+normalise_split_rows <- function(split_rows,
+                                 n_rows) {
+  beyond <- split_rows > n_rows
+
+  if (any(beyond)) {
+    warning(paste0(
+      "split_rows values beyond the end of the data (",
+      paste(unique(split_rows[beyond]), collapse = ", "),
+      ") have been taken as the last row, ", n_rows, "."
+    ))
+  }
+
+  split_rows <- sort(pmin(split_rows, n_rows))
+  split_rows <- split_rows[!duplicated(split_rows)]
+
+  if (split_rows[length(split_rows)] != n_rows) {
+    split_rows <- c(split_rows, n_rows)
+  }
+
+  return(split_rows)
 }
 
 

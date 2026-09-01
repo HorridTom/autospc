@@ -649,3 +649,95 @@ test_that("the facets are analysed from the rounded counts", {
 
   expect_identical(result$y[result$stage == "3"], round(fractional$y))
 })
+
+
+# normalise_split_rows()
+
+
+test_that("a split row at the end of the data gives one stage", {
+  expect_identical(normalise_split_rows(split_rows = 43L, n_rows = 43L), 43L)
+})
+
+
+test_that("the end of the data is added where it is not asked for", {
+  expect_identical(
+    normalise_split_rows(split_rows = c(20L, 30L), n_rows = 43L),
+    c(20L, 30L, 43L)
+  )
+})
+
+
+test_that("split rows beyond the end of the data become the last row", {
+  expect_identical(
+    suppressWarnings(
+      normalise_split_rows(split_rows = c(20L, 44L), n_rows = 43L)
+    ),
+    c(20L, 43L)
+  )
+
+  expect_identical(
+    suppressWarnings(
+      normalise_split_rows(split_rows = c(44L, 45L), n_rows = 43L)
+    ),
+    43L
+  )
+})
+
+
+test_that("a split row beyond the end of the data warns", {
+  expect_warning(
+    normalise_split_rows(split_rows = c(44L, 45L), n_rows = 43L),
+    "beyond the end of the data \\(44, 45\\)"
+  )
+
+  expect_no_warning(
+    normalise_split_rows(split_rows = c(20L, 43L), n_rows = 43L),
+    message = "beyond the end of the data"
+  )
+})
+
+
+test_that("normalise_split_rows keeps the facet names", {
+  expect_identical(
+    suppressWarnings(
+      normalise_split_rows(
+        split_rows = c(early = 20L, late = 44L),
+        n_rows = 43L
+      )
+    ),
+    c(early = 20L, late = 43L)
+  )
+})
+
+
+# one stage
+
+
+test_that("a faceted chart of one stage draws one facet", {
+  plot <- facet_stages(short_facet_data,
+    split_rows = 40L, chart_type = "C", period_min = 21L
+  )
+
+  expect_s3_class(plot$facet, "FacetWrap")
+
+  expect_length(levels(ggplot2::ggplot_build(plot)$data[[1]]$PANEL), 1L)
+})
+
+
+test_that("the table of a faceted chart of one stage names the stage", {
+  table <- facet_stages(short_facet_data,
+    split_rows = 40L, chart_type = "C", period_min = 21L,
+    plot_chart = FALSE
+  )
+
+  expect_identical(unique(table$stage), "1")
+})
+
+
+test_that("an unfaceted chart's table has no stage column", {
+  table <- autospc(short_facet_data,
+    chart_type = "C", period_min = 21L, plot_chart = FALSE
+  )
+
+  expect_false("stage" %in% colnames(table))
+})

@@ -81,7 +81,8 @@ faceted_plot_data <- function(plot_data,
                               visualisation_params) {
   table <- combine_plot_data(
     plot_data = plot_data,
-    visualisation_params = visualisation_params
+    visualisation_params = visualisation_params,
+    faceted = TRUE
   )
 
   # Every facet is the same kind of chart, so the axes are taken from the last.
@@ -108,11 +109,13 @@ faceted_plot_data <- function(plot_data,
 #'
 #' @param charts A list of analysed `autospc_chart` objects.
 #' @param visualisation_params A named list of the visualisation parameters.
+#' @param faceted TRUE where the charts are the stages of a faceted plot.
 #'
 #' @return A data frame.
 #' @noRd
 charts_as_table <- function(charts,
-                            visualisation_params) {
+                            visualisation_params,
+                            faceted = FALSE) {
   plot_data <- build_plot_data(
     charts = charts,
     visualisation_params = visualisation_params
@@ -120,7 +123,8 @@ charts_as_table <- function(charts,
 
   return(combine_plot_data(
     plot_data = plot_data,
-    visualisation_params = visualisation_params
+    visualisation_params = visualisation_params,
+    faceted = faceted
   ))
 }
 
@@ -134,15 +138,18 @@ charts_as_table <- function(charts,
 #'
 #' @param plot_data The charts' plot data, as `build_plot_data()` gives it.
 #' @param visualisation_params A named list of the visualisation parameters.
+#' @param faceted TRUE where the charts are the stages of a faceted plot. A
+#'   faceted plot of one stage is still faceted, so this is not the number of
+#'   charts.
 #'
 #' @return A data frame.
 #' @noRd
 combine_plot_data <- function(plot_data,
-                              visualisation_params) {
+                              visualisation_params,
+                              faceted = FALSE) {
   charts <- lapply(plot_data, function(each) each$chart)
 
-  if (length(plot_data) > 1L && !is_xmr_pair(charts)) {
-    # Faceted plot
+  if (faceted) {
     stages <- lapply(plot_data, function(each) {
       if (visualisation_params$show_limits &&
         enough_data_for_limits(each$chart)) {
@@ -151,7 +158,7 @@ combine_plot_data <- function(plot_data,
 
       return(each$table)
     })
-    # Return for faceted plot
+
     return(dplyr::bind_rows(stages, .id = "stage"))
   }
 

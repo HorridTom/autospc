@@ -95,7 +95,7 @@ test_that("a missing element is caught on the constructor path", {
 
 
 test_that("a missing n is caught on the constructor path", {
-  no_n <- new_autospc_chart_p(autospc_chart_list(
+  no_n <- new_autospc_chart_p(assemble_chart_list(
     data = pre_agg_data,
     x = "x",
     y = "y"
@@ -110,7 +110,7 @@ test_that("a missing n is caught on the constructor path", {
 
 test_that("validate_autospc_chart_p rejects a bare autospc_chart object", {
   expect_error(
-    validate_autospc_chart_p(new_autospc_chart(autospc_chart_list(
+    validate_autospc_chart_p(new_autospc_chart(assemble_chart_list(
       data = pre_agg_data,
       x = "x",
       y = "y"

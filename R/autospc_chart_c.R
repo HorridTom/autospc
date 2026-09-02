@@ -59,7 +59,7 @@ autospc_chart_c <- function(data,
                             x,
                             y,
                             ...) {
-  autospc_chart_c_l <- autospc_chart_list(
+  autospc_chart_c_l <- assemble_chart_list(
     data = data,
     x = x,
     y = y,

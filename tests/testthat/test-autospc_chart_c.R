@@ -23,11 +23,17 @@ test_that("autospc_chart_c returns the common elements and no others", {
 })
 
 
-test_that("baseline_length is present and NULL by default", {
+test_that("baseline_length defaults to period_min", {
   chart <- test_chart_c()
 
-  expect_true("baseline_length" %in% names(chart))
-  expect_null(chart$baseline_length)
+  expect_identical(chart$baseline_length, chart$period_min)
+})
+
+
+test_that("baseline_length is coerced to an integer", {
+  chart <- test_chart_c(baseline_length = 30.7)
+
+  expect_identical(chart$baseline_length, 30L)
 })
 
 
@@ -49,7 +55,11 @@ test_that("defaults populated as expected", {
 test_that("a chart built without chart parameters takes autospc()'s defaults", {
   chart <- test_chart_c()
 
-  for (parameter in autospc_chart_parameters()) {
+  # baseline_length is the exception: autospc() declares it NULL, and the chart
+  # takes period_min in its place. The test above covers it.
+  parameters <- setdiff(autospc_chart_parameters(), "baseline_length")
+
+  for (parameter in parameters) {
     expect_identical(chart[[parameter]],
       autospc_default(parameter),
       info = parameter

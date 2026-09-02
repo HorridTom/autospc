@@ -267,12 +267,18 @@ assemble_chart_list <- function(
   floating_median_n = autospc_default("floating_median_n"),
   keep_candidate_tables = autospc_default("keep_candidate_tables")
 ) {
+  # baseline_length is period_min unless the caller sets it, so that every
+  # chart has a first calculation period length and the field is never NULL.
+  if (is.null(baseline_length)) {
+    baseline_length <- period_min
+  }
+
   autospc_chart_l <- list(
     data = data,
     x = x,
     y = y,
     period_min = period_min,
-    baseline_length = baseline_length,
+    baseline_length = as.integer(baseline_length),
     shift_rule_threshold = shift_rule_threshold,
     baseline_only = baseline_only,
     establish_every_shift = establish_every_shift,

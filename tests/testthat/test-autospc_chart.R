@@ -23,7 +23,7 @@ test_that("new_autospc_chart rejects an object that is not a list", {
 
 
 test_that("validate_autospc_chart rejects a list that is not a chart", {
-  bare_list <- autospc_chart_list(data = test_data, x = "x", y = "y")
+  bare_list <- assemble_chart_list(data = test_data, x = "x", y = "y")
 
   expect_error(
     validate_autospc_chart(bare_list),
@@ -33,7 +33,7 @@ test_that("validate_autospc_chart rejects a list that is not a chart", {
 
 
 test_that("y_axis_title has no method for a bare autospc_chart", {
-  bare_chart <- new_autospc_chart(autospc_chart_list(
+  bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"
@@ -44,7 +44,7 @@ test_that("y_axis_title has no method for a bare autospc_chart", {
 
 
 test_that("aggregate_data returns a bare autospc_chart unchanged", {
-  bare_chart <- new_autospc_chart(autospc_chart_list(
+  bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"
@@ -55,7 +55,7 @@ test_that("aggregate_data returns a bare autospc_chart unchanged", {
 
 
 test_that("chart_type_label has no method for a bare autospc_chart", {
-  bare_chart <- new_autospc_chart(autospc_chart_list(
+  bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"
@@ -66,7 +66,7 @@ test_that("chart_type_label has no method for a bare autospc_chart", {
 
 
 test_that("calculate_limits has no method for a bare autospc_chart", {
-  bare_chart <- new_autospc_chart(autospc_chart_list(
+  bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"
@@ -80,18 +80,18 @@ test_that("calculate_limits has no method for a bare autospc_chart", {
 
 
 # Catch deviations between autospc_chart_elements() (validation) and
-# autospc_chart_list() (creation via helper)
+# assemble_chart_list() (creation via helper)
 
-test_that("autospc_chart_list assembles exactly the chart elements", {
-  bare_list <- autospc_chart_list(data = test_data, x = "x", y = "y")
+test_that("assemble_chart_list assembles exactly the chart elements", {
+  bare_list <- assemble_chart_list(data = test_data, x = "x", y = "y")
 
   expect_setequal(names(bare_list), autospc_chart_elements())
 })
 
 
-test_that("every autospc_chart_list argument is a chart element", {
+test_that("every assemble_chart_list argument is a chart element", {
   expect_identical(
-    setdiff(names(formals(autospc_chart_list)), autospc_chart_elements()),
+    setdiff(names(formals(assemble_chart_list)), autospc_chart_elements()),
     character(0)
   )
 })
@@ -430,7 +430,7 @@ test_that("the classes with no override inherit the averaging default", {
 # limits_table_columns()
 
 test_that("limits_table_columns is empty by default", {
-  bare_chart <- new_autospc_chart(autospc_chart_list(
+  bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"
@@ -563,7 +563,7 @@ test_that("centre line labels are rounded to whole numbers by default", {
 
 
 test_that("the default y axis range is a percentage scale", {
-  bare_chart <- new_autospc_chart(autospc_chart_list(
+  bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"

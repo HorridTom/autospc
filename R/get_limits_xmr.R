@@ -27,23 +27,23 @@ get_x_limits <- function(y,
     y_excl <- y
   }
 
-  # Calculations of limits for I charts
+  # Calculations of limits for X charts
   mr <- abs(diff(y_excl))
   mr_lims <- mr_limits(
     mr = mr,
     mr_screen_max_loops = mr_screen_max_loops
   )
 
-  mean_i <- mean(y_excl, na.rm = TRUE)
+  mean_x <- mean(y_excl, na.rm = TRUE)
   sigma <- mr_lims$mean_mr / 1.128
-  ucl_i <- mean_i + (3 * sigma)
-  lcl_i <- mean_i - (3 * sigma)
+  ucl_x <- mean_x + (3 * sigma)
+  lcl_x <- mean_x - (3 * sigma)
 
   # Lists the results
   return(list(
-    cl = rep(mean_i, length(y)),
-    ucl = rep(ucl_i, length(y)),
-    lcl = rep(lcl_i, length(y))
+    cl = rep(mean_x, length(y)),
+    ucl = rep(ucl_x, length(y)),
+    lcl = rep(lcl_x, length(y))
   ))
 }
 

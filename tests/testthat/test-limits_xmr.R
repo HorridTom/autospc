@@ -11,8 +11,8 @@ test_individual_answer <- readRDS(file.path(
   "test_individual_answer.rds"
 ))
 
-# test that the i chart limits is the same as qicharts2 results
-test_that("I chart limits the same as live qicharts2 v.0.7.2", {
+# test that the X chart limits is the same as qicharts2 results
+test_that("X chart limits the same as live qicharts2 v.0.7.2", {
   results <- get_x_limits(
     y = test_data$y,
     mr_screen_max_loops = 1
@@ -35,7 +35,7 @@ test_mr_answer <- readRDS(file.path(
   "test_mr_answer.rds"
 ))
 
-test_that("I chart limits with mr screening remove extreme moving ranges", {
+test_that("X chart limits with mr screening remove extreme moving ranges", {
   results <- get_x_limits(
     y = extreme_mr_data$y,
     mr_screen_max_loops = 1
@@ -47,7 +47,7 @@ test_that("I chart limits with mr screening remove extreme moving ranges", {
 })
 
 # ...and that they are not when mr_screen_max_loops = 0
-test_that("I chart limits correct without mr screening", {
+test_that("X chart limits correct without mr screening", {
   results <- get_x_limits(
     y = extreme_mr_data$y,
     mr_screen_max_loops = 0

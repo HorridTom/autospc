@@ -71,7 +71,7 @@ validate_autospc_chart <- function(x) {
 
 #' Elements common to all autospc_chart objects
 #'
-#' These names are duplicated by `autospc_chart_list()`, which assembles
+#' These names are duplicated by `assemble_chart_list()`, which assembles
 #' exactly these elements - adding one means adding it in both places.
 #'
 #' data_original is a derived field retaining (by convention only) a copy of the
@@ -249,7 +249,7 @@ autospc_chart <- function(chart_type,
 #' @return A named list holding the elements given by
 #'   `autospc_chart_elements()`.
 #' @noRd
-autospc_chart_list <- function(
+assemble_chart_list <- function(
   data,
   x,
   y,

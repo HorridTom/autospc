@@ -95,7 +95,7 @@ test_that("an unrecognised argument name is rejected", {
 
 
 test_that("a missing n is caught on the constructor path", {
-  no_n <- new_autospc_chart_pp(autospc_chart_list(
+  no_n <- new_autospc_chart_pp(assemble_chart_list(
     data = pp_pre_agg_data,
     x = "x",
     y = "y"
@@ -110,7 +110,7 @@ test_that("a missing n is caught on the constructor path", {
 
 test_that("validate_autospc_chart_pp rejects a bare autospc_chart object", {
   expect_error(
-    validate_autospc_chart_pp(new_autospc_chart(autospc_chart_list(
+    validate_autospc_chart_pp(new_autospc_chart(assemble_chart_list(
       data = pp_pre_agg_data,
       x = "x",
       y = "y"

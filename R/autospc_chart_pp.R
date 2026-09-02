@@ -118,7 +118,7 @@ autospc_chart_pp <- function(data,
                              y,
                              n,
                              ...) {
-  autospc_chart_pp_l <- autospc_chart_list(
+  autospc_chart_pp_l <- assemble_chart_list(
     data = data,
     x = x,
     y = y,

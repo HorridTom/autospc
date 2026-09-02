@@ -270,3 +270,135 @@ test_that("facet_stages checks its own plot_chart argument", {
     "`plot_chart` must be TRUE or FALSE"
   )
 })
+
+
+# the numeric arguments
+
+
+test_that("every numeric argument is checked", {
+  # the kinds cannot be read off the signature, so this is the list that is
+  # expected
+  expect_setequal(
+    names(autospc_numeric_arguments()),
+    c(
+      "period_min",
+      "baseline_length",
+      "shift_rule_threshold",
+      "floating_median_n",
+      "max_exclusions",
+      "mr_screen_max_loops",
+      "centre_line_tolerance",
+      "point_size",
+      "line_width_sf",
+      "annotation_size",
+      "annotation_arrow_curve",
+      "upper_annotation_sf",
+      "lower_annotation_sf",
+      "override_y_lim",
+      "x_break",
+      "x_pad_end",
+      "extend_limits_to"
+    )
+  )
+})
+
+
+test_that("every numeric argument rejects a string", {
+  for (name in names(autospc_numeric_arguments())) {
+    expect_error(
+      do.call(autospc, call_with(name, "banana")),
+      paste0("`", name, "` must be"),
+      info = name
+    )
+  }
+})
+
+
+test_that("a count argument rejects zero, a negative and a fraction", {
+  expect_error(match_number(0, "period_min", "count"), "one or more")
+  expect_error(match_number(-5, "period_min", "count"), "one or more")
+  expect_error(match_number(21.5, "period_min", "count"), "one or more")
+
+  expect_identical(match_number(21L, "period_min", "count"), 21L)
+})
+
+
+test_that("max_exclusions accepts zero, which excludes nothing", {
+  expect_identical(match_number(0, "max_exclusions", "count_from_zero"), 0)
+
+  result <- analyse(max_exclusions = 0)
+
+  expect_false(any(result$excluded, na.rm = TRUE))
+})
+
+
+test_that("max_exclusions rejects Inf, which would not terminate", {
+  # find_extremes() loops max_exclusions times with no other way out
+  expect_error(
+    match_number(Inf, "max_exclusions", "count_from_zero"),
+    "whole number of zero or more"
+  )
+})
+
+
+test_that("mr_screen_max_loops accepts zero and Inf", {
+  expect_identical(match_number(0, "mr_screen_max_loops", "loops"), 0)
+  expect_identical(match_number(Inf, "mr_screen_max_loops", "loops"), Inf)
+})
+
+
+test_that("centre_line_tolerance takes a fraction but not a negative", {
+  expect_identical(
+    match_number(0.5, "centre_line_tolerance", "non_negative"),
+    0.5
+  )
+  expect_error(
+    match_number(-1, "centre_line_tolerance", "non_negative"),
+    "zero or more"
+  )
+})
+
+
+test_that("a size argument rejects zero and a negative", {
+  expect_error(match_number(0, "point_size", "positive"), "above zero")
+  expect_error(match_number(-1, "point_size", "positive"), "above zero")
+
+  expect_identical(match_number(1.5, "point_size", "positive"), 1.5)
+})
+
+
+test_that("an axis value is not restricted to a number", {
+  # x_break is a difftime where the horizontal axis holds dates, and the axis
+  # is not meant to be limited to the types it holds today
+  expect_identical(
+    match_axis_value(as.difftime(2, units = "days"), "x_break"),
+    as.difftime(2, units = "days")
+  )
+  expect_identical(
+    match_axis_value(as.Date("2020-01-01"), "extend_limits_to"),
+    as.Date("2020-01-01")
+  )
+  expect_identical(match_axis_value(40, "extend_limits_to"), 40)
+})
+
+
+test_that("an axis value rejects more than one value and NA", {
+  expect_error(match_axis_value(c(1, 2), "x_break"), "a single value")
+  expect_error(match_axis_value(NA, "x_break"), "a single value")
+})
+
+
+test_that("an argument autospc declares as NULL accepts NULL", {
+  for (name in names(autospc_numeric_arguments())) {
+    if (!is.null(autospc_default(name))) {
+      next
+    }
+
+    # given[[name]] <- NULL would remove the element rather than set it
+    given <- call_with(name, 1)
+    given[name] <- list(NULL)
+    given$plot_chart <- FALSE
+
+    expect_s3_class(do.call(autospc, given), "data.frame")
+  }
+})

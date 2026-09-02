@@ -282,6 +282,91 @@ match_range <- function(value,
 }
 
 
+#' Check that one numeric argument is of the kind it accepts
+#'
+#' The kinds are listed in `autospc_numeric_arguments()`. Inf is a number but
+#' not a finite one, and is accepted only where the kind says so.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_number <- function(value,
+                         name,
+                         kind,
+                         call = rlang::caller_env()) {
+  accepts <- switch(kind,
+    count = "a whole number of one or more",
+    count_from_zero = "a whole number of zero or more",
+    loops = "a whole number of zero or more, or Inf",
+    non_negative = "a number of zero or more",
+    positive = "a number above zero",
+    number = "a number"
+  )
+
+  is_kind <- is.numeric(value) &&
+    length(value) == 1L &&
+    !is.na(value) &&
+    switch(kind,
+      count = is.finite(value) && is_whole_number(value) && value >= 1,
+      count_from_zero = is.finite(value) &&
+        is_whole_number(value) &&
+        value >= 0,
+      loops = identical(value, Inf) ||
+        (is.finite(value) && is_whole_number(value) && value >= 0),
+      non_negative = is.finite(value) && value >= 0,
+      positive = is.finite(value) && value > 0,
+      number = is.finite(value)
+    )
+
+  if (!is_kind) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be %s, not %s.",
+        name,
+        accepts,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Check that one argument is a single point on the horizontal axis
+#'
+#' The types the axis holds are not listed here. It holds dates and times as
+#' well as numbers, and is not meant to be limited to the types it holds today,
+#' so what cannot be a point on it is named instead of what can. Text is
+#' excluded because a string reaches `seq()` in `format_x_axis()` and fails
+#' there.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_axis_value <- function(value,
+                             name,
+                             call = rlang::caller_env()) {
+  is_value <- length(value) == 1L &&
+    !is.list(value) &&
+    !is.character(value) &&
+    !is.factor(value) &&
+    !is.na(value)
+
+  if (!is_value) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a single value on the horizontal axis, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
 #' Check the arguments that accept a fixed set of values
 #'
 #' Called once per call to `autospc()` or `facet_stages()`, before
@@ -310,6 +395,23 @@ validate_argument_values <- function(arguments,
     range = c(0L, 2L),
     call = call
   )
+
+  kinds <- autospc_numeric_arguments()
+
+  for (name in names(kinds)) {
+    value <- arguments[[name]]
+
+    # an argument autospc() declares as NULL accepts NULL
+    if (is.null(value) && is.null(autospc_default(name))) {
+      next
+    }
+
+    arguments[[name]] <- if (identical(kinds[[name]], "axis_value")) {
+      match_axis_value(value, name, call = call)
+    } else {
+      match_number(value, name, kinds[[name]], call = call)
+    }
+  }
 
   return(arguments)
 }

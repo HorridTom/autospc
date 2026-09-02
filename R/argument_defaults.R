@@ -54,6 +54,49 @@ autospc_flag_arguments <- function() {
 }
 
 
+#' The numeric arguments of autospc(), and what each accepts
+#'
+#' The kinds are:
+#' \itemize{
+#'   \item `count` — a whole number of one or more
+#'   \item `count_from_zero` — a whole number of zero or more
+#'   \item `loops` — a whole number of zero or more, or Inf
+#'   \item `non_negative` — a number of zero or more
+#'   \item `positive` — a number above zero
+#'   \item `number` — any single finite number
+#'   \item `axis_value` — a single value of whatever type the horizontal axis
+#'     holds, which is not restricted to numbers
+#' }
+#'
+#' Unlike the Boolean arguments these cannot be read off the signature, because
+#' the default does not say what the argument accepts. This is the one place the
+#' constraint is written.
+#'
+#' @return A named character vector, argument name to kind.
+#' @noRd
+autospc_numeric_arguments <- function() {
+  return(c(
+    period_min = "count",
+    baseline_length = "count",
+    shift_rule_threshold = "count",
+    floating_median_n = "count",
+    max_exclusions = "count_from_zero",
+    mr_screen_max_loops = "loops",
+    centre_line_tolerance = "non_negative",
+    point_size = "positive",
+    line_width_sf = "positive",
+    annotation_size = "positive",
+    annotation_arrow_curve = "number",
+    upper_annotation_sf = "number",
+    lower_annotation_sf = "number",
+    override_y_lim = "number",
+    x_break = "axis_value",
+    x_pad_end = "axis_value",
+    extend_limits_to = "axis_value"
+  ))
+}
+
+
 #' The deprecated arguments of autospc()
 #'
 #' The arguments whose default is `deprecated()`.

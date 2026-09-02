@@ -33,7 +33,8 @@
 #' @param baseline_length Integer, the number of points used to form the first
 #' calculation period. Defaults to period_min. Where the series has fewer points
 #' than this, all of them are used. period_min remains the minimum number of
-#' points needed to form limits.
+#' points needed to form limits. A value given as a decimal is truncated to a
+#' whole number.
 #' @param shift_rule_threshold The minimum number of consecutive points above or
 #' below the centre line constituting a shift (or "rule 2") break.
 #' @param baseline_only Boolean - if TRUE, do not re-establish control limits,

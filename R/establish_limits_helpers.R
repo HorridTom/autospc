@@ -510,7 +510,7 @@ counter_at_rule_break <- function(table,
 }
 
 
-#' Length of the first calculation period when a baseline is set
+#' Length of the first calculation period
 #'
 #' `baseline_length`, or everything available when the series is shorter.
 #'

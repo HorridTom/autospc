@@ -85,8 +85,8 @@ test_that("the counter's path is recorded, without non-moves", {
 })
 
 
-test_that("baseline extent is recorded only when baseline_length is set", {
-  expect_null(analysed_2a()$history$baseline)
+test_that("the first period length is recorded for every chart", {
+  expect_identical(analysed_2a()$history$baseline$length, 21L)
 
   chart <- autospc_chart(
     chart_type = "C\'",
@@ -98,7 +98,22 @@ test_that("baseline extent is recorded only when baseline_length is set", {
   analysed <- establish_limits(prepare_data(chart))
 
   expect_identical(analysed$history$baseline$length, 25L)
-  expect_identical(analysed$history$baseline$rows, 1:25)
+})
+
+
+test_that("a baseline longer than the series is the length of the series", {
+  thirty <- data.frame(x = 1:30, y = rep(c(10, 14, 11, 16, 12), 6))
+
+  chart <- autospc_chart(
+    chart_type = "C\'",
+    data = thirty,
+    x = "x",
+    y = "y",
+    baseline_length = 63L
+  )
+  analysed <- establish_limits(prepare_data(chart))
+
+  expect_identical(analysed$history$baseline$length, 30L)
 })
 
 

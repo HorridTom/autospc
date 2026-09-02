@@ -21,7 +21,7 @@ autospc(
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
-  floating_median = "no",
+  floating_median = c("no", "yes", "auto"),
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
@@ -169,7 +169,8 @@ e.g. \code{write.csv()}.}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
 standard output log; the higher the number the more information is provided,
-none if 0.}
+none if 0. A value outside the range is taken as the nearest end of it, and a
+value between two whole numbers as the next one up.}
 
 \item{log_file_path}{if not NULL (the default), path to save log file to.
 The file extension provided (.rds or .csv) determines the type of file the

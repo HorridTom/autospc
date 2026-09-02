@@ -26,6 +26,34 @@ autospc_default <- function(name) {
 }
 
 
+#' The arguments of autospc() that must be TRUE or FALSE
+#'
+#' The arguments whose default is a single TRUE or FALSE. They are read from the
+#' signature so any arguments added are covered without a second list to keep in
+#' step.
+#'
+#' @return A character vector of argument names.
+#' @noRd
+autospc_flag_arguments <- function() {
+  names_wanted <- setdiff(
+    names(formals(autospc)),
+    c("data", "x", "y", "n", autospc_deprecated_arguments())
+  )
+
+  is_flag <- vapply(
+    names_wanted,
+    function(name) {
+      default <- autospc_default(name)
+
+      return(is.logical(default) && length(default) == 1L)
+    },
+    logical(1L)
+  )
+
+  return(names_wanted[is_flag])
+}
+
+
 #' The deprecated arguments of autospc()
 #'
 #' The arguments whose default is `deprecated()`.

@@ -193,3 +193,225 @@ round_count_column <- function(data,
 
   return(data)
 }
+
+
+#' Describe a value in an error message
+#'
+#' @return A character scalar.
+#' @noRd
+describe_value <- function(value) {
+  return(paste(deparse(value), collapse = " "))
+}
+
+
+#' Match one argument against the values it accepts
+#'
+#' The accepted values are the argument's default in `autospc()`, written there
+#' as a vector. An argument the caller did not give arrives as that whole
+#' vector, and `rlang::arg_match0()` takes the first of them.
+#'
+#' @return The matched value, or an error naming the argument.
+#' @noRd
+match_choice <- function(value,
+                         name,
+                         call = rlang::caller_env()) {
+  return(rlang::arg_match0(
+    value,
+    values = autospc_default(name),
+    arg_nm = name,
+    error_call = call
+  ))
+}
+
+
+#' Check that one argument is TRUE or FALSE
+#'
+#' 1 and 0 are accepted, as they are anywhere R expects a condition. NA is not,
+#' being neither TRUE nor FALSE.
+#'
+#' @return TRUE or FALSE, or an error naming the argument.
+#' @noRd
+match_flag <- function(value,
+                       name,
+                       call = rlang::caller_env()) {
+  is_flag <- length(value) == 1L &&
+    !is.na(value) &&
+    (is.logical(value) ||
+      (is.numeric(value) && value %in% c(0, 1)))
+
+  if (!is_flag) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be TRUE or FALSE, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(as.logical(value))
+}
+
+
+#' Bring one argument into the range it is documented to take
+#'
+#' A value outside the range is taken as the nearest end of it, and a value
+#' between two whole numbers as the ceiling.
+#'
+#' @return An integer in `range`, or an error naming the argument.
+#' @noRd
+match_range <- function(value,
+                        name,
+                        range,
+                        call = rlang::caller_env()) {
+  if (!is.numeric(value) || length(value) != 1L || is.na(value)) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a number from %d to %d, not %s.",
+        name,
+        range[1],
+        range[2],
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(as.integer(min(max(ceiling(value), range[1]), range[2])))
+}
+
+
+#' Check that one numeric argument is of the kind it accepts
+#'
+#' The kinds are listed in `autospc_numeric_arguments()`. Inf is a number but
+#' not a finite one, and is accepted only where the kind says so.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_number <- function(value,
+                         name,
+                         kind,
+                         call = rlang::caller_env()) {
+  accepts <- switch(kind,
+    count = "a whole number of one or more",
+    count_from_zero = "a whole number of zero or more",
+    loops = "a whole number of zero or more, or Inf",
+    non_negative = "a number of zero or more",
+    positive = "a number above zero",
+    number = "a number"
+  )
+
+  is_kind <- is.numeric(value) &&
+    length(value) == 1L &&
+    !is.na(value) &&
+    switch(kind,
+      count = is.finite(value) && is_whole_number(value) && value >= 1,
+      count_from_zero = is.finite(value) &&
+        is_whole_number(value) &&
+        value >= 0,
+      loops = identical(value, Inf) ||
+        (is.finite(value) && is_whole_number(value) && value >= 0),
+      non_negative = is.finite(value) && value >= 0,
+      positive = is.finite(value) && value > 0,
+      number = is.finite(value)
+    )
+
+  if (!is_kind) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be %s, not %s.",
+        name,
+        accepts,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Check that one argument is a single point on the horizontal axis
+#'
+#' The types the axis holds are not listed here. It holds dates and times as
+#' well as numbers, and is not meant to be limited to the types it holds today,
+#' so what cannot be a point on it is named instead of what can. Text is
+#' excluded because a string reaches `seq()` in `format_x_axis()` and fails
+#' there.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_axis_value <- function(value,
+                             name,
+                             call = rlang::caller_env()) {
+  is_value <- length(value) == 1L &&
+    !is.list(value) &&
+    !is.character(value) &&
+    !is.factor(value) &&
+    !is.na(value)
+
+  if (!is_value) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a single value on the horizontal axis, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Check the arguments that accept a fixed set of values
+#'
+#' Called once per call to `autospc()` or `facet_stages()`, before
+#' `validate_algorithm_parameters()`, so that a value that is not one of those
+#' allowed is reported as such rather than failing the consistency check.
+#'
+#' @param arguments A named list of the argument values for one call.
+#'
+#' @return `arguments`, with each checked value as it was matched.
+#' @noRd
+validate_argument_values <- function(arguments,
+                                     call = rlang::caller_env()) {
+  arguments$floating_median <- match_choice(
+    arguments$floating_median,
+    "floating_median",
+    call = call
+  )
+
+  for (name in autospc_flag_arguments()) {
+    arguments[[name]] <- match_flag(arguments[[name]], name, call = call)
+  }
+
+  arguments$verbosity <- match_range(
+    arguments$verbosity,
+    "verbosity",
+    range = c(0L, 2L),
+    call = call
+  )
+
+  kinds <- autospc_numeric_arguments()
+
+  for (name in names(kinds)) {
+    value <- arguments[[name]]
+
+    # an argument autospc() declares as NULL accepts NULL
+    if (is.null(value) && is.null(autospc_default(name))) {
+      next
+    }
+
+    arguments[[name]] <- if (identical(kinds[[name]], "axis_value")) {
+      match_axis_value(value, name, call = call)
+    } else {
+      match_number(value, name, kinds[[name]], call = call)
+    }
+  }
+
+  return(arguments)
+}

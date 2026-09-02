@@ -90,7 +90,8 @@
 #' e.g. `write.csv()`.
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
-#' none if 0.
+#' none if 0. A value outside the range is taken as the nearest end of it, and a
+#' value between two whole numbers as the next one up.
 #' @param log_file_path if not NULL (the default), path to save log file to.
 #' The file extension provided (.rds or .csv) determines the type of file the
 #' log data is saved to. Full log data is saved, regardless of verbosity.
@@ -205,7 +206,7 @@ autospc <- function(data,
                     highlight_exclusions = TRUE,
                     mr_screen_max_loops = 1L,
                     centre_line_tolerance = 0,
-                    floating_median = "no",
+                    floating_median = c("no", "yes", "auto"),
                     floating_median_n = 12L,
                     ## Output Type
                     plot_chart = TRUE,
@@ -318,6 +319,8 @@ autospc <- function(data,
     )
   ))
 
+  arguments <- validate_argument_values(arguments)
+
   arguments <- validate_algorithm_parameters(arguments)
 
   # The validated analysis parameters
@@ -351,12 +354,12 @@ autospc <- function(data,
 
   report_analysis(
     charts = charts,
-    show_limits = show_limits,
-    verbosity = verbosity,
-    log_file_path = log_file_path
+    show_limits = arguments$show_limits,
+    verbosity = arguments$verbosity,
+    log_file_path = arguments$log_file_path
   )
 
-  if (!plot_chart) {
+  if (!arguments$plot_chart) {
     return(charts_as_table(
       charts = charts,
       visualisation_params = visualisation_params

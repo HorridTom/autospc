@@ -115,11 +115,11 @@ test_that("every visualisation parameter reaches the plot object", {
 
     # 1.5 is a valid value for the numeric parameters; the logical and character
     # parameters need a value of their own type
-    if (is.logical(formals(autospc)[[parameter]])) {
-      given[[parameter]] <- !formals(autospc)[[parameter]]
+    if (is.logical(autospc_default(parameter))) {
+      given[[parameter]] <- !autospc_default(parameter)
     }
 
-    if (is.character(formals(autospc)[[parameter]])) {
+    if (is.character(autospc_default(parameter))) {
       given[[parameter]] <- "given"
     }
 

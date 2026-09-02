@@ -36,6 +36,8 @@ facet_stages <- function(data,
                          ...) {
   caller <- parent.frame()
 
+  plot_chart <- match_flag(plot_chart, "plot_chart")
+
   dots_exprs <- rlang::exprs(...)
 
   if ("show_mr" %in% names(dots_exprs)) {
@@ -77,6 +79,8 @@ facet_stages <- function(data,
   )
 
   arguments <- autospc_argument_values(given)
+
+  arguments <- validate_argument_values(arguments)
 
   arguments <- validate_algorithm_parameters(arguments)
 

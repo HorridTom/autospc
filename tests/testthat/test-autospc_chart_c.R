@@ -60,8 +60,10 @@ test_that("a chart built without chart parameters takes autospc()'s defaults", {
   parameters <- setdiff(autospc_chart_parameters(), "baseline_length")
 
   for (parameter in parameters) {
+    # where the default declares a set of accepted values, the first is the
+    # one the chart takes
     expect_identical(chart[[parameter]],
-      autospc_default(parameter),
+      autospc_default(parameter)[1],
       info = parameter
     )
   }

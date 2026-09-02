@@ -273,6 +273,8 @@ assemble_chart_list <- function(
     baseline_length <- period_min
   }
 
+  floating_median <- match_choice(floating_median, "floating_median")
+
   autospc_chart_l <- list(
     data = data,
     x = x,

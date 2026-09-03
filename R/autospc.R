@@ -7,7 +7,9 @@
 #' @param data A data frame. For column requirements by chart type, see
 #' \code{vignette("data-requirements", package = "autospc")}.
 #' @param x Name of column (passed using tidyselect semantics) to use as
-#' subgroups on the horizontal axis of the chart.
+#' subgroups on the horizontal axis of the chart. Rows with NA in this column
+#' are excluded, with a warning; see the Options section of
+#' \code{\link{autospc-package}} to turn the warning off.
 #' @param y Name of column (passed using tidyselect semantics) to use as:
 #' \itemize{
 #'  \item the variable to be plotted for XMR charts,
@@ -308,6 +310,8 @@ autospc <- function(data,
   n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")
 
   check_x_type(data[[x_name]])
+
+  data <- drop_missing_x(data, x_column = x_name)
 
   # Named list of every argument of the call by name, apart from the data,
   # the columns, and the deprecated arguments dealt with above.

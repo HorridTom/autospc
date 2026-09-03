@@ -109,6 +109,8 @@ facet_stages <- function(data,
 
   check_x_type(df_rn$x)
 
+  df_rn <- drop_missing_x(df_rn, x_column = "x")
+
   # Resolved once for the call, from the chart of the whole series.
   visualisation_params <- resolve_default_visualisation_params(
     visualisation_params = visualisation_params,

@@ -62,7 +62,9 @@ autospc(
 \code{vignette("data-requirements", package = "autospc")}.}
 
 \item{x}{Name of column (passed using tidyselect semantics) to use as
-subgroups on the horizontal axis of the chart.}
+subgroups on the horizontal axis of the chart. Rows with NA in this column
+are excluded, with a warning; see the Options section of
+\code{\link{autospc-package}} to turn the warning off.}
 
 \item{y}{Name of column (passed using tidyselect semantics) to use as:
 \itemize{

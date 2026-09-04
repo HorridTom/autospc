@@ -37,6 +37,16 @@ than walking over it as a row. This changes results for any series that has one.
 
 * The warning given when a series is too short now says how many points it has.
 
+* **`aggregation_na_rm` controls what an observation with no value does to the
+  subgroup it is aggregated into.** `FALSE`, the default, makes the whole
+  subgroup missing, as the package has always done. `TRUE` discards the
+  observation and forms the subgroup from the rest. A row is discarded when
+  either its `y` or its `n` has no value, so a subgroup's numerator and
+  denominator always count the same observations. A subgroup that loses every
+  observation stays on the chart as a missing point rather than disappearing.
+  `aggregation_na_rm` has no effect on data that is already one row per
+  subgroup, or on X and MR charts, which do not aggregate.
+
 # autospc 0.1.0.9003
 
 ## Bug fixes

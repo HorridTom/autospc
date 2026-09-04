@@ -92,6 +92,7 @@ test_that("the Boolean arguments are the ones autospc defaults to TRUE or FALSE"
   expect_setequal(
     autospc_flag_arguments(),
     c(
+      "aggregation_na_rm",
       "baseline_only",
       "establish_every_shift",
       "no_regrets",

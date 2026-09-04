@@ -24,6 +24,14 @@
 #' \cr
 #' See \code{vignette("data-requirements", package = "autospc")} for more
 #' details.
+#' @param aggregation_na_rm Boolean controlling what happens to an observation
+#' with no value when aggregating into subgroups. FALSE, the default, makes the
+#' whole subgroup missing. TRUE discards the observation and forms the subgroup
+#' from the rest. A row is discarded when either its `y` or its `n` (for chart
+#' types that require it) has no value, so that a subgroup's numerator and
+#' denominator always count the same observations. Where every observation in a
+#' subgroup is discarded the subgroup itself is missing. Has no effect on data
+#' that is already one row per subgroup, or on X and MR charts.
 #' @param chart_type The type of chart you wish to plot. Must must have length
 #' one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 #'
@@ -198,6 +206,7 @@ autospc <- function(data,
                     x,
                     y,
                     n,
+                    aggregation_na_rm = FALSE,
                     chart_type = NULL,
                     ## Algorithm Parameters
                     period_min = 21L,

@@ -247,3 +247,60 @@ restate_history_rows <- function(history,
 
   return(history)
 }
+
+
+#' Sum observations over subgroups, discarding those with no value
+#'
+#' What `aggregation_na_rm = TRUE` does. A row is discarded when any of the
+#' columns being summed has no value, so that a subgroup's numerator and
+#' denominator always count the same observations.
+#'
+#' A subgroup all of whose observations are discarded stays in the series with
+#' no value, rather than leaving it. There was a subgroup there; nothing is
+#' known about it.
+#'
+#' @param data The data to aggregate, with an `x` column.
+#' @param columns The columns to sum, as a character vector.
+#'
+#' @return A data frame of one row per value of `x`.
+#' @noRd
+sum_over_subgroups_dropping_missing <- function(data,
+                                                columns) {
+  complete <- data %>%
+    dplyr::filter(dplyr::if_all(dplyr::all_of(columns), ~ !is.na(.x)))
+
+  totals <- complete %>%
+    dplyr::group_by(x) %>%
+    dplyr::summarise(dplyr::across(dplyr::all_of(columns), sum))
+
+  every_subgroup <- data %>%
+    dplyr::distinct(x)
+
+  return(dplyr::left_join(every_subgroup, totals, by = "x"))
+}
+
+
+#' Sum observations over subgroups
+#'
+#' `aggregation_na_rm` decides what an observation with no value does to the
+#' subgroup it belongs to.
+#'
+#' @param data The data to aggregate, with an `x` column.
+#' @param columns The columns to sum, as a character vector.
+#' @param aggregation_na_rm Whether to discard an observation with no value.
+#'
+#' @return A data frame of one row per value of `x`.
+#' @noRd
+sum_over_subgroups <- function(data,
+                               columns,
+                               aggregation_na_rm) {
+  if (aggregation_na_rm) {
+    return(sum_over_subgroups_dropping_missing(data, columns = columns))
+  }
+
+  totals <- data %>%
+    dplyr::group_by(x) %>%
+    dplyr::summarise(dplyr::across(dplyr::all_of(columns), sum))
+
+  return(totals)
+}

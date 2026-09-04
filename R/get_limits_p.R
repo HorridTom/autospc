@@ -3,8 +3,7 @@
 get_p_limits <- function(y,
                          n,
                          exclusion_points = NULL,
-                         multiply = 1,
-                         na.rm = TRUE) {
+                         multiply = 1) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -16,13 +15,6 @@ get_p_limits <- function(y,
 
   if (!is.numeric(y) | !is.numeric(n)) {
     stop("The input data is not numeric.")
-  }
-
-  if (na.rm == FALSE & (any(is.na(y)) | any(is.na(y)))) {
-    stop(paste(
-      "There are missing values in the input data. Set na.rm to TRUE",
-      "if you wish to ignore these."
-    ))
   }
 
   if (!is.null(exclusion_points) & length(exclusion_points) > 0) {
@@ -57,7 +49,6 @@ get_pp_limits <- function(y,
                           n,
                           exclusion_points = NULL,
                           multiply = 1,
-                          na.rm = TRUE,
                           mr_screen_max_loops = 1,
                           use_nbar_for_stdev = FALSE) {
   # Errors if data is not in the right format
@@ -71,13 +62,6 @@ get_pp_limits <- function(y,
 
   if (!is.numeric(y) | !is.numeric(n)) {
     stop("The input data is not numeric.")
-  }
-
-  if (na.rm == FALSE & (any(is.na(y)) | any(is.na(n)))) {
-    stop(paste(
-      "There are missing values in the input data. Set na.rm to TRUE",
-      "if you wish to ignore these."
-    ))
   }
 
   if (!is.null(exclusion_points) & length(exclusion_points) > 0) {

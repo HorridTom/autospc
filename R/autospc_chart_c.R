@@ -109,11 +109,10 @@ round_counts.autospc_chart_c <- function(chart) {
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 aggregate_data.autospc_chart_c <- function(chart) {
-  df_agg <- chart$data %>%
-    dplyr::group_by(x) %>%
-    dplyr::summarise(y = sum(y))
-
-  chart$data <- df_agg
+  chart$data <- sum_over_subgroups(chart$data,
+    columns = "y",
+    aggregation_na_rm = chart$aggregation_na_rm
+  )
 
   return(chart)
 }

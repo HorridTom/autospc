@@ -42,12 +42,10 @@ aggregate_ratios <- function(chart,
       dplyr::mutate(n = 1L)
   }
 
-  chart$data <- chart$data %>%
-    dplyr::group_by(x) %>%
-    dplyr::summarise(
-      y = sum(y),
-      n = sum(n)
-    )
+  chart$data <- sum_over_subgroups(chart$data,
+    columns = c("y", "n"),
+    aggregation_na_rm = chart$aggregation_na_rm
+  )
 
   return(chart)
 }

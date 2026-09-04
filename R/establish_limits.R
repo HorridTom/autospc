@@ -1,35 +1,45 @@
 #' Set control limits over a prepared series
 #'
-#' Reads `chart$data`. When there are too few points to form a period the table
-#' has no limits columns.
+#' Reads `chart$data`. The algorithm iterates over the rows that hold an
+#' observation, so it is given those rows rather than `chart$data` itself, and
+#' the rest are put back into the result at the end. When there are too few
+#' points to form a period the table has no limits columns.
 #'
 #' @return autospc_chart object, with `chart$result$table` set
 #' @noRd
 establish_limits <- function(chart) {
+  prepared_data <- chart$data
+  
+  # Remove missing values from series for analysis
+  observed_data <- compact_series(chart,
+    data = prepared_data,
+    na_ends_run = chart$na_ends_run
+  )
+
   # set counter to one
   counter <- 1
 
   # [1] Counter initialised
   # Check whether there are enough data points to form one period
   if (!enough_data_for_new_period(
-    data = chart$data,
+    data = observed_data,
     counter = counter,
     chart = chart
   )) {
-    chart$result$table <- chart$data
+    chart$result$table <- prepared_data
     chart$result$table$log <- render_log(chart)
 
     return(chart)
   } else {
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
-      data = chart$data,
+      data = observed_data,
       counter_at_period_start = counter,
       chart = chart
     )
 
     # Set counter to first point after end of first period
-    baseline_rows <- baseline_period_length(chart, data = chart$data)
+    baseline_rows <- baseline_period_length(chart, data = observed_data)
     chart$history$baseline <- list(length = baseline_rows)
     counter <- counter + baseline_rows
     chart <- record_counter_move(chart,
@@ -41,7 +51,7 @@ establish_limits <- function(chart) {
     if (!chart$baseline_only) {
       # [3] Algorithm loop starts - unless the caller asked for no
       # re-establishment
-      while (counter < nrow(chart$data)) {
+      while (counter < nrow(observed_data)) {
         # [4] Check whether enough points after the counter to form new period
         if (!enough_data_for_new_period(
           data = limits_table,
@@ -99,7 +109,7 @@ establish_limits <- function(chart) {
 
           # [5] Check whether there are any further rule 2 breaks
           if (is.na(rule2_break_position) |
-            rule2_break_position >= nrow(chart$data)) {
+            rule2_break_position >= nrow(observed_data)) {
             # [5b] If not, then there can be no more additional periods
             chart <- record_stop(chart,
               counter = counter,
@@ -286,14 +296,24 @@ establish_limits <- function(chart) {
     } # end of: [3] !baseline_only
 
 
-    # update NAs in limit columns
-    limits_table <- limits_table %>%
-      dplyr::mutate(ucl = dplyr::if_else(is.na(y), as.numeric(NA), ucl)) %>%
-      dplyr::mutate(lcl = dplyr::if_else(is.na(y), as.numeric(NA), lcl))
+    limits_table <- add_period_columns(limits_table)
 
-    chart$result$table <- add_period_columns(limits_table)
-    chart$result$re_establish_rows <- which(limits_table$break_point)
-    chart$result$exclusions <- which(limits_table$excluded)
+    # Restore missing values in their original positions
+    chart$history <- restate_history_rows(
+      history = chart$history,
+      positions = which(observed_rows(chart, data = prepared_data)),
+      n_rows = nrow(prepared_data)
+    )
+
+    chart$result$table <- restore_missing_rows(
+      limits_table = limits_table,
+      data = prepared_data,
+      chart = chart
+    )
+
+    chart$result$table$run_break <- NULL
+    chart$result$re_establish_rows <- which(chart$result$table$break_point)
+    chart$result$exclusions <- which(chart$result$table$excluded)
     chart$result$table$log <- render_log(chart)
 
     return(chart)

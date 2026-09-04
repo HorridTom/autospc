@@ -1,3 +1,52 @@
+# autospc 0.1.0.9008
+
+## Missing values
+
+The analysis now proceeds as though a point with no `y` were not there, rather
+than walking over it as a row. This changes results for any series that has one.
+
+* **A calculation period now holds `period_min` points, not `period_min` rows.**
+  Where a series had missing values inside the first period, limits were
+  previously calculated from fewer points than asked for.
+
+* **An MR chart now shows its control limits at the first point** as well as its
+  centre line, which it already showed. The first row of an MR chart holds no
+  moving range, because there is no earlier point to measure one against; that
+  is not a missing value, and the limits there are defined.
+
+* **Control limits now carry across a gap.** They were drawn only where a point
+  was, so they broke at every missing value; the centre line carried across but
+  the control limits did not.
+
+* **No limits are drawn before the first point or after the last.** The centre
+  line previously ran to both edges of the chart whether or not there was
+  anything there.
+
+* **A missing point no longer silently splits a run**, which had made a shift
+  rule break disappear. `na_ends_run` now controls this, and defaults to `TRUE`,
+  which is the previous behaviour. A missing point may have continued the run
+  before it or been on the other side of the centre line, and the data cannot
+  say which: `TRUE` minimises the risk of a false positive shift rule break
+  arising from missing data, `FALSE` minimises the risk of a false negative.
+
+* Rows with no `x` are excluded before the analysis rather than after it. One
+  such row could previously add a subgroup of its own, which counted towards
+  the minimum needed for limits: 20 subgroups plus one row with no `x` drew
+  limits that 20 subgroups alone correctly refused.
+  `options(autospc.warn_missing_x = FALSE)` turns off the warning.
+
+* The warning given when a series is too short now says how many points it has.
+
+* **`aggregation_na_rm` controls what an observation with no value does to the
+  subgroup it is aggregated into.** `FALSE`, the default, makes the whole
+  subgroup missing, as the package has always done. `TRUE` discards the
+  observation and forms the subgroup from the rest. A row is discarded when
+  either its `y` or its `n` has no value, so a subgroup's numerator and
+  denominator always count the same observations. A subgroup that loses every
+  observation stays on the chart as a missing point rather than disappearing.
+  `aggregation_na_rm` has no effect on data that is already one row per
+  subgroup, or on X and MR charts, which do not aggregate.
+
 # autospc 0.1.0.9003
 
 ## Bug fixes

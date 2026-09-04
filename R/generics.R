@@ -48,6 +48,22 @@ n_effective_points <- function(chart,
 }
 
 
+#' The rows of a prepared series that hold an observation
+#'
+#' A row whose `y` is missing because there was never a value to have is not a
+#' gap in the series. `observed_rows.autospc_chart_mr()` is where that applies.
+#'
+#' @param chart The chart being analysed.
+#' @param data A prepared series, with a `y` column.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+observed_rows <- function(chart,
+                          data) {
+  UseMethod("observed_rows")
+}
+
+
 #' Calculate control limits for a subset of the chart data
 #'
 #' @param period a dataframe providing the subset of the data to use as

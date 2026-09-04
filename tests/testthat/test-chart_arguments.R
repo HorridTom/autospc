@@ -19,6 +19,7 @@ chart_argument_alternatives <- list(
   establish_every_shift = TRUE,
   no_regrets = FALSE,
   overhanging_reversions = FALSE,
+  na_ends_run = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,
   centre_line_tolerance = 0.5,

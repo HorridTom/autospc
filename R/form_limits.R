@@ -50,6 +50,7 @@ form_calculation_limits <- function(data,
       dplyr::select(
         x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
         period_type, excluded,
+        dplyr::any_of("run_break"),
         dplyr::any_of("log")
       )
     # Add the break_point column to keep track of break points as they are

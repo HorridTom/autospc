@@ -91,6 +91,7 @@ autospc_chart_elements <- function() {
     "establish_every_shift",
     "no_regrets",
     "overhanging_reversions",
+    "na_ends_run",
     "max_exclusions",
     "mr_screen_max_loops",
     "centre_line_tolerance",
@@ -260,6 +261,7 @@ assemble_chart_list <- function(
   establish_every_shift = autospc_default("establish_every_shift"),
   no_regrets = autospc_default("no_regrets"),
   overhanging_reversions = autospc_default("overhanging_reversions"),
+  na_ends_run = autospc_default("na_ends_run"),
   max_exclusions = autospc_default("max_exclusions"),
   mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
   centre_line_tolerance = autospc_default("centre_line_tolerance"),
@@ -286,6 +288,7 @@ assemble_chart_list <- function(
     establish_every_shift = establish_every_shift,
     no_regrets = no_regrets,
     overhanging_reversions = overhanging_reversions,
+    na_ends_run = na_ends_run,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,
     centre_line_tolerance = centre_line_tolerance,
@@ -356,6 +359,13 @@ n_effective_points.autospc_chart <- function(chart,
     nrow()
 
   return(points)
+}
+
+
+#' @noRd
+observed_rows.autospc_chart <- function(chart,
+                                        data) {
+  return(!is.na(data$y))
 }
 
 

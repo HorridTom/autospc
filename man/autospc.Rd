@@ -17,6 +17,7 @@ autospc(
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
+  na_ends_run = TRUE,
   max_exclusions = 3L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
@@ -121,6 +122,11 @@ candidate calculation period. Set to FALSE only with no_regrets = FALSE.
 Parameters that control how centre line and control limits are established
 for each period, and details of how SPC rules are applied
 }}
+
+\item{na_ends_run}{Boolean determining whether a missing point starts a new
+run, for the purpose of the shift rule. TRUE minimises the risk of a false
+positive shift rule break arising from missing data; FALSE minimises the risk
+of a false negative.}
 
 \item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations.}

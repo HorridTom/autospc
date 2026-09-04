@@ -97,7 +97,7 @@ test_that("the warning is about the input data, not about named charts", {
       plot_chart = FALSE, chart_type = "XMR",
       period_min = 21L
     ),
-    "^The input data has fewer than the minimum number of points"
+    "^The input data has \\d+ points, fewer than the minimum number of points"
   )
 })
 

@@ -303,7 +303,7 @@ report_analysis <- function(charts,
   )
 
   if (show_limits && any(short)) {
-    warning(short_message(labels[short]))
+    warning(short_message(labels[short], charts[short]))
   }
 
   for (chart in charts) {
@@ -327,12 +327,21 @@ report_analysis <- function(charts,
 
 #' The warning where a series has too few points for limits
 #'
-#' The halves of an XmR pair are short together, so neither is named.
+#' The halves of an XmR pair are short together, so neither is named. The count
+#' is of points the analysis can use, which is fewer than the rows supplied
+#' where any of them hold no observation.
+#'
+#' @param charts The charts that are short of points.
 #'
 #' @return A string.
 #' @noRd
-series_short_message <- function(labels) {
-  return(too_few_points_message("The input data has"))
+series_short_message <- function(labels,
+                                 charts) {
+  points <- n_effective_points(charts[[1]], data = charts[[1]]$data)
+
+  return(too_few_points_message(
+    paste("The input data has", points, "points,")
+  ))
 }
 
 
@@ -343,7 +352,8 @@ series_short_message <- function(labels) {
 #'
 #' @return A string.
 #' @noRd
-stages_short_message <- function(labels) {
+stages_short_message <- function(labels,
+                                 charts) {
   subject <- paste("Stages", paste(labels, collapse = ", "), "have")
 
   if (length(labels) == 1L) {

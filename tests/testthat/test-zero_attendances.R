@@ -95,18 +95,20 @@ test_that("P charts with zero attendances error handle", {
   ) %>%
     dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
 
+  # a subgroup with no attendances has no proportion, so no point is plotted,
+  # and the limits carry across it
   testthat::expect_equal(all(is.na(result1$y[24:28])), TRUE)
-  testthat::expect_equal(all(is.na(result1$ucl[24:28])), TRUE)
-  testthat::expect_equal(all(is.na(result1$lcl[24:28])), TRUE)
+  testthat::expect_equal(all(!is.na(result1$ucl[24:28])), TRUE)
+  testthat::expect_equal(all(!is.na(result1$lcl[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result1$cl[24:28])), TRUE)
 
   testthat::expect_equal(all(is.na(result2$y[24:28])), TRUE)
-  testthat::expect_equal(all(is.na(result2$ucl[24:28])), TRUE)
-  testthat::expect_equal(all(is.na(result2$lcl[24:28])), TRUE)
+  testthat::expect_equal(all(!is.na(result2$ucl[24:28])), TRUE)
+  testthat::expect_equal(all(!is.na(result2$lcl[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result2$cl[24:28])), TRUE)
 
   testthat::expect_equal(all(is.na(result3$y[10:13])), TRUE)
-  testthat::expect_equal(all(is.na(result3$ucl[10:13])), TRUE)
-  testthat::expect_equal(all(is.na(result3$lcl[10:13])), TRUE)
+  testthat::expect_equal(all(!is.na(result3$ucl[10:13])), TRUE)
+  testthat::expect_equal(all(!is.na(result3$lcl[10:13])), TRUE)
   testthat::expect_equal(all(!is.na(result3$cl[10:13])), TRUE)
 })

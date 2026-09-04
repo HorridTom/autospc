@@ -265,11 +265,6 @@ final_run_prevents_re_establishment <- function(
   data <- data %>%
     dplyr::filter(period_count >= last_calc_period)
 
-  # handles NA value that appears sometimes at the end of the data
-  if (is.na(data$y[nrow(data)])) {
-    data <- data[1:(nrow(data) - 1), ]
-  }
-
   # identify the row number of the last point, in the last calculation period,
   # that is not on the centre line
   last_point_in_last_calc_period <- utils::tail(

@@ -103,10 +103,10 @@ compact_series <- function(chart,
 #' per row of the prepared series, with the limits carried across a gap between
 #' two observations and left missing beyond the first and last of them.
 #'
-#' `extrapolate_limits()` gives the limits to carry across. For a chart whose
-#' limits are constant within a period it returns those limits; for one whose
-#' limits vary with the denominator it recalculates them from the period's mean
-#' denominator, as it does for limits extended beyond the end of the data.
+#' `limits_for_missing_rows()` gives the limits to carry across. The
+#' observations either side of a gap belong to the same period as it and
+#' already hold that period's limits, so the values are read from one of those
+#' observations rather than calculated again.
 #'
 #' @param limits_table The analysed table, one row per observation.
 #' @param data The prepared series, one row per row.
@@ -130,6 +130,11 @@ restore_missing_rows <- function(limits_table,
   restored$x <- data$x
   restored$y <- data$y
 
+  # copy the denominator back, onto the rows with no observation as well
+  if ("n" %in% names(restored) && "n" %in% names(data)) {
+    restored$n <- data$n
+  }
+
   restored <- carry_limits_across_gaps(
     restored = restored,
     observed = observed,
@@ -140,10 +145,34 @@ restore_missing_rows <- function(limits_table,
 }
 
 
+#' An observation of the period to read the period's limits from
+#'
+#' Used to give limits to the rows of the period that hold no observation. A
+#' period holds one centre line throughout, and one limit width for the classes
+#' whose limits vary with the denominator, so the first observation that has
+#' both a centre line and an upper limit serves as well as any other.
+#'
+#' @param period The rows of the period that hold an observation.
+#'
+#' @return the first row of `period` whose `cl` and `ucl` are both present, or
+#'   NULL where no row has both
+#' @noRd
+row_holding_period_limits <- function(period) {
+  has_limits <- !is.na(period$cl) & !is.na(period$ucl)
+
+  if (!any(has_limits)) {
+    return(NULL)
+  }
+
+  return(period[which(has_limits)[1L], , drop = FALSE])
+}
+
+
 #' Give the rows between two observations the limits of their period
 #'
-#' Rows before the first observation and after the last are left as they are,
-#' with no limits.
+#' Each row with no observation is given the limits of the period that the
+#' observation before it belongs to. Rows before the first observation and
+#' after the last are left as they are, with no limits.
 #'
 #' @return `restored`, with `cl`, `ucl` and `lcl` set on the rows in a gap.
 #' @noRd
@@ -165,12 +194,14 @@ carry_limits_across_gaps <- function(restored,
   period_of[gaps] <- period_of[positions[findInterval(gaps, positions)]]
 
   for (period in unique(period_of[gaps])) {
-    period_limits <- extrapolate_limits(
-      chart = chart,
-      period = restored[observed & period_of == period, , drop = FALSE]
-    )
-
+    period_rows <- restored[observed & period_of == period, , drop = FALSE]
     rows <- gaps[period_of[gaps] == period]
+
+    period_limits <- limits_for_missing_rows(
+      chart = chart,
+      period = period_rows,
+      rows = restored[rows, , drop = FALSE]
+    )
 
     restored$cl[rows] <- period_limits$cl
     restored$ucl[rows] <- period_limits$ucl

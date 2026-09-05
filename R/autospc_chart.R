@@ -429,6 +429,36 @@ extrapolate_limits.autospc_chart <- function(chart,
 }
 
 
+#' Limits for the rows that hold no observation
+#'
+#' The centre line and limits of these classes hold one value each throughout a
+#' period, so every row with no observation is given the values read from an
+#' observation of the same period. Where no observation of the period holds
+#' limits, every row is given NA.
+#'
+#' @return list of three vectors, named cl, ucl and lcl
+#' @noRd
+limits_for_missing_rows.autospc_chart <- function(chart,
+                                                  period,
+                                                  rows) {
+  observation <- row_holding_period_limits(period)
+
+  if (is.null(observation)) {
+    return(list(
+      cl = rep(NA_real_, nrow(rows)),
+      ucl = rep(NA_real_, nrow(rows)),
+      lcl = rep(NA_real_, nrow(rows))
+    ))
+  }
+
+  return(list(
+    cl = rep(observation$cl, nrow(rows)),
+    ucl = rep(observation$ucl, nrow(rows)),
+    lcl = rep(observation$lcl, nrow(rows))
+  ))
+}
+
+
 # Presentation methods
 
 

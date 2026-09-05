@@ -90,25 +90,223 @@ test_that("the limits carried across a gap are the period's own", {
 })
 
 
-test_that("a P chart takes its gap limits from the period's mean denominator", {
-  set.seed(4)
+# the denominator of a row that holds no observation
+
+
+# every observation has a denominator of 100, so all the observations share the
+# same limits and only the rows with no observation can differ. With no missing
+# y before row 22, the calculation period is rows 1 to 21 and the display period
+# runs from row 22
+proportion_data_with_gaps <- function(gap_n, at = 10) {
   d <- data.frame(
     x = 1:40,
-    y = rep(c(4, 6, 5, 7, 3), 8),
-    n = as.integer(sample(15:40, 40L, replace = TRUE))
+    y = as.numeric(rep(c(18, 22, 20, 21, 19), 8)),
+    n = rep(100, 40)
   )
-  d$y[20] <- NA
+  d$y[at] <- NA
+  d$n[at] <- gap_n
+
+  return(d)
+}
+
+# the denominators alternate between 50 and 150, and average 100 over the
+# display period, so the period's mean denominator is a value that no single
+# observation holds
+proportion_data_with_varying_n <- function(gap_n, at) {
+  n <- rep(c(50, 150), 20)
+  d <- data.frame(
+    x = 1:40,
+    y = round(n * rep(c(0.18, 0.22, 0.20, 0.21, 0.19), 8)),
+    n = n
+  )
+  d$y[at] <- NA
+  d$n[at] <- gap_n
+
+  return(d)
+}
+
+as_proportion_chart <- function(d, chart_type) {
+  return(autospc(d,
+    chart_type = chart_type, x = "x", y = "y", n = "n",
+    plot_chart = FALSE, period_min = 21L
+  ))
+}
+
+
+test_that("the denominator of a row with no observation is reported", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400), "P")
+
+  expect_true(is.na(result$y[10]))
+  expect_identical(result$n[10], 400)
+})
+
+
+test_that("a P chart takes its gap limits from the row's own denominator", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400), "P")
+
+  # at four times the denominator the limits are half as far from the centre
+  # line
+  half_width <- result$ucl[9] - result$cl[9]
+
+  expect_equal(result$ucl[10], result$cl[9] + half_width / 2)
+  expect_equal(result$lcl[10], result$cl[9] - half_width / 2)
+})
+
+
+test_that("a P' chart takes its gap limits from the row's own denominator", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400), "P\'")
+
+  half_width <- result$ucl[9] - result$cl[9]
+
+  expect_equal(result$ucl[10], result$cl[9] + half_width / 2)
+  expect_equal(result$lcl[10], result$cl[9] - half_width / 2)
+})
+
+
+test_that("gap limits are held within the range a percentage can take", {
+  # a denominator of 1 puts the recalculated limits above 100 and below 0
+  result <- as_proportion_chart(proportion_data_with_gaps(1), "P")
+
+  expect_equal(result$ucl[10], 100)
+  expect_equal(result$lcl[10], 0)
+})
+
+
+test_that("a gap with no denominator keeps the period's limits", {
+  result <- as_proportion_chart(proportion_data_with_gaps(NA_real_), "P")
+
+  expect_equal(result$ucl[10], result$ucl[9])
+  expect_equal(result$lcl[10], result$lcl[9])
+})
+
+
+test_that("a gap whose denominator is zero keeps the period's limits", {
+  result <- as_proportion_chart(proportion_data_with_gaps(0), "P")
+
+  expect_equal(result$ucl[10], result$ucl[9])
+  expect_equal(result$lcl[10], result$lcl[9])
+})
+
+
+test_that("a gap in a display period keeps the period's centre line", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400, at = 30), "P")
+
+  expect_identical(result$period_type[29], "display")
+  expect_equal(result$cl[30], result$cl[29])
+})
+
+
+test_that("a gap in a display period takes its own denominator", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400, at = 30), "P")
+
+  half_width <- result$ucl[29] - result$cl[29]
+
+  expect_equal(result$ucl[30], result$cl[29] + half_width / 2)
+  expect_equal(result$lcl[30], result$cl[29] - half_width / 2)
+})
+
+
+test_that("a P' gap in a display period takes its own denominator", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400, at = 30), "P\'")
+
+  half_width <- result$ucl[29] - result$cl[29]
+
+  expect_equal(result$cl[30], result$cl[29])
+  expect_equal(result$ucl[30], result$cl[29] + half_width / 2)
+})
+
+
+test_that("a gap at the first row of a display period is no different", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400, at = 22), "P")
+
+  half_width <- result$ucl[21] - result$cl[21]
+
+  expect_equal(result$cl[22], result$cl[21])
+  expect_equal(result$ucl[22], result$cl[21] + half_width / 2)
+})
+
+
+test_that("consecutive gaps each take their own denominator", {
+  result <- as_proportion_chart(
+    proportion_data_with_gaps(c(400, 100, NA_real_), at = 30:32), "P"
+  )
+
+  half_width <- result$ucl[29] - result$cl[29]
+
+  expect_equal(result$ucl[30], result$cl[29] + half_width / 2)
+  expect_equal(result$ucl[31], result$ucl[29])
+
+  # the third row has no denominator, so it takes the period's mean, which is
+  # also 100
+  expect_equal(result$ucl[32], result$ucl[29])
+})
+
+
+test_that("a gap with no denominator takes the period's mean denominator", {
+  # the mean denominator over the display period is 100, a value that no
+  # observation holds
+  result <- as_proportion_chart(
+    proportion_data_with_varying_n(NA_real_, at = 30), "P"
+  )
+
+  constant <- (result$ucl[29] - result$cl[29]) * sqrt(result$n[29])
+
+  expect_identical(result$period_type[29], "display")
+  expect_false(isTRUE(all.equal(result$ucl[30], result$ucl[29])))
+  expect_equal(result$ucl[30], result$cl[29] + constant / sqrt(100))
+})
+
+
+test_that("a gap in a later period takes that period's limit width", {
+  # a shift at row 31 re-establishes the limits, so the first period sits at
+  # 20% with a width of 3 * sqrt(0.2 * 0.8) * 100, which is 120, and the second
+  # at 50% with a width of 150
+  d <- data.frame(x = 1:70, n = rep(100L, 70))
+  d$y <- c(rep(20L, 30), rep(50L, 40))
+  d$y[40] <- NA
+  d$n[40] <- 400L
+
+  result <- as_proportion_chart(d, "P")
+
+  expect_identical(result$plot_period[39], "calculation31")
+  expect_equal(result$cl[40], 50)
+  expect_equal(result$ucl[40], 50 + 150 / sqrt(400))
+  expect_equal(result$lcl[40], 50 - 150 / sqrt(400))
+})
+
+
+test_that("an observation whose limits are held does not distort a gap", {
+  # every value is 50%, so the centre line is 50 and the limit width is
+  # 3 * sqrt(0.5 * 0.5) * 100, which is 150
+  d <- data.frame(x = 1:40, n = rep(100L, 40))
+
+  # row 22, the first observation of the display period, has a denominator of
+  # 2, so its own limits are held at 100 and 0
+  d$n[22] <- 2L
+  d$y <- d$n / 2
+  d$y[30] <- NA
+  d$n[30] <- 400L
+
+  result <- as_proportion_chart(d, "P")
+
+  expect_equal(result$ucl[22], 100)
+  expect_equal(result$lcl[22], 0)
+
+  expect_equal(result$ucl[30], 50 + 150 / sqrt(400))
+  expect_equal(result$lcl[30], 50 - 150 / sqrt(400))
+})
+
+
+test_that("a C chart ignores the denominator at a gap", {
+  d <- proportion_data_with_gaps(400)
 
   result <- autospc(d,
-    chart_type = "P\'", x = "x", y = "y", n = "n",
+    chart_type = "C\'", x = "x", y = "y", n = "n",
     plot_chart = FALSE, period_min = 21L
   )
 
-  # the limits of a P chart vary with the denominator, so the value at the gap
-  # is neither neighbour's
-  expect_false(is.na(result$ucl[20]))
-  expect_false(isTRUE(all.equal(result$ucl[20], result$ucl[19])))
-  expect_false(isTRUE(all.equal(result$ucl[20], result$ucl[21])))
+  expect_equal(result$ucl[10], result$ucl[9])
+  expect_equal(result$lcl[10], result$lcl[9])
 })
 
 

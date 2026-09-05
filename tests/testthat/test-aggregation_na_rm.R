@@ -42,8 +42,10 @@ test_that("by default one missing observation makes the subgroup missing", {
   result <- analyse(binary_observations(13L), "P\'")
 
   expect_true(is.na(result$y[3]))
-  expect_true(is.na(result$n[3]))
   expect_false(is.na(result$y[2]))
+
+  # the value is missing, the number of observations behind it is not
+  expect_identical(result$n[3], 5L)
 })
 
 

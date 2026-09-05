@@ -32,6 +32,11 @@ get_p_limits <- function(y,
 
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE)
 
+  # the distance of the limits from the centre line at a denominator of 1, so
+  # that the limits at any denominator are the centre line plus and minus it
+  # over the square root of that denominator
+  limit_width <- 3 * sqrt(cl * (1 - cl)) * multiply
+
   stdev <- sqrt(cl * (1 - cl) / n)
   cl <- cl * multiply
   ucl <- cl + 3 * stdev * multiply
@@ -39,7 +44,12 @@ get_p_limits <- function(y,
 
   lcl[lcl < 0 & is.finite(lcl)] <- 0
 
-  list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
+  list(
+    cl = rep(cl, length(y)),
+    ucl = ucl,
+    lcl = lcl,
+    limit_width = rep(limit_width, length(y))
+  )
 }
 
 
@@ -110,11 +120,21 @@ get_pp_limits <- function(y,
   stdev <- sqrt(cl * (1 - cl) / n)
   stdev <- stdev * sigma_z
 
+  # the distance of the limits from the centre line at a denominator of 1, so
+  # that the limits at any denominator are the centre line plus and minus it
+  # over the square root of that denominator
+  limit_width <- 3 * sqrt(cl * (1 - cl)) * sigma_z * multiply
+
   cl <- cl * multiply
   ucl <- cl + 3 * stdev * multiply
   lcl <- cl - 3 * stdev * multiply
 
   lcl[lcl < 0 & is.finite(lcl)] <- 0
 
-  list(cl = rep(cl, length(y)), ucl = ucl, lcl = lcl)
+  list(
+    cl = rep(cl, length(y)),
+    ucl = ucl,
+    lcl = lcl,
+    limit_width = rep(limit_width, length(y))
+  )
 }

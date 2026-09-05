@@ -47,6 +47,31 @@ than walking over it as a row. This changes results for any series that has one.
   `aggregation_na_rm` has no effect on data that is already one row per
   subgroup, or on X and MR charts, which do not aggregate.
 
+* **The limits at a point with missing `y` on a P or P' chart are now calculated
+  from that point's own denominator**, where the data supplied one. The
+  denominator of such a point is also now reported in the returned table. Limits
+  at a point whose denominator is missing or zero are drawn at the mean
+  denominator of its period.
+
+* **P and P' charts now return a `limit_width` column.** It holds the distance
+  the limits sit from the centre line at a denominator of 1, so that the limits
+  at any denominator are the centre line plus and minus `limit_width` over the
+  square root of that denominator. It takes one value for a calculation period
+  and the display period that follows it.
+
+* **P and P' charts no longer return the `constant`, `pbar`, `ucl_display` and
+  `lcl_display` columns.** They held working values from the extension of
+  limits over a display period. `constant` and `pbar` are now `limit_width` and
+  `cl`, which hold the same values on every row rather than on the display rows
+  alone, and the other two held the display limits before they were held within
+  0 and 100, which were not used.
+
+* **The centre line and limits at a point with missing `y` inside a display
+  period now match the rest of that period.** Previously they were calculated
+  afresh from the display period's own values instead of being carried forward
+  with the rest of the period's. No data point is plotted at such a point, so it
+  is only the lines that were affected.
+
 # autospc 0.1.0.9003
 
 ## Bug fixes

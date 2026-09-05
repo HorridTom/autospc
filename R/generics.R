@@ -111,6 +111,26 @@ extrapolate_limits <- function(chart,
 }
 
 
+#' Limits for the rows that hold no observation
+#'
+#' The algorithm walks only the rows that hold an observation, so a row with a
+#' missing `y` is given its limits afterwards, from the period that the
+#' observations either side of it belong to. Overridden by the classes whose
+#' limits vary with the denominator.
+#'
+#' @param period the rows of the period that hold an observation
+#' @param rows the rows that hold no observation, to be given limits
+#'
+#' @return list of three vectors, named cl, ucl and lcl, one value per row of
+#'   `rows`
+#' @noRd
+limits_for_missing_rows <- function(chart,
+                                    period,
+                                    rows) {
+  UseMethod("limits_for_missing_rows")
+}
+
+
 #' Columns the limits table carries in addition to the common ones
 #'
 #' The names are inserted between `y` and `ucl`, so the order matters.

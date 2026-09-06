@@ -5,8 +5,8 @@ test_chart_mr <- function(...) {
   autospc_chart_mr(data = test_data, x = "x", y = "y", ...)
 }
 
-dup_chart_mr <- function(...) {
-  autospc_chart_mr(data = dup_data, x = "x", y = "y", ...)
+extra_column_chart_mr <- function(...) {
+  autospc_chart_mr(data = unique_x_data, x = "x", y = "y", ...)
 }
 
 
@@ -93,10 +93,18 @@ test_that("MR charts have no aggregate_data method of their own", {
 
 
 test_that("aggregate_data leaves an MR chart untouched", {
-  chart <- dup_chart_mr()
+  chart <- extra_column_chart_mr()
 
   expect_identical(aggregate_data(chart), chart)
-  expect_identical(aggregate_data(chart)$data, dup_data_analysed)
+  expect_identical(aggregate_data(chart)$data, unique_x_data_analysed)
+})
+
+
+test_that("validate_autospc_chart_mr rejects a repeated x", {
+  expect_error(
+    autospc_chart_mr(data = dup_data, x = "x", y = "y"),
+    "x must be unique"
+  )
 })
 
 

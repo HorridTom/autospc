@@ -45,6 +45,17 @@ validate_autospc_chart_x <- function(x) {
     )
   )
 
+  require_unique(
+    data = x$data,
+    column = "x",
+    message = paste(
+      "For X, MR and XMR charts, x must be unique:",
+      "each point is one row, so a repeated x has no place",
+      "to be plotted. The C, C', P and P' charts sum the",
+      "rows that share an x into one subgroup."
+    )
+  )
+
   return(x)
 }
 

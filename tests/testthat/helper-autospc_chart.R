@@ -19,6 +19,16 @@ dup_data <- data.frame(
 
 dup_data_analysed <- dup_data[c("x", "y")]
 
+# one row per subgroup, with the same extra column, for the classes that
+# require x to be unique
+unique_x_data <- data.frame(
+  x = 1:3,
+  y = c(1, 10, 100),
+  site = "a"
+)
+
+unique_x_data_analysed <- unique_x_data[c("x", "y")]
+
 # a calculation period of counts with one obvious high point, so that excluding
 # it demonstrably moves the limits. Named for the count charts because the
 # proportion charts need a period carrying y_numerator and n as well.

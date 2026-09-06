@@ -1,5 +1,13 @@
 # autospc 0.1.0.9008
 
+## Data that cannot be charted
+
+* **X, MR and XMR charts now reject a repeated `x`.** Each point on these
+  charts is one row, so a repeated `x` has no place to be plotted. It was
+  previously accepted, and multiplied in the output table. The error names
+  the values that are repeated. C, C', P and P' charts are unchanged, summing
+  the rows that share an `x` into one subgroup as before.
+
 ## Missing values
 
 The analysis now proceeds as though a point with no `y` were not there, rather

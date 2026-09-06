@@ -66,6 +66,11 @@ than walking over it as a row. This changes results for any series that has one.
   alone, and the other two held the display limits before they were held within
   0 and 100, which were not used.
 
+* ** Period columns are now correctly populated for a point with missing `y`.
+  `period_type`, `period_start`, `plot_period`, `limit_change`, `cl_change` and,
+  on a P or P' chart, `limit_width` were all missing at such a point, though its
+  centre line and limits were filled in from the period it sits in.
+
 * **The centre line and limits at a point with missing `y` inside a display
   period now match the rest of that period.** Previously they were calculated
   afresh from the display period's own values instead of being carried forward

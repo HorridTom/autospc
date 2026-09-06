@@ -171,10 +171,13 @@ row_holding_period_limits <- function(period) {
 #' Give the rows between two observations the limits of their period
 #'
 #' Each row with no observation is given the limits of the period that the
-#' observation before it belongs to. Rows before the first observation and
-#' after the last are left as they are, with no limits.
+#' observation before it belongs to, and the columns that say which period
+#' that is. The columns that describe an observation are left missing, because
+#' this row does not have one. Rows before the first observation and after the
+#' last are left as they are, with no limits.
 #'
-#' @return `restored`, with `cl`, `ucl` and `lcl` set on the rows in a gap.
+#' @return `restored`, with `cl`, `ucl`, `lcl`, `limit_width` and the period
+#'   columns set on the rows in a gap
 #' @noRd
 carry_limits_across_gaps <- function(restored,
                                      observed,
@@ -206,6 +209,18 @@ carry_limits_across_gaps <- function(restored,
     restored$cl[rows] <- period_limits$cl
     restored$ucl[rows] <- period_limits$ucl
     restored$lcl[rows] <- period_limits$lcl
+
+    # the row lies inside the period, so it takes the columns that say so.
+    # `plot_period` is not among them because `extend_limits()` derives it
+    # from `period_type` and `period_start` for the whole table
+    restored$period_type[rows] <- period_rows$period_type[1L]
+    restored$period_start[rows] <- period_rows$period_start[1L]
+    restored$limit_change[rows] <- FALSE
+    restored$cl_change[rows] <- 0
+
+    if ("limit_width" %in% names(restored)) {
+      restored$limit_width[rows] <- limit_width_of(period_rows)
+    }
   }
 
   return(restored)

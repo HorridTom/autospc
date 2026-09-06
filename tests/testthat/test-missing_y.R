@@ -297,6 +297,45 @@ test_that("an observation whose limits are held does not distort a gap", {
 })
 
 
+test_that("a row with no observation says which period it is in", {
+  result <- as_proportion_chart(proportion_data_with_gaps(400), "P")
+
+  expect_identical(result$plot_period[10], result$plot_period[9])
+  expect_identical(result$period_type[10], result$period_type[9])
+  expect_identical(result$period_start[10], result$period_start[9])
+  expect_identical(result$limit_width[10], result$limit_width[9])
+
+  expect_false(result$limit_change[10])
+  expect_equal(result$cl_change[10], 0)
+})
+
+
+test_that("a chart without a limit width still says which period a gap is in", {
+  result <- analyse(gapped(23L))
+
+  expect_false("limit_width" %in% names(result))
+  expect_identical(result$plot_period[23], result$plot_period[22])
+  expect_identical(result$period_type[23], result$period_type[22])
+})
+
+
+test_that("the limit lines are drawn through a row with no observation", {
+  # the row carries its own limits, so it has to sit in the same line as the
+  # observations either side of it rather than being stepped over
+  d <- proportion_data_with_varying_n(400, at = 10)
+
+  table <- as_proportion_chart(d, "P")
+  drawn <- ggplot2::ggplot_build(autospc(d,
+    chart_type = "P", x = "x", y = "y", n = "n",
+    plot_chart = TRUE, period_min = 21L
+  ))$data[[1]]
+
+  expect_setequal(drawn$group[drawn$x == 10], drawn$group[drawn$x == 9])
+  expect_true(any(abs(drawn$y[drawn$x == 10] - table$ucl[10]) < 1e-8))
+  expect_true(any(abs(drawn$y[drawn$x == 10] - table$lcl[10]) < 1e-8))
+})
+
+
 test_that("a C chart ignores the denominator at a gap", {
   d <- proportion_data_with_gaps(400)
 

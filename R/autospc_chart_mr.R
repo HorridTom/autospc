@@ -45,6 +45,17 @@ validate_autospc_chart_mr <- function(x) {
     )
   )
 
+  require_unique(
+    data = x$data,
+    column = "x",
+    message = paste(
+      "For X, MR and XMR charts, x must be unique:",
+      "each point is one row, so a repeated x has no place",
+      "to be plotted. The C, C', P and P' charts sum the",
+      "rows that share an x into one subgroup."
+    )
+  )
+
   return(x)
 }
 
@@ -121,6 +132,24 @@ n_effective_points.autospc_chart_mr <- function(chart,
   points <- NextMethod() + 1L
 
   return(points)
+}
+
+
+#' The rows of a prepared MR series that hold an observation
+#'
+#' The first row of an MR series holds no moving range because there is no
+#' earlier point to measure one against, not because a value is missing. It
+#' stays in the series, so that a calculation period spans `period_min` points
+#' of the series the moving ranges were derived from.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+observed_rows.autospc_chart_mr <- function(chart,
+                                           data) {
+  observed <- NextMethod()
+  observed[1L] <- TRUE
+
+  return(observed)
 }
 
 

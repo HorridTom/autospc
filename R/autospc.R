@@ -7,7 +7,9 @@
 #' @param data A data frame. For column requirements by chart type, see
 #' \code{vignette("data-requirements", package = "autospc")}.
 #' @param x Name of column (passed using tidyselect semantics) to use as
-#' subgroups on the horizontal axis of the chart.
+#' subgroups on the horizontal axis of the chart. Rows with NA in this column
+#' are excluded, with a warning; see the Options section of
+#' \code{\link{autospc-package}} to turn the warning off.
 #' @param y Name of column (passed using tidyselect semantics) to use as:
 #' \itemize{
 #'  \item the variable to be plotted for XMR charts,
@@ -22,6 +24,14 @@
 #' \cr
 #' See \code{vignette("data-requirements", package = "autospc")} for more
 #' details.
+#' @param aggregation_na_rm Boolean controlling what happens to an observation
+#' with no value when aggregating into subgroups. FALSE, the default, makes the
+#' whole subgroup missing. TRUE discards the observation and forms the subgroup
+#' from the rest. A row is discarded when either its `y` or its `n` (for chart
+#' types that require it) has no value, so that a subgroup's numerator and
+#' denominator always count the same observations. Where every observation in a
+#' subgroup is discarded the subgroup itself is missing. Has no effect on data
+#' that is already one row per subgroup, or on X and MR charts.
 #' @param chart_type The type of chart you wish to plot. Must must have length
 #' one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
 #'
@@ -52,6 +62,10 @@
 #' ## SPC Parameters
 #' Parameters that control how centre line and control limits are established
 #' for each period, and details of how SPC rules are applied
+#' @param na_ends_run Boolean determining whether a missing point starts a new
+#' run, for the purpose of the shift rule. TRUE minimises the risk of a false
+#' positive shift rule break arising from missing data; FALSE minimises the risk
+#' of a false negative.
 #' @param max_exclusions The maximum number of extreme points to exclude from
 #' limit calculations.
 #' @param highlight_exclusions Boolean signifying whether excluded points are
@@ -192,6 +206,7 @@ autospc <- function(data,
                     x,
                     y,
                     n,
+                    aggregation_na_rm = FALSE,
                     chart_type = NULL,
                     ## Algorithm Parameters
                     period_min = 21L,
@@ -202,6 +217,7 @@ autospc <- function(data,
                     no_regrets = TRUE,
                     overhanging_reversions = TRUE,
                     ## SPC Parameters
+                    na_ends_run = TRUE,
                     max_exclusions = 3L,
                     highlight_exclusions = TRUE,
                     mr_screen_max_loops = 1L,
@@ -308,6 +324,8 @@ autospc <- function(data,
   n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")
 
   check_x_type(data[[x_name]])
+
+  data <- drop_missing_x(data, x_column = x_name)
 
   # Named list of every argument of the call by name, apart from the data,
   # the columns, and the deprecated arguments dealt with above.

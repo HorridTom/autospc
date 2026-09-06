@@ -153,7 +153,7 @@ combine_plot_data <- function(plot_data,
     stages <- lapply(plot_data, function(each) {
       if (visualisation_params$show_limits &&
         enough_data_for_limits(each$chart)) {
-        return(dplyr::filter(each$table, !is.na(x)))
+        return(each$table)
       }
 
       return(each$table)
@@ -180,7 +180,7 @@ combine_plot_data <- function(plot_data,
     )
   }
 
-  return(dplyr::filter(data, !is.na(x)))
+  return(data)
 }
 
 
@@ -197,7 +197,6 @@ join_mr_columns <- function(x_table,
   joined <- x_table %>%
     dplyr::left_join(
       mr_table %>%
-        dplyr::filter(!is.na(x)) %>%
         dplyr::select(x,
           mr = y,
           amr = cl,

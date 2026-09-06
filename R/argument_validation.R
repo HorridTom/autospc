@@ -164,6 +164,40 @@ require_column_type <- function(data,
 }
 
 
+#' Stop unless every value in a column appears once
+#'
+#' The error text is passed in as `message` so that each class can say why it
+#' requires the column to be unique. The values that appear more than once are
+#' named after it, up to five of them, so that the caller can find them.
+#'
+#' @return invisible TRUE, or an error with `message` as its text
+#' @noRd
+require_unique <- function(data,
+                           column,
+                           message) {
+  repeated <- unique(data[[column]][duplicated(data[[column]])])
+
+  if (length(repeated) == 0L) {
+    return(invisible(TRUE))
+  }
+
+  shown <- utils::head(repeated, 5L)
+  listed <- paste(shown, collapse = ", ")
+
+  if (length(repeated) > length(shown)) {
+    listed <- paste0(
+      listed, ", and ",
+      length(repeated) - length(shown), " more"
+    )
+  }
+
+  stop(
+    paste0(message, " Repeated ", column, ": ", listed, "."),
+    call. = FALSE
+  )
+}
+
+
 is_whole_number <- function(x,
                             tol = .Machine$double.eps^0.5) {
   return(abs(x - round(x)) < tol)

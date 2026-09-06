@@ -285,6 +285,7 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
     ucl = c(rep(25, 3), rep(NA_real_, 2)),
     lcl = c(rep(5, 3), rep(NA_real_, 2)),
     cl = c(rep(15, 3), rep(NA_real_, 2)),
+    limit_width = c(rep(100, 3), rep(NA_real_, 2)),
     period_type = c(
       rep("calculation", 3),
       rep(NA_character_, 2)
@@ -296,7 +297,8 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
     counter = 4
   )
 
-  # constant = (25 - 15) * sqrt(100) = 100, so the half-width is 100/sqrt(n)
+  # the period carries a limit width of 100, so the limits sit 100/sqrt(n)
+  # either side of the centre line
   expect_equal(extended$ucl[4], 15 + 100 / sqrt(25))
   expect_equal(extended$lcl[5], 15 - 100 / sqrt(400))
 
@@ -318,6 +320,7 @@ test_that("extend_display_limits clamps the recomputed limits to 0 and 100", {
     ucl = c(rep(80, 3), rep(NA_real_, 2)),
     lcl = c(rep(20, 3), rep(NA_real_, 2)),
     cl = c(rep(50, 3), rep(NA_real_, 2)),
+    limit_width = c(rep(300, 3), rep(NA_real_, 2)),
     period_type = c(
       rep("calculation", 3),
       rep(NA_character_, 2)
@@ -439,4 +442,22 @@ test_that("a P chart label is a percentage", {
     ),
     "43.3%"
   )
+})
+
+
+test_that("the limits table carries the period's limit width", {
+  # every value is 50%, so the centre line is 50 and the limit width is
+  # 3 * sqrt(0.5 * 0.5) * 100, which is 150
+  d <- data.frame(x = 1:40, n = rep(100L, 40))
+  d$y <- d$n / 2
+
+  result <- autospc(d,
+    chart_type = "P", x = "x", y = "y", n = "n",
+    plot_chart = FALSE, period_min = 21L
+  )
+
+  expect_equal(unique(result$limit_width), 150)
+
+  # the stored width and the drawn limits agree at every row
+  expect_equal(result$limit_width, (result$ucl - result$cl) * sqrt(result$n))
 })

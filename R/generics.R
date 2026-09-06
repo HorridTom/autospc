@@ -48,6 +48,22 @@ n_effective_points <- function(chart,
 }
 
 
+#' The rows of a prepared series that hold an observation
+#'
+#' A row whose `y` is missing because there was never a value to have is not a
+#' gap in the series. `observed_rows.autospc_chart_mr()` is where that applies.
+#'
+#' @param chart The chart being analysed.
+#' @param data A prepared series, with a `y` column.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+observed_rows <- function(chart,
+                          data) {
+  UseMethod("observed_rows")
+}
+
+
 #' Calculate control limits for a subset of the chart data
 #'
 #' @param period a dataframe providing the subset of the data to use as
@@ -92,6 +108,26 @@ extend_display_limits <- function(chart,
 extrapolate_limits <- function(chart,
                                period) {
   UseMethod("extrapolate_limits")
+}
+
+
+#' Limits for the rows that hold no observation
+#'
+#' The algorithm walks only the rows that hold an observation, so a row with a
+#' missing `y` is given its limits afterwards, from the period that the
+#' observations either side of it belong to. Overridden by the classes whose
+#' limits vary with the denominator.
+#'
+#' @param period the rows of the period that hold an observation
+#' @param rows the rows that hold no observation, to be given limits
+#'
+#' @return list of three vectors, named cl, ucl and lcl, one value per row of
+#'   `rows`
+#' @noRd
+limits_for_missing_rows <- function(chart,
+                                    period,
+                                    rows) {
+  UseMethod("limits_for_missing_rows")
 }
 
 

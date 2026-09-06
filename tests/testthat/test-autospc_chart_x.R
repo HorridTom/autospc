@@ -2,8 +2,8 @@ test_chart_x <- function(...) {
   autospc_chart_x(data = test_data, x = "x", y = "y", ...)
 }
 
-dup_chart_x <- function(...) {
-  autospc_chart_x(data = dup_data, x = "x", y = "y", ...)
+extra_column_chart_x <- function(...) {
+  autospc_chart_x(data = unique_x_data, x = "x", y = "y", ...)
 }
 
 
@@ -90,11 +90,27 @@ test_that("X charts have no aggregate_data method of their own", {
 
 
 test_that("aggregate_data leaves an X chart untouched", {
-  # duplicated x values, which every other class would collapse
-  chart <- dup_chart_x()
+  # an X chart has one row per subgroup already, so there is nothing to sum
+  chart <- extra_column_chart_x()
 
   expect_identical(aggregate_data(chart), chart)
-  expect_identical(aggregate_data(chart)$data, dup_data_analysed)
+  expect_identical(aggregate_data(chart)$data, unique_x_data_analysed)
+})
+
+
+test_that("validate_autospc_chart_x rejects a repeated x", {
+  expect_error(
+    autospc_chart_x(data = dup_data, x = "x", y = "y"),
+    "x must be unique"
+  )
+})
+
+
+test_that("the error names the values that are repeated", {
+  expect_error(
+    autospc_chart_x(data = dup_data, x = "x", y = "y"),
+    "Repeated x: 1, 2, 3\\."
+  )
 })
 
 

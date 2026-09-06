@@ -12,6 +12,7 @@ argument_data <- data.frame(
 # values only need to be valid: no assertion below is about what the analysis
 # does with them.
 chart_argument_alternatives <- list(
+  aggregation_na_rm = TRUE,
   period_min = 25,
   baseline_length = 25L,
   shift_rule_threshold = 7L,
@@ -19,6 +20,7 @@ chart_argument_alternatives <- list(
   establish_every_shift = TRUE,
   no_regrets = FALSE,
   overhanging_reversions = FALSE,
+  na_ends_run = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,
   centre_line_tolerance = 0.5,

@@ -30,19 +30,49 @@ add_rule_breaks <- function(x,
 }
 
 add_rule_two <- function(table, shift_rule_threshold) {
-  runs <- rle(unlist(table$above_or_below_cl))
-  rulebreakingruns <- runs$lengths >= shift_rule_threshold
-  runs$values <- rulebreakingruns
-  partofrun <- inverse.rle(runs)
-  table$rule2 <- partofrun
-  table <- table %>% dplyr::mutate(
-    run_start =
-      (dplyr::row_number() %in% cumsum(c(
-        1,
-        runs$lengths
-      ))
-      )
-  )
+  # which side of the centre line each point is: 1 above, -1 below, 0 on it
+  # (within centre_line_tolerance), NA where there is no point or no centre
+  # line to compare it with
+  side <- unlist(table$above_or_below_cl)
+
+  if (length(side) == 0L) {
+    table$rule2 <- logical(0)
+    table$run_start <- logical(0)
+
+    return(table)
+  }
+
+  # the side of the point before each one, NA for the first
+  previous_side <- dplyr::lag(side)
+
+  # a point continues the run before it when it is on the same side.
+  # FOR NOW: A point on the centre line is a side of its own, so it ends the run
+  # it interrupts and starts one of its own.
+  # TO DO: Fix this so that points on the centre line do not end a run, and do
+  # not contribute to run length.
+  # A missing side continues nothing. Note that missing values in the analysed
+  # series have been removed by this point, and how their presence impacts run
+  # continuation is dictated by na_ends_run, through table$run_break.
+  continues <- !is.na(side) &
+    !is.na(previous_side) &
+    side == previous_side
+
+  # a gap ends the run before it, where na_ends_run asked for that.
+  if ("run_break" %in% names(table)) {
+    continues <- continues & !table$run_break
+  }
+
+  # number every run, so that the first point of each is where a run does not
+  # continue, and every point of a run carries that run's number
+  run_start <- !continues
+  run <- cumsum(run_start)
+
+  # how many points each run holds, indexed by run number
+  run_lengths <- tabulate(run)
+
+  table$rule2 <- run_lengths[run] >= shift_rule_threshold
+  table$run_start <- run_start
+
   table
 }
 

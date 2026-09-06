@@ -269,39 +269,28 @@ limits_table_columns.autospc_chart_p <- function(chart) {
 extend_display_limits.autospc_chart_p <- function(chart,
                                                   limits_table,
                                                   counter) {
-  # constant from P' chart calc = (UCL - CL)sqrt(n)
-  constant <- (limits_table[(counter - 1), "ucl"] -
-    limits_table[(counter - 1), "cl"]) *
-    sqrt(limits_table[(counter - 1), "n"])
-  pbar <- limits_table[(counter - 1), "cl"]
+  return(extend_display_limits_at_denominators(
+    limits_table = limits_table,
+    counter = counter
+  ))
+}
 
-  limits_table[counter:nrow(limits_table), "cl"] <-
-    limits_table[(counter - 1), "cl"]
-  limits_table[counter:nrow(limits_table), "period_type"] <- "display"
 
-  # splits limits table to just the section that we want
-  limits_table_top <- limits_table[1:(counter - 1), ]
-  limits_table_bottom <- limits_table[counter:nrow(limits_table), ]
-
-  limits_table_bottom <- limits_table_bottom %>%
-    dplyr::mutate(constant = as.numeric(constant)) %>%
-    dplyr::mutate(pbar = as.numeric(pbar)) %>%
-    dplyr::mutate(ucl_display = pbar + (constant / sqrt(n))) %>%
-    dplyr::mutate(lcl_display = pbar - (constant / sqrt(n))) %>%
-    dplyr::mutate(ucl = dplyr::if_else(period_type == "display",
-      ucl_display,
-      ucl
-    )) %>%
-    dplyr::mutate(lcl = dplyr::if_else(period_type == "display",
-      lcl_display,
-      lcl
-    )) %>%
-    dplyr::mutate(ucl = dplyr::if_else(ucl >= 100, 100, ucl)) %>%
-    dplyr::mutate(lcl = dplyr::if_else(lcl <= 0, 0, lcl))
-
-  limits_table <- dplyr::bind_rows(limits_table_top, limits_table_bottom)
-
-  return(limits_table)
+#' Limits for the rows that hold no observation
+#'
+#' The limits of a P chart vary with the denominator, so the values the default
+#' method gives are recalculated at each row's own denominator.
+#'
+#' @return list of three vectors, named cl, ucl and lcl
+#' @noRd
+limits_for_missing_rows.autospc_chart_p <- function(chart,
+                                                    period,
+                                                    rows) {
+  return(proportion_limits_for_missing_rows(
+    limits = NextMethod(),
+    period = period,
+    rows = rows
+  ))
 }
 
 
@@ -336,10 +325,9 @@ extrapolate_limits.autospc_chart_p <- function(chart,
     n = ext_calc_data$n,
     exclusion_points = exclusion_points,
     multiply = 100
-  ) %>%
-    lapply("[[", 1L)
+  )
 
-  return(limits)
+  return(lapply(limits[c("cl", "ucl", "lcl")], "[[", 1L))
 }
 
 # Presentation methods

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,31 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9008" id="autospc-0109008">autospc 0.1.0.9008<a class="anchor" aria-label="anchor" href="#autospc-0109008"></a></h2>
+<div class="section level3">
+<h3 id="data-that-cannot-be-charted-0-1-0-9008">Data that cannot be charted<a class="anchor" aria-label="anchor" href="#data-that-cannot-be-charted-0-1-0-9008"></a></h3>
+<ul><li>
+<strong>X, MR and XMR charts now reject a repeated <code>x</code>.</strong> Each point on these charts is one row, so a repeated <code>x</code> has no place to be plotted. It was previously accepted, and multiplied in the output table. The error names the values that are repeated. C, C’, P and P’ charts are unchanged, summing the rows that share an <code>x</code> into one subgroup as before.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="missing-values-0-1-0-9008">Missing values<a class="anchor" aria-label="anchor" href="#missing-values-0-1-0-9008"></a></h3>
+<p>The analysis now proceeds as though a point with no <code>y</code> were not there, rather than walking over it as a row. This changes results for any series that has one.</p>
+<ul><li><p><strong>A calculation period now holds <code>period_min</code> points, not <code>period_min</code> rows.</strong> Where a series had missing values inside the first period, limits were previously calculated from fewer points than asked for.</p></li>
+<li><p><strong>An MR chart now shows its control limits at the first point</strong> as well as its centre line, which it already showed. The first row of an MR chart holds no moving range, because there is no earlier point to measure one against; that is not a missing value, and the limits there are defined.</p></li>
+<li><p><strong>Control limits now carry across a gap.</strong> They were drawn only where a point was, so they broke at every missing value; the centre line carried across but the control limits did not.</p></li>
+<li><p><strong>No limits are drawn before the first point or after the last.</strong> The centre line previously ran to both edges of the chart whether or not there was anything there.</p></li>
+<li><p><strong>A missing point no longer silently splits a run</strong>, which had made a shift rule break disappear. <code>na_ends_run</code> now controls this, and defaults to <code>TRUE</code>, which is the previous behaviour. A missing point may have continued the run before it or been on the other side of the centre line, and the data cannot say which: <code>TRUE</code> minimises the risk of a false positive shift rule break arising from missing data, <code>FALSE</code> minimises the risk of a false negative.</p></li>
+<li><p>Rows with no <code>x</code> are excluded before the analysis rather than after it. One such row could previously add a subgroup of its own, which counted towards the minimum needed for limits: 20 subgroups plus one row with no <code>x</code> drew limits that 20 subgroups alone correctly refused. <code>options(autospc.warn_missing_x = FALSE)</code> turns off the warning.</p></li>
+<li><p>The warning given when a series is too short now says how many points it has.</p></li>
+<li><p><strong><code>aggregation_na_rm</code> controls what an observation with no value does to the subgroup it is aggregated into.</strong> <code>FALSE</code>, the default, makes the whole subgroup missing, as the package has always done. <code>TRUE</code> discards the observation and forms the subgroup from the rest. A row is discarded when either its <code>y</code> or its <code>n</code> has no value, so a subgroup’s numerator and denominator always count the same observations. A subgroup that loses every observation stays on the chart as a missing point rather than disappearing. <code>aggregation_na_rm</code> has no effect on data that is already one row per subgroup, or on X and MR charts, which do not aggregate.</p></li>
+<li><p><strong>The limits at a point with missing <code>y</code> on a P or P’ chart are now calculated from that point’s own denominator</strong>, where the data supplied one. The denominator of such a point is also now reported in the returned table. Limits at a point whose denominator is missing or zero are drawn at the mean denominator of its period.</p></li>
+<li><p><strong>P and P’ charts now return a <code>limit_width</code> column.</strong> It holds the distance the limits sit from the centre line at a denominator of 1, so that the limits at any denominator are the centre line plus and minus <code>limit_width</code> over the square root of that denominator. It takes one value for a calculation period and the display period that follows it.</p></li>
+<li><p><strong>P and P’ charts no longer return the <code>constant</code>, <code>pbar</code>, <code>ucl_display</code> and <code>lcl_display</code> columns.</strong> They held working values from the extension of limits over a display period. <code>constant</code> and <code>pbar</code> are now <code>limit_width</code> and <code>cl</code>, which hold the same values on every row rather than on the display rows alone, and the other two held the display limits before they were held within 0 and 100, which were not used.</p></li>
+<li><p>** Period columns are now correctly populated for a point with missing <code>y</code>. <code>period_type</code>, <code>period_start</code>, <code>plot_period</code>, <code>limit_change</code>, <code>cl_change</code> and, on a P or P’ chart, <code>limit_width</code> were all missing at such a point, though its centre line and limits were filled in from the period it sits in.</p></li>
+<li><p><strong>The centre line and limits at a point with missing <code>y</code> inside a display period now match the rest of that period.</strong> Previously they were calculated afresh from the display period’s own values instead of being carried forward with the rest of the period’s. No data point is plotted at such a point, so it is only the lines that were affected.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9003" id="autospc-0109003">autospc 0.1.0.9003<a class="anchor" aria-label="anchor" href="#autospc-0109003"></a></h2>
 <div class="section level3">

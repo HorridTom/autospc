@@ -12,6 +12,7 @@ autospc(
   x,
   y,
   n,
+  aggregation_na_rm = FALSE,
   chart_type = NULL,
   period_min = 21L,
   baseline_length = NULL,
@@ -20,6 +21,7 @@ autospc(
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
+  na_ends_run = TRUE,
   max_exclusions = 3L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
@@ -71,7 +73,10 @@ autospc(
 - x:
 
   Name of column (passed using tidyselect semantics) to use as subgroups
-  on the horizontal axis of the chart.
+  on the horizontal axis of the chart. Rows with NA in this column are
+  excluded, with a warning; see the Options section of
+  [`autospc-package`](https://horridtom.github.io/autospc/reference/autospc-package.md)
+  to turn the warning off.
 
 - y:
 
@@ -95,6 +100,18 @@ autospc(
   See
   [`vignette("data-requirements", package = "autospc")`](https://horridtom.github.io/autospc/articles/data-requirements.md)
   for more details.
+
+- aggregation_na_rm:
+
+  Boolean controlling what happens to an observation with no value when
+  aggregating into subgroups. FALSE, the default, makes the whole
+  subgroup missing. TRUE discards the observation and forms the subgroup
+  from the rest. A row is discarded when either its `y` or its `n` (for
+  chart types that require it) has no value, so that a subgroup's
+  numerator and denominator always count the same observations. Where
+  every observation in a subgroup is discarded the subgroup itself is
+  missing. Has no effect on data that is already one row per subgroup,
+  or on X and MR charts.
 
 - chart_type:
 
@@ -151,6 +168,13 @@ autospc(
 
   Parameters that control how centre line and control limits are
   established for each period, and details of how SPC rules are applied
+
+- na_ends_run:
+
+  Boolean determining whether a missing point starts a new run, for the
+  purpose of the shift rule. TRUE minimises the risk of a false positive
+  shift rule break arising from missing data; FALSE minimises the risk
+  of a false negative.
 
 - max_exclusions:
 

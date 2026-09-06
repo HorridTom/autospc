@@ -15,7 +15,7 @@ Creates spc charts with control limits and centre line calculations partitioned 
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,20 @@ Creates spc charts with control limits and centre line calculations partitioned 
     </div>
 
 
+    <div class="section level2">
+    <h2 id="options">Options<a class="anchor" aria-label="anchor" href="#options"></a></h2>
+
+
+<dl><dt><code>autospc.warn_missing_x</code></dt>
+<dd><p>Whether to warn when rows are excluded
+because <code>x</code> is <code>NA</code>. <code>TRUE</code> unless set otherwise. Set
+<code>options(autospc.warn_missing_x = FALSE)</code> to omit this warning, for
+instance when drawing many charts to avoid many warnings. The warning
+carries the class <code>"autospc_missing_x_warning"</code>, so it can also be handled
+on its own with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code>.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Useful links:</p><ul><li><p><a href="https://horridtom.github.io/autospc/">https://horridtom.github.io/autospc/</a></p></li>

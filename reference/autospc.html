@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,7 @@ by default the Stable Shift Algorithm.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  <span class="va">n</span>,</span>
+<span>  aggregation_na_rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  chart_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  period_min <span class="op">=</span> <span class="fl">21L</span>,</span>
 <span>  baseline_length <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -67,6 +68,7 @@ by default the Stable Shift Algorithm.</p>
 <span>  establish_every_shift <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  no_regrets <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overhanging_reversions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  na_ends_run <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  highlight_exclusions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  mr_screen_max_loops <span class="op">=</span> <span class="fl">1L</span>,</span>
@@ -119,7 +121,9 @@ by default the Stable Shift Algorithm.</p>
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>Name of column (passed using tidyselect semantics) to use as
-subgroups on the horizontal axis of the chart.</p></dd>
+subgroups on the horizontal axis of the chart. Rows with NA in this column
+are excluded, with a warning; see the Options section of
+<code><a href="autospc-package.html">autospc-package</a></code> to turn the warning off.</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
@@ -137,6 +141,17 @@ denominator for P and P' charts.
 <br>
 See <code><a href="../articles/data-requirements.html">vignette("data-requirements", package = "autospc")</a></code> for more
 details.</p></dd>
+
+
+<dt id="arg-aggregation-na-rm">aggregation_na_rm<a class="anchor" aria-label="anchor" href="#arg-aggregation-na-rm"></a></dt>
+<dd><p>Boolean controlling what happens to an observation
+with no value when aggregating into subgroups. FALSE, the default, makes the
+whole subgroup missing. TRUE discards the observation and forms the subgroup
+from the rest. A row is discarded when either its <code>y</code> or its <code>n</code> (for chart
+types that require it) has no value, so that a subgroup's numerator and
+denominator always count the same observations. Where every observation in a
+subgroup is discarded the subgroup itself is missing. Has no effect on data
+that is already one row per subgroup, or on X and MR charts.</p></dd>
 
 
 <dt id="arg-chart-type">chart_type<a class="anchor" aria-label="anchor" href="#arg-chart-type"></a></dt>
@@ -195,6 +210,13 @@ candidate calculation period. Set to FALSE only with no_regrets = FALSE.</p><div
 <p>Parameters that control how centre line and control limits are established
 for each period, and details of how SPC rules are applied</p>
 </div></dd>
+
+
+<dt id="arg-na-ends-run">na_ends_run<a class="anchor" aria-label="anchor" href="#arg-na-ends-run"></a></dt>
+<dd><p>Boolean determining whether a missing point starts a new
+run, for the purpose of the shift rule. TRUE minimises the risk of a false
+positive shift rule break arising from missing data; FALSE minimises the risk
+of a false negative.</p></dd>
 
 
 <dt id="arg-max-exclusions">max_exclusions<a class="anchor" aria-label="anchor" href="#arg-max-exclusions"></a></dt>

@@ -349,6 +349,51 @@ test_that("a C chart ignores the denominator at a gap", {
 })
 
 
+# a series with no observations at all
+
+
+test_that("compacting a series with no observations gives an empty result", {
+  chart <- structure(list(), class = c("autospc_chart_c", "autospc_chart"))
+  data <- data.frame(x = 1:3, y = NA_real_)
+
+  compacted <- compact_series(chart, data = data, na_ends_run = TRUE)
+
+  expect_identical(nrow(compacted), 0L)
+  expect_identical(compacted$run_break, logical(0))
+})
+
+
+# a period that holds no limits
+
+
+test_that("row_holding_period_limits returns NULL where no row holds limits", {
+  period <- data.frame(cl = c(NA_real_, NA_real_), ucl = c(NA_real_, NA_real_))
+
+  expect_null(row_holding_period_limits(period))
+})
+
+
+test_that("row_holding_period_limits passes over a row holding only one", {
+  period <- data.frame(cl = c(10, 10), ucl = c(NA_real_, 20))
+
+  expect_identical(row_holding_period_limits(period)$ucl, 20)
+})
+
+
+test_that("a period that holds no limits gives its missing rows none", {
+  chart <- structure(list(), class = c("autospc_chart_c", "autospc_chart"))
+  period <- data.frame(cl = NA_real_, ucl = NA_real_, lcl = NA_real_)
+
+  limits <- limits_for_missing_rows(chart,
+    period = period,
+    rows = data.frame(x = 1:2)
+  )
+
+  expect_length(limits$cl, 2L)
+  expect_true(all(is.na(unlist(limits))))
+})
+
+
 # an MR chart's first point
 
 

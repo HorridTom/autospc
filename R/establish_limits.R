@@ -9,7 +9,7 @@
 #' @noRd
 establish_limits <- function(chart) {
   prepared_data <- chart$data
-  
+
   # Remove missing values from series for analysis
   observed_data <- compact_series(chart,
     data = prepared_data,

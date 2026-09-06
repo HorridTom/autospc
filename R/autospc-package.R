@@ -1,7 +1,7 @@
 #' @section Options:
 #' \describe{
 #'   \item{`autospc.warn_missing_x`}{Whether to warn when rows are excluded
-#'   because `x` is `NA`. `TRUE` unless set otherwise. Set 
+#'   because `x` is `NA`. `TRUE` unless set otherwise. Set
 #'   `options(autospc.warn_missing_x = FALSE)` to omit this warning, for
 #'   instance when drawing many charts to avoid many warnings. The warning
 #'   carries the class `"autospc_missing_x_warning"`, so it can also be handled

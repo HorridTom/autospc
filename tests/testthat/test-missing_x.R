@@ -38,7 +38,8 @@ test_that("a row with no x is excluded", {
 
 test_that("excluding a row warns, and says how many", {
   expect_warning(
-    autospc(missing_x_data(3L), chart_type = "C\'", x = "x", y = "y",
+    autospc(missing_x_data(3L),
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     ),
     "3 rows were excluded"
@@ -48,7 +49,8 @@ test_that("excluding a row warns, and says how many", {
 
 test_that("the warning is worded for a single row", {
   expect_warning(
-    autospc(missing_x_data(1L), chart_type = "C\'", x = "x", y = "y",
+    autospc(missing_x_data(1L),
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     ),
     "1 row was excluded"
@@ -61,7 +63,8 @@ test_that("the warning names the column the caller used as x", {
   names(d)[1] <- "month_start"
 
   expect_warning(
-    autospc(d, chart_type = "C\'", x = "month_start", y = "y",
+    autospc(d,
+      chart_type = "C\'", x = "month_start", y = "y",
       plot_chart = FALSE, period_min = 21L
     ),
     "no month_start value"
@@ -73,7 +76,8 @@ test_that("naming a column the data does not hold is still reported as that", {
   # the x filter runs before the class validator, and must not get in first
   # with an error of its own
   expect_error(
-    autospc(missing_x_data(0L), chart_type = "C\'", x = "not_a_column",
+    autospc(missing_x_data(0L),
+      chart_type = "C\'", x = "not_a_column",
       y = "y", plot_chart = FALSE, period_min = 21L
     ),
     "not_a_column"
@@ -83,7 +87,8 @@ test_that("naming a column the data does not hold is still reported as that", {
 
 test_that("no warning is given when nothing is excluded", {
   expect_no_warning(
-    autospc(missing_x_data(0L), chart_type = "C\'", x = "x", y = "y",
+    autospc(missing_x_data(0L),
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     )
   )
@@ -95,7 +100,8 @@ test_that("the option turns the warning off", {
   on.exit(options(previous), add = TRUE)
 
   expect_no_warning(
-    autospc(missing_x_data(3L), chart_type = "C\'", x = "x", y = "y",
+    autospc(missing_x_data(3L),
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     )
   )
@@ -107,7 +113,8 @@ test_that("a value other than FALSE leaves the warning on", {
   on.exit(options(previous), add = TRUE)
 
   expect_warning(
-    autospc(missing_x_data(3L), chart_type = "C\'", x = "x", y = "y",
+    autospc(missing_x_data(3L),
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     ),
     "3 rows were excluded"
@@ -117,7 +124,8 @@ test_that("a value other than FALSE leaves the warning on", {
 
 test_that("the warning can be handled on its own by its class", {
   caught <- tryCatch(
-    autospc(missing_x_data(1L), chart_type = "C\'", x = "x", y = "y",
+    autospc(missing_x_data(1L),
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     ),
     autospc_missing_x_warning = function(w) "caught"
@@ -139,7 +147,8 @@ test_that("rows with no x do not count towards the minimum for limits", {
   with_phantom <- rbind(twenty, data.frame(x = NA_integer_, y = 12))
 
   expect_warning(
-    result <- autospc(with_phantom, chart_type = "C\'", x = "x", y = "y",
+    result <- autospc(with_phantom,
+      chart_type = "C\'", x = "x", y = "y",
       plot_chart = FALSE, period_min = 21L
     ),
     "fewer than the minimum number of points"
@@ -153,7 +162,8 @@ test_that("facet_stages excludes rows with no x as well", {
   # caught by class rather than by expect_warning(), because stage 1 is 12 rows
   # and warns about being too short for limits as well
   caught <- tryCatch(
-    facet_stages(missing_x_data(3L), split_rows = 12, chart_type = "C\'",
+    facet_stages(missing_x_data(3L),
+      split_rows = 12, chart_type = "C\'",
       x = "x", y = "y", plot_chart = FALSE, period_min = 21L
     ),
     autospc_missing_x_warning = function(w) conditionMessage(w)
@@ -171,7 +181,8 @@ test_that("split_rows and the last stage count rows that have an x", {
   on.exit(options(previous), add = TRUE)
 
   result <- suppressWarnings(
-    facet_stages(missing_x_data(3L), split_rows = 12, chart_type = "C\'",
+    facet_stages(missing_x_data(3L),
+      split_rows = 12, chart_type = "C\'",
       x = "x", y = "y", plot_chart = FALSE, period_min = 21L
     )
   )

@@ -42,38 +42,76 @@ add_rule_two <- function(table, shift_rule_threshold) {
     return(table)
   }
 
-  # the side of the point before each one, NA for the first
-  previous_side <- dplyr::lag(side)
+  # Whether each point is above or below the centre line. A point on the centre
+  # line neither commences a run nor counts towards the length of one, and a
+  # point with no side is not part of one either
+  counts <- !is.na(side) & side != 0L
 
-  # a point continues the run before it when it is on the same side.
-  # FOR NOW: A point on the centre line is a side of its own, so it ends the run
-  # it interrupts and starts one of its own.
-  # TO DO: Fix this so that points on the centre line do not end a run, and do
-  # not contribute to run length.
-  # A missing side continues nothing. Note that missing values in the analysed
-  # series have been removed by this point, and how their presence impacts run
-  # continuation is dictated by na_ends_run, through table$run_break.
-  continues <- !is.na(side) &
-    !is.na(previous_side) &
-    side == previous_side
+  # a run does not continue into a point with no side, nor into the point after
+  # a gap where na_ends_run asked for that
+  barrier <- is.na(side)
 
-  # a gap ends the run before it, where na_ends_run asked for that.
   if ("run_break" %in% names(table)) {
-    continues <- continues & !table$run_break
+    barrier <- barrier | table$run_break
   }
 
-  # number every run, so that the first point of each is where a run does not
-  # continue, and every point of a run carries that run's number
-  run_start <- !continues
-  run <- cumsum(run_start)
+  # number every run, so that every point carries the number of the run it
+  # belongs to, and the points before the first run of the table carry 0
+  table$run_start <- commences_a_run(
+    side = side,
+    counts = counts,
+    barrier = barrier
+  )
 
-  # how many points each run holds, indexed by run number
-  run_lengths <- tabulate(run)
+  run <- cumsum(table$run_start)
 
-  table$rule2 <- run_lengths[run] >= shift_rule_threshold
-  table$run_start <- run_start
+  run_lengths <- tabulate(run[counts], nbins = max(run))
+
+  length_of_run <- rep(0L, length(side))
+  in_a_run <- run > 0L
+  length_of_run[in_a_run] <- run_lengths[run[in_a_run]]
+
+  table$rule2 <- length_of_run >= shift_rule_threshold
 
   table
+}
+
+
+#' Which points commence a run
+#'
+#' A run commences at a point above or below the centre line that does not
+#' continue the run before it, either because the last such point was on the
+#' other side of the centre line or because a barrier lies between the two.
+#' Points on the centre line, and points with no side, never commence one.
+#'
+#' @param side 1 above the centre line, -1 below it, 0 on it, NA for a point
+#'   with no side.
+#' @param counts Whether each point counts towards the length of a run.
+#' @param barrier Whether a run cannot continue into each point.
+#'
+#' @return logical vector, one value per point
+#' @noRd
+commences_a_run <- function(side,
+                            counts,
+                            barrier) {
+  commences <- rep(FALSE, length(side))
+  counting <- which(counts)
+
+  if (length(counting) == 0L) {
+    return(commences)
+  }
+
+  # the counting point before each counting point, and how many barriers lie
+  # between the two
+  previous <- c(NA_integer_, counting[-length(counting)])
+  barriers_so_far <- cumsum(barrier)
+
+  blocked <- is.na(previous) |
+    barriers_so_far[counting] > barriers_so_far[previous]
+
+  commences[counting] <- !(!blocked & side[counting] == side[previous])
+
+  return(commences)
 }
 
 add_highlight <- function(table) {

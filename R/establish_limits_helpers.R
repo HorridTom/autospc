@@ -499,7 +499,11 @@ counter_at_rule_break <- function(table,
     start_of_next_run <- nrow(table) + 1L
   }
 
-  result <- start_of_next_run - counter >= shift_rule_threshold
+  # counted the same way add_rule_two() counts a run, so that the two agree on
+  # whether the threshold is reached: points on the centre line do not count
+  side <- unlist(table$above_or_below_cl)[counter:(start_of_next_run - 1L)]
+
+  result <- sum(!is.na(side) & side != 0L) >= shift_rule_threshold
 
   return(result)
 }

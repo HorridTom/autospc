@@ -479,33 +479,27 @@ test_that("na_ends_run defaults to TRUE", {
 # points on the centre line
 
 
-test_that("a point on the centre line ends the run it sits in", {
-  # this is what the package has always done, and it is recorded here because
-  # add_rule_two() was rewritten: a point within centre_line_tolerance of the
-  # centre line is a side of its own, so it ends the run before it and starts
-  # one of its own, which is then not itself flagged
-  # TO DO: Fix this so points on the centre line are handled correctly.
-  base <- rep(c(11, 13), length.out = 21L)
-  d <- data.frame(x = 1:30, y = as.numeric(c(base, rep(20, 9))))
+test_that("a point on the centre line does not end the run it sits in", {
+  # a point within centre_line_tolerance of the centre line is neither above
+  # nor below it, so it neither ends the run it sits in nor counts towards its
+  # length. test-centre_line_runs.R covers the rules in full
+  baseline <- c(rep(c(12, 10), 10), 11)
+  d <- data.frame(x = 1:30, y = as.numeric(c(baseline, rep(13, 9))))
 
   on_the_line <- d
-  on_the_line$y[26] <- 12
+  on_the_line$y[26] <- 11
 
   flagged <- function(dd) {
     result <- autospc(dd,
-      chart_type = "C\'", x = "x", y = "y", plot_chart = FALSE,
-      period_min = 21L, shift_rule_threshold = 8L, centre_line_tolerance = 1
+      chart_type = "C", x = "x", y = "y", plot_chart = FALSE,
+      period_min = 21L, shift_rule_threshold = 8L
     )
 
     return(which(result$rule2))
   }
 
-  # a run of nine is a shift
   expect_identical(flagged(d), 22:30)
-
-  # the same run, interrupted by one point on the centre line, is two runs of
-  # four, and neither reaches the threshold
-  expect_length(flagged(on_the_line), 0L)
+  expect_identical(flagged(on_the_line), c(22:25, 27:30))
 })
 
 

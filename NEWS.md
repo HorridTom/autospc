@@ -1,3 +1,21 @@
+# autospc 0.1.0.9009
+
+## Bug fixes
+
+* **A point on the centre line no longer ends the run it sits in.** A point
+  within `centre_line_tolerance` of the centre line was treated as a side of
+  its own, so it split the run it fell in, and one such point could hide a
+  shift entirely. It now neither commences a run, ends one, nor counts towards
+  the length of the one it sits in, which is the conventional treatment of a
+  point that is neither above the line nor below it.
+
+  A run therefore continues across any number of consecutive points on the
+  centre line, and reaches back across them, so a series can gain rule 2 breaks
+  it did not have before: where points either side of a stretch on the centre
+  line fall on the same side, they are now one run rather than two. A run still
+  commences only at a point that is above or below the line, so points on the
+  line before any run belong to none.
+  
 # autospc 0.1.0.9008
 
 ## Data that cannot be charted

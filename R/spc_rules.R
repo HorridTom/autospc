@@ -42,9 +42,9 @@ add_rule_two <- function(table, shift_rule_threshold) {
     return(table)
   }
 
-  # a point above or below the centre line. A point on the centre line neither
-  # commences a run nor counts towards the length of one, and a point with no
-  # side is not part of one either
+  # Whether each point is above or below the centre line. A point on the centre
+  # line neither commences a run nor counts towards the length of one, and a
+  # point with no side is not part of one either
   counts <- !is.na(side) & side != 0L
 
   # a run does not continue into a point with no side, nor into the point after

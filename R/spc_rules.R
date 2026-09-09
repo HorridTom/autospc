@@ -1,22 +1,22 @@
 # Code to add rule break columns to a dataframe x
 # Assumes the following columns in x:
-# y   : the measure
-# cl  : the centre line
-# lcl : the lower control limit
-# ucl : the upper control limit
+# series : the values under analysis
+# cl     : the centre line
+# lcl    : the lower control limit
+# ucl    : the upper control limit
 
 add_rule_breaks <- function(x,
                             centre_line_tolerance,
                             shift_rule_threshold) {
   x <- x %>%
-    dplyr::mutate(rule1 = (y > ucl) | (y < lcl)) %>%
+    dplyr::mutate(rule1 = (series > ucl) | (series < lcl)) %>%
     dplyr::mutate(
       above_or_below_cl = dplyr::case_when(
-        abs(y - cl) %<=%
+        abs(series - cl) %<=%
           centre_line_tolerance ~ 0L,
-        (y - cl) %>>%
+        (series - cl) %>>%
           centre_line_tolerance ~ 1L,
-        (y - cl) %<<%
+        (series - cl) %<<%
           -centre_line_tolerance ~ -1L
       )
     ) %>%

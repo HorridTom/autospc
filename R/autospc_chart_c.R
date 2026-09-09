@@ -130,7 +130,7 @@ calculate_limits.autospc_chart_c <- function(chart,
                                              period,
                                              exclusion_points) {
   limits <- get_c_limits(
-    y = period$y,
+    y = period$series,
     exclusion_points = exclusion_points
   )
 
@@ -158,7 +158,7 @@ chart_type_label.autospc_chart_c <- function(chart) {
 y_axis_range.autospc_chart_c <- function(chart,
                                          data) {
   high <- max(data$ucl,
-    data$y,
+    data$series,
     na.rm = TRUE
   ) +
     max(data$ucl,

@@ -108,7 +108,7 @@ calculate_limits.autospc_chart_x <- function(chart,
                                              period,
                                              exclusion_points) {
   limits <- get_x_limits(
-    y = period$y,
+    y = period$series,
     mr_screen_max_loops = chart$mr_screen_max_loops,
     exclusion_points = exclusion_points
   )
@@ -150,7 +150,7 @@ label_accuracy.autospc_chart_x <- function(chart,
 y_axis_range.autospc_chart_x <- function(chart,
                                          data) {
   low <- min(data$lcl,
-    data$y,
+    data$series,
     na.rm = TRUE
   )
 
@@ -161,7 +161,7 @@ y_axis_range.autospc_chart_x <- function(chart,
   }
 
   high <- max(data$ucl,
-    data$y,
+    data$series,
     na.rm = TRUE
   ) * 1.1
 

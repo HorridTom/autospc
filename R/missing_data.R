@@ -71,7 +71,7 @@ drop_missing_x <- function(data,
 #' observations and nothing else. `run_break` marks a point that a gap
 #' immediately precedes, and is what stops a run continuing across that gap.
 #'
-#' @param data A prepared series, with a `y` column.
+#' @param data A prepared series, with a `series` column.
 #' @param na_ends_run Whether a gap starts a new run.
 #'
 #' @return The rows of `data` that hold an observation, with `run_break` added.
@@ -128,6 +128,10 @@ restore_missing_rows <- function(limits_table,
   rownames(restored) <- NULL
 
   restored$x <- data$x
+
+  # a row with no observation is one whose series value is missing, so there is
+  # nothing to put back there. y is another matter: a P chart's count can be
+  # there when the percentage it gives is not
   restored$y <- data$y
 
   # copy the denominator back, onto the rows with no observation as well

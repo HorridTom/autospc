@@ -121,7 +121,7 @@ test_that("calculate_limits matches get_x_limits", {
       exclusion_points = NULL
     ),
     get_x_limits(
-      y = count_period_data$y,
+      y = count_period_data$series,
       mr_screen_max_loops = 1L,
       exclusion_points = NULL
     )
@@ -136,7 +136,7 @@ test_that("calculate_limits passes exclusion_points through", {
       exclusion_points = 6L
     ),
     get_x_limits(
-      y = count_period_data$y,
+      y = count_period_data$series,
       mr_screen_max_loops = 1L,
       exclusion_points = 6L
     )
@@ -163,7 +163,7 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
   expect_identical(
     calculate_limits(chart, period = screening_data, exclusion_points = NULL),
     get_x_limits(
-      y = screening_data$y,
+      y = screening_data$series,
       mr_screen_max_loops = 0L,
       exclusion_points = NULL
     )

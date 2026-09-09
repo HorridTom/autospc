@@ -1,6 +1,9 @@
 # load in test data
 test_data <- readRDS("testdata/test_data.rds")
 
+# these functions walk a prepared series, whose analysed values are `series`
+test_data$series <- test_data$y
+
 # form_calculation_limits() takes its configuration from the chart object,
 # so the settings these figures were produced with live on the chart. They are
 # the defaults: period_min 21, no baseline_length, shift_rule_threshold 8,
@@ -47,7 +50,7 @@ test_that("Calculation period is formed correctly", {
 })
 
 
-test_that("the limits table keeps n and y_numerator for P charts only", {
+test_that("the limits table keeps y and n for P charts only", {
   # which columns survive is decided by limits_table_columns(), a method on the
   # chart object. This is the behavioural end of that: the P table has to carry
   # the counts and denominators the limits were calculated from, and the count
@@ -65,12 +68,12 @@ test_that("the limits table keeps n and y_numerator for P charts only", {
     period_min = 21, plot_chart = FALSE
   )
 
-  expect_true(all(c("n", "y_numerator") %in% names(p_table)))
+  expect_true(all(c("y", "n") %in% names(p_table)))
 
   c_table <- autospc(proportion_data,
     chart_type = "C",
     period_min = 21, plot_chart = FALSE
   )
 
-  expect_false(any(c("n", "y_numerator") %in% names(c_table)))
+  expect_false("n" %in% names(c_table))
 })

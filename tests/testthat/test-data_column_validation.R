@@ -352,7 +352,7 @@ test_that("a P chart analyses the rounded numerator", {
     )
   )
 
-  expect_identical(result$y_numerator, round(rounding_data$y))
+  expect_identical(result$y, round(rounding_data$y))
 })
 
 
@@ -369,7 +369,7 @@ test_that("counts are rounded before they are aggregated, not after", {
     autospc(repeated, chart_type = "P", period_min = 21L, plot_chart = FALSE)
   )
 
-  expect_true(all(result$y_numerator == 2))
+  expect_true(all(result$y == 2))
 })
 
 

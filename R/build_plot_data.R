@@ -184,7 +184,7 @@ join_mr_columns <- function(x_table,
     dplyr::left_join(
       mr_table %>%
         dplyr::select(x,
-          mr = y,
+          mr = series,
           amr = cl,
           url = ucl,
           lrl = lcl
@@ -192,7 +192,7 @@ join_mr_columns <- function(x_table,
       by = c("x" = "x")
     ) %>%
     dplyr::select(
-      x, y, cl, ucl, lcl,
+      x, series, y, cl, ucl, lcl,
       mr, amr, url, lrl,
       dplyr::everything()
     )
@@ -246,8 +246,8 @@ axis_specifications <- function(table,
   end_x <- max(x_max, x_pad_end)
 
   if (!enough_data_for_limits(chart)) {
-    ylimlow <- min(table$y, na.rm = TRUE)
-    ylimhigh <- max(table$y, na.rm = TRUE)
+    ylimlow <- min(table$series, na.rm = TRUE)
+    ylimhigh <- max(table$series, na.rm = TRUE)
   } else {
     y_range <- y_axis_range(
       chart = chart,

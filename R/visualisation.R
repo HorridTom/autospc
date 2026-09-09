@@ -38,15 +38,15 @@ create_spc_plot <- function(plot_data,
 
   long_table <- table %>%
     tidyr::pivot_longer(
-      cols = c(y, cl, ucl, lcl),
-      names_to = "series",
+      cols = c(series, cl, ucl, lcl),
+      names_to = "plotted_line",
       values_to = "value"
     )
 
   long_table <- long_table %>%
     dplyr::select(
       x,
-      series,
+      plotted_line,
       value,
       dplyr::everything()
     )
@@ -234,7 +234,7 @@ create_timeseries_plot <- function(table,
                                    split_rows = NULL) {
   time_series_plot <- ggplot2::ggplot(
     table,
-    ggplot2::aes(x = x, y = y)
+    ggplot2::aes(x = x, y = series)
   ) +
     ggplot2::geom_line(
       colour = "black",
@@ -306,6 +306,22 @@ format_spc_plot <- function(plot_unformatted,
     "Display" = "grey50"
   )
 
+  # keyed by plotted_line, so that renaming one of the four lines cannot
+  # silently reassign the rest
+  line_types <- c(
+    series = "solid",
+    cl = "solid",
+    ucl = "42",
+    lcl = "42"
+  )
+
+  line_widths <- c(
+    series = 0.5,
+    cl = 0.75,
+    ucl = 0.5,
+    lcl = 0.5
+  )
+
   # Prepare information on plot periods
   plot_periods <- long_table$plot_period
 
@@ -331,20 +347,20 @@ format_spc_plot <- function(plot_unformatted,
   plot_unformatted <- plot_unformatted +
     ggplot2::geom_line(
       data = . %>% dplyr::filter(
-        series %in% c("cl", "ucl", "lcl")
+        plotted_line %in% c("cl", "ucl", "lcl")
       ),
       ggplot2::aes(
         colour = plot_period,
-        linetype = series,
-        linewidth = series
+        linetype = plotted_line,
+        linewidth = plotted_line
       ),
       na.rm = TRUE
     ) +
     ggplot2::geom_line(
-      data = . %>% dplyr::filter(series %in% c("y")),
+      data = . %>% dplyr::filter(plotted_line %in% c("series")),
       ggplot2::aes(
-        linetype = series,
-        linewidth = series
+        linetype = plotted_line,
+        linewidth = plotted_line
       ),
       show.legend = FALSE,
       na.rm = TRUE
@@ -367,17 +383,16 @@ format_spc_plot <- function(plot_unformatted,
       }
     ) +
     ggplot2::scale_linetype_manual(
-      values = c("solid", "42", "42", "solid"),
+      values = line_types,
       guide = "none"
     ) +
     ggplot2::scale_linewidth_manual(
-      values =
-        c(0.75, 0.5, 0.5, 0.5) * line_width_sf,
+      values = line_widths * line_width_sf,
       guide = "none"
     ) +
     ggnewscale::new_scale_colour() +
     ggplot2::geom_point(
-      data = . %>% dplyr::filter(series == "y"),
+      data = . %>% dplyr::filter(plotted_line == "series"),
       ggplot2::aes(colour = highlight),
       size = point_size,
       na.rm = TRUE
@@ -551,8 +566,8 @@ add_limit_connectors <- function(long_table) {
     dplyr::pull(x)
 
   # Dataframe listing each display period in the data, with information on
-  # first x value in period, and previous x value to that, along with series
-  # values for that previous point
+  # first x value in period, and previous x value to that, along with the
+  # values of each line at that previous point
   display_periods <- long_table %>%
     dplyr::filter(period_type == "display") %>%
     dplyr::distinct(
@@ -566,12 +581,12 @@ add_limit_connectors <- function(long_table) {
     dplyr::ungroup() %>%
     dplyr::left_join(
       long_table %>%
-        dplyr::distinct(x, series, value) %>%
+        dplyr::distinct(x, plotted_line, value) %>%
         dplyr::rename(prev_value = value),
       by = c("prev_x" = "x")
     )
 
-  # Create additional rows to be added into long_table, with series values at
+  # Create additional rows to be added into long_table, with the line values at
   # the point immediately before the start of each display period. This has the
   # effect of creating an additional point for the control limits and centre
   # line to connect with the preceding calculation period limits and centre line
@@ -581,10 +596,10 @@ add_limit_connectors <- function(long_table) {
         dplyr::select(-plot_period),
       by = c(
         "x" = "x",
-        "series" = "series"
+        "plotted_line" = "plotted_line"
       )
     ) %>%
-    dplyr::filter(series %in% c("cl", "ucl", "lcl")) %>%
+    dplyr::filter(plotted_line %in% c("cl", "ucl", "lcl")) %>%
     dplyr::mutate(
       x = prev_x,
       value = prev_value
@@ -599,7 +614,7 @@ add_limit_connectors <- function(long_table) {
     dplyr::bind_rows(display_starts) %>%
     dplyr::arrange(
       x,
-      series
+      plotted_line
     )
 
   return(long_table)

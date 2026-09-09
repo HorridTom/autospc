@@ -121,7 +121,7 @@ add_annotations_to_plot_pp <- function(spc_plot,
   if (annotation_arrows) {
     annotated_plot <- spc_plot + ggrepel::geom_text_repel(
       data = . %>% dplyr::filter(
-        series %in% c("cl"),
+        plotted_line %in% c("cl"),
         !is.na(annotation_level)
       ),
       ggplot2::aes(
@@ -132,7 +132,7 @@ add_annotations_to_plot_pp <- function(spc_plot,
       position = ggpp::position_nudge_to(
         y = table %>%
           dplyr::filter(
-            series %in% c("cl"),
+            plotted_line %in% c("cl"),
             !is.na(value),
             !is.na(annotation_level)
           ) %>%
@@ -148,7 +148,7 @@ add_annotations_to_plot_pp <- function(spc_plot,
       segment.size = 0.75,
       segment.curvature = table %>%
         dplyr::filter(
-          series %in% c("cl"),
+          plotted_line %in% c("cl"),
           !is.na(value),
           !is.na(annotation_level)
         ) %>%
@@ -163,7 +163,7 @@ add_annotations_to_plot_pp <- function(spc_plot,
   } else {
     annotated_plot <- spc_plot + ggrepel::geom_text_repel(
       data = . %>% dplyr::filter(
-        series %in% c("cl"),
+        plotted_line %in% c("cl"),
         !is.na(annotation_level)
       ),
       ggplot2::aes(
@@ -174,7 +174,7 @@ add_annotations_to_plot_pp <- function(spc_plot,
       position = ggpp::position_nudge_to(
         y = table %>%
           dplyr::filter(
-            series %in% c("cl"),
+            plotted_line %in% c("cl"),
             !is.na(value),
             !is.na(annotation_level)
           ) %>%
@@ -206,7 +206,7 @@ add_annotations_to_plot_basic <- function(spc_plot,
   annotated_plot <- spc_plot +
     ggplot2::geom_text(
       data = . %>% dplyr::filter(
-        series %in% c("cl"),
+        plotted_line %in% c("cl"),
         !is.na(annotation_level)
       ),
       mapping = ggplot2::aes(

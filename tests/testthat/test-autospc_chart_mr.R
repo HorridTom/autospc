@@ -115,7 +115,7 @@ test_that("calculate_limits matches get_mr_limits", {
       exclusion_points = NULL
     ),
     get_mr_limits(
-      mr = count_period_data$y,
+      mr = count_period_data$series,
       mr_screen_max_loops = 0L,
       exclusion_points = NULL
     )
@@ -130,7 +130,7 @@ test_that("calculate_limits passes exclusion_points through", {
       exclusion_points = 6L
     ),
     get_mr_limits(
-      mr = count_period_data$y,
+      mr = count_period_data$series,
       mr_screen_max_loops = 0L,
       exclusion_points = 6L
     )
@@ -170,12 +170,12 @@ test_that("calculate_limits ignores mr_screen_max_loops on the chart", {
   expect_false(
     identical(
       get_mr_limits(
-        mr = screening_data$y,
+        mr = screening_data$series,
         mr_screen_max_loops = 0L,
         exclusion_points = NULL
       ),
       get_mr_limits(
-        mr = screening_data$y,
+        mr = screening_data$series,
         mr_screen_max_loops = 5L,
         exclusion_points = NULL
       )
@@ -188,13 +188,13 @@ test_that("n_effective_points adds one to the moving ranges", {
   # moving_ranges() prepends NA, so an MR series has one fewer non-missing value
   # than the series it came from, and the data-sufficiency checks are about that
   # underlying series
-  counted <- data.frame(y = c(NA, 3, 6, 7))
+  counted <- data.frame(series = c(NA, 3, 6, 7))
 
   expect_identical(n_effective_points(test_chart_mr(), data = counted), 4L)
 })
 
 
-test_that("prepare_data replaces y with the moving ranges", {
+test_that("prepare_data takes the series from the moving ranges", {
   counts <- data.frame(x = 1:5, y = c(5, 8, 2, 9, 4))
 
   chart <- autospc_chart_mr(data = counts, x = "x", y = "y")
@@ -202,8 +202,11 @@ test_that("prepare_data replaces y with the moving ranges", {
   prepared <- prepare_data(chart)
 
   # moving_ranges() prepends NA, so the series stays aligned with x
-  expect_identical(prepared$data$y, c(NA, 3, 6, 7, 5))
+  expect_identical(prepared$data$series, c(NA, 3, 6, 7, 5))
   expect_identical(prepared$data$x, counts$x)
+
+  # and y keeps the values the moving ranges were measured between
+  expect_identical(prepared$data$y, counts$y)
 
   # and what the user supplied is untouched
   expect_identical(prepared$data_original, counts)

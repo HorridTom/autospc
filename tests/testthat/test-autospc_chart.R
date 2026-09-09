@@ -210,7 +210,7 @@ test_that("autospc_chart keeps data_original as passed", {
 
 # prepare_data()
 
-test_that("prepare_data returns the chart unchanged by default", {
+test_that("prepare_data takes the series from y by default", {
   for (chart_type in c("C", "C'", "X")) {
     chart <- autospc_chart(
       chart_type = chart_type,
@@ -219,14 +219,21 @@ test_that("prepare_data returns the chart unchanged by default", {
       y = "y"
     )
 
-    expect_identical(prepare_data(chart), chart, info = chart_type)
+    prepared <- prepare_data(chart)
+
+    expect_identical(prepared$data$series, chart$data$y, info = chart_type)
+
+    # nothing else about the chart changes
+    prepared$data$series <- NULL
+
+    expect_identical(prepared, chart, info = chart_type)
   }
 })
 
 
 # n_effective_points()
 
-test_that("n_effective_points counts the non-missing values of y", {
+test_that("n_effective_points counts the non-missing values of series", {
   chart <- autospc_chart(
     chart_type = "C",
     data = factory_data,
@@ -236,7 +243,7 @@ test_that("n_effective_points counts the non-missing values of y", {
 
   expect_identical(
     n_effective_points(chart,
-      data = data.frame(y = c(1, NA, 3, 4))
+      data = data.frame(series = c(1, NA, 3, 4))
     ),
     3L
   )
@@ -244,7 +251,7 @@ test_that("n_effective_points counts the non-missing values of y", {
 
 
 test_that("the classes other than MR count the rows as they are", {
-  counted <- data.frame(y = c(1, NA, 3, 4))
+  counted <- data.frame(series = c(1, NA, 3, 4))
 
   for (chart_type in c("C", "C'", "X")) {
     chart <- autospc_chart(
@@ -429,20 +436,20 @@ test_that("the classes with no override inherit the averaging default", {
 
 # limits_table_columns()
 
-test_that("limits_table_columns is empty by default", {
+test_that("limits_table_columns is y by default", {
   bare_chart <- new_autospc_chart(assemble_chart_list(
     data = test_data,
     x = "x",
     y = "y"
   ))
 
-  expect_identical(limits_table_columns(bare_chart), character(0))
+  expect_identical(limits_table_columns(bare_chart), "y")
 })
 
 
-test_that("the classes with no override inherit the empty default", {
-  # only P and P' calculate limits from a column other than the plotted y, so
-  # only they need extra columns kept
+test_that("the classes with no override keep y and nothing else", {
+  # only P and P' calculate their limits from a column other than the series
+  # they plot, so only they keep the denominator as well
   for (chart_type in c("C", "C'", "X", "MR")) {
     chart <- autospc_chart(
       chart_type = chart_type,
@@ -451,9 +458,7 @@ test_that("the classes with no override inherit the empty default", {
       y = "y"
     )
 
-    expect_identical(limits_table_columns(chart), character(0),
-      info = chart_type
-    )
+    expect_identical(limits_table_columns(chart), "y", info = chart_type)
   }
 })
 

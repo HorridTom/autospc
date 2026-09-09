@@ -68,24 +68,36 @@ test_that("P chart process works end to end", {
   results <- autospc(test_data, chart_type = "P", plot_chart = FALSE)
   results <- results %>%
     dplyr::select(
-      x, y, n, y_numerator, ucl, lcl, cl, period_type,
+      x, series, y, n, ucl, lcl, cl, period_type,
       excluded, break_point, rule1, rule2, above_or_below_cl,
       highlight, limit_change, period_start, plot_period
     )
 
-  expect_equal(results, as.data.frame(correct_answer_P))
+  # the stored answer was saved when the percentages were `y` and the counts
+  # `y_numerator`. The values are unchanged, only the names
+  expected <- as.data.frame(correct_answer_P) %>%
+    dplyr::rename(series = y, y = y_numerator) %>%
+    dplyr::select(dplyr::all_of(names(results)))
+
+  expect_equal(results, expected)
 })
 
 test_that("P prime chart process works end to end", {
   results <- autospc(test_data, chart_type = "P'", plot_chart = FALSE)
   results <- results %>%
     dplyr::select(
-      x, y, n, y_numerator, ucl, lcl, cl, period_type,
+      x, series, y, n, ucl, lcl, cl, period_type,
       excluded, break_point, rule1, rule2, above_or_below_cl,
       highlight, limit_change, period_start, plot_period
     )
 
-  expect_equal(results, as.data.frame(correct_answer_PP))
+  # the stored answer was saved when the percentages were `y` and the counts
+  # `y_numerator`. The values are unchanged, only the names
+  expected <- as.data.frame(correct_answer_PP) %>%
+    dplyr::rename(series = y, y = y_numerator) %>%
+    dplyr::select(dplyr::all_of(names(results)))
+
+  expect_equal(results, expected)
 })
 
 
@@ -111,7 +123,7 @@ test_that("P chart works with one binary observation per subgroup", {
   )
 
   expect_equal(
-    results$y[1:5],
+    results$series[1:5],
     c(0, 0, 100, 100, 0)
   )
 
@@ -121,7 +133,7 @@ test_that("P chart works with one binary observation per subgroup", {
   )
 
   expect_equal(
-    results$y_numerator[1:5],
+    results$y[1:5],
     c(0L, 0L, 1L, 1L, 0L)
   )
 

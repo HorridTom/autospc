@@ -1,5 +1,66 @@
 # Changelog
 
+## autospc 0.1.0.9010
+
+### The table the package returns
+
+`autospc(plot_chart = FALSE)` and
+[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on a plot
+returned different tables. They are now the same table, providing the
+results of the analysis.
+
+- **The columns that place the centre line labels on a plot have left
+  the returned table.** `cl_label`, `annotation_level` and
+  `annotation_curvature` say where a label and its arrow are drawn,
+  which is a property of the drawing rather than of the analysis. They
+  were in the table `plot_chart = FALSE` returned and were never in the
+  table [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
+  gave.
+
+- **`highlight` now marks only the rules a point breaks.** The rule
+  highlight of an excluded point was overwritten by the exclusion mark,
+  masking the rule it broke. The exclusion mark that
+  `highlight_exclusions` asks for is now added when the plot is drawn,
+  so the plot is unchanged.
+
+- **The floating median and the rows `extend_limits_to` adds are now
+  part of the analysis**, so
+  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on a
+  plot carries them. Both were produced when a plot was drawn, so
+  `plot_chart = FALSE` had them and
+  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) did
+  not.
+
+- **`show_limits` no longer changes the table.** It says whether the
+  limits are drawn, and the table now holds the analysis whether or not
+  they are.
+
+- **New column `limit_extension`**, TRUE on the rows `extend_limits_to`
+  adds beyond the end of the data and FALSE on every row that holds a
+  subgroup.
+
+- **The rows `extend_limits_to` adds no longer copy the last subgroup’s
+  values.** They carried its denominator and numerator, at a point on
+  the axis where there is no subgroup at all; they now hold the limits,
+  the period they continue, and nothing else.
+
+### Bug fixes
+
+- **The rows `extend_limits_to` adds no longer change the type of the
+  `x` and `y` columns.** A column of whole numbers became a column of
+  numbers, and the `x_max` the plot records followed it. A point on the
+  axis that falls between two whole numbers is still taken as given, and
+  the column gives way to it.
+
+- **`plot_period` is now missing on the rows before the first point and
+  after the last**, which have no limits and so belong to no period. It
+  read `NANA` there.
+
+- **The rows `extend_limits_to` adds now name the period they continue**
+  where the series ends with a subgroup that holds no observation. They
+  took the period of the last row of the table, which in that case
+  belongs to no period, so they were labelled `displayNA`.
+
 ## autospc 0.1.0.9009
 
 ### Bug fixes

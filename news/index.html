@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,25 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9010" id="autospc-0109010">autospc 0.1.0.9010<a class="anchor" aria-label="anchor" href="#autospc-0109010"></a></h2>
+<div class="section level3">
+<h3 id="the-table-the-package-returns-0-1-0-9010">The table the package returns<a class="anchor" aria-label="anchor" href="#the-table-the-package-returns-0-1-0-9010"></a></h3>
+<p><code>autospc(plot_chart = FALSE)</code> and <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on a plot returned different tables. They are now the same table, providing the results of the analysis.</p>
+<ul><li><p><strong>The columns that place the centre line labels on a plot have left the returned table.</strong> <code>cl_label</code>, <code>annotation_level</code> and <code>annotation_curvature</code> say where a label and its arrow are drawn, which is a property of the drawing rather than of the analysis. They were in the table <code>plot_chart = FALSE</code> returned and were never in the table <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> gave.</p></li>
+<li><p><strong><code>highlight</code> now marks only the rules a point breaks.</strong> The rule highlight of an excluded point was overwritten by the exclusion mark, masking the rule it broke. The exclusion mark that <code>highlight_exclusions</code> asks for is now added when the plot is drawn, so the plot is unchanged.</p></li>
+<li><p><strong>The floating median and the rows <code>extend_limits_to</code> adds are now part of the analysis</strong>, so <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on a plot carries them. Both were produced when a plot was drawn, so <code>plot_chart = FALSE</code> had them and <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> did not.</p></li>
+<li><p><strong><code>show_limits</code> no longer changes the table.</strong> It says whether the limits are drawn, and the table now holds the analysis whether or not they are.</p></li>
+<li><p><strong>New column <code>limit_extension</code></strong>, TRUE on the rows <code>extend_limits_to</code> adds beyond the end of the data and FALSE on every row that holds a subgroup.</p></li>
+<li><p><strong>The rows <code>extend_limits_to</code> adds no longer copy the last subgroup’s values.</strong> They carried its denominator and numerator, at a point on the axis where there is no subgroup at all; they now hold the limits, the period they continue, and nothing else.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-0-9010">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-0-9010"></a></h3>
+<ul><li><p><strong>The rows <code>extend_limits_to</code> adds no longer change the type of the <code>x</code> and <code>y</code> columns.</strong> A column of whole numbers became a column of numbers, and the <code>x_max</code> the plot records followed it. A point on the axis that falls between two whole numbers is still taken as given, and the column gives way to it.</p></li>
+<li><p><strong><code>plot_period</code> is now missing on the rows before the first point and after the last</strong>, which have no limits and so belong to no period. It read <code>NANA</code> there.</p></li>
+<li><p><strong>The rows <code>extend_limits_to</code> adds now name the period they continue</strong> where the series ends with a subgroup that holds no observation. They took the period of the last row of the table, which in that case belongs to no period, so they were labelled <code>displayNA</code>.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9009" id="autospc-0109009">autospc 0.1.0.9009<a class="anchor" aria-label="anchor" href="#autospc-0109009"></a></h2>
 <div class="section level3">

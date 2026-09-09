@@ -34,6 +34,5 @@ returns, and the same name as the facet variable, because
 [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
 is the only thing that produces several charts of one type.
 
-This is the analytic result, not the table `autospc(plot_chart = FALSE)`
-returns: it carries the columns the algorithm produced, and not the
-columns `add_plot_columns()` adds for drawing.
+This is the same table `autospc(plot_chart = FALSE)` returns; the two
+ways of asking for a table output give the same result.

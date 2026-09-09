@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -443,7 +443,9 @@ with. Anything that works on a ggplot works on it, including <code>+</code>, <co
 and <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>, and <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> gives the analysis behind it.</p>
 <p>With <code>plot_chart = FALSE</code>, a data frame: the subgroup-aggregated data with
 the centre line, the control limits and the rest of the analytic output
-appended as columns.</p>
+appended as columns. <code>series</code> holds the values analysed and plotted, which
+are the moving ranges on an MR chart and percentages on a P or P' chart;
+<code>y</code> holds the values as supplied and aggregated.</p>
     </div>
 
     <div class="section level2">

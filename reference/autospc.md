@@ -399,7 +399,9 @@ the analysis behind it.
 
 With `plot_chart = FALSE`, a data frame: the subgroup-aggregated data
 with the centre line, the control limits and the rest of the analytic
-output appended as columns.
+output appended as columns. `series` holds the values analysed and
+plotted, which are the moving ranges on an MR chart and percentages on a
+P or P' chart; `y` holds the values as supplied and aggregated.
 
 ## Examples
 

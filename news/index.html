@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,18 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9011" id="autospc-0109011">autospc 0.1.0.9011<a class="anchor" aria-label="anchor" href="#autospc-0109011"></a></h2>
+<div class="section level3">
+<h3 id="the-analysed-values-have-a-column-of-their-own-0-1-0-9011">The analysed values have a column of their own<a class="anchor" aria-label="anchor" href="#the-analysed-values-have-a-column-of-their-own-0-1-0-9011"></a></h3>
+<p><strong>This changes what <code>y</code> means in the table <code><a href="../reference/autospc.html">autospc()</a></code> returns</strong>, for the chart types whose analysed series is derived from column(s) the caller passed. C, C’ and X charts are unaffected: what they analyse is <code>y</code> as supplied.</p>
+<ul><li><p><strong><code>series</code> is new</strong>, and holds the values the algorithm analyses and the chart plots: the <code>y</code> values as supplied on a C, C’ or X chart, the moving ranges on an MR chart, and percentages on a P or P’ chart.</p></li>
+<li><p><strong><code>y</code> now holds what the caller supplied</strong>, aggregated where the chart type aggregates. It held the analysed series before, so on an MR chart it held the moving ranges and now holds the values they were measured between, and on a P or P’ chart it held percentages and now holds the count.</p></li>
+<li><p><strong><code>y_numerator</code> is gone.</strong> It existed only because <code>y</code> held percentages on a P or P’ chart and the count had nowhere else to go.</p></li>
+<li><p>The columns are ordered <code>x</code>, <code>series</code>, <code>y</code>, and then the denominator <code>n</code> where the chart type has one.</p></li>
+</ul><p>The plot itself is unchanged. Note that for MR, P and P’ charts this is a breaking change for code taking the output of <code><a href="../reference/autospc.html">autospc()</a></code> with <code>plot_chart = FALSE</code> and using the analysed values or <code>y_numerator</code>. The fix is straightforward however, simply replace the <code>y</code> with <code>series</code> and <code>y_numerator</code> with <code>y</code> in the legacy code.</p>
+</div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9010" id="autospc-0109010">autospc 0.1.0.9010<a class="anchor" aria-label="anchor" href="#autospc-0109010"></a></h2>
 <div class="section level3">

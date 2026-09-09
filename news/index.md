@@ -1,5 +1,38 @@
 # Changelog
 
+## autospc 0.1.0.9011
+
+### The analysed values have a column of their own
+
+**This changes what `y` means in the table
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+returns**, for the chart types whose analysed series is derived from
+column(s) the caller passed. C, C’ and X charts are unaffected: what
+they analyse is `y` as supplied.
+
+- **`series` is new**, and holds the values the algorithm analyses and
+  the chart plots: the `y` values as supplied on a C, C’ or X chart, the
+  moving ranges on an MR chart, and percentages on a P or P’ chart.
+
+- **`y` now holds what the caller supplied**, aggregated where the chart
+  type aggregates. It held the analysed series before, so on an MR chart
+  it held the moving ranges and now holds the values they were measured
+  between, and on a P or P’ chart it held percentages and now holds the
+  count.
+
+- **`y_numerator` is gone.** It existed only because `y` held
+  percentages on a P or P’ chart and the count had nowhere else to go.
+
+- The columns are ordered `x`, `series`, `y`, and then the denominator
+  `n` where the chart type has one.
+
+The plot itself is unchanged. Note that for MR, P and P’ charts this is
+a breaking change for code taking the output of
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+with `plot_chart = FALSE` and using the analysed values or
+`y_numerator`. The fix is straightforward however, simply replace the
+`y` with `series` and `y_numerator` with `y` in the legacy code.
+
 ## autospc 0.1.0.9010
 
 ### The table the package returns

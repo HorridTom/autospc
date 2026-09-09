@@ -59,7 +59,7 @@ utils::globalVariables(c(
   "n",
   "new_period",
   "new_run",
-  "non_missing_y",
+  "non_missing",
   "num_rows",
   "period_count",
   "period_start",
@@ -67,6 +67,7 @@ utils::globalVariables(c(
   "period_type.x",
   "period_type.y",
   "plot_period",
+  "plotted_line",
   "prev_value",
   "prev_x",
   "row_index",
@@ -76,6 +77,8 @@ utils::globalVariables(c(
   "run_count",
   "run_start",
   "series",
+  "series.x",
+  "series.y",
   "stage",
   "ucl",
   "ucl.x",
@@ -83,7 +86,5 @@ utils::globalVariables(c(
   "upper_annotation_level",
   "value",
   "x",
-  "y",
-  "y.x",
-  "y.y"
+  "y"
 ))

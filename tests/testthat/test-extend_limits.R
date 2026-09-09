@@ -144,34 +144,36 @@ test_that("Limit extension works correctly for P-prime chart (regression)", {
   ) %>%
     dplyr::select(
       x,
+      series,
       y,
       n,
-      y_numerator,
       ucl,
       lcl,
       cl
     )
 
-  # the stored answer was saved when autospc() returned a tibble; the values are
-  # unchanged, so it is compared as a data frame
+  # the stored answer was saved when autospc() returned a tibble, and when the
+  # percentages were `y` and the counts `y_numerator`. The values are
+  # unchanged, only the names and the class
   test_extend_limits_pp_answer <- test_extend_limits_pp_answer %>%
+    dplyr::rename(series = y, y = y_numerator) %>%
     dplyr::select(
       x,
+      series,
       y,
       n,
-      y_numerator,
       ucl,
       lcl,
       cl
     ) %>%
     as.data.frame()
 
-  # the stored answer was also saved when the two rows of the extension copied
-  # the denominator and numerator of the last row of the data. They now hold no
-  # observation, because there is no subgroup at those points on the axis
+  # it was also saved when the two rows of the extension copied the denominator
+  # and numerator of the last row of the data. They now hold no observation,
+  # because there is no subgroup at those points on the axis
   extension <- nrow(test_data) + 1:2
   test_extend_limits_pp_answer$n[extension] <- NA_integer_
-  test_extend_limits_pp_answer$y_numerator[extension] <- NA_integer_
+  test_extend_limits_pp_answer$y[extension] <- NA_integer_
 
   expect_equal(
     results_ext,
@@ -194,9 +196,9 @@ test_that("the extension rows carry limits and no observation", {
   expect_false(any(result$limit_extension[seq_len(nrow(test_data))]))
 
   # the columns that describe a subgroup, of which there is none here
+  expect_true(all(is.na(extension$series)))
   expect_true(all(is.na(extension$y)))
   expect_true(all(is.na(extension$n)))
-  expect_true(all(is.na(extension$y_numerator)))
   expect_true(all(is.na(extension$log)))
 
   # a row that is neither above the centre line nor below it commences no run

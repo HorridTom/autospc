@@ -407,7 +407,7 @@ test_that("the first row of an MR chart is not treated as missing data", {
     plot_chart = FALSE, period_min = 21L
   )
 
-  expect_true(is.na(result$y[1]))
+  expect_true(is.na(result$series[1]))
   expect_false(is.na(result$cl[1]))
   expect_false(is.na(result$ucl[1]))
 
@@ -415,7 +415,7 @@ test_that("the first row of an MR chart is not treated as missing data", {
   first <- calculation[calculation <= 30]
 
   expect_identical(range(first), c(1L, 21L))
-  expect_identical(sum(!is.na(result$y[1:21])), 20L)
+  expect_identical(sum(!is.na(result$series[1:21])), 20L)
 })
 
 
@@ -429,7 +429,7 @@ test_that("a missing y in an MR series is still treated as a gap", {
   )
 
   # the gap costs the moving range at the missing point and the one after it
-  expect_true(all(is.na(result$y[30:31])))
+  expect_true(all(is.na(result$series[30:31])))
 
   # and the limits carry across, because the gap is inside the series
   expect_false(anyNA(result$cl[30:31]))

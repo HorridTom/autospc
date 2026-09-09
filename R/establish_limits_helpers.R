@@ -60,7 +60,7 @@ find_extremes <- function(data,
     calculation_period$lcl <- limits_list$lcl
 
     calculation_period <- calculation_period %>%
-      dplyr::select(x, y, ucl, lcl, cl)
+      dplyr::select(x, series, ucl, lcl, cl)
 
     calculation_period <- add_rule_breaks(
       calculation_period,
@@ -68,17 +68,17 @@ find_extremes <- function(data,
       shift_rule_threshold = chart$shift_rule_threshold
     )
     calculation_period <- calculation_period %>%
-      dplyr::mutate(above_cl = ifelse(y > cl,
+      dplyr::mutate(above_cl = ifelse(series > cl,
         TRUE,
-        ifelse(y < cl,
+        ifelse(series < cl,
           FALSE,
           NA
         )
       )) %>%
       dplyr::mutate(rule1_distance = ifelse(rule1 & above_cl,
-        y - ucl,
+        series - ucl,
         ifelse(rule1 & !above_cl,
-          lcl - y,
+          lcl - series,
           NA
         )
       )) %>%
@@ -430,9 +430,9 @@ floating_median_column <- function(table,
                                    floating_median,
                                    floating_median_n) {
   median_from_x <- table %>%
-    dplyr::mutate(non_missing_y = !is.na(y)) %>%
+    dplyr::mutate(non_missing = !is.na(series)) %>%
     dplyr::arrange(dplyr::desc(x)) %>%
-    dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing_y)) %>%
+    dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing)) %>%
     dplyr::filter(cumulative_num_non_missing == floating_median_n) %>%
     dplyr::pull(x) %>%
     max()
@@ -454,7 +454,7 @@ floating_median_column <- function(table,
             stats::median(
               table %>%
                 dplyr::filter(x >= median_from_x) %>%
-                dplyr::pull(y),
+                dplyr::pull(series),
               na.rm = TRUE
             ),
             NA

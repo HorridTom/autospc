@@ -31,10 +31,10 @@ unique_x_data_analysed <- unique_x_data[c("x", "y")]
 
 # a calculation period of counts with one obvious high point, so that excluding
 # it demonstrably moves the limits. Named for the count charts because the
-# proportion charts need a period carrying y_numerator and n as well.
+# proportion charts need a period carrying the count and n as well.
 count_period_data <- data.frame(
   x = 1:10,
-  y = c(12, 15, 11, 14, 13, 30, 12, 14, 13, 11)
+  series = c(12, 15, 11, 14, 13, 30, 12, 14, 13, 11)
 )
 
 # a calculation period with a peak extreme enough that moving-range screening
@@ -45,14 +45,14 @@ count_period_data <- data.frame(
 # get_cp_limits() and get_x_limits().
 screening_data <- data.frame(
   x = 1:10,
-  y = c(12, 15, 11, 14, 13, 60, 12, 14, 13, 11)
+  series = c(12, 15, 11, 14, 13, 60, 12, 14, 13, 11)
 )
 
 
 # a plotted series with limits, as the y axis methods see it
 limits_data <- data.frame(
   x = 1:5,
-  y = c(10, 12, 11, 13, 14),
+  series = c(10, 12, 11, 13, 14),
   cl = 12,
   lcl = 6,
   ucl = 18

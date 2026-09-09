@@ -99,9 +99,8 @@ autospc_chart_mr <- function(data,
 
 #' Turn the aggregated data into the series the algorithm analyses
 #'
-#' An MR chart analyses the moving ranges, so `y` is replaced by them. Nothing
-#' downstream needs the original values, and `chart$data_original` keeps what
-#' the user supplied.
+#' An MR chart analyses the moving ranges of the values the user supplied, so
+#' the series is those moving ranges and `y` keeps the values themselves.
 #'
 #' `moving_ranges()` prepends `NA`, so the series stays aligned with `x` and is
 #' one non-missing value shorter - see `n_effective_points()`.
@@ -109,10 +108,7 @@ autospc_chart_mr <- function(data,
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart_mr <- function(chart) {
-  mrs <- moving_ranges(y = chart$data$y)
-
-  chart$data <- chart$data %>%
-    dplyr::mutate(y = mrs)
+  chart$data$series <- moving_ranges(y = chart$data$y)
 
   return(chart)
 }
@@ -169,9 +165,9 @@ observed_rows.autospc_chart_mr <- function(chart,
 calculate_limits.autospc_chart_mr <- function(chart,
                                               period,
                                               exclusion_points) {
-  # period$y holds the moving ranges, put there by prepare_data()
+  # the series of an MR chart is the moving ranges, put there by prepare_data()
   limits <- get_mr_limits(
-    mr = period$y,
+    mr = period$series,
     mr_screen_max_loops = 0L,
     exclusion_points = exclusion_points
   )
@@ -235,7 +231,7 @@ labels_stay_above.autospc_chart_mr <- function(chart) {
 y_axis_range.autospc_chart_mr <- function(chart,
                                           data) {
   high <- max(data$ucl,
-    data$y,
+    data$series,
     na.rm = TRUE
   ) * 1.1
 

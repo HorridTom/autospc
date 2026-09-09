@@ -204,19 +204,19 @@ aggregate_data.autospc_chart_pp <- function(chart) {
 
 #' Turn the aggregated data into the series the algorithm analyses
 #'
-#' A P' chart plots percentages, so `y` becomes the percentage and the count it
-#' was calculated from is kept as `y_numerator`. Division by a zero or missing
+#' A P' chart plots percentages, so the series is the count as a percentage of
+#' the denominator and `y` keeps the count. Division by a zero or missing
 #' denominator gives `NA` rather than `NaN` or `Inf`.
 #'
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart_pp <- function(chart) {
   chart$data <- chart$data %>%
-    dplyr::mutate(y_numerator = y) %>%
-    dplyr::mutate(y = y * 100 / n) %>%
-    dplyr::mutate(y = dplyr::if_else(is.nan(y) | is.infinite(y),
+    dplyr::mutate(series = y * 100 / n) %>%
+    dplyr::mutate(series = dplyr::if_else(
+      is.nan(series) | is.infinite(series),
       as.numeric(NA),
-      y
+      series
     ))
 
   return(chart)
@@ -235,7 +235,7 @@ calculate_limits.autospc_chart_pp <- function(chart,
                                               period,
                                               exclusion_points) {
   limits <- get_pp_limits(
-    y = period$y_numerator,
+    y = period$y,
     n = period$n,
     exclusion_points = exclusion_points,
     multiply = 100,
@@ -246,15 +246,15 @@ calculate_limits.autospc_chart_pp <- function(chart,
 }
 
 
-#' Columns the limits table carries in addition to the common ones
+#' Columns the limits table carries beside the series under analysis
 #'
-#' `y` holds percentages for this class, so the counts and denominators the
-#' limits were calculated from have to be kept as well.
+#' The count and the denominator, because the limits of this class are
+#' calculated from both rather than from the percentages it plots.
 #'
 #' @return character vector
 #' @noRd
 limits_table_columns.autospc_chart_pp <- function(chart) {
-  return(c("n", "y_numerator"))
+  return(c("y", "n"))
 }
 
 
@@ -304,16 +304,13 @@ limits_for_missing_rows.autospc_chart_pp <- function(chart,
 #' @noRd
 extrapolate_limits.autospc_chart_pp <- function(chart,
                                                 period) {
-  ext_calc_data <- period %>%
-    dplyr::mutate(y = (y / 100) * n)
-
-  exclusion_points <- ext_calc_data %>%
+  exclusion_points <- period %>%
     dplyr::pull(excluded) %>%
     which()
 
   limits <- get_pp_limits(
-    y = ext_calc_data$y,
-    n = ext_calc_data$n,
+    y = period$y,
+    n = period$n,
     exclusion_points = exclusion_points,
     multiply = 100,
     use_nbar_for_stdev = TRUE

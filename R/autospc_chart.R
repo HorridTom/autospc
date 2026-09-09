@@ -37,10 +37,10 @@ new_autospc_chart <- function(x = list(),
 #' holds only the columns the analysis uses - `x`, `y` and, where the class has
 #' one, `n` - renamed from the columns the user named for those arguments; those
 #' columns meet the class's requirements on presence and type, and any counts
-#' among them are whole numbers. After `prepare_data()` its `y` is *the series
-#' under analysis*, which is not always the column the user passed. For MR it
-#' holds the moving ranges; for P and P' it holds percentages, with the counts
-#' kept as `y_numerator`.
+#' among them are whole numbers. `prepare_data()` then adds `series`, *the
+#' values under analysis*, which are not always the values the user passed: for
+#' MR they are the moving ranges, and for P and P' the percentages. `y` keeps
+#' what the user supplied, aggregated where the class aggregates.
 #'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
@@ -342,26 +342,28 @@ aggregate_data.autospc_chart <- function(chart) {
 
 #' Turn the aggregated data into the series the algorithm analyses
 #'
-#' Returns the chart unchanged. Overridden by the classes that analyse something
-#' other than the column the user supplied.
+#' The series is the column the user supplied. Overridden by the classes that
+#' analyse something derived from it.
 #'
 #' @return autospc_chart object of the same class as chart
 #' @noRd
 prepare_data.autospc_chart <- function(chart) {
+  chart$data$series <- chart$data$y
+
   return(chart)
 }
 
 
 #' Number of points available for analysis
 #'
-#' The non-missing values of `y`.
+#' The non-missing values of `series`.
 #'
 #' @return integer
 #' @noRd
 n_effective_points.autospc_chart <- function(chart,
                                              data) {
   points <- data %>%
-    dplyr::filter(!is.na(y)) %>%
+    dplyr::filter(!is.na(series)) %>%
     nrow()
 
   return(points)
@@ -371,19 +373,19 @@ n_effective_points.autospc_chart <- function(chart,
 #' @noRd
 observed_rows.autospc_chart <- function(chart,
                                         data) {
-  return(!is.na(data$y))
+  return(!is.na(data$series))
 }
 
 
-#' Columns the limits table carries in addition to the common ones
+#' Columns the limits table carries beside the series under analysis
 #'
-#' None by default. Overridden by the classes whose limits are calculated from
-#' something other than the plotted `y`.
+#' `y`, what the caller supplied, by default. The proportion classes add the
+#' denominator, which their limits are calculated from as well.
 #'
-#' @return character vector, possibly empty
+#' @return character vector
 #' @noRd
 limits_table_columns.autospc_chart <- function(chart) {
-  return(character(0))
+  return("y")
 }
 
 

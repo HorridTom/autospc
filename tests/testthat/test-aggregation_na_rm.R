@@ -68,9 +68,9 @@ test_that("the numerator and denominator count the same observations", {
     aggregation_na_rm = TRUE
   )
 
-  expect_identical(result$y_numerator[3], 1L)
+  expect_identical(result$y[3], 1L)
   expect_identical(result$n[3], 4L)
-  expect_equal(result$y[3], 25)
+  expect_equal(result$series[3], 25)
 })
 
 
@@ -105,11 +105,11 @@ test_that("a row is discarded when its denominator has no value", {
     plot_chart = FALSE, period_min = 21L, aggregation_na_rm = TRUE
   )
 
-  expect_true(is.na(by_default$y[3]))
+  expect_true(is.na(by_default$series[3]))
 
   # the row with no denominator takes its numerator out with it: 4 + 3 of 20,
   # not 4 + 5 + 3 of 20
-  expect_identical(discarded$y_numerator[3], 7)
+  expect_identical(discarded$y[3], 7)
   expect_identical(discarded$n[3], 20)
 })
 

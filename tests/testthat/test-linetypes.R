@@ -45,3 +45,27 @@ test_that("Linetypes are formed correctly", {
   expect_identical(rle_layer_1, correct_answer_1)
   expect_identical(rle_layer_2, correct_answer_2)
 })
+
+
+test_that("the centre line is drawn thicker than the limits and the series", {
+  # the widths are keyed by plotted_line, so a mistake there would give one of
+  # the four lines another's width with nothing to say so
+  test_plt <- autospc(test_data,
+    chart_type = "C'"
+  )
+
+  limits <- ggplot2::layer_data(test_plt, 1)
+  series <- ggplot2::layer_data(test_plt, 2)
+
+  # the centre line is the solid one in layer 1, the control limits the dashed
+  centre <- unique(limits$linewidth[limits$linetype == "solid"])
+  control <- unique(limits$linewidth[limits$linetype == "42"])
+  plotted <- unique(series$linewidth)
+
+  expect_length(centre, 1L)
+  expect_length(control, 1L)
+  expect_length(plotted, 1L)
+
+  expect_gt(centre, control)
+  expect_identical(plotted, control)
+})

@@ -97,7 +97,10 @@ test_that("an MR chart analyses the moving ranges, not the values passed in", {
     period_min = 21
   )
 
-  expect_identical(result$y, moving_ranges(values$y))
+  expect_identical(result$series, moving_ranges(values$y))
+
+  # and y keeps the values the moving ranges were measured between
+  expect_identical(result$y, values$y)
 
   # and the centre line is the mean moving range, not the mean value
   expect_lt(result$cl[21], mean(values$y))

@@ -172,7 +172,7 @@ test_that("calculate_limits matches get_c_limits", {
       period = count_period_data,
       exclusion_points = NULL
     ),
-    get_c_limits(y = count_period_data$y, exclusion_points = NULL)
+    get_c_limits(y = count_period_data$series, exclusion_points = NULL)
   )
 })
 
@@ -183,7 +183,7 @@ test_that("calculate_limits passes exclusion_points through", {
       period = count_period_data,
       exclusion_points = 6L
     ),
-    get_c_limits(y = count_period_data$y, exclusion_points = 6L)
+    get_c_limits(y = count_period_data$series, exclusion_points = 6L)
   )
 
   # excluding the high point must actually lower the centre line, otherwise the

@@ -31,9 +31,9 @@ test_that("Charts with fewer points than min period error handle", {
     autospc(test_data, plot_chart = FALSE, chart_type = "P", period_min = 21)
   )
 
-  # x, y and log. aggregate_data() summarises to the columns the class
+  # x, y, series and log. aggregate_data() summarises to the columns the class
   # analyses, so a C chart drops n
-  testthat::expect_equal(ncol(result_C), 3)
+  testthat::expect_equal(ncol(result_C), 4)
   testthat::expect_equal(ncol(result_P), 5)
   testthat::expect_warning(
     autospc(test_data, plot_chart = TRUE, chart_type = "C")
@@ -53,7 +53,7 @@ test_that("Charts with show_limits = FALSE behave as expected", {
 
   # expect full limits table to be returned regardless of show_limits status,
   # including the four columns describing the periods
-  testthat::expect_equal(ncol(result_C), 19)
+  testthat::expect_equal(ncol(result_C), 20)
   testthat::expect_equal(ncol(result_P), 22)
 
   testthat::expect_true(all(c(
@@ -103,7 +103,8 @@ test_that("the warning is about the input data, not about named charts", {
 
 
 chart_of_length <- function(rows, chart_type = "C", period_min = 21L) {
-  autospc_chart(
+  # prepared, because enough_data_for_limits() reads the prepared series
+  return(prepare_data(autospc_chart(
     chart_type = chart_type,
     data = data.frame(
       x = seq_len(rows),
@@ -112,7 +113,7 @@ chart_of_length <- function(rows, chart_type = "C", period_min = 21L) {
     x = "x",
     y = "y",
     period_min = period_min
-  )
+  )))
 }
 
 
@@ -132,6 +133,27 @@ test_that("an MR chart has as much data for limits as its own series", {
   expect_true(enough_data_for_limits(long_enough))
 
   expect_false(enough_data_for_limits(one_short))
+})
+
+
+test_that("a chart with no limits draws the series, not the column supplied", {
+  # an MR chart analyses the moving ranges of what the caller passed, so those
+  # are what it plots whether or not it has enough points for limits
+  values <- data.frame(x = 1:10, y = c(10, 14, 11, 16, 12, 15, 10, 18, 13, 11))
+
+  plot <- suppressWarnings(autospc(values,
+    chart_type = "MR", x = "x", y = "y", period_min = 21L
+  ))
+
+  drawn <- ggplot2::layer_data(plot, 1)
+
+  expect_identical(drawn$y, moving_ranges(values$y))
+
+  # and the axis is scaled to the moving ranges rather than to the values
+  expect_lt(
+    autospc_plot_axis_extents(plot, value = "ylimhigh"),
+    min(values$y)
+  )
 })
 
 

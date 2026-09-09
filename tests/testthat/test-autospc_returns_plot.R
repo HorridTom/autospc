@@ -270,9 +270,15 @@ test_that("the wide join carries the moving ranges, not a second y column", {
 
   mr_chart <- autospc_plot_charts(plot)[[2]]
 
-  expect_identical(result$mr, mr_chart$result$table$y)
+  expect_identical(result$mr, mr_chart$result$table$series)
 
-  expect_identical(result$y, autospc_plot_charts(plot)[[1]]$result$table$y)
+  expect_identical(
+    result$series,
+    autospc_plot_charts(plot)[[1]]$result$table$series
+  )
+
+  # the two halves are one analysis of one series, so y is the same on both
+  expect_identical(result$y, mr_chart$result$table$y)
 })
 
 

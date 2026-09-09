@@ -1,6 +1,9 @@
 # load in test data
 test_data <- readRDS("testdata/test_data_rule2_break.rds")
 
+# these functions walk a prepared series, whose analysed values are `series`
+test_data$series <- test_data$y
+
 test_that("Start of subsequent rule 2 breaks identified correctly", {
   test_data <- add_rule_breaks(test_data,
     centre_line_tolerance = 0,

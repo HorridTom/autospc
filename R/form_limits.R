@@ -1,5 +1,5 @@
 # Function to form calculation limits for a period
-# data has columns x and y
+# data has columns x and series
 form_calculation_limits <- function(data,
                                     counter,
                                     chart) {
@@ -35,7 +35,7 @@ form_calculation_limits <- function(data,
   extra_columns <- limits_table_columns(chart)
 
   calculation_period <- calculation_period %>%
-    dplyr::select(x, y, ucl, lcl, cl, dplyr::any_of("limit_width")) %>%
+    dplyr::select(x, series, ucl, lcl, cl, dplyr::any_of("limit_width")) %>%
     dplyr::mutate(period_type = "calculation") %>%
     dplyr::mutate(
       excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F)
@@ -47,11 +47,13 @@ form_calculation_limits <- function(data,
     # Joins limits to the existing data
     limits_table <- data %>%
       dplyr::left_join(calculation_period, by = "x") %>%
-      dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y))
+      dplyr::mutate(series = dplyr::if_else(
+        is.na(series.y), series.x, series.y
+      ))
 
     limits_table <- limits_table %>%
       dplyr::select(
-        x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
+        x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
         dplyr::any_of("limit_width"),
         period_type, excluded,
         dplyr::any_of("run_break"),
@@ -70,7 +72,9 @@ form_calculation_limits <- function(data,
     # joins limits to the existing data, overwriting display limits
     limits_table <- data %>%
       dplyr::left_join(calculation_period, by = "x") %>%
-      dplyr::mutate(y = dplyr::if_else(is.na(y.y), y.x, y.y)) %>%
+      dplyr::mutate(series = dplyr::if_else(
+        is.na(series.y), series.x, series.y
+      )) %>%
       dplyr::mutate(ucl = dplyr::if_else(is.na(ucl.y), ucl.x, ucl.y)) %>%
       dplyr::mutate(lcl = dplyr::if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
       dplyr::mutate(cl = dplyr::if_else(is.na(cl.y), cl.x, cl.y)) %>%
@@ -95,7 +99,7 @@ form_calculation_limits <- function(data,
 
     limits_table <- limits_table %>%
       dplyr::select(
-        x, y, dplyr::all_of(extra_columns), ucl, lcl, cl,
+        x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
         dplyr::any_of("limit_width"),
         period_type, excluded,
         dplyr::contains("break_point"),

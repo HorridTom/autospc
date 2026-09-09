@@ -50,11 +50,12 @@ n_effective_points <- function(chart,
 
 #' The rows of a prepared series that hold an observation
 #'
-#' A row whose `y` is missing because there was never a value to have is not a
-#' gap in the series. `observed_rows.autospc_chart_mr()` is where that applies.
+#' A row whose `series` value is missing because there was never a value to
+#' have is not a gap in the series. `observed_rows.autospc_chart_mr()` is where
+#' that applies.
 #'
 #' @param chart The chart being analysed.
-#' @param data A prepared series, with a `y` column.
+#' @param data A prepared series, with a `series` column.
 #'
 #' @return A logical vector, one element per row of `data`.
 #' @noRd
@@ -113,8 +114,8 @@ extrapolate_limits <- function(chart,
 
 #' Limits for the rows that hold no observation
 #'
-#' The algorithm walks only the rows that hold an observation, so a row with a
-#' missing `y` is given its limits afterwards, from the period that the
+#' The algorithm walks only the rows that hold an observation, so a row with no
+#' `series` value is given its limits afterwards, from the period that the
 #' observations either side of it belong to. Overridden by the classes whose
 #' limits vary with the denominator.
 #'
@@ -131,11 +132,11 @@ limits_for_missing_rows <- function(chart,
 }
 
 
-#' Columns the limits table carries in addition to the common ones
+#' Columns the limits table carries beside the series under analysis
 #'
-#' The names are inserted between `y` and `ucl`, so the order matters.
+#' The names are inserted between `series` and `ucl`, so the order matters.
 #'
-#' @return character vector, possibly empty
+#' @return character vector
 #' @noRd
 limits_table_columns <- function(chart) {
   UseMethod("limits_table_columns")

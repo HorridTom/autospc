@@ -83,32 +83,38 @@ test_that("P charts with zero attendances error handle", {
   result1 <- autospc(test_data1,
     chart_type = "P'", plot_chart = FALSE, period_min = 21
   ) %>%
-    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
+    dplyr::select(x, series, y, n, ucl, lcl, cl)
 
   result2 <- autospc(test_data2,
     chart_type = "P'", plot_chart = FALSE, period_min = 21
   ) %>%
-    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
+    dplyr::select(x, series, y, n, ucl, lcl, cl)
 
   result3 <- autospc(test_data3,
     chart_type = "P'", plot_chart = FALSE, period_min = 21
   ) %>%
-    dplyr::select(x, y, n, y_numerator, ucl, lcl, cl)
+    dplyr::select(x, series, y, n, ucl, lcl, cl)
 
   # a subgroup with no attendances has no proportion, so no point is plotted,
   # and the limits carry across it
-  testthat::expect_equal(all(is.na(result1$y[24:28])), TRUE)
+  testthat::expect_equal(all(is.na(result1$series[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result1$ucl[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result1$lcl[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result1$cl[24:28])), TRUE)
 
-  testthat::expect_equal(all(is.na(result2$y[24:28])), TRUE)
+  testthat::expect_equal(all(is.na(result2$series[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result2$ucl[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result2$lcl[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result2$cl[24:28])), TRUE)
 
-  testthat::expect_equal(all(is.na(result3$y[10:13])), TRUE)
+  testthat::expect_equal(all(is.na(result3$series[10:13])), TRUE)
   testthat::expect_equal(all(!is.na(result3$ucl[10:13])), TRUE)
   testthat::expect_equal(all(!is.na(result3$lcl[10:13])), TRUE)
   testthat::expect_equal(all(!is.na(result3$cl[10:13])), TRUE)
+
+  # the numerator is an observation in its own right, so it is kept where the
+  # denominator is zero. It is only the proportion it would give that is missing
+  testthat::expect_false(any(is.na(result1$y[24:28])))
+  testthat::expect_false(any(is.na(result2$y[24:28])))
+  testthat::expect_false(any(is.na(result3$y[10:13])))
 })

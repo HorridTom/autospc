@@ -1,6 +1,9 @@
 # load in test data
 test_data <- readRDS("testdata/test_data.rds")
 
+# these functions walk a prepared series, whose analysed values are `series`
+test_data$series <- test_data$y
+
 # enough_data_for_new_period() takes both the point count and the thresholds it
 # compares them against from the chart object, so one has to be supplied. The
 # defaults are period_min 21 and no baseline_length.

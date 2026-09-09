@@ -27,14 +27,14 @@ binary_degenerate_data <- data.frame(
   y = c(TRUE, FALSE, TRUE, TRUE, FALSE)
 )
 
-# a calculation period as the algorithm builds it for P charts: y holds
-# percentages and y_numerator holds the counts, so a method reading the wrong
-# column produces a different answer rather than an error
+# a calculation period as the algorithm builds it for P charts: series holds
+# percentages and y holds the counts, so a method reading the wrong column
+# produces a different answer rather than an error
 proportion_period_data <- data.frame(
   x = 1:5,
-  y_numerator = c(3, 4, 2, 5, 3),
+  y = c(3, 4, 2, 5, 3),
   n = rep(20, 5),
-  y = c(3, 4, 2, 5, 3) * 100 / rep(20, 5)
+  series = c(3, 4, 2, 5, 3) * 100 / rep(20, 5)
 )
 
 chart_p <- function(data, ...) {
@@ -209,7 +209,7 @@ test_that("calculate_limits matches get_p_limits", {
       exclusion_points = NULL
     ),
     get_p_limits(
-      y = proportion_period_data$y_numerator,
+      y = proportion_period_data$y,
       n = proportion_period_data$n,
       exclusion_points = NULL,
       multiply = 100
@@ -218,9 +218,9 @@ test_that("calculate_limits matches get_p_limits", {
 })
 
 
-test_that("calculate_limits uses y_numerator, not the percentage column y", {
-  # the y column holds percentages; using it would give a centre line of 85
-  # rather than the true 17%, with no error raised
+test_that("calculate_limits uses y, not the percentage column series", {
+  # the series column holds percentages; using it would give a centre line of
+  # 85 rather than the true 17%, with no error raised
   limits <- calculate_limits(chart_p(pre_agg_data),
     period = proportion_period_data,
     exclusion_points = NULL
@@ -228,7 +228,7 @@ test_that("calculate_limits uses y_numerator, not the percentage column y", {
 
   expect_equal(
     limits$cl[1],
-    sum(proportion_period_data$y_numerator) /
+    sum(proportion_period_data$y) /
       sum(proportion_period_data$n) * 100
   )
 })
@@ -241,7 +241,7 @@ test_that("calculate_limits passes exclusion_points through", {
       exclusion_points = 4L
     ),
     get_p_limits(
-      y = proportion_period_data$y_numerator,
+      y = proportion_period_data$y,
       n = proportion_period_data$n,
       exclusion_points = 4L,
       multiply = 100
@@ -263,12 +263,12 @@ test_that("calculate_limits passes exclusion_points through", {
 })
 
 
-test_that("limits_table_columns keeps n and y_numerator", {
+test_that("limits_table_columns keeps y and n", {
   # y holds percentages for this class, so the counts and denominators the
   # limits were calculated from have to survive into the limits table
   expect_identical(
     limits_table_columns(chart_p(pre_agg_data)),
-    c("n", "y_numerator")
+    c("y", "n")
   )
 })
 
@@ -342,7 +342,7 @@ test_that("extrapolate_limits recalculates from the final period", {
   # forward. They are recalculated from the final calculation period, giving
   # one set of values for the whole extension.
   final_period <- data.frame(
-    y = c(10, 15, 20, 12, 18), # percentages
+    y = c(10, 15, 40, 24, 18), # counts
     n = c(100, 100, 200, 200, 100),
     excluded = rep(FALSE, 5),
     cl = rep(99, 5), # deliberately wrong,
@@ -357,8 +357,7 @@ test_that("extrapolate_limits recalculates from the final period", {
 
   # the centre line is the pooled proportion of the period, not anything taken
   # from the cl column
-  pooled <- sum(final_period$y / 100 * final_period$n) /
-    sum(final_period$n) * 100
+  pooled <- sum(final_period$y) / sum(final_period$n) * 100
 
   expect_equal(limits$cl, pooled)
   expect_gt(limits$ucl, limits$cl)
@@ -399,8 +398,8 @@ test_that("prepare_data turns counts into percentages and keeps the count", {
     autospc_chart_p(data = counts, x = "x", y = "y", n = "n")
   )
 
-  expect_identical(prepared$data$y, c(10, 10, 30, 20))
-  expect_identical(prepared$data$y_numerator, counts$y)
+  expect_identical(prepared$data$series, c(10, 10, 30, 20))
+  expect_identical(prepared$data$y, counts$y)
   expect_identical(prepared$data$n, counts$n)
 
   expect_identical(prepared$data_original, counts)
@@ -419,7 +418,7 @@ test_that("prepare_data gives NA for a zero or missing denominator", {
     autospc_chart_p(data = counts, x = "x", y = "y", n = "n")
   )
 
-  expect_identical(prepared$data$y, c(10, NA_real_, NA_real_))
+  expect_identical(prepared$data$series, c(10, NA_real_, NA_real_))
 })
 
 

@@ -192,6 +192,8 @@ test_that("the y limits recorded are the ones the class asks for", {
 test_that("extend_limits_to reaches the recorded end of the x axis", {
   plot <- run_returns(extend_limits_to = 40)
 
+  # the rows the extension adds are beyond the end of the data, so they are not
+  # what x_max reports
   expect_identical(autospc_plot_axis_extents(plot, value = "x_max"), 30L)
 
   expect_identical(autospc_plot_axis_extents(plot, value = "end_x"), 40)
@@ -281,7 +283,8 @@ test_that("as.data.frame identifies the stage when there is more than one", {
     new_autospc_plot(
       plot = ggplot2::ggplot(returns_data, ggplot2::aes(x = x, y = y)),
       charts = list(chart, chart),
-      presentation = list(visualisation_params = list(), axis_extents = list())
+      presentation = list(visualisation_params = list(), axis_extents = list()),
+      faceted = TRUE
     )
   )
 

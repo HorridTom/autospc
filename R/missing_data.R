@@ -210,11 +210,10 @@ carry_limits_across_gaps <- function(restored,
     restored$ucl[rows] <- period_limits$ucl
     restored$lcl[rows] <- period_limits$lcl
 
-    # the row lies inside the period, so it takes the columns that say so.
-    # `plot_period` is not among them because `extend_limits()` derives it
-    # from `period_type` and `period_start` for the whole table
+    # the row lies inside the period, so it takes the columns that say so
     restored$period_type[rows] <- period_rows$period_type[1L]
     restored$period_start[rows] <- period_rows$period_start[1L]
+    restored$plot_period[rows] <- period
     restored$limit_change[rows] <- FALSE
     restored$cl_change[rows] <- 0
 

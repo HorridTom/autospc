@@ -29,9 +29,11 @@
 #' @noRd
 new_autospc_plot <- function(plot,
                              charts,
-                             presentation) {
+                             presentation,
+                             faceted = FALSE) {
   plot$charts <- charts
   plot$presentation <- presentation
+  plot$faceted <- faceted
 
   class(plot) <- c("autospc_plot", class(plot))
 
@@ -184,7 +186,8 @@ validate_autospc_plot <- function(x) {
 autospc_plot_elements <- function() {
   plot_elements <- c(
     "charts",
-    "presentation"
+    "presentation",
+    "faceted"
   )
 
   return(plot_elements)
@@ -236,7 +239,6 @@ visualisation_param_names <- function() {
     "x_break",
     "x_date_format",
     "x_pad_end",
-    "extend_limits_to",
     "r1_col",
     "r2_col",
     "point_size",
@@ -414,7 +416,10 @@ autospc_plot <- function(charts,
     presentation = list(
       visualisation_params = visualisation_params,
       axis_extents = main$axis_extents
-    )
+    ),
+    # `split_rows` is given by `facet_stages()` and by nothing else, so it says
+    # whether the call faceted, rather than the drawn plot being asked
+    faceted = !is.null(split_rows)
   )
 
   autospc_plot_object <- validate_autospc_plot(autospc_plot_object)
@@ -495,9 +500,8 @@ autospc_plot_axis_extents <- function(plot,
 #' facet variable, because `facet_stages()` is the only thing that produces
 #' several charts of one type.
 #'
-#' This is the analytic result, not the table `autospc(plot_chart = FALSE)`
-#' returns: it carries the columns the algorithm produced, and not the columns
-#' `add_plot_columns()` adds for drawing.
+#' This is the same table `autospc(plot_chart = FALSE)` returns; the two ways of
+#' asking for a table output give the same result.
 #'
 #' @param x An `autospc_plot`.
 #' @param ... Ignored, for consistency with the generic.
@@ -505,23 +509,8 @@ autospc_plot_axis_extents <- function(plot,
 #' @return A data frame.
 #' @export
 as.data.frame.autospc_plot <- function(x, ...) {
-  charts <- autospc_plot_charts(x)
-
-  results <- lapply(
-    charts,
-    function(chart) chart$result$table
-  )
-
-  if (length(results) == 1L) {
-    return(as.data.frame(results[[1]]))
-  }
-
-  if (is_xmr_pair(charts)) {
-    return(as.data.frame(join_mr_columns(
-      x_table = results[[1]],
-      mr_table = results[[2]]
-    )))
-  }
-
-  return(as.data.frame(dplyr::bind_rows(results, .id = "stage")))
+  return(as.data.frame(charts_as_table(
+    charts = autospc_plot_charts(x),
+    faceted = isTRUE(x$faceted)
+  )))
 }

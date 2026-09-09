@@ -20,15 +20,26 @@ annotation_data <- data.frame(
   n = rep(100L, 30)
 )
 
-run_annotation <- function(chart_type, ...) {
-  suppressWarnings(
-    autospc(annotation_data,
+# the annotation columns are put on the table a plot is drawn from rather than
+# on the analysis, so these tests read that table rather than what autospc()
+# returns
+plot_table <- function(data, chart_type, ...) {
+  plot <- suppressWarnings(
+    autospc(data,
       chart_type = chart_type,
       period_min = 21L,
-      plot_chart = FALSE,
       ...
-    )$annotation_level
+    )
   )
+
+  return(plot_data_for_chart(
+    chart = autospc_plot_charts(plot)[[1]],
+    visualisation_params = autospc_plot_visualisation_params(plot)
+  )$table)
+}
+
+run_annotation <- function(chart_type, ...) {
+  return(plot_table(annotation_data, chart_type, ...)$annotation_level)
 }
 
 
@@ -80,13 +91,9 @@ label_p_data <- data.frame(
 )
 
 drawn_labels <- function(data, chart_type, ...) {
-  result <- autospc(data,
-    chart_type = chart_type,
-    period_min = 21L,
-    plot_chart = FALSE,
-    ...
-  )
-  unique(result$cl_label[result$cl_label != ""])
+  result <- plot_table(data, chart_type, ...)
+
+  return(unique(result$cl_label[result$cl_label != ""]))
 }
 
 
@@ -110,14 +117,11 @@ stepped_data <- data.frame(
 )
 
 flipped_levels <- function(chart_type) {
-  result <- autospc(stepped_data,
-    chart_type = chart_type,
-    period_min = 21L,
-    flip_labels = TRUE,
-    plot_chart = FALSE
-  )
+  result <- plot_table(stepped_data, chart_type, flip_labels = TRUE)
+
   labelled <- !is.na(result$cl_label) & result$cl_label != ""
-  result$annotation_level[labelled] < result$ucl[labelled]
+
+  return(result$annotation_level[labelled] < result$ucl[labelled])
 }
 
 

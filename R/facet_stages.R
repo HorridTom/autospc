@@ -166,7 +166,6 @@ facet_stages <- function(data,
   if (!plot_chart) {
     return(charts_as_table(
       charts = charts,
-      visualisation_params = visualisation_params,
       faceted = TRUE
     ))
   }

@@ -53,8 +53,8 @@ test_that("Charts with show_limits = FALSE behave as expected", {
 
   # expect full limits table to be returned regardless of show_limits status,
   # including the four columns describing the periods
-  testthat::expect_equal(ncol(result_C), 18)
-  testthat::expect_equal(ncol(result_P), 21)
+  testthat::expect_equal(ncol(result_C), 19)
+  testthat::expect_equal(ncol(result_P), 22)
 
   testthat::expect_true(all(c(
     "limit_change", "period_start", "plot_period",
@@ -171,8 +171,8 @@ test_that("a series with limits takes the limits path", {
     period_min = 21
   )
 
-  # add_plot_columns() runs, so the presentation columns are there
-  expect_true(all(c("limit_change", "annotation_level", "plot_period") %in%
+  # the columns that describe the periods are there
+  expect_true(all(c("limit_change", "cl_change", "plot_period") %in%
     colnames(result)))
 })
 

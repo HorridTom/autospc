@@ -26,7 +26,6 @@ column \code{facet_stages(plot_chart = FALSE)} returns, and the same name as the
 facet variable, because \code{facet_stages()} is the only thing that produces
 several charts of one type.
 
-This is the analytic result, not the table \code{autospc(plot_chart = FALSE)}
-returns: it carries the columns the algorithm produced, and not the columns
-\code{add_plot_columns()} adds for drawing.
+This is the same table \code{autospc(plot_chart = FALSE)} returns; the two ways of
+asking for a table output give the same result.
 }

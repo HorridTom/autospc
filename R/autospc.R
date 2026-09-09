@@ -378,10 +378,7 @@ autospc <- function(data,
   )
 
   if (!arguments$plot_chart) {
-    return(charts_as_table(
-      charts = charts,
-      visualisation_params = visualisation_params
-    ))
+    return(charts_as_table(charts = charts))
   }
 
   return(autospc_plot(

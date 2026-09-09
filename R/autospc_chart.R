@@ -98,6 +98,7 @@ autospc_chart_elements <- function() {
     "centre_line_tolerance",
     "floating_median",
     "floating_median_n",
+    "extend_limits_to",
     "keep_candidate_tables",
     "data_original",
     # the analysis
@@ -269,6 +270,7 @@ assemble_chart_list <- function(
   centre_line_tolerance = autospc_default("centre_line_tolerance"),
   floating_median = autospc_default("floating_median"),
   floating_median_n = autospc_default("floating_median_n"),
+  extend_limits_to = autospc_default("extend_limits_to"),
   keep_candidate_tables = autospc_default("keep_candidate_tables")
 ) {
   # baseline_length is period_min unless the caller sets it, so that every
@@ -297,6 +299,7 @@ assemble_chart_list <- function(
     centre_line_tolerance = centre_line_tolerance,
     floating_median = floating_median,
     floating_median_n = floating_median_n,
+    extend_limits_to = extend_limits_to,
     keep_candidate_tables = keep_candidate_tables,
     # derived fields
     data_original = data,

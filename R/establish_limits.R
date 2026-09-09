@@ -314,7 +314,22 @@ establish_limits <- function(chart) {
     chart$result$table$run_break <- NULL
     chart$result$re_establish_rows <- which(chart$result$table$break_point)
     chart$result$exclusions <- which(chart$result$table$excluded)
+
+    # the floating median
+    chart$result$table <- floating_median_column(
+      table = chart$result$table,
+      floating_median = chart$floating_median,
+      floating_median_n = chart$floating_median_n
+    )
+
     chart$result$table$log <- render_log(chart)
+
+    # extend_limits_to produces limit values. They go on last
+    # so that every column they copy from the last row of the data is present
+    chart$result$table <- extend_limits(
+      table = chart$result$table,
+      chart = chart
+    )
 
     return(chart)
   } # end of: [2] enough data points to form one period

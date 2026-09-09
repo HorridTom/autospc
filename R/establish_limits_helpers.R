@@ -527,8 +527,8 @@ baseline_period_length <- function(chart,
 #' changed, where each period starts, an identifier for the period, and the
 #' direction the centre line moved at each change.
 #'
-#' `plot_period` is re-derived by `extend_limits()` for any rows it adds beyond
-#' the end of the data.
+#' `extension_row()` sets these columns itself on the rows `extend_limits()`
+#' adds beyond the end of the data, from the period those rows continue.
 #'
 #' @return `data`, with the four columns added
 #' @noRd

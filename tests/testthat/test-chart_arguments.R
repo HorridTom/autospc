@@ -26,6 +26,8 @@ chart_argument_alternatives <- list(
   centre_line_tolerance = 0.5,
   floating_median = "yes",
   floating_median_n = 8L,
+  # limits can only be extended to a point beyond the end of the data
+  extend_limits_to = 40,
   keep_candidate_tables = TRUE
 )
 
@@ -123,11 +125,6 @@ test_that("every visualisation parameter reaches the plot object", {
 
     if (is.character(autospc_default(parameter))) {
       given[[parameter]] <- "given"
-    }
-
-    # limits can only be extended to a point beyond the end of the data
-    if (identical(parameter, "extend_limits_to")) {
-      given[[parameter]] <- 40
     }
 
     drawn_with <- suppressWarnings(

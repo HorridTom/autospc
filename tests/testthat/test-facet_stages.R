@@ -50,10 +50,7 @@ test_that("facet_stages produces correct data output", {
         above_or_below_cl,
         highlight,
         limit_change,
-        cl_label,
         cl_change,
-        annotation_level,
-        annotation_curvature,
         period_start,
         plot_period
       ),
@@ -73,10 +70,7 @@ test_that("facet_stages produces correct data output", {
         above_or_below_cl,
         highlight,
         limit_change,
-        cl_label,
         cl_change,
-        annotation_level,
-        annotation_curvature,
         period_start,
         plot_period
       )

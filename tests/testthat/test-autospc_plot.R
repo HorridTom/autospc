@@ -253,6 +253,7 @@ test_that("validate rejects a presentation missing a half", {
   half_only <- built_plot()
   half_only$charts <- list(plot_chart_c())
   half_only$presentation <- list(visualisation_params = list())
+  half_only$faceted <- FALSE
   class(half_only) <- c("autospc_plot", class(half_only))
 
   expect_error(

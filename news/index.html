@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,18 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9015" id="autospc-0109015">autospc 0.1.0.9015<a class="anchor" aria-label="anchor" href="#autospc-0109015"></a></h2>
+<div class="section level3">
+<h3 id="facet_stagessplit_rows-is-now-facet_stagessplit_at-0-1-0-9015">
+<code>facet_stages(split_rows)</code> is now <code>facet_stages(split_at)</code>
+<a class="anchor" aria-label="anchor" href="#facet_stagessplit_rows-is-now-facet_stagessplit_at-0-1-0-9015"></a></h3>
+<p><code>split_rows</code> counted rows of the data as supplied. Where the data held several observations per subgroup, that was not the number of points on the chart: thirty-six observations of twelve subgroups, split at row 18, gave a first stage of six points rather than eighteen. Where the data was not in <code>x</code> order the split did not respect that ordering either.</p>
+<ul><li><p><strong><code>split_at</code> counts points in the analysed series</strong>, which holds one point per subgroup in <code>x</code> order. Where the data already holds one row per subgroup, in <code>x</code> order, nothing changes.</p></li>
+<li><p><strong><code>split_rows</code> is deprecated.</strong> Supplying it warns, and its value is taken as <code>split_at</code> — so it takes the new meaning rather than keeping the old one for a release. Where both are given, <code>split_at</code> is used.</p></li>
+<li><p>The warning about split points beyond the end of the series now refers to the analysed series.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9014" id="autospc-0109014">autospc 0.1.0.9014<a class="anchor" aria-label="anchor" href="#autospc-0109014"></a></h2>
 <div class="section level3">

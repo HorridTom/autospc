@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +118,7 @@ on this dataset see <code><a href="../reference/ed_attendances_monthly.html">?ed
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/facet_stages.html">facet_stages</a></span><span class="op">(</span></span>
 <span>  <span class="va">ed_attendances_monthly</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">32L</span><span class="op">)</span>,</span>
-<span>  split_rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  split_at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">"Baseline"</span> <span class="op">=</span> <span class="fl">24L</span>,</span>
 <span>    <span class="st">"Data added beyond baseline"</span> <span class="op">=</span> <span class="fl">28L</span>,</span>
 <span>    <span class="st">"Further data added"</span> <span class="op">=</span> <span class="fl">32L</span></span>

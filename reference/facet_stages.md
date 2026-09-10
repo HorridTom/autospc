@@ -11,7 +11,7 @@ arrived.
 ## Usage
 
 ``` r
-facet_stages(data, split_rows, plot_chart = TRUE, ...)
+facet_stages(data, split_at, plot_chart = TRUE, ..., split_rows = deprecated())
 ```
 
 ## Arguments
@@ -21,9 +21,10 @@ facet_stages(data, split_rows, plot_chart = TRUE, ...)
   A data frame. For column requirements by chart type, see
   [`vignette("data-requirements", package = "autospc")`](https://horridtom.github.io/autospc/articles/data-requirements.md).
 
-- split_rows:
+- split_at:
 
-  A vector of row numbers specifying the stages to display results at.
+  A vector of positions in the analysed series, which holds one point
+  per subgroup in x order, specifying the stages to display results at.
   Names specify facet strip labels.
 
 - plot_chart:
@@ -36,6 +37,12 @@ facet_stages(data, split_rows, plot_chart = TRUE, ...)
 
   Arguments passed to
   [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+
+- split_rows:
+
+  **\[deprecated\]** Use `split_at` instead. The positions it takes are
+  now counted in the analysed series rather than in the data as
+  supplied.
 
 ## Value
 
@@ -52,7 +59,7 @@ With `plot_chart = FALSE`, a data frame holding every stage, with
 # Show progression of C' chart for count of monthly attendances over time
 facet_stages(
   ed_attendances_monthly,
-  split_rows = c(30L, 60L, 90L),
+  split_at = c(30L, 60L, 90L),
   chart_type = "C'",
   x = month_start,
   y = att_all,

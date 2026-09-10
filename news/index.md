@@ -1,5 +1,26 @@
 # Changelog
 
+## autospc 0.1.0.9015
+
+### `facet_stages(split_rows)` is now `facet_stages(split_at)`
+
+`split_rows` counted rows of the data as supplied. Where the data held
+several observations per subgroup, that was not the number of points on
+the chart: thirty-six observations of twelve subgroups, split at row 18,
+gave a first stage of six points rather than eighteen. Where the data
+was not in `x` order the split did not respect that ordering either.
+
+- **`split_at` counts points in the analysed series**, which holds one
+  point per subgroup in `x` order. Where the data already holds one row
+  per subgroup, in `x` order, nothing changes.
+
+- **`split_rows` is deprecated.** Supplying it warns, and its value is
+  taken as `split_at` — so it takes the new meaning rather than keeping
+  the old one for a release. Where both are given, `split_at` is used.
+
+- The warning about split points beyond the end of the series now refers
+  to the analysed series.
+
 ## autospc 0.1.0.9014
 
 ### Deprecations

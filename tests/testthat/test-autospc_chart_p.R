@@ -337,7 +337,7 @@ test_that("extend_display_limits clamps the recomputed limits to 0 and 100", {
 })
 
 
-test_that("extrapolate_limits recalculates from the final period", {
+test_that("limits_for_extension_rows recalculates from the final period", {
   # the limits of a P chart vary with n, so there is no single set to carry
   # forward. They are recalculated from the final calculation period, giving
   # one set of values for the whole extension.
@@ -350,7 +350,9 @@ test_that("extrapolate_limits recalculates from the final period", {
     ucl = rep(99, 5)
   ) # echoes them fails
 
-  limits <- extrapolate_limits(chart_p(pre_agg_data), period = final_period)
+  limits <- limits_for_extension_rows(chart_p(pre_agg_data),
+    period = final_period
+  )
 
   expect_named(limits, c("cl", "ucl", "lcl"), ignore.order = TRUE)
   expect_length(limits$cl, 1L)
@@ -365,7 +367,7 @@ test_that("extrapolate_limits recalculates from the final period", {
 })
 
 
-test_that("extrapolate_limits leaves out the excluded points", {
+test_that("limits_for_extension_rows leaves out the excluded points", {
   base_period <- data.frame(
     y = c(15, 15, 15, 60, 15),
     n = rep(100, 5),
@@ -378,8 +380,10 @@ test_that("extrapolate_limits leaves out the excluded points", {
   excluded_period <- base_period
   excluded_period$excluded <- c(FALSE, FALSE, FALSE, TRUE, FALSE)
 
-  with_spike <- extrapolate_limits(chart_p(pre_agg_data), period = base_period)
-  without_spike <- extrapolate_limits(chart_p(pre_agg_data),
+  with_spike <- limits_for_extension_rows(chart_p(pre_agg_data),
+    period = base_period
+  )
+  without_spike <- limits_for_extension_rows(chart_p(pre_agg_data),
     period = excluded_period
   )
 

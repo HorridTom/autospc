@@ -201,26 +201,6 @@ join_mr_columns <- function(x_table,
 }
 
 
-#' The horizontal axis values of the subgroups
-#'
-#' `extend_limits_to` adds rows beyond the end of the data, so the largest `x`
-#' in the table is not always the largest `x` of a subgroup. `limit_extension`
-#' says which rows those added ones are, and is absent from a table that has no
-#' limits, where no rows have been added.
-#'
-#' @param table The table to be drawn.
-#'
-#' @return The `x` column, without the rows the extension added.
-#' @noRd
-x_of_the_data <- function(table) {
-  if (!"limit_extension" %in% names(table)) {
-    return(table$x)
-  }
-
-  return(table$x[!table$limit_extension])
-}
-
-
 #' The axis extents and axis titles a table is drawn with
 #'
 #' The table is passed in rather than read from the chart, because a faceted
@@ -242,7 +222,7 @@ axis_specifications <- function(table,
   }
 
   start_x <- min(table$x, na.rm = TRUE)
-  x_max <- max(x_of_the_data(table), na.rm = TRUE)
+  x_max <- max(subgroup_x_values(table), na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
 
   if (!enough_data_for_limits(chart)) {

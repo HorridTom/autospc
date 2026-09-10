@@ -303,8 +303,8 @@ limits_for_missing_rows.autospc_chart_p <- function(chart,
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
-extrapolate_limits.autospc_chart_p <- function(chart,
-                                               period) {
+limits_for_extension_rows.autospc_chart_p <- function(chart,
+                                                      period) {
   ext_calc_data <- period %>%
     dplyr::mutate(
       n = dplyr::if_else(is.na(n),

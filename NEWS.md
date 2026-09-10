@@ -1,3 +1,36 @@
+# autospc 0.1.0.9012
+
+## Where an extension of the limits begins
+
+`extend_limits_to` adds rows past the end of the data and draws the final
+period's limits across them. The first of those rows sat one unit along the
+horizontal axis from the last subgroup. One unit is a step in whatever units `x`
+is expressed in rather than a subgroup, so on finely spaced data it was far too
+long: with readings ten milliseconds apart and `x` in seconds, one unit is a
+hundred subgroups, and a short extension put the first row past the second.
+
+* **The step is now the median gap between consecutive subgroups**, so the
+  extension starts where the next subgroup would have been.
+
+* **It is capped at half the extension**, so that both rows fall inside an
+  extension shorter than one subgroup. The limits then slope over the first half
+  of that extension rather than holding level, although this is by definition
+  over only a small fraction of the x-axis.
+
+* **It is rounded up on an axis of whole units** — an integer column, or a
+  `Date` — because a fractional step there lands on a value the column cannot
+  tell from the one before it.
+
+* **On an axis of whole units the step is also held to the length of the
+  extension**, because rounding up can otherwise take it back past the cap.
+  Where that leaves the step landing on `extend_limits_to` itself — an
+  extension of one whole unit or less — the extension is a single row rather
+  than two, and the limits slope across it.
+
+On a chart whose `x` is spaced about one unit apart nothing moves. On other
+spacings the first row of the extension moves: on monthly `Date` data, from one
+day past the last subgroup to one month past it.
+
 # autospc 0.1.0.9011
 
 ## The analysed values have a column of their own

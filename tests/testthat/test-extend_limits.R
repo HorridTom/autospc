@@ -182,6 +182,19 @@ test_that("Limit extension works correctly for P-prime chart (regression)", {
 })
 
 
+test_that("limits are only extended beyond the end of the data", {
+  # the last x of the data is not beyond the end of it
+  expect_error(
+    autospc(test_data,
+      chart_type = "C",
+      plot_chart = FALSE,
+      extend_limits_to = nrow(test_data)
+    ),
+    "beyond the end of the data"
+  )
+})
+
+
 test_that("the extension rows carry limits and no observation", {
   result <- autospc(test_data,
     chart_type = "P",
@@ -282,6 +295,17 @@ test_that("the extension takes its number from a final calculation period", {
 })
 
 
+test_that("a table with no period start has no final period", {
+  # asserted on the function directly: the analysis does not produce such a
+  # table, because a table with no row in any period has no limits, and the
+  # extension is only added to a table that has them
+  expect_identical(
+    final_period_start(data.frame(period_start = NA_integer_)),
+    NA_integer_
+  )
+})
+
+
 test_that("the extension keeps the type of the columns it adds rows to", {
   whole_numbers <- data.frame(
     x = seq_len(nrow(test_data)),
@@ -331,4 +355,139 @@ test_that("a column of whole numbers gives way to a value it cannot hold", {
   expect_type(result$x, "double")
 
   expect_identical(result$x[nrow(result)], 35.5)
+})
+
+
+# where the extension begins
+
+
+test_that("the extension begins one subgroup on from the end of the data", {
+  # the step used to be a fixed 1, which is a hundred subgroups here: readings
+  # ten milliseconds apart, with x expressed in seconds
+  fine <- data.frame(
+    x = seq(0.01, 0.40, by = 0.01),
+    y = as.numeric(rep(c(30, 28, 32, 29, 31), 8))
+  )
+
+  result <- autospc(fine,
+    chart_type = "C",
+    plot_chart = FALSE,
+    period_min = 21L,
+    extend_limits_to = 0.60
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_equal(result$x[extension], c(0.41, 0.60))
+
+  expect_false(is.unsorted(result$x))
+})
+
+
+test_that("the step is capped so that the extension holds both rows", {
+  # ten days is less than a third of one subgroup here, so the median gap on
+  # its own would put the first row beyond the second
+  monthly <- data.frame(
+    x = seq(as.Date("2020-01-01"), by = "month", length.out = 40),
+    y = as.numeric(rep(c(30, 28, 32, 29, 31), 8))
+  )
+
+  result <- autospc(monthly,
+    chart_type = "C",
+    plot_chart = FALSE,
+    period_min = 21L,
+    extend_limits_to = as.Date("2023-04-11")
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_identical(
+    result$x[extension],
+    as.Date(c("2023-04-06", "2023-04-11"))
+  )
+
+  expect_false(is.unsorted(result$x))
+})
+
+
+test_that("the step is a whole unit on an axis that holds whole units", {
+  # a Date is a whole number of days, so half a day is a step to a value the
+  # column cannot tell from the one before it
+  expect_identical(
+    extension_step(
+      x_values = seq(as.Date("2020-01-01"), by = "month", length.out = 3),
+      extend_limits_to = as.Date("2020-03-02")
+    ),
+    1
+  )
+
+  # 21 gaps of one and 21 of two give a median of one and a half
+  irregular <- as.integer(c(seq(1, 22), seq(24, 64, by = 2)))
+
+  expect_identical(
+    extension_step(x_values = irregular, extend_limits_to = 100L),
+    2
+  )
+
+  # and where the axis holds any number, the step is not rounded
+  expect_equal(
+    extension_step(
+      x_values = seq(0.01, 0.40, by = 0.01),
+      extend_limits_to = 1.60
+    ),
+    0.01
+  )
+})
+
+
+test_that("an extension of one whole unit adds one row", {
+  # the step is a whole unit on this axis and the extension is one unit long,
+  # so the first row of the extension is also the last row of it
+  whole_numbers <- data.frame(
+    x = seq_len(nrow(test_data)),
+    y = as.integer(test_data$y)
+  )
+
+  result <- autospc(whole_numbers,
+    chart_type = "C",
+    plot_chart = FALSE,
+    extend_limits_to = nrow(test_data) + 1L
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_length(extension, 1L)
+
+  expect_identical(result$x[extension], nrow(test_data) + 1L)
+
+  expect_equal(anyDuplicated(result$x), 0L)
+})
+
+
+test_that("the step does not reach past the end of a short extension", {
+  # rounding the step up on a whole-unit axis would otherwise take it past
+  # extend_limits_to, which is half a unit from the end of the data
+  expect_identical(
+    extension_step(x_values = 1:21, extend_limits_to = 21.5),
+    0.5
+  )
+
+  whole_numbers <- data.frame(
+    x = seq_len(nrow(test_data)),
+    y = as.integer(test_data$y)
+  )
+
+  result <- autospc(whole_numbers,
+    chart_type = "C",
+    plot_chart = FALSE,
+    extend_limits_to = nrow(test_data) + 0.5
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_length(extension, 1L)
+
+  expect_identical(result$x[extension], nrow(test_data) + 0.5)
+
+  expect_false(is.unsorted(result$x))
 })

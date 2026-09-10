@@ -345,7 +345,7 @@ test_that("the classes with no override inherit the carry-forward default", {
 })
 
 
-# extrapolate_limits()
+# limits_for_extension_rows()
 
 test_that("the default averages the final period's limits", {
   # for the classes with constant limits within a period the mean is just that
@@ -364,7 +364,7 @@ test_that("the default averages the final period's limits", {
   )
 
   expect_identical(
-    extrapolate_limits(chart, period = final_period),
+    limits_for_extension_rows(chart, period = final_period),
     list(cl = 11, lcl = 4, ucl = 18)
   )
 })
@@ -385,7 +385,7 @@ test_that("the default ignores missing limit values", {
   )
 
   expect_identical(
-    extrapolate_limits(chart, period = final_period),
+    limits_for_extension_rows(chart, period = final_period),
     list(cl = 11, lcl = 4, ucl = 18)
   )
 })
@@ -409,7 +409,7 @@ test_that("the default averages, rather than taking a single row", {
   )
 
   expect_identical(
-    extrapolate_limits(chart, period = final_period),
+    limits_for_extension_rows(chart, period = final_period),
     list(cl = 15, lcl = 3, ucl = 27)
   )
 })
@@ -426,7 +426,7 @@ test_that("the classes with no override inherit the averaging default", {
       y = "y"
     )
 
-    expect_identical(extrapolate_limits(chart, period = final_period),
+    expect_identical(limits_for_extension_rows(chart, period = final_period),
       list(cl = 11, lcl = 4, ucl = 18),
       info = chart_type
     )

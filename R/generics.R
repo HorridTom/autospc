@@ -97,7 +97,7 @@ extend_display_limits <- function(chart,
 }
 
 
-#' Limits to use beyond the end of the data
+#' Limits for the rows the extension adds beyond the end of the data
 #'
 #' Used when `extend_limits_to` carries the final period's limits out past the
 #' last data point. One set of values for the whole extension.
@@ -106,9 +106,9 @@ extend_display_limits <- function(chart,
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
-extrapolate_limits <- function(chart,
-                               period) {
-  UseMethod("extrapolate_limits")
+limits_for_extension_rows <- function(chart,
+                                      period) {
+  UseMethod("limits_for_extension_rows")
 }
 
 

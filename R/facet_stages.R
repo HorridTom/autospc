@@ -82,7 +82,10 @@ facet_stages <- function(data,
 
   arguments <- validate_argument_values(arguments)
 
-  arguments <- validate_algorithm_parameters(arguments)
+  arguments <- validate_algorithm_parameters(
+    arguments,
+    user_env = rlang::caller_env()
+  )
 
   chart_args <- arguments[autospc_chart_parameters()]
   visualisation_params <- arguments[visualisation_param_names()]

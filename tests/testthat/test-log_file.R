@@ -75,7 +75,7 @@ test_that("a faceted chart writes one entry per stage", {
 
   suppressWarnings(
     facet_stages(log_file_data,
-      split_rows = c(20L, 40L, 60L),
+      split_at = c(20L, 40L, 60L),
       chart_type = "C", period_min = 21L, plot_chart = FALSE,
       log_file_path = path
     )
@@ -87,13 +87,13 @@ test_that("a faceted chart writes one entry per stage", {
 })
 
 
-test_that("named split_rows name the stages in the log", {
+test_that("named split_at name the stages in the log", {
   path <- tempfile(fileext = ".rds")
   on.exit(unlink(path), add = TRUE)
 
   suppressWarnings(
     facet_stages(log_file_data,
-      split_rows = c(first = 20L, second = 40L, third = 60L),
+      split_at = c(first = 20L, second = 40L, third = 60L),
       chart_type = "C", period_min = 21L, plot_chart = FALSE,
       log_file_path = path
     )

@@ -163,7 +163,7 @@ test_that("facet_stages excludes rows with no x as well", {
   # and warns about being too short for limits as well
   caught <- tryCatch(
     facet_stages(missing_x_data(3L),
-      split_rows = 12, chart_type = "C\'",
+      split_at = 12, chart_type = "C\'",
       x = "x", y = "y", plot_chart = FALSE, period_min = 21L
     ),
     autospc_missing_x_warning = function(w) conditionMessage(w)
@@ -173,7 +173,7 @@ test_that("facet_stages excludes rows with no x as well", {
 })
 
 
-test_that("split_rows and the last stage count rows that have an x", {
+test_that("split_at and the last stage count rows that have an x", {
   # facet_stages() is cumulative: each stage is the series up to its split
   # point, so with 3 of 25 rows dropped the stages hold 12 and 22 rows rather
   # than 12 and 25
@@ -182,7 +182,7 @@ test_that("split_rows and the last stage count rows that have an x", {
 
   result <- suppressWarnings(
     facet_stages(missing_x_data(3L),
-      split_rows = 12, chart_type = "C\'",
+      split_at = 12, chart_type = "C\'",
       x = "x", y = "y", plot_chart = FALSE, period_min = 21L
     )
   )

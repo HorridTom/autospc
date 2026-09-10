@@ -53,7 +53,7 @@ test_that("the rows are numbered from one", {
 test_that("facet_stages returns a plain data frame", {
   result <- suppressWarnings(
     facet_stages(return_class_tibble,
-      split_rows = c(15L, 30L),
+      split_at = c(15L, 30L),
       chart_type = "C", period_min = 21L, plot_chart = FALSE
     )
   )

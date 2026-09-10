@@ -13,13 +13,13 @@
 #' facet.
 #' @param visualisation_params The visualisation parameters, with the axis
 #'   titles resolved.
-#' @param split_rows Non-NULL to facet by stage.
+#' @param faceted TRUE to facet by stage.
 #'
 #' @return A ggplot.
 #' @noRd
 create_spc_plot <- function(plot_data,
                             visualisation_params,
-                            split_rows = NULL) {
+                            faceted = FALSE) {
   main <- plot_data[[1]]
 
   chart <- main$chart
@@ -140,7 +140,7 @@ create_spc_plot <- function(plot_data,
   )
 
   # Facet by stages if needed
-  if (!is.null(split_rows)) {
+  if (faceted) {
     spc_plot <- spc_plot +
       ggplot2::facet_wrap(
         facets = ggplot2::vars(stage),
@@ -231,7 +231,7 @@ draw_mr_panel <- function(plot_data,
 create_timeseries_plot <- function(table,
                                    visualisation_params,
                                    axis_extents,
-                                   split_rows = NULL) {
+                                   faceted = FALSE) {
   time_series_plot <- ggplot2::ggplot(
     table,
     ggplot2::aes(x = x, y = series)
@@ -273,7 +273,7 @@ create_timeseries_plot <- function(table,
     end_x = axis_extents$end_x
   )
 
-  if (!is.null(split_rows)) {
+  if (faceted) {
     time_series_plot <- time_series_plot +
       ggplot2::facet_wrap(
         facets = ggplot2::vars(stage),

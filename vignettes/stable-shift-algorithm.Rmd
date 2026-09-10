@@ -56,7 +56,7 @@ on this dataset see `?ed_attendances_monthly`.
 facet_stages(
   ed_attendances_monthly %>%
     filter(row_number() <= 32L),
-  split_rows = c(
+  split_at = c(
     "Baseline" = 24L,
     "Data added beyond baseline" = 28L,
     "Further data added" = 32L

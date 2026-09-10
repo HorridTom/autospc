@@ -3,7 +3,7 @@
 test_that("facet_stages produces correct data output", {
   faceted_results <- facet_stages(
     ed_attendances_monthly,
-    split_rows = c(30L, 60L, 90L),
+    split_at = c(30L, 60L, 90L),
     chart_type = "C'",
     x = month_start,
     y = att_all,
@@ -81,7 +81,7 @@ test_that("facet_stages produces correct data output", {
 test_that("", {
   faceted_plot <- facet_stages(
     ed_attendances_monthly,
-    split_rows = c(30L, 60L, 90L),
+    split_at = c(30L, 60L, 90L),
     chart_type = "C'",
     x = month_start,
     y = att_all,
@@ -105,7 +105,7 @@ test_that("facet_stages works when relying on x,y columns in data", {
       x = 1L:100L,
       y = rnorm(n = 100L)
     ),
-    split_rows = c(30L, 60L),
+    split_at = c(30L, 60L),
     chart_type = "XMR",
     plot_chart = FALSE
   )
@@ -129,7 +129,7 @@ test_that("an XMR request is faceted as its X chart", {
         x = 1L:60L,
         y = rep(c(10, 12, 11, 13, 9, 14), 10L)
       ),
-      split_rows = c(30L, 60L),
+      split_at = c(30L, 60L),
       chart_type = "XMR"
     )
   )
@@ -154,7 +154,7 @@ facet_arg_data <- data.frame(
 
 faceted_plot <- function(...) {
   facet_stages(facet_arg_data,
-    split_rows = c(30L, 60L, 90L),
+    split_at = c(30L, 60L, 90L),
     chart_type = "C",
     period_min = 21L,
     ...
@@ -164,7 +164,7 @@ faceted_plot <- function(...) {
 
 faceted_arg <- function(...) {
   facet_stages(facet_arg_data,
-    split_rows = c(30L, 60L, 90L),
+    split_at = c(30L, 60L, 90L),
     chart_type = "C",
     plot_chart = FALSE,
     ...
@@ -267,7 +267,7 @@ test_that("the axes hold every facet, not just the first", {
 
 test_that("the caption names the chart type that was asked for", {
   plot <- facet_stages(facet_arg_data,
-    split_rows = c(30L, 60L, 90L),
+    split_at = c(30L, 60L, 90L),
     chart_type = "C'",
     period_min = 21L
   )
@@ -325,10 +325,10 @@ test_that("it carries one analysed chart per facet, in stage order", {
 })
 
 
-test_that("named split_rows name the charts", {
+test_that("named split_at name the charts", {
   charts <- autospc_plot_charts(
     facet_stages(facet_arg_data,
-      split_rows = c(early = 30L, mid = 60L, all = 90L),
+      split_at = c(early = 30L, mid = 60L, all = 90L),
       chart_type = "C",
       period_min = 21L
     )
@@ -428,7 +428,7 @@ test_that("a title in the data reaches the faceted chart", {
   titled$subtitle <- "Also from the data"
 
   plot <- facet_stages(titled,
-    split_rows = c(30L, 60L, 90L),
+    split_at = c(30L, 60L, 90L),
     chart_type = "C",
     period_min = 21L
   )
@@ -501,7 +501,7 @@ facet_warnings <- function(...) {
 
 test_that("one warning names the stage that is short of points", {
   # 10 points in the first stage, 40 in the second
-  given <- facet_warnings(split_rows = c(10L, 40L))
+  given <- facet_warnings(split_at = c(10L, 40L))
 
   expect_length(given, 1L)
 
@@ -510,7 +510,7 @@ test_that("one warning names the stage that is short of points", {
 
 
 test_that("one warning names every stage that is short of points", {
-  given <- facet_warnings(split_rows = c(5L, 10L, 40L))
+  given <- facet_warnings(split_at = c(5L, 10L, 40L))
 
   expect_length(given, 1L)
 
@@ -521,15 +521,15 @@ test_that("one warning names every stage that is short of points", {
 })
 
 
-test_that("the warning names the stages the way split_rows does", {
-  given <- facet_warnings(split_rows = c(early = 10L, late = 40L))
+test_that("the warning names the stages the way split_at does", {
+  given <- facet_warnings(split_at = c(early = 10L, late = 40L))
 
   expect_match(given, "Stage early has")
 })
 
 
 test_that("no stage short of points gives no warning", {
-  expect_length(facet_warnings(split_rows = c(30L, 40L)), 0L)
+  expect_length(facet_warnings(split_at = c(30L, 40L)), 0L)
 })
 
 
@@ -556,7 +556,7 @@ test_that("a faceted chart with no limits draws a plain time series", {
   short <- data.frame(x = 1:10, y = rep(c(10L, 12L), 5L))
 
   plot <- suppressWarnings(facet_stages(short,
-    split_rows = c(5L, 10L),
+    split_at = c(5L, 10L),
     chart_type = "C", period_min = 21L
   ))
 
@@ -570,7 +570,7 @@ test_that("a faceted chart with no limits draws a plain time series", {
 
 test_that("a faceted chart drawn without limits draws a plain time series", {
   plot <- facet_stages(short_facet_data,
-    split_rows = c(20L, 40L), chart_type = "C", period_min = 5L,
+    split_at = c(20L, 40L), chart_type = "C", period_min = 5L,
     show_limits = FALSE
   )
 
@@ -584,7 +584,7 @@ test_that("the points of a stage without limits are drawn black", {
   # grey is the colour of a point excluded from the limits calculation, so a
   # stage without limits must not take it
   plot <- suppressWarnings(facet_stages(short_facet_data,
-    split_rows = c(10L, 40L), chart_type = "C", period_min = 21L
+    split_at = c(10L, 40L), chart_type = "C", period_min = 21L
   ))
 
   expect_identical(point_colours_of(plot), "black")
@@ -596,7 +596,7 @@ test_that("leaving out chart_type says so, rather than failing on a length", {
   # logical(0) when no chart type was given, so the call died before
   # validate_chart_type() could say what was wrong
   message <- tryCatch(
-    facet_stages(facet_arg_data, split_rows = c(30L, 60L, 90L)),
+    facet_stages(facet_arg_data, split_at = c(30L, 60L, 90L)),
     error = conditionMessage
   )
 
@@ -616,7 +616,7 @@ test_that("a rounding warning is given once for the call, not once per facet", {
 
   withCallingHandlers(
     facet_stages(fractional,
-      split_rows = c(30L, 60L, 90L), chart_type = "C",
+      split_at = c(30L, 60L, 90L), chart_type = "C",
       period_min = 21L, plot_chart = FALSE
     ),
     warning = function(w) {
@@ -642,7 +642,7 @@ test_that("the facets are analysed from the rounded counts", {
 
   result <- suppressWarnings(
     facet_stages(fractional,
-      split_rows = c(30L, 60L, 90L), chart_type = "C",
+      split_at = c(30L, 60L, 90L), chart_type = "C",
       period_min = 21L, plot_chart = FALSE
     )
   )
@@ -651,58 +651,58 @@ test_that("the facets are analysed from the rounded counts", {
 })
 
 
-# normalise_split_rows()
+# normalise_split_at()
 
 
-test_that("a split row at the end of the data gives one stage", {
-  expect_identical(normalise_split_rows(split_rows = 43L, n_rows = 43L), 43L)
+test_that("a split point at the end of the analysed series gives one stage", {
+  expect_identical(normalise_split_at(split_at = 43L, n_points = 43L), 43L)
 })
 
 
-test_that("the end of the data is added where it is not asked for", {
+test_that("the end of the analysed series is added where it is not asked for", {
   expect_identical(
-    normalise_split_rows(split_rows = c(20L, 30L), n_rows = 43L),
+    normalise_split_at(split_at = c(20L, 30L), n_points = 43L),
     c(20L, 30L, 43L)
   )
 })
 
 
-test_that("split rows beyond the end of the data become the last row", {
+test_that("split points beyond the end of the analysed series become its last point", {
   expect_identical(
     suppressWarnings(
-      normalise_split_rows(split_rows = c(20L, 44L), n_rows = 43L)
+      normalise_split_at(split_at = c(20L, 44L), n_points = 43L)
     ),
     c(20L, 43L)
   )
 
   expect_identical(
     suppressWarnings(
-      normalise_split_rows(split_rows = c(44L, 45L), n_rows = 43L)
+      normalise_split_at(split_at = c(44L, 45L), n_points = 43L)
     ),
     43L
   )
 })
 
 
-test_that("a split row beyond the end of the data warns", {
+test_that("a split point beyond the end of the analysed series warns", {
   expect_warning(
-    normalise_split_rows(split_rows = c(44L, 45L), n_rows = 43L),
-    "beyond the end of the data \\(44, 45\\)"
+    normalise_split_at(split_at = c(44L, 45L), n_points = 43L),
+    "beyond the end of the analysed series \\(44, 45\\)"
   )
 
   expect_no_warning(
-    normalise_split_rows(split_rows = c(20L, 43L), n_rows = 43L),
-    message = "beyond the end of the data"
+    normalise_split_at(split_at = c(20L, 43L), n_points = 43L),
+    message = "beyond the end of the analysed series"
   )
 })
 
 
-test_that("normalise_split_rows keeps the facet names", {
+test_that("normalise_split_at keeps the facet names", {
   expect_identical(
     suppressWarnings(
-      normalise_split_rows(
-        split_rows = c(early = 20L, late = 44L),
-        n_rows = 43L
+      normalise_split_at(
+        split_at = c(early = 20L, late = 44L),
+        n_points = 43L
       )
     ),
     c(early = 20L, late = 43L)
@@ -715,7 +715,7 @@ test_that("normalise_split_rows keeps the facet names", {
 
 test_that("a faceted chart of one stage draws one facet", {
   plot <- facet_stages(short_facet_data,
-    split_rows = 40L, chart_type = "C", period_min = 21L
+    split_at = 40L, chart_type = "C", period_min = 21L
   )
 
   expect_s3_class(plot$facet, "FacetWrap")
@@ -726,7 +726,7 @@ test_that("a faceted chart of one stage draws one facet", {
 
 test_that("the table of a faceted chart of one stage names the stage", {
   table <- facet_stages(short_facet_data,
-    split_rows = 40L, chart_type = "C", period_min = 21L,
+    split_at = 40L, chart_type = "C", period_min = 21L,
     plot_chart = FALSE
   )
 

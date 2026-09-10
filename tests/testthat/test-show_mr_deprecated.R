@@ -112,7 +112,7 @@ facet_data <- data.frame(
 
 facet_show_mr <- function(...) {
   facet_stages(facet_data,
-    split_rows = c(30L, 60L),
+    split_at = c(30L, 60L),
     chart_type = "XMR",
     period_min = 21L,
     ...
@@ -162,7 +162,7 @@ test_that("faceting an XMR request draws the same chart as asking for X", {
   expect_equal(
     suppressWarnings(facet_show_mr(show_mr = FALSE))$data,
     facet_stages(facet_data,
-      split_rows = c(30L, 60L),
+      split_at = c(30L, 60L),
       chart_type = "X",
       period_min = 21L
     )$data

@@ -91,7 +91,7 @@ test_that("an XMR request is warned about once, not once per chart of the pair",
 test_that("a faceted chart is warned about once, not once per facet", {
   count <- count_x_type_warnings(
     facet_stages(x_type_data(as.character(1:30)),
-      split_rows = c(10L, 20L, 30L), chart_type = "C",
+      split_at = c(10L, 20L, 30L), chart_type = "C",
       period_min = 21L, plot_chart = FALSE
     )
   )

@@ -238,7 +238,7 @@ test_that("verbosity rejects a value that is not a number", {
 test_that("facet_stages checks the values it is given", {
   expect_error(
     facet_stages(values_data,
-      split_rows = 20,
+      split_at = 20,
       chart_type = "C\'",
       x = "x",
       y = "y",
@@ -249,7 +249,7 @@ test_that("facet_stages checks the values it is given", {
 
   expect_error(
     facet_stages(values_data,
-      split_rows = 20,
+      split_at = 20,
       chart_type = "C\'",
       x = "x",
       y = "y",
@@ -263,7 +263,7 @@ test_that("facet_stages checks the values it is given", {
 test_that("facet_stages checks its own plot_chart argument", {
   expect_error(
     facet_stages(values_data,
-      split_rows = 20,
+      split_at = 20,
       chart_type = "C\'",
       x = "x",
       y = "y",

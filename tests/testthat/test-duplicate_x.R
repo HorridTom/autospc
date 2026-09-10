@@ -39,7 +39,7 @@ test_that("facet_stages refuses a repeated x on an X chart", {
   expect_error(
     facet_stages(repeated(),
       chart_type = "X", x = "x", y = "y",
-      split_rows = 12L, period_min = 10L
+      split_at = 12L, period_min = 10L
     ),
     "x must be unique"
   )

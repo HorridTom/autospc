@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,9 +104,7 @@ by default the Stable Shift Algorithm.</p>
 <span>  upper_annotation_sf <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lower_annotation_sf <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  annotation_arrows <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  annotation_arrow_curve <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>  override_annotation_dist <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  override_annotation_dist_P <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
+<span>  annotation_arrow_curve <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -419,19 +417,6 @@ connecting centre line labels to the centre line they refer to</p></dd>
 
 <dt id="arg-annotation-arrow-curve">annotation_arrow_curve<a class="anchor" aria-label="anchor" href="#arg-annotation-arrow-curve"></a></dt>
 <dd><p>Numeric curvature of the annotation arrows</p></dd>
-
-
-<dt id="arg-override-annotation-dist">override_annotation_dist<a class="anchor" aria-label="anchor" href="#arg-override-annotation-dist"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use
-<code>upper_annotation_sf</code> and <code>lower_annotation_sf</code> instead. The equivalent
-scale factor is <code>1 + 1/override_annotation_dist</code>, so
-<code>override_annotation_dist = 10</code> becomes <code>upper_annotation_sf = 1.1</code>.</p></dd>
-
-
-<dt id="arg-override-annotation-dist-p">override_annotation_dist_P<a class="anchor" aria-label="anchor" href="#arg-override-annotation-dist-p"></a></dt>
-<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use
-<code>upper_annotation_sf</code> and <code>lower_annotation_sf</code> instead. These apply to
-every chart type, so a P or P' chart no longer needs an argument of its own.</p></dd>
 
 </dl></div>
     <div class="section level2">

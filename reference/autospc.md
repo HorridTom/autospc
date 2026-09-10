@@ -57,9 +57,7 @@ autospc(
   upper_annotation_sf = NULL,
   lower_annotation_sf = NULL,
   annotation_arrows = FALSE,
-  annotation_arrow_curve = 0.3,
-  override_annotation_dist = deprecated(),
-  override_annotation_dist_P = deprecated()
+  annotation_arrow_curve = 0.3
 )
 ```
 
@@ -372,19 +370,6 @@ autospc(
 - annotation_arrow_curve:
 
   Numeric curvature of the annotation arrows
-
-- override_annotation_dist:
-
-  **\[deprecated\]** Use `upper_annotation_sf` and `lower_annotation_sf`
-  instead. The equivalent scale factor is
-  `1 + 1/override_annotation_dist`, so `override_annotation_dist = 10`
-  becomes `upper_annotation_sf = 1.1`.
-
-- override_annotation_dist_P:
-
-  **\[deprecated\]** Use `upper_annotation_sf` and `lower_annotation_sf`
-  instead. These apply to every chart type, so a P or P' chart no longer
-  needs an argument of its own.
 
 ## Value
 

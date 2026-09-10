@@ -1,5 +1,18 @@
 # Changelog
 
+## autospc 0.1.0.9014
+
+### Deprecations
+
+- `autospc(override_annotation_dist)` and
+  `autospc(override_annotation_dist_P)` are gone. They were deprecated
+  in 0.0.0.9010 and became defunct in 0.1.0, and stayed in the signature
+  only so that supplying one gave an error naming its replacement.
+  Supplying one is now R’s own “unused argument” error. Use
+  `upper_annotation_sf` and `lower_annotation_sf` instead — the
+  equivalent scale factor is `1 + 1/x`, so
+  `override_annotation_dist = 10` becomes `upper_annotation_sf = 1.1`.
+
 ## autospc 0.1.0.9013
 
 ### Deprecations

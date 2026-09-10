@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,14 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9014" id="autospc-0109014">autospc 0.1.0.9014<a class="anchor" aria-label="anchor" href="#autospc-0109014"></a></h2>
+<div class="section level3">
+<h3 id="deprecations-0-1-0-9014">Deprecations<a class="anchor" aria-label="anchor" href="#deprecations-0-1-0-9014"></a></h3>
+<ul><li>
+<code>autospc(override_annotation_dist)</code> and <code>autospc(override_annotation_dist_P)</code> are gone. They were deprecated in 0.0.0.9010 and became defunct in 0.1.0, and stayed in the signature only so that supplying one gave an error naming its replacement. Supplying one is now R’s own “unused argument” error. Use <code>upper_annotation_sf</code> and <code>lower_annotation_sf</code> instead — the equivalent scale factor is <code>1 + 1/x</code>, so <code>override_annotation_dist = 10</code> becomes <code>upper_annotation_sf = 1.1</code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9013" id="autospc-0109013">autospc 0.1.0.9013<a class="anchor" aria-label="anchor" href="#autospc-0109013"></a></h2>
 <div class="section level3">

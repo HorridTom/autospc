@@ -107,6 +107,34 @@ count_pair_warnings <- function(result) {
 }
 
 
+# the condition itself, for assertions about its class and its text
+pair_warning <- function(result) {
+  warnings_given <- list()
+
+  withCallingHandlers(
+    force(result),
+    warning = function(w) {
+      warnings_given[[length(warnings_given) + 1L]] <<- w
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  is_pair <- vapply(
+    warnings_given,
+    function(w) {
+      grepl("does not make sense", conditionMessage(w), fixed = TRUE)
+    },
+    logical(1L)
+  )
+
+  if (!any(is_pair)) {
+    return(NULL)
+  }
+
+  return(warnings_given[is_pair][[1L]])
+}
+
+
 test_that("an inconsistent pair is warned about once for a single chart", {
   count <- count_pair_warnings(
     autospc(inconsistent_pair,
@@ -167,4 +195,34 @@ test_that("a consistent pair is left alone and doesn't warn of inconsistency", {
   expect_identical(count, 0L)
 
   expect_false(autospc_plot_charts(plot)[[1]]$overhanging_reversions)
+})
+
+
+test_that("the inconsistent pair is a deprecation warning", {
+  given <- pair_warning(
+    autospc(inconsistent_pair,
+      chart_type = "C", period_min = 21L,
+      overhanging_reversions = FALSE, plot_chart = FALSE
+    )
+  )
+
+  expect_s3_class(given, "lifecycle_warning_deprecated")
+
+  # the warning names the caller's own call rather than the package's use of
+  # validate_algorithm_parameters(), so it does not ask for a bug report
+  expect_no_match(conditionMessage(given), "report the issue")
+})
+
+
+test_that("facet_stages gives the same deprecation warning", {
+  given <- pair_warning(
+    facet_stages(inconsistent_pair,
+      chart_type = "C", period_min = 21L, split_rows = 30L,
+      overhanging_reversions = FALSE, plot_chart = FALSE
+    )
+  )
+
+  expect_s3_class(given, "lifecycle_warning_deprecated")
+
+  expect_no_match(conditionMessage(given), "report the issue")
 })

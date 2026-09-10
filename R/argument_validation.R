@@ -103,22 +103,36 @@ check_x_type <- function(x) {
 #' pair is inconsistent, one of the two is changed and the caller is warned.
 #'
 #' `no_regrets = TRUE` with `overhanging_reversions = FALSE` sets
-#' `overhanging_reversions` to TRUE.
+#' `overhanging_reversions` to TRUE. That combination is deprecated and will be
+#' an error, so the warning is a deprecation warning.
 #'
 #' Called once per call to `autospc()` or `facet_stages()`.
 #'
 #' @param arguments A named list of the argument values for one call.
+#' @param user_env The environment the deprecation warning names as the place
+#'   the combination was used. `autospc()` and `facet_stages()` pass their own
+#'   caller, because they are the functions the user calls.
 #'
 #' @return `arguments`, with any value the checks changed.
 #' @noRd
-validate_algorithm_parameters <- function(arguments) {
+validate_algorithm_parameters <- function(arguments,
+                                          user_env = rlang::caller_env()) {
   if (arguments$no_regrets & !arguments$overhanging_reversions) {
-    warning(paste0(
-      "Setting no_regrets = TRUE and overhanging_reversions = ",
-      "FALSE does not make sense, since no_regrets requires ",
-      "consideration of overhanging reversions. Changing ",
-      "overhanging_reversions to TRUE."
-    ))
+    lifecycle::deprecate_warn(
+      when = "0.1.0.9013",
+      what = I(paste(
+        "Setting `no_regrets = TRUE` with",
+        "`overhanging_reversions = FALSE`"
+      )),
+      details = paste(
+        "no_regrets requires consideration of overhanging reversions,",
+        "so the combination does not make sense. overhanging_reversions",
+        "has been changed to TRUE for this call. It will be an error in",
+        "a future version: set overhanging_reversions = TRUE, or leave",
+        "it at its default, or set no_regrets = FALSE."
+      ),
+      user_env = user_env
+    )
 
     arguments$overhanging_reversions <- TRUE
   }

@@ -1,3 +1,15 @@
+# autospc 0.1.0.9013
+
+## Deprecations
+
+* Setting `no_regrets = TRUE` with `overhanging_reversions = FALSE` is now
+  deprecated, and will be an error in a future version. `no_regrets` requires
+  consideration of overhanging reversions, so the combination does not make
+  sense. It has always warned and changed `overhanging_reversions` to TRUE, and
+  still does; the warning now says that the change is going away. Set
+  `overhanging_reversions = TRUE`, or leave it at its default, or set
+  `no_regrets = FALSE`.
+
 # autospc 0.1.0.9012
 
 ## Where an extension of the limits begins

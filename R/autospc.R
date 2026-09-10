@@ -341,7 +341,10 @@ autospc <- function(data,
 
   arguments <- validate_argument_values(arguments)
 
-  arguments <- validate_algorithm_parameters(arguments)
+  arguments <- validate_algorithm_parameters(
+    arguments,
+    user_env = rlang::caller_env()
+  )
 
   # The validated analysis parameters
   chart_args <- arguments[autospc_chart_parameters()]

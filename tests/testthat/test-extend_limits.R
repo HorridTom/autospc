@@ -182,6 +182,19 @@ test_that("Limit extension works correctly for P-prime chart (regression)", {
 })
 
 
+test_that("limits are only extended beyond the end of the data", {
+  # the last x of the data is not beyond the end of it
+  expect_error(
+    autospc(test_data,
+      chart_type = "C",
+      plot_chart = FALSE,
+      extend_limits_to = nrow(test_data)
+    ),
+    "beyond the end of the data"
+  )
+})
+
+
 test_that("the extension rows carry limits and no observation", {
   result <- autospc(test_data,
     chart_type = "P",
@@ -278,6 +291,17 @@ test_that("the extension takes its number from a final calculation period", {
   expect_identical(
     result$period_start[extension],
     rep(result$period_start[final], 2L)
+  )
+})
+
+
+test_that("a table with no period start has no final period", {
+  # asserted on the function directly: the analysis does not produce such a
+  # table, because a table with no row in any period has no limits, and the
+  # extension is only added to a table that has them
+  expect_identical(
+    final_period_start(data.frame(period_start = NA_integer_)),
+    NA_integer_
   )
 })
 

@@ -39,9 +39,7 @@ test_that("the deprecated arguments are the ones autospc declares as deprecated"
     autospc_deprecated_arguments(),
     c(
       "show_mr",
-      "write_table",
-      "override_annotation_dist",
-      "override_annotation_dist_P"
+      "write_table"
     )
   )
 })

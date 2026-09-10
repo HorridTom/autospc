@@ -418,8 +418,8 @@ extend_display_limits.autospc_chart <- function(chart,
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
-extrapolate_limits.autospc_chart <- function(chart,
-                                             period) {
+limits_for_extension_rows.autospc_chart <- function(chart,
+                                                    period) {
   limits <- period %>%
     dplyr::select(cl, lcl, ucl) %>%
     dplyr::summarise(dplyr::across(

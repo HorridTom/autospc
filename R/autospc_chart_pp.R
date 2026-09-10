@@ -302,8 +302,8 @@ limits_for_missing_rows.autospc_chart_pp <- function(chart,
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
-extrapolate_limits.autospc_chart_pp <- function(chart,
-                                                period) {
+limits_for_extension_rows.autospc_chart_pp <- function(chart,
+                                                       period) {
   exclusion_points <- period %>%
     dplyr::pull(excluded) %>%
     which()

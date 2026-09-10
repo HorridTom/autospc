@@ -326,7 +326,7 @@ establish_limits <- function(chart) {
 
     # extend_limits_to produces limit values. They go on last
     # so that every column they copy from the last row of the data is present
-    chart$result$table <- extend_limits(
+    chart$result$table <- extend_limits_beyond_data(
       table = chart$result$table,
       chart = chart
     )

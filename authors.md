@@ -10,13 +10,13 @@
 ## Citation
 
 Woodcock T, O'Connor I (2026). *autospc: Automatically Partitioned SPC
-Charts*. R package version 0.1.0.9012,
+Charts*. R package version 0.1.0.9013,
 <https://horridtom.github.io/autospc/>.
 
     @Manual{,
       title = {autospc: Automatically Partitioned SPC Charts},
       author = {Thomas Woodcock and Imogen O'Connor},
       year = {2026},
-      note = {R package version 0.1.0.9012},
+      note = {R package version 0.1.0.9013},
       url = {https://horridtom.github.io/autospc/},
     }

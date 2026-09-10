@@ -350,14 +350,14 @@ resolve_default_visualisation_params <- function(visualisation_params,
 #' @param visualisation_params A named list of the visualisation parameters.
 #'   The axis titles are taken from the plot data that is drawn, so that the
 #'   object records what is drawn.
-#' @param split_rows Non-NULL to facet by stage.
+#' @param faceted TRUE to facet by stage.
 #'
 #' @return An object whose class vector begins `"autospc_plot"`, followed by
 #'   ggplot2's own classes.
 #' @noRd
 autospc_plot <- function(charts,
                          visualisation_params,
-                         split_rows = NULL) {
+                         faceted = FALSE) {
   if (inherits(charts, "autospc_chart")) {
     stop(
       paste(
@@ -373,7 +373,7 @@ autospc_plot <- function(charts,
     visualisation_params = visualisation_params
   )
 
-  if (!is.null(split_rows)) {
+  if (faceted) {
     plot_data <- list(faceted_plot_data(
       plot_data = plot_data,
       visualisation_params = visualisation_params
@@ -391,7 +391,7 @@ autospc_plot <- function(charts,
   if (!limits_drawn) {
     # A pair without limits is drawn as the location chart alone. A faceted
     # plot keeps every facet, and its plot data is already one element.
-    if (is.null(split_rows)) {
+    if (!faceted) {
       charts <- charts[1]
       plot_data <- plot_data[1]
     }
@@ -400,13 +400,13 @@ autospc_plot <- function(charts,
       table = main$table,
       visualisation_params = visualisation_params,
       axis_extents = main$axis_extents,
-      split_rows = split_rows
+      faceted = faceted
     )
   } else {
     plot <- create_spc_plot(
       plot_data = plot_data,
       visualisation_params = visualisation_params,
-      split_rows = split_rows
+      faceted = faceted
     )
   }
 
@@ -417,9 +417,9 @@ autospc_plot <- function(charts,
       visualisation_params = visualisation_params,
       axis_extents = main$axis_extents
     ),
-    # `split_rows` is given by `facet_stages()` and by nothing else, so it says
+    # `faceted` is set by `facet_stages()` and by nothing else, so it says
     # whether the call faceted, rather than the drawn plot being asked
-    faceted = !is.null(split_rows)
+    faceted = faceted
   )
 
   autospc_plot_object <- validate_autospc_plot(autospc_plot_object)

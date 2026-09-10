@@ -4,20 +4,25 @@
 \alias{facet_stages}
 \title{Plot SPC charts at successive stages of a series}
 \usage{
-facet_stages(data, split_rows, plot_chart = TRUE, ...)
+facet_stages(data, split_at, plot_chart = TRUE, ..., split_rows = deprecated())
 }
 \arguments{
 \item{data}{A data frame. For column requirements by chart type, see
 \code{vignette("data-requirements", package = "autospc")}.}
 
-\item{split_rows}{A vector of row numbers specifying the stages to display
-results at. Names specify facet strip labels.}
+\item{split_at}{A vector of positions in the analysed series, which holds
+one point per subgroup in x order, specifying the stages to display results
+at. Names specify facet strip labels.}
 
 \item{plot_chart}{Boolean specifying whether to plot the chart. If not, the
 subgroup-aggregated data is returned with centre line, control limits and
 other analytic output appended as columns.}
 
 \item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
+
+\item{split_rows}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{split_at} instead.
+The positions it takes are now counted in the analysed series rather than in
+the data as supplied.}
 }
 \value{
 With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: one
@@ -38,7 +43,7 @@ data arrived.
 # Show progression of C' chart for count of monthly attendances over time
 facet_stages(
   ed_attendances_monthly,
-  split_rows = c(30L, 60L, 90L),
+  split_at = c(30L, 60L, 90L),
   chart_type = "C'",
   x = month_start,
   y = att_all,

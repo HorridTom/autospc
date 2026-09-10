@@ -48,7 +48,7 @@ test_that("a column already named x does not stop another being named as x", {
 test_that("facet_stages settles a clash the same way", {
   result <- suppressWarnings(
     facet_stages(clashing_data,
-      split_rows = c(15L, 30L), chart_type = "C",
+      split_at = c(15L, 30L), chart_type = "C",
       x = month, y = count, period_min = 21L, plot_chart = FALSE
     )
   )

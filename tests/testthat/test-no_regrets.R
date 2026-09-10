@@ -162,7 +162,7 @@ test_that("an XmR pair is warned about once, not once per chart", {
 test_that("a faceted chart is warned about once, not once per facet", {
   count <- count_pair_warnings(
     facet_stages(inconsistent_pair,
-      split_rows = c(20L, 40L), chart_type = "C",
+      split_at = c(20L, 40L), chart_type = "C",
       period_min = 21L, overhanging_reversions = FALSE,
       plot_chart = FALSE
     )
@@ -217,7 +217,7 @@ test_that("the inconsistent pair is a deprecation warning", {
 test_that("facet_stages gives the same deprecation warning", {
   given <- pair_warning(
     facet_stages(inconsistent_pair,
-      chart_type = "C", period_min = 21L, split_rows = 30L,
+      chart_type = "C", period_min = 21L, split_at = 30L,
       overhanging_reversions = FALSE, plot_chart = FALSE
     )
   )

@@ -7,9 +7,13 @@
 #' data arrived.
 #'
 #' @inheritParams autospc
-#' @param split_rows A vector of row numbers specifying the stages to display
-#' results at. Names specify facet strip labels.
+#' @param split_at A vector of positions in the analysed series, which holds
+#' one point per subgroup in x order, specifying the stages to display results
+#' at. Names specify facet strip labels.
 #' @param ... Arguments passed to [autospc::autospc()]
+#' @param split_rows `r lifecycle::badge("deprecated")` Use `split_at` instead.
+#' The positions it takes are now counted in the analysed series rather than in
+#' the data as supplied.
 #'
 #' @returns With `plot_chart = TRUE` (the default), an `autospc_plot`: one
 #' ggplot, faceted by stage, which also carries the analysed chart behind each
@@ -22,7 +26,7 @@
 #' # Show progression of C' chart for count of monthly attendances over time
 #' facet_stages(
 #'   ed_attendances_monthly,
-#'   split_rows = c(30L, 60L, 90L),
+#'   split_at = c(30L, 60L, 90L),
 #'   chart_type = "C'",
 #'   x = month_start,
 #'   y = att_all,
@@ -31,10 +35,29 @@
 #'
 #' @export
 facet_stages <- function(data,
-                         split_rows,
+                         split_at,
                          plot_chart = TRUE,
-                         ...) {
+                         ...,
+                         split_rows = deprecated()) {
   caller <- parent.frame()
+
+  if (lifecycle::is_present(split_rows)) {
+    lifecycle::deprecate_warn(
+      when = "0.1.0.9015",
+      what = "facet_stages(split_rows)",
+      with = "facet_stages(split_at)",
+      details = paste(
+        "The positions are now counted in the analysed series, which",
+        "holds one point per subgroup in x order, rather than in the",
+        "data as supplied. Where the data already holds one row per",
+        "subgroup, in x order, nothing changes."
+      )
+    )
+
+    if (missing(split_at)) {
+      split_at <- split_rows
+    }
+  }
 
   plot_chart <- match_flag(plot_chart, "plot_chart")
 
@@ -98,21 +121,26 @@ facet_stages <- function(data,
   # constructed for chart$data, which has the columns renamed to x, y and n, has
   # been checked against the column requirements for the chart type, and has any
   # counts rounded. Doing this here means each of those happens once per call
-  # rather than once per facet. The chart parameters are not passed because none
-  # of them affects chart$data.
+  # rather than once per facet. aggregation_na_rm is the only chart parameter
+  # passed, because it is the only one that affects chart$data.
   whole_series <- autospc_chart(
     chart_type = chart_type,
     data = data,
     x = column_name_of(xyn_exprs, field = "x"),
     y = column_name_of(xyn_exprs, field = "y"),
-    n = column_name_of(xyn_exprs, field = "n")
+    n = column_name_of(xyn_exprs, field = "n"),
+    aggregation_na_rm = arguments$aggregation_na_rm
   )
 
+  check_x_type(whole_series$data$x)
+
+  whole_series$data <- drop_missing_x(whole_series$data, x_column = "x")
+
+  # The split points count points in the analysed series, so the series is
+  # aggregated and put in x order before it is split.
+  whole_series <- order_series(aggregate_data(whole_series))
+
   df_rn <- whole_series$data
-
-  check_x_type(df_rn$x)
-
-  df_rn <- drop_missing_x(df_rn, x_column = "x")
 
   # Resolved once for the call, from the chart of the whole series.
   visualisation_params <- resolve_default_visualisation_params(
@@ -120,14 +148,14 @@ facet_stages <- function(data,
     chart = whole_series
   )
 
-  split_rows <- normalise_split_rows(
-    split_rows = split_rows,
-    n_rows = nrow(df_rn)
+  split_at <- normalise_split_at(
+    split_at = split_at,
+    n_points = nrow(df_rn)
   )
 
   data_splits_list <- create_splits_list(
     data = df_rn,
-    split_rows = split_rows
+    split_at = split_at
   )
 
   charts <- lapply(
@@ -148,7 +176,7 @@ facet_stages <- function(data,
     }
   )
 
-  # The facets take their names from split_rows where it has them, and their
+  # The facets take their names from split_at where it has them, and their
   # positions where it does not.
   stage_names <- names(charts)
 
@@ -176,52 +204,64 @@ facet_stages <- function(data,
   return(autospc_plot(
     charts = charts,
     visualisation_params = visualisation_params,
-    split_rows = split_rows
+    faceted = TRUE
   ))
 }
 
 
-#' The split rows a call is run with
+#' The split points a call is run with
 #'
-#' Sorted, with any value beyond the end of the data taken as the last row,
-#' duplicates removed, and the last row added if it is not already there. Facet
-#' names are kept.
+#' Sorted, with any value beyond the end of the analysed series taken as its
+#' last point, duplicates removed, and the last point added if it is not
+#' already there. Facet names are kept.
 #'
-#' @param split_rows The `split_rows` the caller gave.
-#' @param n_rows The number of rows being split.
+#' @param split_at The `split_at` the caller gave.
+#' @param n_points The number of points in the analysed series.
 #'
-#' @return An integer vector of row numbers.
+#' @return An integer vector of positions in the analysed series.
 #' @noRd
-normalise_split_rows <- function(split_rows,
-                                 n_rows) {
-  beyond <- split_rows > n_rows
+normalise_split_at <- function(split_at,
+                               n_points) {
+  beyond <- split_at > n_points
 
   if (any(beyond)) {
     warning(paste0(
-      "split_rows values beyond the end of the data (",
-      paste(unique(split_rows[beyond]), collapse = ", "),
-      ") have been taken as the last row, ", n_rows, "."
+      "split_at values beyond the end of the analysed series (",
+      paste(unique(split_at[beyond]), collapse = ", "),
+      ") have been taken as its last point, ", n_points, "."
     ))
   }
 
-  split_rows <- sort(pmin(split_rows, n_rows))
-  split_rows <- split_rows[!duplicated(split_rows)]
+  split_at <- sort(pmin(split_at, n_points))
+  split_at <- split_at[!duplicated(split_at)]
 
-  if (split_rows[length(split_rows)] != n_rows) {
-    split_rows <- c(split_rows, n_rows)
+  if (split_at[length(split_at)] != n_points) {
+    split_at <- c(split_at, n_points)
   }
 
-  return(split_rows)
+  return(split_at)
 }
 
 
+#' The series as it stood at each split point
+#'
+#' The stages are cumulative rather than a partition: each one is the series
+#' from its start up to a split point. A split at 12 of 25 points therefore
+#' gives a stage of 12 points and a stage of 25, 37 in all, and not stages of
+#' 12 and 13.
+#'
+#' @param data The analysed series, aggregated and in x order.
+#' @param split_at The normalised split points.
+#'
+#' @return A list of data frames, one per stage.
+#' @noRd
 create_splits_list <- function(data,
-                               split_rows) {
-  if (is.null(split_rows)) {
+                               split_at) {
+  if (is.null(split_at)) {
     data_splits <- list(data)
   } else {
     data_splits <- lapply(
-      split_rows,
+      split_at,
       function(x) {
         data[1:x, ]
       }

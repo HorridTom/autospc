@@ -3,7 +3,7 @@
 # The package extends limits in three different senses:
 # (a) extending calculation period limits into display periods
 # (b) extending limits beyond the end of the data, and
-# (c) extending limits over a subgroup where the analysis series is 
+# (c) extending limits over a subgroup where the analysis series is missing
 #
 # This file holds the functionality for (b).
 #
@@ -150,6 +150,63 @@ extension_row <- function(table,
 }
 
 
+#' Whether the horizontal axis holds whole units only
+#'
+#' An integer column counts, and so does a `Date`, which R stores as a number
+#' of whole days. A step of less than one unit on either of those is a step to
+#' a value the column cannot tell apart from the one before it.
+#'
+#' @param x_values Values from the horizontal axis, read for their type.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+axis_holds_whole_units <- function(x_values) {
+  return(is.integer(x_values) || inherits(x_values, "Date"))
+}
+
+
+#' The step from the last subgroup to the first row of the extension
+#'
+#' The extension begins one subgroup on from the end of the data, so that it
+#' starts where the next subgroup would have been. The median gap between
+#' consecutive subgroups is what "one subgroup" means for a series whose
+#' spacing is not perfectly regular, and it carries the units of the axis: a
+#' day for daily data, a month for monthly, a hundredth of a second for data
+#' measured every ten milliseconds and expressed in seconds.
+#'
+#' The step is capped at half the extension, because the caller may ask for an
+#' extension shorter than one subgroup, and the first row has to fall inside
+#' it. Where the cap binds, the limits slope over the first half of the
+#' extension rather than holding level; the extension is short whenever that
+#' happens, and the axis is at least `period_min` subgroups long, so it is a
+#' small part of the chart.
+#'
+#' The gaps are measured as plain numbers so that a `Date` or `POSIXct`
+#' difference cannot arrive in different units from the extension it is
+#' compared with. Adding the result back to `x` returns to the axis's own
+#' units, because that is how `+` reads a number for those classes.
+#'
+#' @param x_values The horizontal axis values of the subgroups.
+#' @param extend_limits_to The point the caller asked to extend to.
+#'
+#' @return The step, as a number in the units of the `x` column.
+#' @noRd
+extension_step <- function(x_values,
+                           extend_limits_to) {
+  positions <- sort(unique(as.numeric(x_values)))
+
+  extension <- as.numeric(extend_limits_to) - positions[length(positions)]
+
+  step <- min(stats::median(diff(positions)), extension / 2)
+
+  if (axis_holds_whole_units(x_values)) {
+    step <- ceiling(step)
+  }
+
+  return(step)
+}
+
+
 #' Extend the final period's limits out beyond the end of the data
 #'
 #' The functionality for the `extend_limits_to` argument. Two rows are added to
@@ -168,7 +225,7 @@ extension_row <- function(table,
 #'   for an extension, the two rows.
 #' @noRd
 extend_limits_beyond_data <- function(table,
-                          chart) {
+                                      chart) {
   table$limit_extension <- FALSE
 
   extend_limits_to <- chart$extend_limits_to
@@ -196,7 +253,12 @@ extend_limits_beyond_data <- function(table,
     period = final_period
   )
 
-  starts_at <- x_value_for_extension(x_max + 1, table$x)
+  step <- extension_step(
+    x_values = subgroup_x_values(table),
+    extend_limits_to = extend_limits_to
+  )
+
+  starts_at <- x_value_for_extension(x_max + step, table$x)
   ends_at <- x_value_for_extension(extend_limits_to, table$x)
 
   return(dplyr::bind_rows(

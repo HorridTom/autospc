@@ -332,3 +332,85 @@ test_that("a column of whole numbers gives way to a value it cannot hold", {
 
   expect_identical(result$x[nrow(result)], 35.5)
 })
+
+
+# where the extension begins
+
+
+test_that("the extension begins one subgroup on from the end of the data", {
+  # the step used to be a fixed 1, which is a hundred subgroups here: readings
+  # ten milliseconds apart, with x expressed in seconds
+  fine <- data.frame(
+    x = seq(0.01, 0.40, by = 0.01),
+    y = as.numeric(rep(c(30, 28, 32, 29, 31), 8))
+  )
+
+  result <- autospc(fine,
+    chart_type = "C",
+    plot_chart = FALSE,
+    period_min = 21L,
+    extend_limits_to = 0.60
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_equal(result$x[extension], c(0.41, 0.60))
+
+  expect_false(is.unsorted(result$x))
+})
+
+
+test_that("the step is capped so that the extension holds both rows", {
+  # ten days is less than a third of one subgroup here, so the median gap on
+  # its own would put the first row beyond the second
+  monthly <- data.frame(
+    x = seq(as.Date("2020-01-01"), by = "month", length.out = 40),
+    y = as.numeric(rep(c(30, 28, 32, 29, 31), 8))
+  )
+
+  result <- autospc(monthly,
+    chart_type = "C",
+    plot_chart = FALSE,
+    period_min = 21L,
+    extend_limits_to = as.Date("2023-04-11")
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_identical(
+    result$x[extension],
+    as.Date(c("2023-04-06", "2023-04-11"))
+  )
+
+  expect_false(is.unsorted(result$x))
+})
+
+
+test_that("the step is a whole unit on an axis that holds whole units", {
+  # a Date is a whole number of days, so half a day is a step to a value the
+  # column cannot tell from the one before it
+  expect_identical(
+    extension_step(
+      x_values = seq(as.Date("2020-01-01"), by = "month", length.out = 3),
+      extend_limits_to = as.Date("2020-03-02")
+    ),
+    1
+  )
+
+  # 21 gaps of one and 21 of two give a median of one and a half
+  irregular <- as.integer(c(seq(1, 22), seq(24, 64, by = 2)))
+
+  expect_identical(
+    extension_step(x_values = irregular, extend_limits_to = 100L),
+    2
+  )
+
+  # and where the axis holds any number, the step is not rounded
+  expect_equal(
+    extension_step(
+      x_values = seq(0.01, 0.40, by = 0.01),
+      extend_limits_to = 1.60
+    ),
+    0.01
+  )
+})

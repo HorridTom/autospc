@@ -181,6 +181,10 @@ axis_holds_whole_units <- function(x_values) {
 #' happens, and the axis is at least `period_min` subgroups long, so it is a
 #' small part of the chart.
 #'
+#' Rounding up can take the step back past that cap, so on a whole-unit axis it
+#' is held to the length of the extension. The first row of the extension then
+#' sits at `extend_limits_to` itself, and there is only one row.
+#'
 #' The gaps are measured as plain numbers so that a `Date` or `POSIXct`
 #' difference cannot arrive in different units from the extension it is
 #' compared with. Adding the result back to `x` returns to the axis's own
@@ -200,7 +204,7 @@ extension_step <- function(x_values,
   step <- min(stats::median(diff(positions)), extension / 2)
 
   if (axis_holds_whole_units(x_values)) {
-    step <- ceiling(step)
+    step <- min(ceiling(step), extension)
   }
 
   return(step)
@@ -209,11 +213,14 @@ extension_step <- function(x_values,
 
 #' Extend the final period's limits out beyond the end of the data
 #'
-#' The functionality for the `extend_limits_to` argument. Two rows are added to
-#' the table, one at the first point past the last x of the data, and one at
+#' The functionality for the `extend_limits_to` argument. Rows are added to the
+#' table at the first point past the last x of the data and at
 #' `extend_limits_to`, both holding the limits `limits_for_extension_rows()`
 #' gives for the final calculation period, and no observation. Drawing a line
-#' between them puts the limits across the extension.
+#' through them puts the limits across the extension.
+#'
+#' There are two such rows, except where the step from the last subgroup
+#' reaches `extend_limits_to` itself, which leaves one.
 #'
 #' `limit_extension` says which rows those are, and is FALSE on every row of
 #' the data whether or not the caller asked for an extension.
@@ -222,7 +229,7 @@ extension_step <- function(x_values,
 #' @param chart The chart being analysed, read for `extend_limits_to`.
 #'
 #' @return `table`, with `limit_extension` added and, where the caller asked
-#'   for an extension, the two rows.
+#'   for an extension, the rows of the extension.
 #' @noRd
 extend_limits_beyond_data <- function(table,
                                       chart) {
@@ -261,11 +268,13 @@ extend_limits_beyond_data <- function(table,
   starts_at <- x_value_for_extension(x_max + step, table$x)
   ends_at <- x_value_for_extension(extend_limits_to, table$x)
 
-  return(dplyr::bind_rows(
-    table,
-    extension_row(table, starts_at, limits, final_period),
-    extension_row(table, ends_at, limits, final_period)
-  ))
+  # a row at each distinct position, which is one row where the two coincide
+  rows <- lapply(
+    unique(c(starts_at, ends_at)),
+    function(x_value) extension_row(table, x_value, limits, final_period)
+  )
+
+  return(dplyr::bind_rows(c(list(table), rows)))
 }
 
 

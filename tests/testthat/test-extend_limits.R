@@ -414,3 +414,56 @@ test_that("the step is a whole unit on an axis that holds whole units", {
     0.01
   )
 })
+
+
+test_that("an extension of one whole unit adds one row", {
+  # the step is a whole unit on this axis and the extension is one unit long,
+  # so the first row of the extension is also the last row of it
+  whole_numbers <- data.frame(
+    x = seq_len(nrow(test_data)),
+    y = as.integer(test_data$y)
+  )
+
+  result <- autospc(whole_numbers,
+    chart_type = "C",
+    plot_chart = FALSE,
+    extend_limits_to = nrow(test_data) + 1L
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_length(extension, 1L)
+
+  expect_identical(result$x[extension], nrow(test_data) + 1L)
+
+  expect_equal(anyDuplicated(result$x), 0L)
+})
+
+
+test_that("the step does not reach past the end of a short extension", {
+  # rounding the step up on a whole-unit axis would otherwise take it past
+  # extend_limits_to, which is half a unit from the end of the data
+  expect_identical(
+    extension_step(x_values = 1:21, extend_limits_to = 21.5),
+    0.5
+  )
+
+  whole_numbers <- data.frame(
+    x = seq_len(nrow(test_data)),
+    y = as.integer(test_data$y)
+  )
+
+  result <- autospc(whole_numbers,
+    chart_type = "C",
+    plot_chart = FALSE,
+    extend_limits_to = nrow(test_data) + 0.5
+  )
+
+  extension <- which(result$limit_extension)
+
+  expect_length(extension, 1L)
+
+  expect_identical(result$x[extension], nrow(test_data) + 0.5)
+
+  expect_false(is.unsorted(result$x))
+})

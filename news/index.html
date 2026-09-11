@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,15 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9017" id="autospc-0109017">autospc 0.1.0.9017<a class="anchor" aria-label="anchor" href="#autospc-0109017"></a></h2>
+<div class="section level3">
+<h3 id="argument-checks-0-1-0-9017">Argument checks<a class="anchor" aria-label="anchor" href="#argument-checks-0-1-0-9017"></a></h3>
+<p>The arguments that are neither Boolean, nor one of a closed set, nor numeric were not checked, so a value that was not what the argument needed failed wherever it was eventually used, or did not fail at all.</p>
+<ul><li><p><strong><code>title</code>, <code>subtitle</code>, <code>override_x_title</code>, <code>override_y_title</code> and <code>log_file_path</code> must be a single string</strong>, or NULL. A number, or a vector of two strings, was accepted and drawn.</p></li>
+<li><p><strong><code>r1_col</code> and <code>r2_col</code> must be a colour</strong> - a name R knows, a hexadecimal string, or a number indexing the palette. <code>r1_col = "notacolour"</code> previously errored only once a rule 1 break was drawn, with “Problem while converting geom to grob”, and <code>r2_col = "notacolour"</code> stayed silent until a series happened to break rule 2.</p></li>
+<li><p><strong><code>x_date_format</code> must hold at least one <code>%</code> code.</strong> A string holding none formats every date as itself, so <code>x_date_format = "nonsense"</code> previously drew a chart reading “nonsense” at every tick on the horizontal axis.</p></li>
+<li><p><strong>A column named by <code>x</code>, <code>y</code> or <code>n</code> that is not in the data is now named in the error</strong>, along with the argument that named it. The error came from <code><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">dplyr::all_of()</a></code> and named neither.</p></li>
+<li><p><strong>A chart with no <code>x</code> says so.</strong> Where the caller gave no <code>x</code> argument and the data holds no column called <code>x</code>, the error was “Must group by variables found in <code>.data</code>”, raised from the aggregation. It is now “x not specified. Every chart type needs x: name the column with the x argument, or call it x in the data.”</p></li>
+</ul></div>
 <div class="section level3">
 <h3 id="smaller-changes-0-1-0-9017">Smaller changes<a class="anchor" aria-label="anchor" href="#smaller-changes-0-1-0-9017"></a></h3>
 <ul><li>The error raised when <code>extend_limits_to</code> is not beyond the end of the data now names the argument, and is raised before the chart is computed rather than at the end of the analysis.</li>

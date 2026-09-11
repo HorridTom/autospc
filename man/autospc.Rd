@@ -155,12 +155,14 @@ purposes of shift rule breaks}
 calculated based on the final floating_median_n data points on the chart:
 "no" - do not display a floating median,
 "yes" - display a floating median,
-"auto" - display a floating median if and only if there is at least one point
-that is part of a shift rule break in the final floating_median_n data points
-on the chart.}
+"auto" - display a floating median if and only if there are sufficient data
+to form a median, and at least one point that is part of a shift rule break
+in the final floating_median_n data points on the chart.}
 
 \item{floating_median_n}{The number of points to use for calculation of the
-floating median, if present.
+floating median, if present. Where the series holds fewer non-missing points
+than this, there are none to take a median over, so none is drawn: "yes"
+warns, and "auto" is silent.
 \subsection{Output Type}{
 
 Arguments that control how the result is outputted

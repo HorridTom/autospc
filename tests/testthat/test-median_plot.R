@@ -220,3 +220,81 @@ test_that("a non-default floating_median_n reaches the label", {
   # the label sits at the start of the window, so a wider window moves it left
   expect_lt(label_x(20L), label_x(8L))
 })
+
+
+# A series holding fewer points with a value than floating_median_n has none
+# for the median to be taken over
+
+
+short_median_data <- data.frame(
+  x = 1:9,
+  y = as.integer(c(10, 11, 10, 12, 11, 18, 19, 20, 19))
+)
+
+
+short_median_chart <- function(floating_median, data = short_median_data) {
+  return(autospc(data,
+    chart_type = "C",
+    period_min = 5L,
+    floating_median = floating_median,
+    plot_chart = FALSE
+  ))
+}
+
+
+test_that("too few points with a value means no floating median", {
+  expect_false("median" %in% names(
+    suppressWarnings(short_median_chart("yes"))
+  ))
+})
+
+
+test_that("asking for a floating median on too short a series warns", {
+  expect_warning(
+    short_median_chart("yes"),
+    "taken over the last 12 points that have a value, and this series has 9"
+  )
+})
+
+
+test_that("auto is silent on too short a series", {
+  # "auto" asked the package to decide, and deciding not to draw one is an
+  # answer rather than a failure
+  expect_no_warning(short_median_chart("auto"))
+
+  expect_false("median" %in% names(short_median_chart("auto")))
+})
+
+
+test_that("a short series does not warn about taking a maximum of nothing", {
+  # the position the median window starts at used to be worked out before
+  # anything asked whether there was a median to draw, and max() of no values
+  # warns and gives -Inf
+  expect_no_warning(short_median_chart("no"))
+})
+
+
+test_that("a series of exactly floating_median_n points gets a median", {
+  twelve <- data.frame(
+    x = 1:12,
+    y = as.integer(c(10, 11, 10, 12, 11, 18, 19, 20, 19, 17, 18, 19))
+  )
+
+  result <- short_median_chart("yes", data = twelve)
+
+  expect_identical(sum(!is.na(result$median)), 12L)
+})
+
+
+test_that("points with no value do not count towards floating_median_n", {
+  # fourteen points, three of them holding no value, so eleven have one
+  with_gaps <- data.frame(
+    x = 1:14,
+    y = as.integer(c(10, NA, 11, 10, 12, NA, 11, 18, 19, 20, NA, 19, 17, 18))
+  )
+
+  expect_warning(
+    short_median_chart("yes", data = with_gaps),
+    "this series has 11"
+  )
+})

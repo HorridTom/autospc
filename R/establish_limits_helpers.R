@@ -424,11 +424,53 @@ fill_na <- function(x) {
 }
 
 
-# Check whether a floating median is required, and if so add a column to the
-# table holding its values
+#' The number of points in the series that have a value
+#'
+#' What the floating median is taken over, and what decides whether there are
+#' enough of them for one.
+#'
+#' @param table The analysed table.
+#'
+#' @return A count.
+#' @noRd
+points_with_a_value <- function(table) {
+  return(sum(!is.na(table$series)))
+}
+
+
+#' Check whether a floating median is required, and if so add a column to the
+#' table holding its values
+#'
+#' The median is taken over the last `floating_median_n` points that have a
+#' value. A series holding fewer than that has none to take it over, so no
+#' median is drawn; `floating_median = "yes"` asked for one and is warned,
+#' where `"auto"` only asked the package to decide and is not.
+#'
+#' @param table The analysed table.
+#' @param floating_median One of "no", "yes" and "auto".
+#' @param floating_median_n The number of points the median is taken over.
+#'
+#' @return `table`, with a `median` column where a floating median is drawn.
+#' @noRd
 floating_median_column <- function(table,
                                    floating_median,
                                    floating_median_n) {
+  if (identical(floating_median, "no")) {
+    return(table)
+  }
+
+  if (points_with_a_value(table) < floating_median_n) {
+    if (identical(floating_median, "yes")) {
+      warning(paste0(
+        "A floating median is taken over the last ", floating_median_n,
+        " points that have a value, and this series has ",
+        points_with_a_value(table), ". No floating median is drawn."
+      ))
+    }
+
+    return(table)
+  }
+
   median_from_x <- table %>%
     dplyr::mutate(non_missing = !is.na(series)) %>%
     dplyr::arrange(dplyr::desc(x)) %>%

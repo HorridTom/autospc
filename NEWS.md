@@ -1,3 +1,11 @@
+# autospc 0.1.0.9017
+
+## Smaller changes
+
+* The error raised when `extend_limits_to` is not beyond the end of the data
+  now names the argument, and is raised before the chart is computed rather
+  than at the end of the analysis.
+
 # autospc 0.1.0.9016
 
 ## A short series no longer warns about taking a maximum of nothing
@@ -213,7 +221,8 @@ than walking over it as a row. This changes results for any series that has one.
 * **An MR chart now shows its control limits at the first point** as well as its
   centre line, which it already showed. The first row of an MR chart holds no
   moving range, because there is no earlier point to measure one against; that
-  is not a missing value, and the limits there are defined.
+  is not a missing value, and the limits there are defined. The limits
+  themselves are unchanged.
 
 * **Control limits now carry across a gap.** They were drawn only where a point
   was, so they broke at every missing value; the centre line carried across but
@@ -267,7 +276,7 @@ than walking over it as a row. This changes results for any series that has one.
   alone, and the other two held the display limits before they were held within
   0 and 100, which were not used.
 
-* ** Period columns are now correctly populated for a point with missing `y`.
+* **Period columns are now correctly populated for a point with missing `y`.**
   `period_type`, `period_start`, `plot_period`, `limit_change`, `cl_change` and,
   on a P or P' chart, `limit_width` were all missing at such a point, though its
   centre line and limits were filled in from the period it sits in.

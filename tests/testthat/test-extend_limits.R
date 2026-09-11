@@ -182,19 +182,6 @@ test_that("Limit extension works correctly for P-prime chart (regression)", {
 })
 
 
-test_that("limits are only extended beyond the end of the data", {
-  # the last x of the data is not beyond the end of it
-  expect_error(
-    autospc(test_data,
-      chart_type = "C",
-      plot_chart = FALSE,
-      extend_limits_to = nrow(test_data)
-    ),
-    "beyond the end of the data"
-  )
-})
-
-
 test_that("the extension rows carry limits and no observation", {
   result <- autospc(test_data,
     chart_type = "P",

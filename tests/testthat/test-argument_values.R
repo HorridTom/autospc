@@ -404,3 +404,92 @@ test_that("an argument autospc declares as NULL accepts NULL", {
     expect_s3_class(do.call(autospc, given), "data.frame")
   }
 })
+
+
+# extend_limits_to against the data, which is the one check that cannot be
+# made from an argument's value alone
+
+
+test_that("limits are only extended beyond the end of the data", {
+  # values_data runs x = 1 to 30, so 30 is the end of it and not beyond it
+  expect_error(analyse(extend_limits_to = 30), "beyond the end of the data")
+
+  expect_error(analyse(extend_limits_to = 25), "beyond the end of the data")
+
+  expect_s3_class(analyse(extend_limits_to = 40), "data.frame")
+})
+
+
+test_that("the error names the function the caller called", {
+  # validate_arguments_against_data() is internal, so the error is reported
+  # against autospc() rather than against itself
+  caught <- tryCatch(analyse(extend_limits_to = 30), error = function(e) e)
+
+  expect_identical(as.character(conditionCall(caught)[[1L]]), "autospc")
+})
+
+
+test_that("facet_stages checks against the whole series", {
+  # every stage but the last is a prefix of the series, so a point inside the
+  # series is beyond some stages and not others. The last stage is always the
+  # whole series, so the whole series decides
+  expect_error(
+    facet_stages(values_data,
+      split_at = c(10L, 20L, 30L),
+      chart_type = "C", period_min = 5L,
+      extend_limits_to = 25, plot_chart = FALSE
+    ),
+    "beyond the end of the data"
+  )
+
+  expect_s3_class(
+    facet_stages(values_data,
+      split_at = c(10L, 20L, 30L),
+      chart_type = "C", period_min = 5L,
+      extend_limits_to = 40, plot_chart = FALSE
+    ),
+    "data.frame"
+  )
+})
+
+
+test_that("the check steps aside where there is no x to compare against", {
+  # a column that is not in the data, so there is nothing to take a maximum
+  # of. The column itself is reported by the code that looks for it
+  caught <- character()
+
+  withCallingHandlers(
+    try(
+      autospc(values_data,
+        chart_type = "C", x = nosuch, y = y,
+        period_min = 5L, extend_limits_to = 40, plot_chart = FALSE
+      ),
+      silent = TRUE
+    ),
+    warning = function(w) {
+      caught <<- c(caught, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_length(caught, 0L)
+
+  # every x missing, which warns about the rows it drops but not about taking
+  # a maximum of nothing
+  no_x <- data.frame(x = rep(NA_integer_, 30L), y = values_data$y)
+
+  caught <- character()
+
+  withCallingHandlers(
+    autospc(no_x,
+      chart_type = "C", period_min = 5L,
+      extend_limits_to = 40, plot_chart = FALSE
+    ),
+    warning = function(w) {
+      caught <<- c(caught, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+
+  expect_false(any(grepl("maximum", caught, fixed = TRUE)))
+})

@@ -243,10 +243,6 @@ extend_limits_beyond_data <- function(table,
 
   x_max <- max(table$x, na.rm = TRUE)
 
-  if (extend_limits_to <= x_max) {
-    stop("Limits can only be extended to a point beyond the end of the data.")
-  }
-
   last_calc_period <- table %>%
     dplyr::filter(period_type == "calculation") %>%
     dplyr::slice_tail(n = 1L) %>%

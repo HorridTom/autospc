@@ -105,6 +105,11 @@ facet_stages <- function(data,
 
   arguments <- validate_argument_values(arguments)
 
+  arguments <- validate_arguments_against_data(
+    arguments,
+    x_values = data[[column_name_of(xyn_exprs, field = "x")]]
+  )
+
   arguments <- validate_algorithm_parameters(
     arguments,
     user_env = rlang::caller_env()

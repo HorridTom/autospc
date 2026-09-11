@@ -415,6 +415,45 @@ match_axis_value <- function(value,
 }
 
 
+#' Check the arguments whose valid values depend on the data
+#'
+#' The checks that cannot be made from an argument's value alone. Called once
+#' per call to `autospc()` or `facet_stages()`, next to
+#' `validate_argument_values()`, which holds the checks that can.
+#'
+#' Where the data holds no `x` at all - because the caller named a column that
+#' is not there, or because every value is missing - there is nothing to compare
+#' against and no check is made. The column itself is reported by the code that
+#' looks for it.
+#'
+#' @param arguments A named list of the argument values for one call.
+#' @param x_values The `x` column of the data.
+#' @param call The environment the error is reported against.
+#'
+#' @return `arguments`, unchanged.
+#' @noRd
+validate_arguments_against_data <- function(arguments,
+                                            x_values,
+                                            call = rlang::caller_env()) {
+  extend_limits_to <- arguments$extend_limits_to
+
+  observed_x <- x_values[!is.na(x_values)]
+
+  if (is.null(extend_limits_to) || length(observed_x) == 0L) {
+    return(arguments)
+  }
+
+  if (extend_limits_to <= max(observed_x)) {
+    rlang::abort(
+      "`extend_limits_to` must be a point beyond the end of the data.",
+      call = call
+    )
+  }
+
+  return(arguments)
+}
+
+
 #' Check the arguments that accept a fixed set of values
 #'
 #' Called once per call to `autospc()` or `facet_stages()`, before

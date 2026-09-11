@@ -185,7 +185,8 @@ test_that("a missing x column is reported wherever its name came from", {
   )
 
   expect_error(
-    autospc(no_x, chart_type = "C", y = att, period_min = 5L,
+    autospc(no_x,
+      chart_type = "C", y = att, period_min = 5L,
       plot_chart = FALSE
     ),
     "x not specified"
@@ -193,7 +194,8 @@ test_that("a missing x column is reported wherever its name came from", {
 
   # and where the caller names one that is not there, the column is named
   expect_error(
-    autospc(no_x, chart_type = "C", x = nosuch, y = att, period_min = 5L,
+    autospc(no_x,
+      chart_type = "C", x = nosuch, y = att, period_min = 5L,
       plot_chart = FALSE
     ),
     "Columns not found in the data"

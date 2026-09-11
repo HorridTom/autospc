@@ -42,6 +42,13 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9017" id="autospc-0109017">autospc 0.1.0.9017<a class="anchor" aria-label="anchor" href="#autospc-0109017"></a></h2>
+<div class="section level3">
+<h3 id="smaller-changes-0-1-0-9017">Smaller changes<a class="anchor" aria-label="anchor" href="#smaller-changes-0-1-0-9017"></a></h3>
+<ul><li>The error raised when <code>extend_limits_to</code> is not beyond the end of the data now names the argument, and is raised before the chart is computed rather than at the end of the analysis.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9016" id="autospc-0109016">autospc 0.1.0.9016<a class="anchor" aria-label="anchor" href="#autospc-0109016"></a></h2>
 <div class="section level3">
 <h3 id="a-short-series-no-longer-warns-about-taking-a-maximum-of-nothing-0-1-0-9016">A short series no longer warns about taking a maximum of nothing<a class="anchor" aria-label="anchor" href="#a-short-series-no-longer-warns-about-taking-a-maximum-of-nothing-0-1-0-9016"></a></h3>
@@ -140,7 +147,7 @@
 <h3 id="missing-values-0-1-0-9008">Missing values<a class="anchor" aria-label="anchor" href="#missing-values-0-1-0-9008"></a></h3>
 <p>The analysis now proceeds as though a point with no <code>y</code> were not there, rather than walking over it as a row. This changes results for any series that has one.</p>
 <ul><li><p><strong>A calculation period now holds <code>period_min</code> points, not <code>period_min</code> rows.</strong> Where a series had missing values inside the first period, limits were previously calculated from fewer points than asked for.</p></li>
-<li><p><strong>An MR chart now shows its control limits at the first point</strong> as well as its centre line, which it already showed. The first row of an MR chart holds no moving range, because there is no earlier point to measure one against; that is not a missing value, and the limits there are defined.</p></li>
+<li><p><strong>An MR chart now shows its control limits at the first point</strong> as well as its centre line, which it already showed. The first row of an MR chart holds no moving range, because there is no earlier point to measure one against; that is not a missing value, and the limits there are defined. The limits themselves are unchanged.</p></li>
 <li><p><strong>Control limits now carry across a gap.</strong> They were drawn only where a point was, so they broke at every missing value; the centre line carried across but the control limits did not.</p></li>
 <li><p><strong>No limits are drawn before the first point or after the last.</strong> The centre line previously ran to both edges of the chart whether or not there was anything there.</p></li>
 <li><p><strong>A missing point no longer silently splits a run</strong>, which had made a shift rule break disappear. <code>na_ends_run</code> now controls this, and defaults to <code>TRUE</code>, which is the previous behaviour. A missing point may have continued the run before it or been on the other side of the centre line, and the data cannot say which: <code>TRUE</code> minimises the risk of a false positive shift rule break arising from missing data, <code>FALSE</code> minimises the risk of a false negative.</p></li>
@@ -150,7 +157,7 @@
 <li><p><strong>The limits at a point with missing <code>y</code> on a P or P’ chart are now calculated from that point’s own denominator</strong>, where the data supplied one. The denominator of such a point is also now reported in the returned table. Limits at a point whose denominator is missing or zero are drawn at the mean denominator of its period.</p></li>
 <li><p><strong>P and P’ charts now return a <code>limit_width</code> column.</strong> It holds the distance the limits sit from the centre line at a denominator of 1, so that the limits at any denominator are the centre line plus and minus <code>limit_width</code> over the square root of that denominator. It takes one value for a calculation period and the display period that follows it.</p></li>
 <li><p><strong>P and P’ charts no longer return the <code>constant</code>, <code>pbar</code>, <code>ucl_display</code> and <code>lcl_display</code> columns.</strong> They held working values from the extension of limits over a display period. <code>constant</code> and <code>pbar</code> are now <code>limit_width</code> and <code>cl</code>, which hold the same values on every row rather than on the display rows alone, and the other two held the display limits before they were held within 0 and 100, which were not used.</p></li>
-<li><p>** Period columns are now correctly populated for a point with missing <code>y</code>. <code>period_type</code>, <code>period_start</code>, <code>plot_period</code>, <code>limit_change</code>, <code>cl_change</code> and, on a P or P’ chart, <code>limit_width</code> were all missing at such a point, though its centre line and limits were filled in from the period it sits in.</p></li>
+<li><p><strong>Period columns are now correctly populated for a point with missing <code>y</code>.</strong> <code>period_type</code>, <code>period_start</code>, <code>plot_period</code>, <code>limit_change</code>, <code>cl_change</code> and, on a P or P’ chart, <code>limit_width</code> were all missing at such a point, though its centre line and limits were filled in from the period it sits in.</p></li>
 <li><p><strong>The centre line and limits at a point with missing <code>y</code> inside a display period now match the rest of that period.</strong> Previously they were calculated afresh from the display period’s own values instead of being carried forward with the rest of the period’s. No data point is plotted at such a point, so it is only the lines that were affected.</p></li>
 </ul></div>
 </div>

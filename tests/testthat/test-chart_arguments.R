@@ -122,7 +122,14 @@ test_that("every visualisation parameter reaches the plot object", {
     }
 
     if (is.character(autospc_default(parameter))) {
-      given[[parameter]] <- "given"
+      # a character parameter that is checked for more than being a string
+      # needs a value that passes that check too
+      given[[parameter]] <- switch(parameter,
+        x_date_format = "%b %Y",
+        r1_col = "red",
+        r2_col = "blue",
+        "given"
+      )
     }
 
     drawn_with <- suppressWarnings(

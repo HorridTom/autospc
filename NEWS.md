@@ -1,5 +1,35 @@
 # autospc 0.1.0.9017
 
+## Argument checks
+
+The arguments that are neither Boolean, nor one of a closed set, nor numeric
+were not checked, so a value that was not what the argument needed failed
+wherever it was eventually used, or did not fail at all.
+
+* **`title`, `subtitle`, `override_x_title`, `override_y_title` and
+  `log_file_path` must be a single string**, or NULL. A number, or a vector of
+  two strings, was accepted and drawn.
+
+* **`r1_col` and `r2_col` must be a colour** - a name R knows, a hexadecimal
+  string, or a number indexing the palette. `r1_col = "notacolour"` previously
+  errored only once a rule 1 break was drawn, with "Problem while converting
+  geom to grob", and `r2_col = "notacolour"` stayed silent until a series
+  happened to break rule 2.
+
+* **`x_date_format` must hold at least one `%` code.** A string holding none
+  formats every date as itself, so `x_date_format = "nonsense"` previously drew
+  a chart reading "nonsense" at every tick on the horizontal axis.
+
+* **A column named by `x`, `y` or `n` that is not in the data is now named in
+  the error**, along with the argument that named it. The error came from
+  `dplyr::all_of()` and named neither.
+
+* **A chart with no `x` says so.** Where the caller gave no `x` argument and the
+  data holds no column called `x`, the error was "Must group by variables found
+  in `.data`", raised from the aggregation. It is now "x not specified. Every
+  chart type needs x: name the column with the x argument, or call it x in the
+  data."
+
 ## Smaller changes
 
 * The error raised when `extend_limits_to` is not beyond the end of the data

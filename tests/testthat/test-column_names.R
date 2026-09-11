@@ -133,3 +133,71 @@ test_that("normalisation is silent", {
     y = "att_all"
   ))
 })
+
+
+# a column the caller named that is not in the data
+
+
+test_that("a column that is not in the data is named in the error", {
+  named_data <- data.frame(
+    month = 1:30,
+    att = as.integer(rep(c(50L, 48L, 52L, 47L, 51L, 49L), 5L)),
+    denom = rep(100L, 30L)
+  )
+
+  expect_error(
+    autospc(named_data,
+      chart_type = "C", x = nosuch, y = att,
+      period_min = 5L, plot_chart = FALSE
+    ),
+    'Columns not found in the data: "nosuch" \\(named by `x`\\)',
+    fixed = FALSE
+  )
+
+  # each absent column is named, with the argument it came from
+  expect_error(
+    autospc(named_data,
+      chart_type = "P", x = nosuch, y = att, n = alsonot,
+      period_min = 5L, plot_chart = FALSE
+    ),
+    '"alsonot" \\(named by `n`\\)',
+    fixed = FALSE
+  )
+
+  # a denominator column that takes its default name may be absent: a P chart
+  # given individual observations has none
+  binary <- data.frame(x = 1:30, y = rep(c(TRUE, FALSE, TRUE), 10L))
+
+  expect_s3_class(
+    autospc(binary, chart_type = "P", period_min = 5L, plot_chart = FALSE),
+    "data.frame"
+  )
+})
+
+
+test_that("a missing x column is reported wherever its name came from", {
+  # x taking its default name is not an error at the point the columns are
+  # selected, because a column that may be absent is skipped there. Every
+  # chart type needs x, so the chart validator reports it
+  no_x <- data.frame(
+    month = 1:30,
+    att = as.integer(rep(c(50L, 48L, 52L, 47L, 51L, 49L), 5L))
+  )
+
+  expect_error(
+    autospc(no_x,
+      chart_type = "C", y = att, period_min = 5L,
+      plot_chart = FALSE
+    ),
+    "x not specified"
+  )
+
+  # and where the caller names one that is not there, the column is named
+  expect_error(
+    autospc(no_x,
+      chart_type = "C", x = nosuch, y = att, period_min = 5L,
+      plot_chart = FALSE
+    ),
+    "Columns not found in the data"
+  )
+})

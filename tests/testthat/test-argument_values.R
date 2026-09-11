@@ -493,3 +493,98 @@ test_that("the check steps aside where there is no x to compare against", {
 
   expect_false(any(grepl("maximum", caught, fixed = TRUE)))
 })
+
+
+# the arguments that take a single string
+
+
+test_that("a string argument takes a single string, and NULL where it may", {
+  # the value each one is given where it is accepted: log_file_path is written
+  # to, so it is given a path rather than a word
+  accepted <- list(
+    title = "Something",
+    subtitle = "Something",
+    override_x_title = "Something",
+    override_y_title = "Something",
+    log_file_path = file.path(tempdir(), "argument_values_log.csv")
+  )
+
+  expect_setequal(names(accepted), autospc_string_arguments())
+
+  for (name in autospc_string_arguments()) {
+    expect_s3_class(
+      do.call(analyse, stats::setNames(accepted[name], name)),
+      "data.frame"
+    )
+
+    expect_error(
+      do.call(analyse, stats::setNames(list(42), name)),
+      "must be a single string",
+      info = name
+    )
+
+    expect_error(
+      do.call(analyse, stats::setNames(list(c("a", "b")), name)),
+      "must be a single string",
+      info = name
+    )
+
+    # every one of them defaults to NULL, so NULL is left alone
+    expect_s3_class(
+      do.call(analyse, stats::setNames(list(NULL), name)),
+      "data.frame"
+    )
+  }
+
+  unlink(accepted$log_file_path)
+})
+
+
+# the arguments that take a colour
+
+
+test_that("a colour argument takes what R accepts as a colour", {
+  expect_setequal(autospc_colour_arguments(), c("r1_col", "r2_col"))
+
+  for (name in autospc_colour_arguments()) {
+    for (value in list("red", "#ff0000", 2L)) {
+      expect_s3_class(
+        do.call(analyse, stats::setNames(list(value), name)),
+        "data.frame"
+      )
+    }
+
+    expect_error(
+      do.call(analyse, stats::setNames(list("notacolour"), name)),
+      "must be a colour",
+      info = name
+    )
+
+    expect_error(
+      do.call(analyse, stats::setNames(list(c("red", "blue")), name)),
+      "must be a colour",
+      info = name
+    )
+  }
+})
+
+
+test_that("a bad colour is refused whether or not the chart would use it", {
+  # values_data breaks no rule, so neither highlight colour is drawn. The
+  # colour is still checked, because a later series would use it
+  expect_error(analyse(r2_col = "notacolour"), "must be a colour")
+})
+
+
+# x_date_format
+
+
+test_that("x_date_format holds at least one % code", {
+  expect_s3_class(analyse(x_date_format = "%b %Y"), "data.frame")
+
+  expect_error(analyse(x_date_format = 42), "must be a single string")
+
+  # a format with no % code formats every date as itself, so every label on
+  # the axis would read the same
+  expect_error(analyse(x_date_format = "nonsense"), "at least one % code")
+})

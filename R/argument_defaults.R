@@ -97,6 +97,33 @@ autospc_numeric_arguments <- function() {
 }
 
 
+#' The arguments that take a single string
+#'
+#' Listed rather than derived, because their default is NULL, which says
+#' nothing about the values they accept.
+#'
+#' @return A character vector of argument names.
+#' @noRd
+autospc_string_arguments <- function() {
+  return(c(
+    "title",
+    "subtitle",
+    "override_x_title",
+    "override_y_title",
+    "log_file_path"
+  ))
+}
+
+
+#' The arguments that take a colour
+#'
+#' @return A character vector of argument names.
+#' @noRd
+autospc_colour_arguments <- function() {
+  return(c("r1_col", "r2_col"))
+}
+
+
 #' The deprecated arguments of autospc()
 #'
 #' The arguments whose default is `deprecated()`.

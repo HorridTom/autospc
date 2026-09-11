@@ -415,6 +415,104 @@ match_axis_value <- function(value,
 }
 
 
+#' Whether an argument was left at a NULL default
+#'
+#' An argument `autospc()` declares as NULL accepts NULL, so there is nothing
+#' to check.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+left_at_null <- function(value,
+                         name) {
+  return(is.null(value) && is.null(autospc_default(name)))
+}
+
+
+#' Check that a value is a single string
+#'
+#' @return `value`, unchanged, or an error naming the argument.
+#' @noRd
+match_string <- function(value,
+                         name,
+                         call = rlang::caller_env()) {
+  is_string <- is.character(value) &&
+    length(value) == 1L &&
+    !is.na(value)
+
+  if (!is_string) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a single string, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Check that a value is a colour
+#'
+#' Whatever `grDevices::col2rgb()` accepts: a name R knows, a hexadecimal
+#' string, or a number indexing the palette.
+#'
+#' @return `value`, unchanged, or an error naming the argument.
+#' @noRd
+match_colour <- function(value,
+                         name,
+                         call = rlang::caller_env()) {
+  is_colour <- length(value) == 1L &&
+    !is.na(value) &&
+    !inherits(
+      tryCatch(grDevices::col2rgb(value), error = function(e) e),
+      "error"
+    )
+
+  if (!is_colour) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a colour, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Check that a value is a date format
+#'
+#' A single string holding at least one `%` code. A string with none formats
+#' every date as itself, so every label on the axis would read the same.
+#'
+#' @return `value`, unchanged, or an error naming the argument.
+#' @noRd
+match_date_format <- function(value,
+                              name,
+                              call = rlang::caller_env()) {
+  value <- match_string(value, name, call = call)
+
+  if (!grepl("%", value, fixed = TRUE)) {
+    rlang::abort(
+      sprintf(
+        "`%s` must hold at least one %% code, as \"%%Y-%%m-%%d\" does, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
 #' Check the arguments whose valid values depend on the data
 #'
 #' The checks that cannot be made from an argument's value alone. Called once
@@ -488,8 +586,7 @@ validate_argument_values <- function(arguments,
   for (name in names(kinds)) {
     value <- arguments[[name]]
 
-    # an argument autospc() declares as NULL accepts NULL
-    if (is.null(value) && is.null(autospc_default(name))) {
+    if (left_at_null(value, name)) {
       next
     }
 
@@ -499,6 +596,24 @@ validate_argument_values <- function(arguments,
       match_number(value, name, kinds[[name]], call = call)
     }
   }
+
+  for (name in autospc_string_arguments()) {
+    if (left_at_null(arguments[[name]], name)) {
+      next
+    }
+
+    arguments[[name]] <- match_string(arguments[[name]], name, call = call)
+  }
+
+  for (name in autospc_colour_arguments()) {
+    arguments[[name]] <- match_colour(arguments[[name]], name, call = call)
+  }
+
+  arguments$x_date_format <- match_date_format(
+    arguments$x_date_format,
+    "x_date_format",
+    call = call
+  )
 
   return(arguments)
 }

@@ -104,8 +104,46 @@ select_named_columns <- function(data,
     logical(1)
   )
 
+  require_named_columns(data, sources = sources[wanted])
+
   data <- data %>%
     dplyr::select(dplyr::all_of(sources[wanted]))
 
   return(data)
+}
+
+
+#' Stop unless every column the caller named is in the data
+#'
+#' `dplyr::all_of()` raises its own error for a column that is not there, which
+#' names neither the argument the column came from nor the chart being built.
+#'
+#' @param sources A character vector of the column names that must be present,
+#'   named for the fields they fill.
+#'
+#' @return invisible TRUE, or an error naming each argument and its column
+#' @noRd
+require_named_columns <- function(data,
+                                  sources) {
+  absent <- !sources %in% colnames(data)
+
+  if (any(absent)) {
+    stop(
+      paste0(
+        "Columns not found in the data: ",
+        paste(
+          sprintf(
+            "\"%s\" (named by `%s`)",
+            sources[absent],
+            names(sources)[absent]
+          ),
+          collapse = ", "
+        ),
+        "."
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
 }

@@ -65,6 +65,15 @@ validate_autospc_chart <- function(x) {
     )
   }
 
+  require_column(
+    data = x$data,
+    column = "x",
+    message = paste(
+      "x not specified. Every chart type needs x: name the column with",
+      "the x argument, or call it x in the data."
+    )
+  )
+
   return(x)
 }
 

@@ -1,5 +1,31 @@
 # Changelog
 
+## autospc 0.1.0.9016
+
+### A short series no longer warns about taking a maximum of nothing
+
+A floating median is taken over the last `floating_median_n` non-missing
+points, and `floating_median_n` defaults to 12. Where a series held
+fewer points than that, the position the median window starts at was
+worked out before ascertaining whether there was a median to draw,
+resulting in [`max()`](https://rdrr.io/r/base/Extremes.html) of no
+values warning and giving `-Inf`. Every chart of fewer than twelve
+points therefore emitted “no non-missing arguments to max; returning
+-Inf”, whatever `floating_median` was set to.
+
+- **A series with too few points now draws no floating median.** `-Inf`
+  had meant that `floating_median = "yes"` took the median over the
+  whole series instead, and that `"auto"` looked for a shift rule break
+  across the whole series rather than over the last `floating_median_n`
+  points.
+
+- **`floating_median = "yes"` warns** when it asked for a median and the
+  series is too short for one, naming both counts.
+
+- **`"auto"` and `"no"` are silent.** `"auto"` simply does not draw a
+  median line where there are not sufficient data to do so; `"no"` never
+  draws one.
+
 ## autospc 0.1.0.9015
 
 ### `facet_stages(split_rows)` is now `facet_stages(split_at)`

@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -245,14 +245,16 @@ purposes of shift rule breaks</p></dd>
 calculated based on the final floating_median_n data points on the chart:
 "no" - do not display a floating median,
 "yes" - display a floating median,
-"auto" - display a floating median if and only if there is at least one point
-that is part of a shift rule break in the final floating_median_n data points
-on the chart.</p></dd>
+"auto" - display a floating median if and only if there are sufficient data
+to form a median, and at least one point that is part of a shift rule break
+in the final floating_median_n data points on the chart.</p></dd>
 
 
 <dt id="arg-floating-median-n">floating_median_n<a class="anchor" aria-label="anchor" href="#arg-floating-median-n"></a></dt>
 <dd><p>The number of points to use for calculation of the
-floating median, if present.</p><div class="section">
+floating median, if present. Where the series holds fewer non-missing points
+than this, there are none to take a median over, so none is drawn: "yes"
+warns, and "auto" is silent.</p><div class="section">
 <h3 id="output-type">Output Type<a class="anchor" aria-label="anchor" href="#output-type"></a></h3>
 
 

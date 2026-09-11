@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,16 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9016" id="autospc-0109016">autospc 0.1.0.9016<a class="anchor" aria-label="anchor" href="#autospc-0109016"></a></h2>
+<div class="section level3">
+<h3 id="a-short-series-no-longer-warns-about-taking-a-maximum-of-nothing-0-1-0-9016">A short series no longer warns about taking a maximum of nothing<a class="anchor" aria-label="anchor" href="#a-short-series-no-longer-warns-about-taking-a-maximum-of-nothing-0-1-0-9016"></a></h3>
+<p>A floating median is taken over the last <code>floating_median_n</code> non-missing points, and <code>floating_median_n</code> defaults to 12. Where a series held fewer points than that, the position the median window starts at was worked out before ascertaining whether there was a median to draw, resulting in <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max()</a></code> of no values warning and giving <code>-Inf</code>. Every chart of fewer than twelve points therefore emitted “no non-missing arguments to max; returning -Inf”, whatever <code>floating_median</code> was set to.</p>
+<ul><li><p><strong>A series with too few points now draws no floating median.</strong> <code>-Inf</code> had meant that <code>floating_median = "yes"</code> took the median over the whole series instead, and that <code>"auto"</code> looked for a shift rule break across the whole series rather than over the last <code>floating_median_n</code> points.</p></li>
+<li><p><strong><code>floating_median = "yes"</code> warns</strong> when it asked for a median and the series is too short for one, naming both counts.</p></li>
+<li><p><strong><code>"auto"</code> and <code>"no"</code> are silent.</strong> <code>"auto"</code> simply does not draw a median line where there are not sufficient data to do so; <code>"no"</code> never draws one.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9015" id="autospc-0109015">autospc 0.1.0.9015<a class="anchor" aria-label="anchor" href="#autospc-0109015"></a></h2>
 <div class="section level3">

@@ -1,3 +1,28 @@
+# autospc 0.1.0.9018
+
+## `plot_chart = FALSE` returns the same columns for a given chart type
+
+A series holding too few points to establish limits was returned with only the
+columns the data preparation had added, so a caller reading the table had to
+test for the presence of every analysed column before using it. Such a series
+now returns the same columns, in the same order and of the same types, as a
+series long enough to establish limits. The columns that would have recorded the
+result of the analysis hold NA.
+
+* `limit_extension` is the exception that holds a value rather than NA. It
+  records whether `extend_limits_to` added the row beyond the end of the data,
+  and a series too short to establish limits has no rows added, so FALSE is the
+  answer and not a missing one.
+
+* `median` is outside this contract. The column is there when a floating median
+  is drawn and absent when it is not, and a series too short to establish limits
+  never has one drawn. So with `floating_median = "yes"`, a series long enough
+  for limits returns a `median` column and a series too short for them does not.
+
+* An XmR chart's two halves are now joined whether or not limits were
+  established, so `plot_chart = FALSE` returns the moving range columns for a
+  short series as it does for a full one.
+
 # autospc 0.1.0.9017
 
 ## Argument checks

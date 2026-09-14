@@ -258,6 +258,14 @@ limits_table_columns.autospc_chart_pp <- function(chart) {
 }
 
 
+#' @describeIn limit_width_columns The limits depend on the row's denominator,
+#'   so the table carries `limit_width`.
+#' @noRd
+limit_width_columns.autospc_chart_pp <- function(chart) {
+  return("limit_width")
+}
+
+
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' The limits of a P' chart depend on the denominator, so they cannot simply be

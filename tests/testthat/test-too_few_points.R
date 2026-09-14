@@ -31,10 +31,11 @@ test_that("Charts with fewer points than min period error handle", {
     autospc(test_data, plot_chart = FALSE, chart_type = "P", period_min = 21)
   )
 
-  # x, y, series and log. aggregate_data() summarises to the columns the class
-  # analyses, so a C chart drops n
-  testthat::expect_equal(ncol(result_C), 4)
-  testthat::expect_equal(ncol(result_P), 5)
+  # the same columns a series long enough for limits returns, the analysed
+  # ones holding no value. aggregate_data() summarises to the columns the class
+  # analyses, so a C chart drops n and a P chart keeps it
+  testthat::expect_equal(ncol(result_C), 20)
+  testthat::expect_equal(ncol(result_P), 22)
   testthat::expect_warning(
     autospc(test_data, plot_chart = TRUE, chart_type = "C")
   )
@@ -199,12 +200,136 @@ test_that("a series with limits takes the limits path", {
 })
 
 
-test_that("a series without limits does not take the limits path", {
+test_that("a series without limits has limits columns holding no value", {
+  # the columns are there, because they do not depend on the data, and they
+  # hold nothing, because no limits were established
   result <- suppressWarnings(
     autospc(test_data, plot_chart = FALSE, chart_type = "C", period_min = 21)
   )
 
-  expect_false("cl" %in% colnames(result))
+  expect_true("cl" %in% colnames(result))
 
-  expect_false("limit_change" %in% colnames(result))
+  expect_true(all(is.na(result$cl)))
+
+  expect_true("limit_change" %in% colnames(result))
+
+  expect_true(all(is.na(result$limit_change)))
+})
+
+
+# The columns a chart returns do not depend on whether the series held enough
+# points to form a period
+
+
+test_that("a short series returns the columns a full one does", {
+  set.seed(5)
+
+  sized <- function(rows) {
+    return(data.frame(
+      x = seq_len(rows),
+      y = as.integer(stats::rpois(rows, 50)),
+      n = rep(100L, rows)
+    ))
+  }
+
+  short <- sized(10L)
+  full <- sized(40L)
+
+  analyse <- function(data, chart_type) {
+    return(suppressWarnings(
+      autospc(data,
+        chart_type = chart_type,
+        x = "x", y = "y", n = "n",
+        period_min = 21L,
+        plot_chart = FALSE
+      )
+    ))
+  }
+
+  for (chart_type in c("C", "C'", "P", "P'", "X", "MR", "XMR")) {
+    from_short <- analyse(short, chart_type)
+    from_full <- analyse(full, chart_type)
+
+    expect_identical(names(from_short), names(from_full), info = chart_type)
+
+    # a column of missing values is a different column if it is of a different
+    # type, so the types are asserted as well as the names
+    expect_identical(
+      vapply(from_short, function(column) class(column)[1L], character(1L)),
+      vapply(from_full, function(column) class(column)[1L], character(1L)),
+      info = chart_type
+    )
+  }
+})
+
+
+test_that("a short series reports no re-established rows and no exclusions", {
+  short <- data.frame(x = 1:10, y = as.integer(c(49, 50, 50, 50, 48, 49, 50,
+                                                 49, 50, 47)))
+
+  chart <- autospc_plot_charts(
+    suppressWarnings(autospc(short, chart_type = "C", period_min = 21L))
+  )[[1L]]
+
+  expect_identical(chart$result$re_establish_rows, integer(0))
+
+  expect_identical(chart$result$exclusions, integer(0))
+})
+
+
+test_that("the analysed columns a short series gets hold no value", {
+  short <- data.frame(x = 1:10, y = as.integer(c(49, 50, 50, 50, 48, 49, 50,
+                                                 49, 50, 47)))
+
+  result <- suppressWarnings(
+    autospc(short, chart_type = "C", period_min = 21L, plot_chart = FALSE)
+  )
+
+  # limit_extension is not one of them: it says whether the extension put the
+  # row there, and none did
+  filled <- setdiff(
+    names(analysis_column_types()),
+    c("limit_width", "limit_extension")
+  )
+
+  for (column in filled) {
+    expect_true(all(is.na(result[[column]])), info = column)
+  }
+
+  expect_false(any(result$limit_extension))
+
+  # and the data is there as it was
+  expect_identical(result$x, short$x)
+
+  expect_identical(result$y, short$y)
+})
+
+
+test_that("a series with no rows to analyse returns the same columns", {
+  # every x is missing, so every row is dropped before the analysis and the
+  # table it returns has no rows at all
+  previous <- options(autospc.warn_missing_x = FALSE)
+  on.exit(options(previous), add = TRUE)
+
+  no_rows <- data.frame(
+    x = rep(NA_integer_, 30L),
+    y = as.integer(rep(c(10L, 12L), 15L))
+  )
+
+  full <- data.frame(
+    x = 1:40,
+    y = as.integer(rep(c(10L, 12L), 20L))
+  )
+
+  from_none <- suppressWarnings(
+    autospc(no_rows, chart_type = "C", period_min = 5L, plot_chart = FALSE)
+  )
+
+  from_full <- suppressWarnings(
+    autospc(full, chart_type = "C", period_min = 5L, plot_chart = FALSE)
+  )
+
+  expect_identical(nrow(from_none), 0L)
+
+  expect_identical(names(from_none), names(from_full))
 })

@@ -241,3 +241,19 @@ test_that("a break is against the prevailing limits, not a candidate's", {
     breaks$cl[1]
   )))
 })
+
+
+test_that("the columns come back in one order whatever route is taken", {
+  # A series whose limits are re-established gains run_start at a different
+  # point in the analysis from one holding a single calculation period, so the
+  # two routes are compared against each other.
+  re_established <- suppressWarnings(autospc(ed_attendances_monthly,
+    chart_type = "C", x = month_start, y = att_all, plot_chart = FALSE
+  ))
+
+  one_period <- suppressWarnings(autospc(ed_attendances_monthly[1:30, ],
+    chart_type = "C", x = month_start, y = att_all, plot_chart = FALSE
+  ))
+
+  expect_identical(names(one_period), names(re_established))
+})

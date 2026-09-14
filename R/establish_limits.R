@@ -29,6 +29,14 @@ establish_limits <- function(chart) {
     chart$result$table <- prepared_data
     chart$result$table$log <- render_log(chart)
 
+    chart$result$table <- fill_analysis_columns(
+      table = chart$result$table,
+      chart = chart
+    )
+
+    chart$result$re_establish_rows <- integer(0)
+    chart$result$exclusions <- integer(0)
+
     return(chart)
   } else {
     # [2] There are enough data points to form one period
@@ -330,6 +338,13 @@ establish_limits <- function(chart) {
       table = chart$result$table,
       chart = chart
     )
+
+    # the same columns, in the same order, as the path above returns
+    chart$result$table <- chart$result$table %>%
+      dplyr::select(
+        dplyr::all_of(analysis_table_columns(chart)),
+        dplyr::everything()
+      )
 
     return(chart)
   } # end of: [2] enough data points to form one period

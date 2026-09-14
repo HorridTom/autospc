@@ -75,7 +75,9 @@ test_that("period_min is the floor, not baseline_length", {
     "fewer than the minimum number of points"
   )
 
-  expect_false("cl" %in% colnames(result))
+  # the column is there whatever the data, and holds nothing where no limits
+  # were established
+  expect_true(all(is.na(result$cl)))
 })
 
 

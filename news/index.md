@@ -1,5 +1,47 @@
 # Changelog
 
+## autospc 0.1.0.9018
+
+### `plot_chart = FALSE` returns the same columns for a given chart type
+
+A series holding too few points to establish limits was returned with
+only the columns the data preparation had added, so a caller reading the
+table had to test for the presence of every analysed column before using
+it. Such a series now returns the same columns, in the same order and of
+the same types, as a series long enough to establish limits. The columns
+that would have recorded the result of the analysis hold NA.
+
+- `limit_extension` is the exception that holds a value rather than NA.
+  It records whether `extend_limits_to` added the row beyond the end of
+  the data, and a series too short to establish limits has no rows
+  added, so FALSE is the answer and not a missing value.
+
+- `median` is outside this contract. The column is there when a floating
+  median is drawn and absent when it is not.
+
+- An XmR chart’s two halves are now joined whether or not limits were
+  established, so `plot_chart = FALSE` returns the moving range columns
+  for a short series as it does for a full one.
+
+### `limit_width` becomes `sd_estimate`
+
+P and P’ charts returned a `limit_width` column holding the distance the
+limits sit from the centre line at a denominator of one. That distance
+is three times an estimate of the standard deviation of a single
+observation. The name did not make this clear. Furthermore, the limits
+of a C or X chart have a width as well, which was not clear.
+
+- **The column is now `sd_estimate`, and holds an estimate of one
+  standard deviation rather than three**: `sqrt(p_bar * (1 - p_bar))`
+  for a P chart, the same times Laney’s sigma_z for a P’ chart, on the
+  same scale as the centre line. The limits themselves are unchanged,
+  and the old column’s values are `3 * sd_estimate`.
+
+- The factor of three now sits where the limits are formed, in
+  `limits_at_denominators()`, rather than where the estimate is
+  calculated. The limits sit `3 * sd_estimate / sqrt(n)` either side of
+  the centre line.
+
 ## autospc 0.1.0.9017
 
 ### Argument checks

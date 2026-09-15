@@ -42,6 +42,25 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9018" id="autospc-0109018">autospc 0.1.0.9018<a class="anchor" aria-label="anchor" href="#autospc-0109018"></a></h2>
+<div class="section level3">
+<h3 id="plot_chart--false-returns-the-same-columns-for-a-given-chart-type-0-1-0-9018">
+<code>plot_chart = FALSE</code> returns the same columns for a given chart type<a class="anchor" aria-label="anchor" href="#plot_chart--false-returns-the-same-columns-for-a-given-chart-type-0-1-0-9018"></a></h3>
+<p>A series holding too few points to establish limits was returned with only the columns the data preparation had added, so a caller reading the table had to test for the presence of every analysed column before using it. Such a series now returns the same columns, in the same order and of the same types, as a series long enough to establish limits. The columns that would have recorded the result of the analysis hold NA.</p>
+<ul><li><p><code>limit_extension</code> is the exception that holds a value rather than NA. It records whether <code>extend_limits_to</code> added the row beyond the end of the data, and a series too short to establish limits has no rows added, so FALSE is the answer and not a missing value.</p></li>
+<li><p><code>median</code> is outside this contract. The column is there when a floating median is drawn and absent when it is not.</p></li>
+<li><p>An XmR chart’s two halves are now joined whether or not limits were established, so <code>plot_chart = FALSE</code> returns the moving range columns for a short series as it does for a full one.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="limit_width-becomes-sd_estimate-0-1-0-9018">
+<code>limit_width</code> becomes <code>sd_estimate</code>
+<a class="anchor" aria-label="anchor" href="#limit_width-becomes-sd_estimate-0-1-0-9018"></a></h3>
+<p>P and P’ charts returned a <code>limit_width</code> column holding the distance the limits sit from the centre line at a denominator of one. That distance is three times an estimate of the standard deviation of a single observation. The name did not make this clear. Furthermore, the limits of a C or X chart have a width as well, which was not clear.</p>
+<ul><li><p><strong>The column is now <code>sd_estimate</code>, and holds an estimate of one standard deviation rather than three</strong>: <code>sqrt(p_bar * (1 - p_bar))</code> for a P chart, the same times Laney’s sigma_z for a P’ chart, on the same scale as the centre line. The limits themselves are unchanged, and the old column’s values are <code>3 * sd_estimate</code>.</p></li>
+<li><p>The factor of three now sits where the limits are formed, in <code>limits_at_denominators()</code>, rather than where the estimate is calculated. The limits sit <code>3 * sd_estimate / sqrt(n)</code> either side of the centre line.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9017" id="autospc-0109017">autospc 0.1.0.9017<a class="anchor" aria-label="anchor" href="#autospc-0109017"></a></h2>
 <div class="section level3">
 <h3 id="argument-checks-0-1-0-9017">Argument checks<a class="anchor" aria-label="anchor" href="#argument-checks-0-1-0-9017"></a></h3>

@@ -257,10 +257,10 @@ test_that("a gap with no denominator takes the period's mean denominator", {
 })
 
 
-test_that("a gap in a later period takes that period's limit width", {
+test_that("a gap in a later period takes that period's sd estimate", {
   # a shift at row 31 re-establishes the limits, so the first period sits at
-  # 20% with a width of 3 * sqrt(0.2 * 0.8) * 100, which is 120, and the second
-  # at 50% with a width of 150
+  # 20% with an sd estimate of sqrt(0.2 * 0.8) * 100, which is 40, and the
+  # second at 50% with an sd estimate of 50
   d <- data.frame(x = 1:70, n = rep(100L, 70))
   d$y <- c(rep(20L, 30), rep(50L, 40))
   d$y[40] <- NA
@@ -270,14 +270,14 @@ test_that("a gap in a later period takes that period's limit width", {
 
   expect_identical(result$plot_period[39], "calculation31")
   expect_equal(result$cl[40], 50)
-  expect_equal(result$ucl[40], 50 + 150 / sqrt(400))
-  expect_equal(result$lcl[40], 50 - 150 / sqrt(400))
+  expect_equal(result$ucl[40], 50 + 3 * 50 / sqrt(400))
+  expect_equal(result$lcl[40], 50 - 3 * 50 / sqrt(400))
 })
 
 
 test_that("an observation whose limits are held does not distort a gap", {
-  # every value is 50%, so the centre line is 50 and the limit width is
-  # 3 * sqrt(0.5 * 0.5) * 100, which is 150
+  # every value is 50%, so the centre line is 50 and the sd estimate is
+  # sqrt(0.5 * 0.5) * 100, which is 50
   d <- data.frame(x = 1:40, n = rep(100L, 40))
 
   # row 22, the first observation of the display period, has a denominator of
@@ -292,8 +292,8 @@ test_that("an observation whose limits are held does not distort a gap", {
   expect_equal(result$ucl[22], 100)
   expect_equal(result$lcl[22], 0)
 
-  expect_equal(result$ucl[30], 50 + 150 / sqrt(400))
-  expect_equal(result$lcl[30], 50 - 150 / sqrt(400))
+  expect_equal(result$ucl[30], 50 + 3 * 50 / sqrt(400))
+  expect_equal(result$lcl[30], 50 - 3 * 50 / sqrt(400))
 })
 
 
@@ -303,17 +303,17 @@ test_that("a row with no observation says which period it is in", {
   expect_identical(result$plot_period[10], result$plot_period[9])
   expect_identical(result$period_type[10], result$period_type[9])
   expect_identical(result$period_start[10], result$period_start[9])
-  expect_identical(result$limit_width[10], result$limit_width[9])
+  expect_identical(result$sd_estimate[10], result$sd_estimate[9])
 
   expect_false(result$limit_change[10])
   expect_equal(result$cl_change[10], 0)
 })
 
 
-test_that("a chart without a limit width still says which period a gap is in", {
+test_that("a chart without an sd estimate still says which period a gap is in", {
   result <- analyse(gapped(23L))
 
-  expect_false("limit_width" %in% names(result))
+  expect_false("sd_estimate" %in% names(result))
   expect_identical(result$plot_period[23], result$plot_period[22])
   expect_identical(result$period_type[23], result$period_type[22])
 })

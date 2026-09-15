@@ -242,7 +242,7 @@ test_that("the extension continues the period the series ends in", {
     rep(paste0("display", result$period_start[final]), 2L)
   )
 
-  expect_false(any(is.na(result$limit_width[extension])))
+  expect_false(any(is.na(result$sd_estimate[extension])))
 
   expect_false(any(result$limit_change[extension]))
 

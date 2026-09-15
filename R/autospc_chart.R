@@ -398,10 +398,10 @@ limits_table_columns.autospc_chart <- function(chart) {
 }
 
 
-#' @describeIn limit_width_columns The limits are the same at every row of a
+#' @describeIn sd_estimate_columns The limits are the same at every row of a
 #'   calculation period, so no column is needed to place them elsewhere.
 #' @noRd
-limit_width_columns.autospc_chart <- function(chart) {
+sd_estimate_columns.autospc_chart <- function(chart) {
   return(character(0))
 }
 

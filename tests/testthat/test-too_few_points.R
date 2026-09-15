@@ -264,8 +264,10 @@ test_that("a short series returns the columns a full one does", {
 
 
 test_that("a short series reports no re-established rows and no exclusions", {
-  short <- data.frame(x = 1:10, y = as.integer(c(49, 50, 50, 50, 48, 49, 50,
-                                                 49, 50, 47)))
+  short <- data.frame(x = 1:10, y = as.integer(c(
+    49, 50, 50, 50, 48, 49, 50,
+    49, 50, 47
+  )))
 
   chart <- autospc_plot_charts(
     suppressWarnings(autospc(short, chart_type = "C", period_min = 21L))
@@ -278,8 +280,10 @@ test_that("a short series reports no re-established rows and no exclusions", {
 
 
 test_that("the analysed columns a short series gets hold no value", {
-  short <- data.frame(x = 1:10, y = as.integer(c(49, 50, 50, 50, 48, 49, 50,
-                                                 49, 50, 47)))
+  short <- data.frame(x = 1:10, y = as.integer(c(
+    49, 50, 50, 50, 48, 49, 50,
+    49, 50, 47
+  )))
 
   result <- suppressWarnings(
     autospc(short, chart_type = "C", period_min = 21L, plot_chart = FALSE)
@@ -289,7 +293,7 @@ test_that("the analysed columns a short series gets hold no value", {
   # row there, and none did
   filled <- setdiff(
     names(analysis_column_types()),
-    c("limit_width", "limit_extension")
+    c("sd_estimate", "limit_extension")
   )
 
   for (column in filled) {

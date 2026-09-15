@@ -258,20 +258,21 @@ limits_table_columns.autospc_chart_pp <- function(chart) {
 }
 
 
-#' @describeIn limit_width_columns The limits depend on the row's denominator,
-#'   so the table carries `limit_width`.
+#' @describeIn sd_estimate_columns The limits depend on the row's denominator,
+#'   so the table carries `sd_estimate`.
 #' @noRd
-limit_width_columns.autospc_chart_pp <- function(chart) {
-  return("limit_width")
+sd_estimate_columns.autospc_chart_pp <- function(chart) {
+  return("sd_estimate")
 }
 
 
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' The limits of a P' chart depend on the denominator, so they cannot simply be
-#' carried forward. The width of the last calculated period is expressed as a
-#' constant, and the display limits are recomputed from it at each point's own
-#' denominator. The centre line is carried forward unchanged.
+#' carried forward. The standard deviation estimate of the last calculated
+#' period is carried forward instead, and the display limits are recomputed from
+#' it at each point's own denominator. The centre line is carried forward
+#' unchanged.
 #'
 #' @return `limits_table`, with the display rows filled in
 #' @noRd

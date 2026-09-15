@@ -1,32 +1,33 @@
 # The limit arithmetic the P and P' charts share.
 
 
-#' The limit width a period's rows carry
+#' The standard deviation estimate a period's rows carry
 #'
-#' The limits of a P or P' chart sit a distance from the centre line that
-#' varies as one over the square root of the denominator. The rest of that
-#' distance is the same at every point of a period, so it is one value however
-#' much the denominators vary, and the limits can be recalculated from it at
-#' any other denominator. For a p-chart this is 3*sqrt(p_bar*(1-p_bar)), for a
-#' p-prime chart this is modified by the average moving range.
+#' An estimate of the standard deviation of a single observation, which is the
+#' same at every point of a period however much the denominators vary. The
+#' standard error at a denominator is this over the square root of that
+#' denominator, and the limits sit three standard errors either side of the
+#' centre line, so the limits can be recalculated at any other denominator. For
+#' a p-chart this is sqrt(p_bar*(1-p_bar)), for a p-prime chart this is modified
+#' by the average moving range.
 #'
 #' `get_p_limits()` and `get_pp_limits()` calculate it where they calculate the
 #' limits themselves, and `form_calculation_limits()` carries it into the
-#' limits table as the `limit_width` column, so it is read from there rather
+#' limits table as the `sd_estimate` column, so it is read from there rather
 #' than worked back out of the limits. Working it back out would give the wrong
 #' answer for a row whose limits have been held at 0 or 100.
 #'
-#' @param rows Rows of a limits table, holding a `limit_width` column.
+#' @param rows Rows of a limits table, holding an `sd_estimate` column.
 #'
-#' @return the first value of `limit_width` in `rows` that is not NA, or NA
+#' @return the first value of `sd_estimate` in `rows` that is not NA, or NA
 #'   where the column is absent or every value is NA
 #' @noRd
-limit_width_of <- function(rows) {
-  if (!"limit_width" %in% names(rows)) {
+sd_estimate_of <- function(rows) {
+  if (!"sd_estimate" %in% names(rows)) {
     return(NA_real_)
   }
 
-  present <- rows$limit_width[!is.na(rows$limit_width)]
+  present <- rows$sd_estimate[!is.na(rows$sd_estimate)]
 
   if (length(present) == 0L) {
     return(NA_real_)
@@ -38,20 +39,21 @@ limit_width_of <- function(rows) {
 
 #' Calculate limits at given denominators
 #'
-#' Returns `cl` plus and minus `constant / sqrt(n)`, one pair of limits for
-#' each element of `n`. The values are not held within the range a percentage
-#' can take; `clamp_percentage_limits()` does that.
+#' Returns `cl` plus and minus `3 * sd_estimate / sqrt(n)`, one pair of limits
+#' for each element of `n`. The values are not held within the range a
+#' percentage can take; `clamp_percentage_limits()` does that.
 #'
 #' @param cl The centre line the limits sit either side of.
-#' @param constant The period's limit width, from `limit_width_of()`.
+#' @param sd_estimate The period's standard deviation estimate, from
+#'   `sd_estimate_of()`.
 #' @param n The denominators to calculate the limits at.
 #'
 #' @return list of two numeric vectors named ucl and lcl, each as long as `n`
 #' @noRd
 limits_at_denominators <- function(cl,
-                                   constant,
+                                   sd_estimate,
                                    n) {
-  half_width <- constant / sqrt(n)
+  half_width <- 3 * sd_estimate / sqrt(n)
 
   return(list(
     ucl = cl + half_width,
@@ -80,33 +82,34 @@ clamp_percentage_limits <- function(limits) {
 #' Extend a calculation period's limits over the display rows
 #'
 #' Called by the `extend_display_limits()` methods of the P and P' classes.
-#' Takes the centre line and the limit width of the row at `counter - 1`, which
-#' is the last row of the calculation period, and gives every row from
+#' Takes the centre line and the standard deviation estimate of the row at
+#' `counter - 1`, which is the last row of the calculation period, and gives
+#' every row from
 #' `counter` to the end of the table that centre line and limits recalculated
 #' at its own denominator.
 #'
 #' @param limits_table The limits table being built.
 #' @param counter The first display row.
 #'
-#' @return `limits_table`, with `cl`, `ucl`, `lcl`, `limit_width` and
+#' @return `limits_table`, with `cl`, `ucl`, `lcl`, `sd_estimate` and
 #'   `period_type` set on the rows from `counter` onwards
 #' @noRd
 extend_display_limits_at_denominators <- function(limits_table,
                                                   counter) {
   last_calculated <- counter - 1
 
-  constant <- limit_width_of(limits_table[last_calculated, , drop = FALSE])
+  sd_estimate <- sd_estimate_of(limits_table[last_calculated, , drop = FALSE])
   pbar <- as.numeric(limits_table[last_calculated, "cl"])
 
   display_rows <- counter:nrow(limits_table)
 
   limits_table[display_rows, "cl"] <- pbar
-  limits_table[display_rows, "limit_width"] <- constant
+  limits_table[display_rows, "sd_estimate"] <- sd_estimate
   limits_table[display_rows, "period_type"] <- "display"
 
   display_limits <- limits_at_denominators(
     cl = pbar,
-    constant = constant,
+    sd_estimate = sd_estimate,
     n = limits_table[["n"]][display_rows]
   )
   held <- clamp_percentage_limits(display_limits)
@@ -151,11 +154,11 @@ denominators_for_missing_rows <- function(period,
 #' Called by the `limits_for_missing_rows()` methods of the P and P' classes,
 #' with the limits the default method has already given those rows. Replaces
 #' `ucl` and `lcl` with the limits calculated at each row's own denominator,
-#' from the width of the period the row sits in.
+#' from the standard deviation estimate of the period the row sits in.
 #'
 #' A row that `denominators_for_missing_rows()` returns NA for keeps the limits
 #' it was given, as do all of them where no observation in the period holds a
-#' limit width.
+#' standard deviation estimate.
 #'
 #' @param limits The limits these rows have already been given, as vectors
 #'   named cl, ucl and lcl, one value per row of `rows`.
@@ -167,18 +170,18 @@ denominators_for_missing_rows <- function(period,
 proportion_limits_for_missing_rows <- function(limits,
                                                period,
                                                rows) {
-  constant <- limit_width_of(period)
+  sd_estimate <- sd_estimate_of(period)
 
   n <- denominators_for_missing_rows(period = period, rows = rows)
   usable <- !is.na(n)
 
-  if (is.na(constant) || !any(usable)) {
+  if (is.na(sd_estimate) || !any(usable)) {
     return(limits)
   }
 
   at_n <- limits_at_denominators(
     cl = limits$cl[usable],
-    constant = constant,
+    sd_estimate = sd_estimate,
     n = n[usable]
   )
   held <- clamp_percentage_limits(at_n)

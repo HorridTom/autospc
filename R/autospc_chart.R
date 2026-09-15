@@ -398,6 +398,14 @@ limits_table_columns.autospc_chart <- function(chart) {
 }
 
 
+#' @describeIn sd_estimate_columns The limits are the same at every row of a
+#'   calculation period, so no column is needed to place them elsewhere.
+#' @noRd
+sd_estimate_columns.autospc_chart <- function(chart) {
+  return(character(0))
+}
+
+
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' Carries the last calculated centre line and limits forward unchanged.

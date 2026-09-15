@@ -275,17 +275,17 @@ test_that("limits_table_columns keeps y and n", {
 
 test_that("extend_display_limits recomputes the limits at each denominator", {
   # the limits of a P chart depend on n, so they cannot be carried forward.
-  # The width of the last calculated period is held as a constant and reapplied
-  # at each display point's own denominator - so a point with a larger n gets
-  # narrower limits.
+  # The standard deviation estimate of the last calculated period is carried
+  # forward and reapplied at each display point's own denominator - so a point
+  # with a larger n gets narrower limits.
   table <- data.frame(
     x = 1:5,
     y = c(15, 15, 15, 15, 15),
     n = c(100, 100, 100, 25, 400),
-    ucl = c(rep(25, 3), rep(NA_real_, 2)),
-    lcl = c(rep(5, 3), rep(NA_real_, 2)),
+    ucl = c(rep(21, 3), rep(NA_real_, 2)),
+    lcl = c(rep(9, 3), rep(NA_real_, 2)),
     cl = c(rep(15, 3), rep(NA_real_, 2)),
-    limit_width = c(rep(100, 3), rep(NA_real_, 2)),
+    sd_estimate = c(rep(20, 3), rep(NA_real_, 2)),
     period_type = c(
       rep("calculation", 3),
       rep(NA_character_, 2)
@@ -297,10 +297,10 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
     counter = 4
   )
 
-  # the period carries a limit width of 100, so the limits sit 100/sqrt(n)
-  # either side of the centre line
-  expect_equal(extended$ucl[4], 15 + 100 / sqrt(25))
-  expect_equal(extended$lcl[5], 15 - 100 / sqrt(400))
+  # the period carries a standard deviation estimate of 20, so the limits sit
+  # 3 * 20 / sqrt(n) either side of the centre line
+  expect_equal(extended$ucl[4], 15 + 3 * 20 / sqrt(25))
+  expect_equal(extended$lcl[5], 15 - 3 * 20 / sqrt(400))
 
   # the centre line is carried forward, and the calculated rows are untouched
   expect_identical(extended$cl, rep(15, 5))
@@ -320,7 +320,7 @@ test_that("extend_display_limits clamps the recomputed limits to 0 and 100", {
     ucl = c(rep(80, 3), rep(NA_real_, 2)),
     lcl = c(rep(20, 3), rep(NA_real_, 2)),
     cl = c(rep(50, 3), rep(NA_real_, 2)),
-    limit_width = c(rep(300, 3), rep(NA_real_, 2)),
+    sd_estimate = c(rep(100, 3), rep(NA_real_, 2)),
     period_type = c(
       rep("calculation", 3),
       rep(NA_character_, 2)
@@ -448,9 +448,9 @@ test_that("a P chart label is a percentage", {
 })
 
 
-test_that("the limits table carries the period's limit width", {
-  # every value is 50%, so the centre line is 50 and the limit width is
-  # 3 * sqrt(0.5 * 0.5) * 100, which is 150
+test_that("the limits table carries the period's sd estimate", {
+  # every value is 50%, so the centre line is 50 and the standard deviation
+  # estimate is sqrt(0.5 * 0.5) * 100, which is 50
   d <- data.frame(x = 1:40, n = rep(100L, 40))
   d$y <- d$n / 2
 
@@ -459,8 +459,11 @@ test_that("the limits table carries the period's limit width", {
     plot_chart = FALSE, period_min = 21L
   )
 
-  expect_equal(unique(result$limit_width), 150)
+  expect_equal(unique(result$sd_estimate), 50)
 
-  # the stored width and the drawn limits agree at every row
-  expect_equal(result$limit_width, (result$ucl - result$cl) * sqrt(result$n))
+  # the stored estimate and the drawn limits agree at every row
+  expect_equal(
+    3 * result$sd_estimate,
+    (result$ucl - result$cl) * sqrt(result$n)
+  )
 })

@@ -30,12 +30,12 @@ form_calculation_limits <- function(data,
   calculation_period$lcl <- limits_list$lcl
 
   # only the classes whose limits vary with the denominator return this
-  calculation_period$limit_width <- limits_list$limit_width
+  calculation_period$sd_estimate <- limits_list$sd_estimate
 
   extra_columns <- limits_table_columns(chart)
 
   calculation_period <- calculation_period %>%
-    dplyr::select(x, series, ucl, lcl, cl, dplyr::any_of("limit_width")) %>%
+    dplyr::select(x, series, ucl, lcl, cl, dplyr::any_of("sd_estimate")) %>%
     dplyr::mutate(period_type = "calculation") %>%
     dplyr::mutate(
       excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F)
@@ -54,7 +54,7 @@ form_calculation_limits <- function(data,
     limits_table <- limits_table %>%
       dplyr::select(
         x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
-        dplyr::any_of("limit_width"),
+        dplyr::any_of("sd_estimate"),
         period_type, excluded,
         dplyr::any_of("run_break"),
         dplyr::any_of("log")
@@ -85,11 +85,11 @@ form_calculation_limits <- function(data,
         is.na(excluded.y), excluded.x, excluded.y
       ))
 
-    if ("limit_width.y" %in% names(limits_table)) {
-      limits_table$limit_width <- dplyr::if_else(
-        is.na(limits_table$limit_width.y),
-        limits_table$limit_width.x,
-        limits_table$limit_width.y
+    if ("sd_estimate.y" %in% names(limits_table)) {
+      limits_table$sd_estimate <- dplyr::if_else(
+        is.na(limits_table$sd_estimate.y),
+        limits_table$sd_estimate.x,
+        limits_table$sd_estimate.y
       )
     }
 
@@ -100,7 +100,7 @@ form_calculation_limits <- function(data,
     limits_table <- limits_table %>%
       dplyr::select(
         x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
-        dplyr::any_of("limit_width"),
+        dplyr::any_of("sd_estimate"),
         period_type, excluded,
         dplyr::contains("break_point"),
         dplyr::contains("rule"),

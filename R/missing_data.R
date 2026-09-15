@@ -152,8 +152,9 @@ restore_missing_rows <- function(limits_table,
 #' An observation of the period to read the period's limits from
 #'
 #' Used to give limits to the rows of the period that hold no observation. A
-#' period holds one centre line throughout, and one limit width for the classes
-#' whose limits vary with the denominator, so the first observation that has
+#' period holds one centre line throughout, and one standard deviation estimate
+#' for the classes whose limits vary with the denominator, so the first
+#' observation that has
 #' both a centre line and an upper limit serves as well as any other.
 #'
 #' @param period The rows of the period that hold an observation.
@@ -180,7 +181,7 @@ row_holding_period_limits <- function(period) {
 #' this row does not have one. Rows before the first observation and after the
 #' last are left as they are, with no limits.
 #'
-#' @return `restored`, with `cl`, `ucl`, `lcl`, `limit_width` and the period
+#' @return `restored`, with `cl`, `ucl`, `lcl`, `sd_estimate` and the period
 #'   columns set on the rows in a gap
 #' @noRd
 carry_limits_across_gaps <- function(restored,
@@ -221,8 +222,8 @@ carry_limits_across_gaps <- function(restored,
     restored$limit_change[rows] <- FALSE
     restored$cl_change[rows] <- 0
 
-    if ("limit_width" %in% names(restored)) {
-      restored$limit_width[rows] <- limit_width_of(period_rows)
+    if ("sd_estimate" %in% names(restored)) {
+      restored$sd_estimate[rows] <- sd_estimate_of(period_rows)
     }
   }
 

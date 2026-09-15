@@ -3,27 +3,27 @@
 # them returns when it is given nothing to work from.
 
 
-# limit_width_of
+# sd_estimate_of
 
 
-test_that("limit_width_of returns the first value that is not missing", {
-  rows <- data.frame(limit_width = c(NA_real_, 150, 150))
+test_that("sd_estimate_of returns the first value that is not missing", {
+  rows <- data.frame(sd_estimate = c(NA_real_, 150, 150))
 
-  expect_identical(limit_width_of(rows), 150)
+  expect_identical(sd_estimate_of(rows), 150)
 })
 
 
-test_that("limit_width_of returns NA where the column is absent", {
+test_that("sd_estimate_of returns NA where the column is absent", {
   rows <- data.frame(cl = 20, ucl = 30, n = 100)
 
-  expect_true(is.na(limit_width_of(rows)))
+  expect_true(is.na(sd_estimate_of(rows)))
 })
 
 
-test_that("limit_width_of returns NA where every value is missing", {
-  rows <- data.frame(limit_width = c(NA_real_, NA_real_))
+test_that("sd_estimate_of returns NA where every value is missing", {
+  rows <- data.frame(sd_estimate = c(NA_real_, NA_real_))
 
-  expect_true(is.na(limit_width_of(rows)))
+  expect_true(is.na(sd_estimate_of(rows)))
 })
 
 
@@ -67,7 +67,7 @@ test_that("a denominator stays missing where the period has none either", {
 
 
 test_that("rows keep the limits they were given where the period holds no
-          limit width", {
+          sd estimate", {
   period <- data.frame(cl = 20, ucl = 30, n = 100)
   rows <- data.frame(n = 400)
   limits <- list(cl = 20, ucl = 30, lcl = 10)
@@ -85,7 +85,7 @@ test_that("rows keep the limits they were given where the period holds no
 
 test_that("rows keep the limits they were given where there is no denominator
           to calculate at", {
-  period <- data.frame(cl = 20, ucl = 30, n = NA_real_, limit_width = 120)
+  period <- data.frame(cl = 20, ucl = 30, n = NA_real_, sd_estimate = 120)
   rows <- data.frame(n = NA_real_)
   limits <- list(cl = 20, ucl = 30, lcl = 10)
 

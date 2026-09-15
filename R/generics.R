@@ -143,6 +143,21 @@ limits_table_columns <- function(chart) {
 }
 
 
+#' The column a class needs in order to place its limits at any denominator
+#'
+#' A P or P' chart's limits sit at the centre line plus and minus three times
+#' `sd_estimate` over the square root of the row's denominator, so the analysis
+#' table carries `sd_estimate` and the limits can be placed at a denominator the
+#' data does not hold. The classes whose limits are the same at every row of a
+#' calculation period need no such column.
+#'
+#' @return A character vector, empty where the class needs no such column.
+#' @noRd
+sd_estimate_columns <- function(chart) {
+  UseMethod("sd_estimate_columns")
+}
+
+
 #' The centre line label, formatted
 #'
 #' Everything about how a centre line value is written: the rounding, which

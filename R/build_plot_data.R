@@ -157,9 +157,7 @@ combine_plot_data <- function(plot_data,
 
   charts <- lapply(plot_data, function(each) each$chart)
 
-  # the moving range half has no limits to join on where there were too few
-  # points to form a period
-  if (!(is_xmr_pair(charts) && enough_data_for_limits(main$chart))) {
+  if (!is_xmr_pair(charts)) {
     return(main$table)
   }
 

@@ -445,3 +445,43 @@ test_that("the floating median is not drawn over the extension", {
   expect_identical(sum(!is.na(result$median)), 12L)
   expect_false(any(!is.na(result$median) & result$limit_extension))
 })
+
+
+test_that("an XmR pair too short for limits draws its floating median", {
+  # a pair without limits is drawn as the location chart alone, so the median
+  # is reached through create_timeseries_plot() rather than the pair
+  short_pair <- data.frame(
+    x = 1:14,
+    y = as.integer(c(10, 11, 10, 12, 11, 18, 19, 20, 19, 17, 18, 19, 18, 20))
+  )
+
+  drawn <- drawn_medians(suppressWarnings(autospc(short_pair,
+    chart_type = "XMR", period_min = 21L, floating_median = "yes"
+  )))
+
+  expect_true("Median" %in% drawn$labels)
+})
+
+
+test_that("a moving range panel without limits draws its floating median", {
+  # a gap costs the moving range series two of its values, so a series long
+  # enough for the X chart's limits can leave the moving range chart short of
+  # them. That panel is then drawn by create_timeseries_plot().
+  set.seed(3)
+  with_a_gap <- data.frame(x = 1:22, y = as.integer(stats::rpois(22, 50)))
+  with_a_gap$y[11] <- NA
+
+  plot <- suppressWarnings(autospc(with_a_gap,
+    chart_type = "XMR", period_min = 21L, floating_median = "yes"
+  ))
+
+  halves <- autospc_plot_charts(plot)
+
+  expect_identical(
+    vapply(halves, enough_data_for_limits, logical(1L)),
+    c(location = TRUE, dispersion = FALSE)
+  )
+
+  # one median label on each panel
+  expect_identical(sum(panel_texts(plot) == "Median"), 2L)
+})

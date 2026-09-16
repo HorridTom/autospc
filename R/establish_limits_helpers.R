@@ -455,23 +455,33 @@ points_with_a_value <- function(table) {
 floating_median_column <- function(table,
                                    floating_median,
                                    floating_median_n) {
+  # the column is always returned, and holds a value only on the rows the
+  # median is drawn over
+  table <- table %>%
+    dplyr::mutate(median = NA_real_)
+
   if (identical(floating_median, "no")) {
     return(table)
   }
 
-  if (points_with_a_value(table) < floating_median_n) {
+  # the rows the extension added beyond the end of the data hold no
+  # observation, so the median is taken over the rows the data supplied
+  observed <- table %>%
+    dplyr::filter(!limit_extension)
+
+  if (points_with_a_value(observed) < floating_median_n) {
     if (identical(floating_median, "yes")) {
       warning(paste0(
         "A floating median is taken over the last ", floating_median_n,
         " points that have a value, and this series has ",
-        points_with_a_value(table), ". No floating median is drawn."
+        points_with_a_value(observed), ". No floating median is drawn."
       ))
     }
 
     return(table)
   }
 
-  median_from_x <- table %>%
+  median_from_x <- observed %>%
     dplyr::mutate(non_missing = !is.na(series)) %>%
     dplyr::arrange(dplyr::desc(x)) %>%
     dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing)) %>%
@@ -479,29 +489,25 @@ floating_median_column <- function(table,
     dplyr::pull(x) %>%
     max()
 
+  window <- observed %>%
+    dplyr::filter(x >= median_from_x)
+
   addfloating_median <- switch(
     EXPR = floating_median,
     yes = TRUE,
-    auto = any(table %>%
-      dplyr::filter(x >= median_from_x) %>%
-      dplyr::pull(rule2)),
+    # a row with no value is not part of a shift rule break, so its NA counts
+    # as no break rather than making the whole test missing
+    auto = any(window$rule2, na.rm = TRUE),
     FALSE
   )
 
   if (addfloating_median) {
     table <- table %>%
-      dplyr::mutate(
-        median =
-          dplyr::if_else(x >= median_from_x,
-            stats::median(
-              table %>%
-                dplyr::filter(x >= median_from_x) %>%
-                dplyr::pull(series),
-              na.rm = TRUE
-            ),
-            NA
-          )
-      )
+      dplyr::mutate(median = dplyr::if_else(
+        !limit_extension & x >= median_from_x,
+        stats::median(window$series, na.rm = TRUE),
+        NA_real_
+      ))
   }
 
   return(table)

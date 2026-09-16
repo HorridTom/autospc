@@ -2,8 +2,8 @@
 #'
 #' Reads `chart$data`. The algorithm iterates over the rows that hold an
 #' observation, so it is given those rows rather than `chart$data` itself, and
-#' the rest are put back into the result at the end. When there are too few
-#' points to form a period the table has no limits columns.
+#' the rest are put back into the result at the end. Where there are too few
+#' points to form a period the analysed columns hold no value.
 #'
 #' @return autospc_chart object, with `chart$result$table` set
 #' @noRd
@@ -36,8 +36,6 @@ establish_limits <- function(chart) {
 
     chart$result$re_establish_rows <- integer(0)
     chart$result$exclusions <- integer(0)
-
-    return(chart)
   } else {
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
@@ -323,13 +321,6 @@ establish_limits <- function(chart) {
     chart$result$re_establish_rows <- which(chart$result$table$break_point)
     chart$result$exclusions <- which(chart$result$table$excluded)
 
-    # the floating median
-    chart$result$table <- floating_median_column(
-      table = chart$result$table,
-      floating_median = chart$floating_median,
-      floating_median_n = chart$floating_median_n
-    )
-
     chart$result$table$log <- render_log(chart)
 
     # extend_limits_to produces limit values. They go on last
@@ -338,14 +329,7 @@ establish_limits <- function(chart) {
       table = chart$result$table,
       chart = chart
     )
-
-    # the same columns, in the same order, as the path above returns
-    chart$result$table <- chart$result$table %>%
-      dplyr::select(
-        dplyr::all_of(analysis_table_columns(chart)),
-        dplyr::everything()
-      )
-
-    return(chart)
   } # end of: [2] enough data points to form one period
+
+  return(finish_analysis_table(chart))
 }

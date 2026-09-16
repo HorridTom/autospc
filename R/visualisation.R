@@ -109,10 +109,11 @@ create_spc_plot <- function(plot_data,
     )
 
   # Add floating median to chart if needed
-  if ("median" %in% colnames(table)) {
+  if (has_floating_median(table)) {
     spc_plot <- add_floating_median(
       spc_plot = spc_plot,
-      table = long_table,
+      table = long_table %>%
+        dplyr::filter(plotted_line == "cl"),
       floating_median_n = chart$floating_median_n
     )
   }
@@ -210,7 +211,8 @@ draw_mr_panel <- function(plot_data,
     return(create_timeseries_plot(
       table = plot_data$table,
       visualisation_params = visualisation_params,
-      axis_extents = plot_data$axis_extents
+      axis_extents = plot_data$axis_extents,
+      floating_median_n = plot_data$chart$floating_median_n
     ))
   }
 
@@ -231,6 +233,7 @@ draw_mr_panel <- function(plot_data,
 create_timeseries_plot <- function(table,
                                    visualisation_params,
                                    axis_extents,
+                                   floating_median_n,
                                    faceted = FALSE) {
   time_series_plot <- ggplot2::ggplot(
     table,
@@ -263,6 +266,15 @@ create_timeseries_plot <- function(table,
         big.mark = ","
       )
     )
+
+  # a floating median does not need limits, so is added here if present
+  if (has_floating_median(table)) {
+    time_series_plot <- add_floating_median(
+      table = table,
+      spc_plot = time_series_plot,
+      floating_median_n = floating_median_n
+    )
+  }
 
   time_series_plot <- format_x_axis(
     spc_plot = time_series_plot,

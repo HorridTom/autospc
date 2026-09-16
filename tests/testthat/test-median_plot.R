@@ -64,8 +64,8 @@ test_that("the median is not generated nor plotted when floating_median is set t
   # Store XmR chart data
   chart_result_data <- chart_result$data
 
-  # Test that a median column is not generated
-  expect_false("median" %in% names(chart_result_data))
+  # Test that no median is calculated
+  expect_true(all(is.na(chart_result_data$median)))
 })
 
 test_that("the series of medians being plotted are correctly calculated when floating_median is set to auto", {
@@ -141,7 +141,7 @@ test_that("Median is not plotted when floating_median is set to auto and there i
 
   # Test that the median is not calculated nor plotted when there is not a
   # shift rule 2 break in last 12L points
-  expect_false("median" %in% names(chart_result_data))
+  expect_true(all(is.na(chart_result_data$median)))
 })
 
 
@@ -165,8 +165,8 @@ test_that("NAs do not prevent median from being plotted", {
   # Store XmR chart data
   chart_result_data <- chart_result$data
 
-  # Test that a median column is generated
-  expect_true("median" %in% names(chart_result_data))
+  # Test that a median is calculated
+  expect_false(all(is.na(chart_result_data$median)))
 
   # Test it is not NA and has the correct value
   result_median <- chart_result_data %>%
@@ -243,9 +243,9 @@ short_median_chart <- function(floating_median, data = short_median_data) {
 
 
 test_that("too few points with a value means no floating median", {
-  expect_false("median" %in% names(
-    suppressWarnings(short_median_chart("yes"))
-  ))
+  expect_true(all(is.na(
+    suppressWarnings(short_median_chart("yes"))$median
+  )))
 })
 
 
@@ -262,7 +262,7 @@ test_that("auto is silent on too short a series", {
   # answer rather than a failure
   expect_no_warning(short_median_chart("auto"))
 
-  expect_false("median" %in% names(short_median_chart("auto")))
+  expect_true(all(is.na(short_median_chart("auto")$median)))
 })
 
 
@@ -297,4 +297,191 @@ test_that("points with no value do not count towards floating_median_n", {
     short_median_chart("yes", data = with_gaps),
     "this series has 11"
   )
+})
+
+
+# A series too short to establish control limits
+
+
+no_limits_data <- data.frame(
+  x = 1:14,
+  y = as.integer(c(10, 11, 10, 12, 11, 18, 19, 20, 19, 17, 18, 19, 18, 20))
+)
+
+
+no_limits_chart <- function(floating_median, ...) {
+  return(suppressWarnings(autospc(no_limits_data,
+    chart_type = "C",
+    period_min = 21L,
+    floating_median = floating_median,
+    ...
+  )))
+}
+
+
+median_value_of <- function(table) {
+  return(as.numeric(unique(stats::na.omit(table$median))))
+}
+
+
+drawn_medians <- function(plot) {
+  built <- ggplot2::ggplot_build(plot)
+
+  return(list(
+    values = lapply(built$data, function(layer) {
+      as.numeric(unique(stats::na.omit(layer$y)))
+    }),
+    labels = unlist(lapply(built$data, function(layer) layer$label))
+  ))
+}
+
+
+test_that("a series too short for limits still gets a floating median", {
+  result <- no_limits_chart("yes", plot_chart = FALSE)
+
+  expect_identical(sum(!is.na(result$median)), 12L)
+  expect_length(median_value_of(result), 1L)
+})
+
+
+test_that("the floating median is drawn on a series too short for limits", {
+  expected <- median_value_of(no_limits_chart("yes", plot_chart = FALSE))
+
+  drawn <- drawn_medians(no_limits_chart("yes"))
+
+  # one layer holds the median line, at the value the table reports
+  expect_true(any(vapply(
+    drawn$values,
+    function(y) identical(y, expected),
+    logical(1L)
+  )))
+
+  # and one holds its label
+  expect_true("Median" %in% drawn$labels)
+})
+
+
+test_that("no floating median is drawn where none was asked for", {
+  expect_false("Median" %in% drawn_medians(no_limits_chart("no"))$labels)
+})
+
+
+test_that("show_limits = FALSE keeps the floating median", {
+  # the argument asks for no control limits, not for no median, and the series
+  # is long enough for both
+  longer <- data.frame(
+    x = 1:30,
+    y = as.integer(c(rep(c(10, 11, 10, 12, 11), 3), rep(c(18, 19, 20), 5)))
+  )
+
+  drawn <- drawn_medians(suppressWarnings(autospc(longer,
+    chart_type = "C", period_min = 21L, floating_median = "yes",
+    show_limits = FALSE
+  )))
+
+  expect_true("Median" %in% drawn$labels)
+})
+
+
+test_that("auto draws no median on a series too short for limits", {
+  # auto draws one only where a point in the window is part of a shift rule
+  # break, and without limits there are no rule breaks to find
+  expect_true(all(is.na(no_limits_chart("auto",
+    plot_chart = FALSE
+  )$median)))
+})
+
+
+test_that("auto is not confused by a point with no value in the window", {
+  # the rule 2 column holds NA at a point with no value, which is not a break
+  alternating <- data.frame(x = 1:40, y = as.integer(rep(c(48L, 52L), 20)))
+  alternating$y[38] <- NA
+
+  result <- expect_no_error(suppressWarnings(autospc(alternating,
+    chart_type = "C", period_min = 21L, floating_median = "auto",
+    plot_chart = FALSE
+  )))
+
+  # no point in the window is part of a shift rule break, so no median
+  expect_true(all(is.na(result$median)))
+})
+
+
+test_that("the floating median label sits at the start of the median window", {
+  table <- suppressWarnings(autospc(example_series_1,
+    chart_type = "C", floating_median = "yes", plot_chart = FALSE
+  ))
+
+  window_starts_at <- min(table$x[!is.na(table$median)])
+
+  drawn <- ggplot2::ggplot_build(suppressWarnings(autospc(example_series_1,
+    chart_type = "C", floating_median = "yes"
+  )))$data
+
+  label <- do.call(rbind, lapply(drawn, function(layer) {
+    if (is.null(layer$label)) {
+      return(NULL)
+    }
+
+    return(layer[layer$label == "Median", c("x", "y")])
+  }))
+
+  expect_equal(label$x, window_starts_at)
+})
+
+
+test_that("the floating median is not drawn over the extension", {
+  # extend_limits_to adds rows beyond the end of the data, and they hold no
+  # observation for a median to be taken over
+  set.seed(5)
+  extended <- data.frame(x = 1:40, y = as.integer(stats::rpois(40, 50)))
+
+  result <- suppressWarnings(autospc(extended,
+    chart_type = "C", period_min = 21L, floating_median = "yes",
+    extend_limits_to = 48, plot_chart = FALSE
+  ))
+
+  expect_identical(sum(result$limit_extension), 2L)
+  expect_identical(sum(!is.na(result$median)), 12L)
+  expect_false(any(!is.na(result$median) & result$limit_extension))
+})
+
+
+test_that("an XmR pair too short for limits draws its floating median", {
+  # a pair without limits is drawn as the location chart alone, so the median
+  # is reached through create_timeseries_plot() rather than the pair
+  short_pair <- data.frame(
+    x = 1:14,
+    y = as.integer(c(10, 11, 10, 12, 11, 18, 19, 20, 19, 17, 18, 19, 18, 20))
+  )
+
+  drawn <- drawn_medians(suppressWarnings(autospc(short_pair,
+    chart_type = "XMR", period_min = 21L, floating_median = "yes"
+  )))
+
+  expect_true("Median" %in% drawn$labels)
+})
+
+
+test_that("a moving range panel without limits draws its floating median", {
+  # a gap costs the moving range series two of its values, so a series long
+  # enough for the X chart's limits can leave the moving range chart short of
+  # them. That panel is then drawn by create_timeseries_plot().
+  set.seed(3)
+  with_a_gap <- data.frame(x = 1:22, y = as.integer(stats::rpois(22, 50)))
+  with_a_gap$y[11] <- NA
+
+  plot <- suppressWarnings(autospc(with_a_gap,
+    chart_type = "XMR", period_min = 21L, floating_median = "yes"
+  ))
+
+  halves <- autospc_plot_charts(plot)
+
+  expect_identical(
+    vapply(halves, enough_data_for_limits, logical(1L)),
+    c(location = TRUE, dispersion = FALSE)
+  )
+
+  # one median label on each panel
+  expect_identical(sum(panel_texts(plot) == "Median"), 2L)
 })

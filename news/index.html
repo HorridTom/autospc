@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9017</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,18 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9019" id="autospc-0109019">autospc 0.1.0.9019<a class="anchor" aria-label="anchor" href="#autospc-0109019"></a></h2>
+<div class="section level3">
+<h3 id="a-floating-median-is-drawn-on-a-series-too-short-for-control-limits-0-1-0-9019">A floating median is drawn on a series too short for control limits<a class="anchor" aria-label="anchor" href="#a-floating-median-is-drawn-on-a-series-too-short-for-control-limits-0-1-0-9019"></a></h3>
+<p><code>floating_median = "yes"</code> asks for a median over the last <code>floating_median_n</code> points that have a value. That does not need control limits, but a series too short for limits got no median and no <code>median</code> column, however many points it held.</p>
+<ul><li><p><strong>A series too short for limits now gets its floating median</strong>, in the returned table and on the chart.</p></li>
+<li><p><strong><code>show_limits = FALSE</code> keeps the floating median as well.</strong> It asks for no control limits, not for no median.</p></li>
+<li><p><strong><code>floating_median = "auto"</code> no longer errors where a point in the median window is missing.</strong></p></li>
+<li><p><code>floating_median = "auto"</code> draws no median on a series too short for limits. It draws one only where a point in the window is part of a shift rule break, and a series without centre line and limits has no rule breaks by definition.</p></li>
+<li><p><strong>The <code>median</code> column is now always returned</strong>, holding no value where no floating median was drawn. It used to appear only when one was drawn, which depended on the data as well as on <code>floating_median</code>: under <code>"yes"</code> on whether enough points had a value, and under <code>"auto"</code> on whether one of them was part of a shift rule break. A given chart type now returns the same columns whatever the data and whatever the other arguments.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9018" id="autospc-0109018">autospc 0.1.0.9018<a class="anchor" aria-label="anchor" href="#autospc-0109018"></a></h2>
 <div class="section level3">

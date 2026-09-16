@@ -35,7 +35,7 @@ get_x_limits <- function(y,
   )
 
   mean_x <- mean(y_excl, na.rm = TRUE)
-  sigma <- mr_lims$mean_mr / 1.128
+  sigma <- mr_lims$mean_mr / d2_constant()
   ucl_x <- mean_x + (3 * sigma)
   lcl_x <- mean_x - (3 * sigma)
 
@@ -100,7 +100,7 @@ mr_limits <- function(mr,
   mean_mr <- mean(mr,
     na.rm = TRUE
   )
-  ucl_mr <- 3.267 * mean_mr
+  ucl_mr <- mr_upper_limit_factor() * mean_mr
 
   # Recursively removes moving ranges that are above the upper range limit and
   # recalculates the average moving range. mr_screen_max_loops sets the maximum
@@ -110,7 +110,7 @@ mr_limits <- function(mr,
   while (any(mr > ucl_mr, na.rm = TRUE) & (i < mr_screen_max_loops)) {
     mr <- mr[mr < ucl_mr] # removes any mr values above the url
     mean_mr <- mean(mr, na.rm = TRUE)
-    ucl_mr <- 3.267 * mean_mr
+    ucl_mr <- mr_upper_limit_factor() * mean_mr
 
     i <- i + 1L
   }

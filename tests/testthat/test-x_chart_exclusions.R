@@ -23,6 +23,11 @@ test_x_chart_exclusions_answer <- readRDS(
 
 # test that the X chart limits is the same as qicharts2 results
 test_that("X chart limits the same as qicharts2 v.0.7.2", {
+  # qicharts2 uses the published rounded constants, so the agreement holds
+  # under the option that selects them
+  previous <- options(autospc.rounded_constants = TRUE)
+  on.exit(options(previous))
+
   results <- get_x_limits(
     y = test_data$y,
     exclusion_points = c(6, 15)

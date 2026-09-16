@@ -6,6 +6,11 @@
 #'   instance when drawing many charts to avoid many warnings. The warning
 #'   carries the class `"autospc_missing_x_warning"`, so it can also be handled
 #'   on its own with `withCallingHandlers()`.}
+#'   \item{`autospc.rounded_constants`}{Whether to use the published rounded
+#'   values of the antibiasing constants, rather than their exact values.
+#'   `FALSE` unless set to `TRUE`, so the exact values are used by default. Set
+#'   `options(autospc.rounded_constants = TRUE)` for limits that agree with a
+#'   hand calculation from a published table of constants.}
 #' }
 #'
 #' @keywords internal

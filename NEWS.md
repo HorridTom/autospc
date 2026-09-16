@@ -1,3 +1,22 @@
+# autospc 0.1.0.9020
+
+## Antibiasing constants
+
+X, C', P' and MR charts use antibiasing constants d2 and D4 . Both were written
+into the code as the values published to three decimal places, 1.128 and 3.267.
+For a subgroup of two both have closed forms.
+
+* **The exact values are now used**: d2 is `2 / sqrt(pi)` and D4 is
+  `1 + 3 * sqrt(2 * (1 - 2 / pi)) / d2`. The limits of an X, C' or P' chart are
+  0.034% narrower than before and an MR chart's upper limit 0.014% lower. The
+  centre line is unchanged on every chart type, as are C and P charts, whose
+  limits do not involve a moving range.
+
+* **`options(autospc.rounded_constants = TRUE)` restores the rounded values**,
+  for limits that agree with a hand calculation from a published table of
+  constants, or with software that uses the same rounded values. Only `TRUE`
+  selects them, so a mis-typed option leaves the exact values in use.
+
 # autospc 0.1.0.9019
 
 ## A floating median is drawn on a series too short for control limits

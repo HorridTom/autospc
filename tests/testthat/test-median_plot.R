@@ -427,3 +427,20 @@ test_that("the floating median label sits at the start of the median window", {
 
   expect_equal(label$x, window_starts_at)
 })
+
+
+test_that("the floating median is not drawn over the extension", {
+  # extend_limits_to adds rows beyond the end of the data, and they hold no
+  # observation for a median to be taken over
+  set.seed(5)
+  extended <- data.frame(x = 1:40, y = as.integer(stats::rpois(40, 50)))
+
+  result <- suppressWarnings(autospc(extended,
+    chart_type = "C", period_min = 21L, floating_median = "yes",
+    extend_limits_to = 48, plot_chart = FALSE
+  ))
+
+  expect_identical(sum(result$limit_extension), 2L)
+  expect_identical(sum(!is.na(result$median)), 12L)
+  expect_false(any(!is.na(result$median) & result$limit_extension))
+})

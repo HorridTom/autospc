@@ -49,6 +49,7 @@ utils::globalVariables(c(
   "lcl.x",
   "lcl.y",
   "limit_change",
+  "limit_extension",
   "log_entry",
   "lower_annotation_level",
   "lower_level",

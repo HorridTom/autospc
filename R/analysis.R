@@ -113,8 +113,8 @@ analysis_column_types <- function() {
 #' @param table The prepared data, with the log on it.
 #' @param chart The chart being analysed.
 #'
-#' @return `table`, holding the columns of `analysis_table_columns(chart)` in
-#'   that order.
+#' @return `table`, holding every column of `analysis_table_columns(chart)`.
+#'   `finish_analysis_table()` puts them in order.
 #' @noRd
 fill_analysis_columns <- function(table,
                                   chart) {
@@ -126,7 +126,34 @@ fill_analysis_columns <- function(table,
 
   table$limit_extension <- rep(FALSE, nrow(table))
 
-  return(dplyr::select(table, dplyr::all_of(analysis_table_columns(chart))))
+  return(table)
+}
+
+
+#' Finish a chart's analysis table
+#'
+#' What both paths through `establish_limits()` end with: the floating median,
+#' and the columns in the order `analysis_table_columns()` declares.
+#'
+#' @param chart The chart being analysed, with `chart$result$table` set.
+#'
+#' @return `chart`, with the median drawn where there is one and the columns in
+#'   the declared order.
+#' @noRd
+finish_analysis_table <- function(chart) {
+  chart$result$table <- floating_median_column(
+    table = chart$result$table,
+    floating_median = chart$floating_median,
+    floating_median_n = chart$floating_median_n
+  )
+
+  chart$result$table <- chart$result$table %>%
+    dplyr::select(
+      dplyr::all_of(analysis_table_columns(chart)),
+      dplyr::everything()
+    )
+
+  return(chart)
 }
 
 

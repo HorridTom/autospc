@@ -350,7 +350,8 @@ test_that("the floating median is drawn on a series too short for limits", {
   drawn <- drawn_medians(no_limits_chart("yes"))
 
   # one layer holds the median line, at the value the table reports
-  expect_true(any(vapply(drawn$values,
+  expect_true(any(vapply(
+    drawn$values,
     function(y) identical(y, expected),
     logical(1L)
   )))

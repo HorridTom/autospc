@@ -27,15 +27,12 @@ analyse_charts <- function(charts) {
 
 #' The columns a chart's analysis table holds, in order
 #'
-#' The contract `autospc(plot_chart = FALSE)` returns: for a given chart type
-#' and the same arguments, the same columns whether or not the series held
-#' enough points to form a period. Both paths through `establish_limits()`
-#' finish against this list.
+#' The contract `autospc(plot_chart = FALSE)` returns: for a given chart type,
+#' the same columns whatever the data and whatever the other arguments. Both
+#' paths through `establish_limits()` finish against this list.
 #'
-#' `median` is not among them. A floating median is drawn only where the series
-#' holds enough points with a value for one, which depends on the data as well
-#' as on the arguments, so the column is added where it is drawn and not
-#' otherwise.
+#' `median` is among them, and holds no value where no floating median was
+#' drawn.
 #'
 #' @param chart The chart being analysed.
 #'
@@ -63,7 +60,8 @@ analysis_table_columns <- function(chart) {
     "plot_period",
     "cl_change",
     "log",
-    "limit_extension"
+    "limit_extension",
+    "median"
   ))
 }
 
@@ -98,7 +96,8 @@ analysis_column_types <- function() {
     period_start = integer(0),
     plot_period = character(0),
     cl_change = numeric(0),
-    limit_extension = logical(0)
+    limit_extension = logical(0),
+    median = numeric(0)
   ))
 }
 

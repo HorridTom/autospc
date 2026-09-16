@@ -32,14 +32,17 @@ analyse_plotting <- function(...) {
 
 
 test_that("floating_median takes each of the values it accepts", {
-  expect_false("median" %in% names(analyse(floating_median = "no")))
-  expect_true("median" %in% names(analyse(floating_median = "yes")))
-  expect_false("median" %in% names(analyse(floating_median = "auto")))
+  # the median column is always returned, so what the value decides is whether
+  # a median is drawn into it. This series has no shift rule break in the
+  # window, so "auto" draws none.
+  expect_true(all(is.na(analyse(floating_median = "no")$median)))
+  expect_false(all(is.na(analyse(floating_median = "yes")$median)))
+  expect_true(all(is.na(analyse(floating_median = "auto")$median)))
 })
 
 
 test_that("floating_median defaults to no when it is not given", {
-  expect_false("median" %in% names(analyse()))
+  expect_true(all(is.na(analyse()$median)))
 })
 
 

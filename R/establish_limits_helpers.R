@@ -455,6 +455,10 @@ points_with_a_value <- function(table) {
 floating_median_column <- function(table,
                                    floating_median,
                                    floating_median_n) {
+  # the column is always returned, and holds a value only on the rows the
+  # median is drawn over
+  table$median <- rep(NA_real_, nrow(table))
+
   if (identical(floating_median, "no")) {
     return(table)
   }
@@ -482,9 +486,11 @@ floating_median_column <- function(table,
   addfloating_median <- switch(
     EXPR = floating_median,
     yes = TRUE,
+    # a row with no value is not part of a shift rule break, so its NA counts
+    # as no break rather than making the whole test missing
     auto = any(table %>%
       dplyr::filter(x >= median_from_x) %>%
-      dplyr::pull(rule2)),
+      dplyr::pull(rule2), na.rm = TRUE),
     FALSE
   )
 

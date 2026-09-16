@@ -1,3 +1,32 @@
+# autospc 0.1.0.9019
+
+## A floating median is drawn on a series too short for control limits
+
+`floating_median = "yes"` asks for a median over the last `floating_median_n`
+points that have a value. That does not need control limits, but a series too
+short for limits got no median and no `median` column, however many points it
+held.
+
+* **A series too short for limits now gets its floating median**, in the
+  returned table and on the chart.
+
+* **`show_limits = FALSE` keeps the floating median as well.** It asks for no
+  control limits, not for no median.
+
+* **`floating_median = "auto"` no longer errors where a point in the median
+  window is missing.** 
+
+* `floating_median = "auto"` draws no median on a series too short for limits.
+  It draws one only where a point in the window is part of a shift rule break,
+  and a series without centre line and limits has no rule breaks by definition.
+
+* **The `median` column is now always returned**, holding no value where no
+  floating median was drawn. It used to appear only when one was drawn, which
+  depended on the data as well as on `floating_median`: under `"yes"` on
+  whether enough points had a value, and under `"auto"` on whether one of them
+  was part of a shift rule break. A given chart type now returns the same
+  columns whatever the data and whatever the other arguments.
+
 # autospc 0.1.0.9018
 
 ## `plot_chart = FALSE` returns the same columns for a given chart type

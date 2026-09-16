@@ -34,6 +34,14 @@ establish_limits <- function(chart) {
       chart = chart
     )
 
+    # a floating median is taken over points that have a value, which does not
+    # need limits, so it is drawn here as well as on the path below
+    chart$result$table <- floating_median_column(
+      table = chart$result$table,
+      floating_median = chart$floating_median,
+      floating_median_n = chart$floating_median_n
+    )
+
     chart$result$re_establish_rows <- integer(0)
     chart$result$exclusions <- integer(0)
 

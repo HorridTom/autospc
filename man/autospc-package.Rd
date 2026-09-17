@@ -18,6 +18,11 @@ because \code{x} is \code{NA}. \code{TRUE} unless set otherwise. Set
 instance when drawing many charts to avoid many warnings. The warning
 carries the class \code{"autospc_missing_x_warning"}, so it can also be handled
 on its own with \code{withCallingHandlers()}.}
+\item{\code{autospc.rounded_constants}}{Whether to use the published rounded
+values of the antibiasing constants, rather than their exact values.
+\code{FALSE} unless set to \code{TRUE}, so the exact values are used by default. Set
+\code{options(autospc.rounded_constants = TRUE)} for limits that agree with a
+hand calculation from a published table of constants.}
 }
 }
 

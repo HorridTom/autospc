@@ -16,6 +16,11 @@ test_mr_limit_answer <- readRDS(file.path(
 # test that mr control limits match those from qicharts2 v.0.7.2
 # when mr_screen_max_loops = 0
 test_that("mR chart limits the same as qicharts2 v.0.7.2", {
+  # qicharts2 uses the published rounded constants, so the agreement holds
+  # under the option that selects them
+  previous <- options(autospc.rounded_constants = TRUE)
+  on.exit(options(previous))
+
   mrs <- moving_ranges(y = mr_data$y)
   results <- get_mr_limits(
     mr = mrs,

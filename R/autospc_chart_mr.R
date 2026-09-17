@@ -152,7 +152,7 @@ observed_rows.autospc_chart_mr <- function(chart,
 #' Calculate control limits for a subset of MR-chart data
 #'
 #' Centre line is the mean moving range of the non-excluded points, with the
-#' upper limit 3.267 times that and the lower limit zero.
+#' upper limit `mr_upper_limit_factor()` times that and the lower limit zero.
 #'
 #' Screening is deliberately not applied. It exists to estimate the average
 #' moving range used for the X chart's limits; the MR chart itself never screens

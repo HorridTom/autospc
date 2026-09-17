@@ -44,6 +44,11 @@ test_cp_limit_answer <- readRDS(file.path(
 ))
 
 test_that("C prime chart limits the same as qicharts2 v.0.7.2", {
+  # qicharts2 uses the published rounded constants, so the agreement holds
+  # under the option that selects them
+  previous <- options(autospc.rounded_constants = TRUE)
+  on.exit(options(previous))
+
   results <- get_cp_limits(y = test_data$y)
 
   expect_equal(results$cl, test_cp_limit_answer$cl)

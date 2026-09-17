@@ -109,7 +109,7 @@ get_pp_limits <- function(y,
   amr <- mr_lims$mean_mr
   ulmr <- mr_lims$ucl_mr
 
-  sigma_z <- amr / 1.128
+  sigma_z <- amr / d2_constant()
 
   # Recalculate the standard error with excluded data
   if (use_nbar_for_stdev) {

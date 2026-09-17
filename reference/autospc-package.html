@@ -15,7 +15,7 @@ Creates spc charts with control limits and centre line calculations partitioned 
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9020</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,13 @@ because <code>x</code> is <code>NA</code>. <code>TRUE</code> unless set otherwis
 instance when drawing many charts to avoid many warnings. The warning
 carries the class <code>"autospc_missing_x_warning"</code>, so it can also be handled
 on its own with <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">withCallingHandlers()</a></code>.</p></dd>
+
+<dt><code>autospc.rounded_constants</code></dt>
+<dd><p>Whether to use the published rounded
+values of the antibiasing constants, rather than their exact values.
+<code>FALSE</code> unless set to <code>TRUE</code>, so the exact values are used by default. Set
+<code>options(autospc.rounded_constants = TRUE)</code> for limits that agree with a
+hand calculation from a published table of constants.</p></dd>
 
 
 </dl></div>

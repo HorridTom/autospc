@@ -14,6 +14,14 @@ partitioned into distinct periods.
   so it can also be handled on its own with
   [`withCallingHandlers()`](https://rdrr.io/r/base/conditions.html).
 
+- `autospc.rounded_constants`:
+
+  Whether to use the published rounded values of the antibiasing
+  constants, rather than their exact values. `FALSE` unless set to
+  `TRUE`, so the exact values are used by default. Set
+  `options(autospc.rounded_constants = TRUE)` for limits that agree with
+  a hand calculation from a published table of constants.
+
 ## See also
 
 Useful links:

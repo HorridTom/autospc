@@ -81,6 +81,19 @@ calculate_limits <- function(chart,
 }
 
 
+#' The range the plotted statistic can take
+#'
+#' Limits are constrained to this range, so that a chart does not draw a limit
+#' at a value the statistic could never take. A count cannot be negative, a
+#' percentage lies between 0 and 100, and an individuals value has no bound.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds <- function(chart) {
+  UseMethod("limit_bounds")
+}
+
+
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' Called with `counter` already known to be within the table.

@@ -42,8 +42,6 @@ get_p_limits <- function(y,
   ucl <- cl + 3 * standard_error * multiply
   lcl <- cl - 3 * standard_error * multiply
 
-  lcl[lcl < 0 & is.finite(lcl)] <- 0
-
   list(
     cl = rep(cl, length(y)),
     ucl = ucl,
@@ -128,8 +126,6 @@ get_pp_limits <- function(y,
   cl <- cl * multiply
   ucl <- cl + 3 * standard_error * multiply
   lcl <- cl - 3 * standard_error * multiply
-
-  lcl[lcl < 0 & is.finite(lcl)] <- 0
 
   list(
     cl = rep(cl, length(y)),

@@ -33,8 +33,6 @@ get_c_limits <- function(y,
   ucl <- cl + 3 * stdev
   lcl <- cl - 3 * stdev
 
-  lcl[lcl < 0 & is.finite(lcl)] <- 0
-
   list(
     cl = rep(cl, length(y)),
     ucl = rep(ucl, length(y)),
@@ -91,8 +89,6 @@ get_cp_limits <- function(y,
   stdev <- stdev * sigma_z
   ucl <- cl + 3 * stdev
   lcl <- cl - 3 * stdev
-
-  lcl[lcl < 0 & is.finite(lcl)] <- 0
 
   list(
     cl = rep(cl, length(y)),

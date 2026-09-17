@@ -15,7 +15,7 @@
 #' limits themselves, and `form_calculation_limits()` carries it into the
 #' limits table as the `sd_estimate` column, so it is read from there rather
 #' than worked back out of the limits. Working it back out would give the wrong
-#' answer for a row whose limits have been held at 0 or 100.
+#' answer for a row whose limits have been constrained to 0 or 100.
 #'
 #' @param rows Rows of a limits table, holding an `sd_estimate` column.
 #'
@@ -40,8 +40,8 @@ sd_estimate_of <- function(rows) {
 #' Calculate limits at given denominators
 #'
 #' Returns `cl` plus and minus `3 * sd_estimate / sqrt(n)`, one pair of limits
-#' for each element of `n`. The values are not held within the range a
-#' percentage can take; `clamp_percentage_limits()` does that.
+#' for each element of `n`. The values are not constrained to the range a
+#' percentage can take; `constrain_limits()` does that.
 #'
 #' @param cl The centre line the limits sit either side of.
 #' @param sd_estimate The period's standard deviation estimate, from
@@ -62,23 +62,6 @@ limits_at_denominators <- function(cl,
 }
 
 
-#' Hold limits within the range a percentage can take
-#'
-#' Returns `limits` with any `ucl` above 100 replaced by 100 and any `lcl`
-#' below 0 replaced by 0. NA values are left as they are.
-#'
-#' @param limits A list of two numeric vectors, named ucl and lcl.
-#'
-#' @return `limits`, with nothing above 100 or below 0
-#' @noRd
-clamp_percentage_limits <- function(limits) {
-  return(list(
-    ucl = pmin(limits$ucl, 100),
-    lcl = pmax(limits$lcl, 0)
-  ))
-}
-
-
 #' Extend a calculation period's limits over the display rows
 #'
 #' Called by the `extend_display_limits()` methods of the P and P' classes.
@@ -90,12 +73,14 @@ clamp_percentage_limits <- function(limits) {
 #'
 #' @param limits_table The limits table being built.
 #' @param counter The first display row.
+#' @param bounds The range a percentage can take, as `limit_bounds()` gives it.
 #'
 #' @return `limits_table`, with `cl`, `ucl`, `lcl`, `sd_estimate` and
 #'   `period_type` set on the rows from `counter` onwards
 #' @noRd
 extend_display_limits_at_denominators <- function(limits_table,
-                                                  counter) {
+                                                  counter,
+                                                  bounds) {
   last_calculated <- counter - 1
 
   sd_estimate <- sd_estimate_of(limits_table[last_calculated, , drop = FALSE])
@@ -112,10 +97,13 @@ extend_display_limits_at_denominators <- function(limits_table,
     sd_estimate = sd_estimate,
     n = limits_table[["n"]][display_rows]
   )
-  held <- clamp_percentage_limits(display_limits)
+  constrained <- constrain_limits(
+    limits = display_limits,
+    bounds = bounds
+  )
 
-  limits_table$ucl[display_rows] <- held$ucl
-  limits_table$lcl[display_rows] <- held$lcl
+  limits_table$ucl[display_rows] <- constrained$ucl
+  limits_table$lcl[display_rows] <- constrained$lcl
 
   return(limits_table)
 }
@@ -164,12 +152,14 @@ denominators_for_missing_rows <- function(period,
 #'   named cl, ucl and lcl, one value per row of `rows`.
 #' @param period The rows of the period that hold an observation.
 #' @param rows The rows that hold no observation, to be given limits.
+#' @param bounds The range a percentage can take, as `limit_bounds()` gives it.
 #'
 #' @return `limits`, with `ucl` and `lcl` recalculated
 #' @noRd
 proportion_limits_for_missing_rows <- function(limits,
                                                period,
-                                               rows) {
+                                               rows,
+                                               bounds) {
   sd_estimate <- sd_estimate_of(period)
 
   n <- denominators_for_missing_rows(period = period, rows = rows)
@@ -184,10 +174,10 @@ proportion_limits_for_missing_rows <- function(limits,
     sd_estimate = sd_estimate,
     n = n[usable]
   )
-  held <- clamp_percentage_limits(at_n)
+  constrained <- constrain_limits(limits = at_n, bounds = bounds)
 
-  limits$ucl[usable] <- held$ucl
-  limits$lcl[usable] <- held$lcl
+  limits$ucl[usable] <- constrained$ucl
+  limits$lcl[usable] <- constrained$lcl
 
   return(limits)
 }

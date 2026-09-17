@@ -175,6 +175,21 @@ calculate_limits.autospc_chart_mr <- function(chart,
   return(limits)
 }
 
+
+#' The range a moving range can take
+#'
+#' A moving range cannot be negative, and has no upper bound.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart_mr <- function(chart) {
+  return(list(
+    low = 0,
+    high = Inf
+  ))
+}
+
+
 # Presentation methods
 
 #' Chart name

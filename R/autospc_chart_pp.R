@@ -281,7 +281,8 @@ extend_display_limits.autospc_chart_pp <- function(chart,
                                                    counter) {
   return(extend_display_limits_at_denominators(
     limits_table = limits_table,
-    counter = counter
+    counter = counter,
+    bounds = limit_bounds(chart)
   ))
 }
 
@@ -299,7 +300,8 @@ limits_for_missing_rows.autospc_chart_pp <- function(chart,
   return(proportion_limits_for_missing_rows(
     limits = NextMethod(),
     period = period,
-    rows = rows
+    rows = rows,
+    bounds = limit_bounds(chart)
   ))
 }
 
@@ -325,8 +327,29 @@ limits_for_extension_rows.autospc_chart_pp <- function(chart,
     use_nbar_for_stdev = TRUE
   )
 
+  limits <- constrain_limits(
+    limits = limits,
+    bounds = limit_bounds(chart)
+  )
+
   return(lapply(limits[c("cl", "ucl", "lcl")], "[[", 1L))
 }
+
+
+#' The range a percentage can take
+#'
+#' A percentage lies between 0 and 100. The limits are on that scale
+#' because the class calculates them with `multiply = 100`.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart_pp <- function(chart) {
+  return(list(
+    low = 0,
+    high = 100
+  ))
+}
+
 
 # Presentation methods
 

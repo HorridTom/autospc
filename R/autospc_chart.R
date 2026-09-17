@@ -549,18 +549,46 @@ upper_annotation_sf_default.autospc_chart <- function(chart) {
 }
 
 
+#' The range the plotted statistic can take
+#'
+#' No bound, which is right for an individuals value and is the safe answer for
+#' a class that has not said otherwise. Overridden by the classes whose
+#' statistic is a count, a moving range or a percentage.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart <- function(chart) {
+  return(list(
+    low = -Inf,
+    high = Inf
+  ))
+}
+
+
 #' Lower and upper ends of the y axis
 #'
-#' Zero to 110, the range for a chart labelled as a percentage. Overridden by
-#' the classes whose axis follows the data.
+#' Zero to 110 wherever the limits and the points lie within 0 to 100, which is
+#' where constraining the limits keeps them. Where they do not, the axis
+#' follows them, so that nothing the chart draws falls outside it. Overridden
+#' by the classes whose axis follows the data.
 #'
 #' @return list of two numbers, low and high
 #' @noRd
 y_axis_range.autospc_chart <- function(chart,
                                        data) {
+  low <- min(0, data$lcl, data$series, na.rm = TRUE)
+  high <- max(data$ucl, data$series, na.rm = TRUE)
+
+  if (high <= 100) {
+    return(list(
+      low = low,
+      high = 110
+    ))
+  }
+
   return(list(
-    low = 0,
-    high = 110
+    low = low,
+    high = high * 1.1
   ))
 }
 

@@ -138,6 +138,20 @@ calculate_limits.autospc_chart_c <- function(chart,
 }
 
 
+#' The range a count can take
+#'
+#' A count cannot be negative, and has no upper bound.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart_c <- function(chart) {
+  return(list(
+    low = 0,
+    high = Inf
+  ))
+}
+
+
 # Presentation methods
 
 #' Chart name

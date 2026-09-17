@@ -326,7 +326,7 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
 })
 
 
-test_that("extend_display_limits clamps the recomputed limits to 0 and 100", {
+test_that("extend_display_limits constrains the recomputed limits to 0 and 100", {
   # percentages, so a limit outside 0-100 is meaningless
   table <- data.frame(
     x = 1:5,

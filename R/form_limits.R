@@ -25,6 +25,11 @@ form_calculation_limits <- function(data,
     exclusion_points = exclusion_points
   )
 
+  limits_list <- constrain_limits(
+    limits = limits_list,
+    bounds = limit_bounds(chart)
+  )
+
   calculation_period$cl <- limits_list$cl
   calculation_period$ucl <- limits_list$ucl
   calculation_period$lcl <- limits_list$lcl

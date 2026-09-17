@@ -1,5 +1,35 @@
 # Changelog
 
+## autospc 0.1.0.9021
+
+### Control limits constrained to the range the statistic can take
+
+A count and a moving range cannot be negative, and a percentage cannot
+exceed 100. Each limit calculation applied its own version of this and
+the rules did not agree: a P chart’s upper limit was constrained to 100
+on its display rows, but not on its calculation rows and not beyond the
+end of the data.
+
+- **The constraining now happens in one place, after the limits are
+  formed**, so the same rule reaches every row of a chart. A P or P’
+  chart’s upper limit is constrained to 100 wherever it would otherwise
+  pass it, which it was not on calculation rows or on the rows an
+  `extend_limits_to` extension adds.
+
+- **A percentage chart’s vertical axis follows the limits and the
+  points** where they reach outside 0 to 100, rather than stopping at
+  110 whatever they are. Anything outside the axis was dropped from the
+  drawing without a warning, so a chart could be drawn with no upper
+  control limit at all. This only affected uninformative limits, and
+  invalid data points, outside the valid range.
+
+- **`options(autospc.constrain_limits = FALSE)` draws the limits where
+  the arithmetic puts them**, which shows how wide they are at the cost
+  of potentially putting them at values the statistic could not take.
+  Only `FALSE` turns the constraining off, so a mis-typed option leaves
+  it in place. An MR chart has a lower limit of zero either way, as is
+  standard.
+
 ## autospc 0.1.0.9020
 
 ### Antibiasing constants

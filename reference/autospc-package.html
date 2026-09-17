@@ -15,7 +15,7 @@ Creates spc charts with control limits and centre line calculations partitioned 
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9020</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9021</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,6 +68,16 @@ values of the antibiasing constants, rather than their exact values.
 <code>FALSE</code> unless set to <code>TRUE</code>, so the exact values are used by default. Set
 <code>options(autospc.rounded_constants = TRUE)</code> for limits that agree with a
 hand calculation from a published table of constants.</p></dd>
+
+<dt><code>autospc.constrain_limits</code></dt>
+<dd><p>Whether to constrain control limits to
+the range the plotted statistic can take: a count and a moving range at or
+above zero, a percentage between 0 and 100. <code>TRUE</code> unless set to <code>FALSE</code>.
+Set <code>options(autospc.constrain_limits = FALSE)</code> to draw the limits where
+the arithmetic puts them, which shows how wide they are but potentially
+puts them at values the statistic could not take. The vertical axis
+follows the limits either way. An MR chart has a lower limit of zero
+either way, as is standard.</p></dd>
 
 
 </dl></div>

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9021</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9022</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,22 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9022" id="autospc-0109022">autospc 0.1.0.9022<a class="anchor" aria-label="anchor" href="#autospc-0109022"></a></h2>
+<div class="section level3">
+<h3 id="a-standard-deviation-estimate-for-every-chart-type-0-1-0-9022">A standard deviation estimate for every chart type<a class="anchor" aria-label="anchor" href="#a-standard-deviation-estimate-for-every-chart-type-0-1-0-9022"></a></h3>
+<p><code>sd_estimate</code> is an estimate of the standard deviation of a single observation, on the same scale as the centre line. A P or P’ chart carried it; the other four chart types calculated the same kind of estimate, formed their limits from it and then discarded it.</p>
+<ul><li><p><strong>Every chart type now returns <code>sd_estimate</code>.</strong> A C, C’, X or MR chart’s analysis table gains the column, so <code>plot_chart = FALSE</code> returns one column more than before for those four types. The values already existed inside the calculations - <code>sqrt(cl)</code> for a C chart, the mean moving range over d2 for an X chart - and are now returned rather than thrown away.</p></li>
+<li><p><strong>The limits are formed in one place</strong>, three standard errors either side of the centre line, rather than inside each of the six calculations. The standard error is the estimate itself for the chart types whose limits do not vary with a denominator, and the estimate over the square root of the row’s denominator for P and P’. An MR chart’s lower limit remains zero, D3 being zero for a subgroup of two.</p></li>
+</ul><p>This change has no impact on the actual values for any chart’s limits. The calculation is the same arithmetic in a different place, and the estimate is what the limits were already being formed from. A P’ chart’s limits can differ in the last bit or two, the largest difference measured being 1.4e-14, because they are now formed from <code>sd_estimate</code> rather than from a separately computed standard error.</p>
+</div>
+<div class="section level3">
+<h3 id="a-p-charts-extended-limits-are-standardised-correctly-0-1-0-9022">A P’ chart’s extended limits are standardised correctly<a class="anchor" aria-label="anchor" href="#a-p-charts-extended-limits-are-standardised-correctly-0-1-0-9022"></a></h3>
+<p>A P’ chart forms z scores to standardise each point’s distance from the centre line in light of its own denominator, and the spread of those z scores gives Laney’s <code>sigma_z</code>. When extending limits beyond the end of the data, every z score was being standardised at the period’s mean denominator instead of the point’s own, which is what <code>use_nbar_for_stdev</code> did.</p>
+<ul><li><p><strong>The z scores now use each point’s own denominator wherever they are formed.</strong> P’ limits extended beyond data with varying denominators become narrower, more so with greater variation in the denominators. Only rows added by <code>extend_limits_to</code> are affected, so no centre line, control limit or rule break within the data changes.</p></li>
+<li><p><strong>A P chart’s extended limits sit at the centre line of the period they extend.</strong> Where a point had been excluded from the final calculation period, the extension rows were drawn at a centre line computed from averaged denominators, so they did not match the period they were carried from.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9021" id="autospc-0109021">autospc 0.1.0.9021<a class="anchor" aria-label="anchor" href="#autospc-0109021"></a></h2>
 <div class="section level3">

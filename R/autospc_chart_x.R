@@ -107,7 +107,7 @@ autospc_chart_x <- function(data,
 calculate_limits.autospc_chart_x <- function(chart,
                                              period,
                                              exclusion_points) {
-  limits <- get_x_limits(
+  limits <- get_x_statistics(
     y = period$series,
     mr_screen_max_loops = chart$mr_screen_max_loops,
     exclusion_points = exclusion_points

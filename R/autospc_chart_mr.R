@@ -166,7 +166,7 @@ calculate_limits.autospc_chart_mr <- function(chart,
                                               period,
                                               exclusion_points) {
   # the series of an MR chart is the moving ranges, put there by prepare_data()
-  limits <- get_mr_limits(
+  limits <- get_mr_statistics(
     mr = period$series,
     mr_screen_max_loops = 0L,
     exclusion_points = exclusion_points

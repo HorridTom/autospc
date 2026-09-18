@@ -108,13 +108,13 @@ test_that("validate_autospc_chart_mr rejects a repeated x", {
 })
 
 
-test_that("calculate_limits matches get_mr_limits", {
+test_that("calculate_limits matches get_mr_statistics", {
   expect_identical(
     calculate_limits(test_chart_mr(),
       period = count_period_data,
       exclusion_points = NULL
     ),
-    get_mr_limits(
+    get_mr_statistics(
       mr = count_period_data$series,
       mr_screen_max_loops = 0L,
       exclusion_points = NULL
@@ -129,7 +129,7 @@ test_that("calculate_limits passes exclusion_points through", {
       period = count_period_data,
       exclusion_points = 6L
     ),
-    get_mr_limits(
+    get_mr_statistics(
       mr = count_period_data$series,
       mr_screen_max_loops = 0L,
       exclusion_points = 6L
@@ -169,12 +169,12 @@ test_that("calculate_limits ignores mr_screen_max_loops on the chart", {
   # it were applied, so the test above is not vacuous
   expect_false(
     identical(
-      get_mr_limits(
+      get_mr_statistics(
         mr = screening_data$series,
         mr_screen_max_loops = 0L,
         exclusion_points = NULL
       ),
-      get_mr_limits(
+      get_mr_statistics(
         mr = screening_data$series,
         mr_screen_max_loops = 5L,
         exclusion_points = NULL

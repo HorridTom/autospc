@@ -27,7 +27,7 @@ test_p_limit_answer <- readRDS(file.path(
 test_that("P chart limits the same as qicharts2 v.0.7.2", {
   chart <- autospc_chart_p(data = test_data, x = "x", y = "y", n = "n")
 
-  statistics <- get_p_limits(
+  statistics <- get_p_statistics(
     y = test_data$y,
     n = test_data$n
   )
@@ -57,7 +57,7 @@ test_that("P prime chart limits the same as qicharts2 v.0.7.2", {
 
   chart <- autospc_chart_pp(data = test_data, x = "x", y = "y", n = "n")
 
-  statistics <- get_pp_limits(
+  statistics <- get_pp_statistics(
     y = test_data$y, n = test_data$n, multiply = 100
   )
   limits <- limits_from_statistics(chart, statistics, test_data)

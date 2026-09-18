@@ -24,7 +24,7 @@ test_that("mR chart limits the same as qicharts2 v.0.7.2", {
   chart <- autospc_chart_mr(data = mr_data, x = "x", y = "y")
 
   mrs <- moving_ranges(y = mr_data$y)
-  statistics <- get_mr_limits(
+  statistics <- get_mr_statistics(
     mr = mrs,
     mr_screen_max_loops = 0
   )

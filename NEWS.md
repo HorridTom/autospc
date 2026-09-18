@@ -36,8 +36,10 @@ score was being standardised at the period's mean denominator instead of the
 point's own, which is what `use_nbar_for_stdev` did.
 
 * **The z scores now use each point's own denominator wherever they are
-  formed.** Only rows added by `extend_limits_to` are affected, so no centre
-  line, control limit or rule break within the data changes.
+  formed.** P' limits extended beyond data with varying denominators become
+  narrower, more so with greater variation in the denominators. Only rows added
+  by `extend_limits_to` are affected, so no centre line, control limit or rule
+  break within the data changes.
 
 * **A P chart's extended limits sit at the centre line of the period they
   extend.** Where a point had been excluded from the final calculation period,

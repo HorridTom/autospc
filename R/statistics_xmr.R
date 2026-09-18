@@ -1,9 +1,9 @@
 # Get i limits
 # Input y as a vector. returns cl, ucl and lcl as a list.
-get_x_limits <- function(y,
-                         na.rm = TRUE,
-                         mr_screen_max_loops = 1,
-                         exclusion_points = NULL) {
+get_x_statistics <- function(y,
+                             na.rm = TRUE,
+                             mr_screen_max_loops = 1,
+                             exclusion_points = NULL) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -63,10 +63,10 @@ moving_ranges <- function(y,
 
 
 # Get moving range limits
-get_mr_limits <- function(mr,
-                          na.rm = TRUE,
-                          mr_screen_max_loops = 0,
-                          exclusion_points = NULL) {
+get_mr_statistics <- function(mr,
+                              na.rm = TRUE,
+                              mr_screen_max_loops = 0,
+                              exclusion_points = NULL) {
   # Exclude exclusion points from calculations
   if (!is.null(exclusion_points) & length(exclusion_points) > 0) {
     mr_excl <- mr[-exclusion_points]

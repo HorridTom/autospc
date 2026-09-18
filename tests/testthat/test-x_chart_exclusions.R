@@ -30,7 +30,7 @@ test_that("X chart limits the same as qicharts2 v.0.7.2", {
 
   chart <- autospc_chart_x(data = test_data, x = "x", y = "y")
 
-  statistics <- get_x_limits(
+  statistics <- get_x_statistics(
     y = test_data$y,
     exclusion_points = c(6, 15)
   )

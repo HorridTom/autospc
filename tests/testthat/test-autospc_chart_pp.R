@@ -183,13 +183,13 @@ test_that("aggregate_data returns the same columns by either route", {
 })
 
 
-test_that("calculate_limits matches get_pp_limits", {
+test_that("calculate_limits matches get_pp_statistics", {
   expect_identical(
     calculate_limits(chart_pp(pp_pre_agg_data),
       period = pp_period_data,
       exclusion_points = NULL
     ),
-    get_pp_limits(
+    get_pp_statistics(
       y = pp_period_data$y,
       n = pp_period_data$n,
       exclusion_points = NULL,
@@ -220,7 +220,7 @@ test_that("calculate_limits passes exclusion_points through", {
       period = pp_period_data,
       exclusion_points = 4L
     ),
-    get_pp_limits(
+    get_pp_statistics(
       y = pp_period_data$y,
       n = pp_period_data$n,
       exclusion_points = 4L,
@@ -250,7 +250,7 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
       period = pp_screening_data,
       exclusion_points = NULL
     ),
-    get_pp_limits(
+    get_pp_statistics(
       y = pp_screening_data$y,
       n = pp_screening_data$n,
       exclusion_points = NULL,

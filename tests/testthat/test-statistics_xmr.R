@@ -20,7 +20,7 @@ test_that("X chart limits the same as live qicharts2 v.0.7.2", {
 
   chart <- autospc_chart_x(data = test_data, x = "x", y = "y")
 
-  statistics <- get_x_limits(
+  statistics <- get_x_statistics(
     y = test_data$y,
     mr_screen_max_loops = 1
   )
@@ -51,7 +51,7 @@ test_that("X chart limits with mr screening remove extreme moving ranges", {
 
   chart <- autospc_chart_x(data = extreme_mr_data, x = "x", y = "y")
 
-  statistics <- get_x_limits(
+  statistics <- get_x_statistics(
     y = extreme_mr_data$y,
     mr_screen_max_loops = 1
   )
@@ -66,7 +66,7 @@ test_that("X chart limits with mr screening remove extreme moving ranges", {
 test_that("X chart limits correct without mr screening", {
   chart <- autospc_chart_x(data = extreme_mr_data, x = "x", y = "y")
 
-  statistics <- get_x_limits(
+  statistics <- get_x_statistics(
     y = extreme_mr_data$y,
     mr_screen_max_loops = 0
   )

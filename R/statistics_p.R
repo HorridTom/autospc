@@ -1,9 +1,9 @@
 # Get p chart limits
 # Input y and n data as vectors. Returns cl, ucl and lcl as named list.
-get_p_limits <- function(y,
-                         n,
-                         exclusion_points = NULL,
-                         multiply = 1) {
+get_p_statistics <- function(y,
+                             n,
+                             exclusion_points = NULL,
+                             multiply = 1) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -48,11 +48,11 @@ get_p_limits <- function(y,
 
 # Get P prime limits
 # Input data with x, y and n columns. Returns cl, ucl and lcl as named list.
-get_pp_limits <- function(y,
-                          n,
-                          exclusion_points = NULL,
-                          multiply = 1,
-                          mr_screen_max_loops = 1) {
+get_pp_statistics <- function(y,
+                              n,
+                              exclusion_points = NULL,
+                              multiply = 1,
+                              mr_screen_max_loops = 1) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")

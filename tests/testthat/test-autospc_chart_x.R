@@ -114,13 +114,13 @@ test_that("the error names the values that are repeated", {
 })
 
 
-test_that("calculate_limits matches get_x_limits", {
+test_that("calculate_limits matches get_x_statistics", {
   expect_identical(
     calculate_limits(test_chart_x(),
       period = count_period_data,
       exclusion_points = NULL
     ),
-    get_x_limits(
+    get_x_statistics(
       y = count_period_data$series,
       mr_screen_max_loops = 1L,
       exclusion_points = NULL
@@ -135,7 +135,7 @@ test_that("calculate_limits passes exclusion_points through", {
       period = count_period_data,
       exclusion_points = 6L
     ),
-    get_x_limits(
+    get_x_statistics(
       y = count_period_data$series,
       mr_screen_max_loops = 1L,
       exclusion_points = 6L
@@ -162,7 +162,7 @@ test_that("calculate_limits takes mr_screen_max_loops from the chart", {
 
   expect_identical(
     calculate_limits(chart, period = screening_data, exclusion_points = NULL),
-    get_x_limits(
+    get_x_statistics(
       y = screening_data$series,
       mr_screen_max_loops = 0L,
       exclusion_points = NULL

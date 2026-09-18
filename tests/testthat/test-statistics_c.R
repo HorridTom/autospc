@@ -27,7 +27,7 @@ test_c_limit_answer <- readRDS(file.path(
 test_that("C chart limits the same as qicharts2 v.0.7.2", {
   chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
 
-  statistics <- get_c_limits(y = test_data$y)
+  statistics <- get_c_statistics(y = test_data$y)
   limits <- limits_from_statistics(chart, statistics, test_data)
 
   expect_equal(statistics$cl, test_c_limit_answer$cl)
@@ -54,7 +54,7 @@ test_that("C prime chart limits the same as qicharts2 v.0.7.2", {
 
   chart <- autospc_chart_cp(data = test_data, x = "x", y = "y")
 
-  statistics <- get_cp_limits(y = test_data$y)
+  statistics <- get_cp_statistics(y = test_data$y)
   limits <- limits_from_statistics(chart, statistics, test_data)
 
   expect_equal(statistics$cl, test_cp_limit_answer$cl)

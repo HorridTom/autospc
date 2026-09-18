@@ -234,7 +234,7 @@ prepare_data.autospc_chart_p <- function(chart) {
 calculate_limits.autospc_chart_p <- function(chart,
                                              period,
                                              exclusion_points) {
-  limits <- get_p_limits(
+  limits <- get_p_statistics(
     y = period$y,
     n = period$n,
     exclusion_points = exclusion_points,
@@ -312,7 +312,7 @@ limits_for_extension_rows.autospc_chart_p <- function(chart,
     dplyr::pull(excluded) %>%
     which()
 
-  statistics <- get_p_limits(
+  statistics <- get_p_statistics(
     y = period$y,
     n = period$n,
     exclusion_points = exclusion_points,

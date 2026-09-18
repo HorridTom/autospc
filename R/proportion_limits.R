@@ -11,7 +11,7 @@
 #' a p-chart this is sqrt(p_bar*(1-p_bar)), for a p-prime chart this is modified
 #' by the average moving range.
 #'
-#' `get_p_limits()` and `get_pp_limits()` calculate it where they calculate the
+#' `get_p_statistics()` and `get_pp_statistics()` calculate it where they calculate the
 #' limits themselves, and `form_calculation_limits()` carries it into the
 #' limits table as the `sd_estimate` column, so it is read from there rather
 #' than worked back out of the limits. Working it back out would give the wrong

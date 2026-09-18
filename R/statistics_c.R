@@ -1,8 +1,8 @@
 # Get c chart limits
 # Input y data as vector. Returns cl, ucl and lcl as named list.
-get_c_limits <- function(y,
-                         exclusion_points = NULL,
-                         na.rm = TRUE) {
+get_c_statistics <- function(y,
+                             exclusion_points = NULL,
+                             na.rm = TRUE) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -41,10 +41,10 @@ get_c_limits <- function(y,
 # Get C prime limits
 # This is the same as U prime with n = 1
 # Input y and n data as vectors. Returns cl, ucl and lcl as named list.
-get_cp_limits <- function(y,
-                          exclusion_points = NULL,
-                          na.rm = TRUE,
-                          mr_screen_max_loops = 1) {
+get_cp_statistics <- function(y,
+                              exclusion_points = NULL,
+                              na.rm = TRUE,
+                              mr_screen_max_loops = 1) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")

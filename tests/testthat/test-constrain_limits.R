@@ -101,7 +101,7 @@ test_that("every chart class states the range its statistic can take", {
 
 
 test_that("an infinite or missing limit is left alone", {
-  # get_p_limits() returns infinite limits for a denominator of zero, and an
+  # get_p_statistics() returns infinite limits for a denominator of zero, and an
   # infinite limit means the limit is unknown rather than at the bound
   constrained <- constrain_limits(
     limits = list(ucl = c(Inf, 120, NA), lcl = c(-Inf, -20, NA)),

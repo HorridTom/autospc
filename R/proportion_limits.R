@@ -83,6 +83,22 @@ extend_display_limits_at_denominators <- function(chart,
 }
 
 
+#' A period's rows, with every denominator replaced by the period's mean
+#'
+#' An extension row sits beyond the end of the data and so has no denominator
+#' of its own. The limits of the whole extension are placed at the mean of the
+#' period they are carried from.
+#'
+#' @param period The rows of the calculation period.
+#'
+#' @return `period`, with `n` replaced by its mean
+#' @noRd
+at_mean_denominator <- function(period) {
+  return(period %>%
+    dplyr::mutate(n = mean(n, na.rm = TRUE)))
+}
+
+
 #' The denominator to calculate a row with no observation's limits at
 #'
 #' Returns the denominator (`n`) at the row in question, where that is present

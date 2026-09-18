@@ -27,6 +27,23 @@ in the last bit or two, the largest difference measured being 1.4e-14, because
 they are now formed from `sd_estimate` rather than from a separately computed
 standard error.
 
+## A P' chart's extended limits are standardised correctly
+
+A P' chart forms z scores to standardise each point's distance from the centre
+line in light of its own denominator, and the spread of those z scores gives
+Laney's `sigma_z`. When extending limits beyond the end of the data, every z
+score was being standardised at the period's mean denominator instead of the
+point's own, which is what `use_nbar_for_stdev` did.
+
+* **The z scores now use each point's own denominator wherever they are
+  formed.** Only rows added by `extend_limits_to` are affected, so no centre
+  line, control limit or rule break within the data changes.
+
+* **A P chart's extended limits sit at the centre line of the period they
+  extend.** Where a point had been excluded from the final calculation period,
+  the extension rows were drawn at a centre line computed from averaged
+  denominators, so they did not match the period they were carried from.
+
 # autospc 0.1.0.9021
 
 ## Control limits constrained to the range the statistic can take

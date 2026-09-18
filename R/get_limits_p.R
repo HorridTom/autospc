@@ -52,8 +52,7 @@ get_pp_limits <- function(y,
                           n,
                           exclusion_points = NULL,
                           multiply = 1,
-                          mr_screen_max_loops = 1,
-                          use_nbar_for_stdev = FALSE) {
+                          mr_screen_max_loops = 1) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -83,12 +82,6 @@ get_pp_limits <- function(y,
   cl <- sum(y_excl, na.rm = TRUE) / sum(n_excl, na.rm = TRUE)
 
   y_new <- y_excl / n_excl
-
-  if (use_nbar_for_stdev) {
-    n_excl <- mean(n_excl,
-      na.rm = TRUE
-    )
-  }
 
   standard_error <- sqrt(cl * (1 - cl) / n_excl)
   z_i <- (y_new - cl) / standard_error

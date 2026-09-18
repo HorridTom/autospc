@@ -300,8 +300,7 @@ limits_for_missing_rows.autospc_chart_pp <- function(chart,
 
 #' Limits to use beyond the end of the data
 #'
-#' As for P, except that the denominators are left as they are and
-#' `use_nbar_for_stdev` handles the averaging inside `get_pp_limits()`.
+#' As for P.
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
@@ -311,26 +310,18 @@ limits_for_extension_rows.autospc_chart_pp <- function(chart,
     dplyr::pull(excluded) %>%
     which()
 
-  # the centre line and the standard deviation estimate come from the period's
-  # own denominators, with `use_nbar_for_stdev` averaging them for the z scores
-  # alone. The limits are placed at the period's mean denominator, so that the
-  # whole extension carries one pair.
   statistics <- get_pp_limits(
     y = period$y,
     n = period$n,
     exclusion_points = exclusion_points,
-    multiply = 100,
-    use_nbar_for_stdev = TRUE
+    multiply = 100
   )
-
-  at_mean_n <- period %>%
-    dplyr::mutate(n = mean(n, na.rm = TRUE))
 
   limits <- constrain_limits(
     limits = limits_from_statistics(
       chart = chart,
       statistics = statistics,
-      rows = at_mean_n
+      rows = at_mean_denominator(period)
     ),
     bounds = limit_bounds(chart)
   )

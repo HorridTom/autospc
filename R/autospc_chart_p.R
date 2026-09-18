@@ -299,32 +299,22 @@ limits_for_missing_rows.autospc_chart_p <- function(chart,
 
 #' Limits to use beyond the end of the data
 #'
-#' The limits of a P chart vary with the denominator, so there is no single set
-#' to carry forward. They are recalculated from the final calculation period
-#' with every denominator replaced by the period's mean, giving one set of
-#' values for the whole extension.
+#' The limits of a P chart vary with the denominator, and an extension row has
+#' no denominator of its own. The statistics come from the final calculation
+#' period, and the limits are placed at that period's mean denominator, giving
+#' one set of values for the whole extension.
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
 limits_for_extension_rows.autospc_chart_p <- function(chart,
                                                       period) {
-  ext_calc_data <- period %>%
-    dplyr::mutate(
-      n = dplyr::if_else(is.na(n),
-        NA_real_,
-        mean(n,
-          na.rm = TRUE
-        )
-      )
-    )
-
-  exclusion_points <- ext_calc_data %>%
+  exclusion_points <- period %>%
     dplyr::pull(excluded) %>%
     which()
 
   statistics <- get_p_limits(
-    y = ext_calc_data$y,
-    n = ext_calc_data$n,
+    y = period$y,
+    n = period$n,
     exclusion_points = exclusion_points,
     multiply = 100
   )
@@ -333,7 +323,7 @@ limits_for_extension_rows.autospc_chart_p <- function(chart,
     limits = limits_from_statistics(
       chart = chart,
       statistics = statistics,
-      rows = ext_calc_data
+      rows = at_mean_denominator(period)
     ),
     bounds = limit_bounds(chart)
   )

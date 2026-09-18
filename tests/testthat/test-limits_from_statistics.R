@@ -77,3 +77,37 @@ test_that("a proportion chart's estimate is free of the denominator", {
   expect_gt(length(unique(table$n)), 1L)
   expect_equal(table$ucl, table$cl + 3 * table$sd_estimate / sqrt(table$n))
 })
+
+
+test_that("extension rows are formed from the estimate the table carries", {
+  set.seed(6)
+
+  denominators <- as.integer(sample(c(20L, 60L, 200L), 40L, replace = TRUE))
+  data <- data.frame(
+    x = 1:40,
+    n = denominators,
+    y = as.integer(stats::rbinom(40L, denominators, 0.4))
+  )
+  data$y[9] <- data$n[9]
+
+  for (chart_type in c("P", "P'")) {
+    table <- suppressWarnings(autospc(data,
+      chart_type = chart_type, x = x, y = y, n = n, period_min = 21L,
+      extend_limits_to = 50L, plot_chart = FALSE
+    ))
+
+    calculated <- table[table$period_type == "calculation", ]
+    final <- calculated[
+      calculated$plot_period == calculated$plot_period[nrow(calculated)],
+    ]
+    extension <- table[table$limit_extension, ]
+
+    # the extension carries one pair of limits, placed at the mean denominator
+    # of the period it is carried from
+    implied <- (extension$ucl[1] - extension$cl[1]) *
+      sqrt(mean(final$n, na.rm = TRUE)) / 3
+
+    expect_equal(implied, extension$sd_estimate[1], label = chart_type)
+    expect_equal(extension$cl[1], final$cl[1], label = chart_type)
+  }
+})

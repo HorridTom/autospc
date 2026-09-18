@@ -25,14 +25,17 @@ test_p_limit_answer <- readRDS(file.path(
 ))
 
 test_that("P chart limits the same as qicharts2 v.0.7.2", {
-  results <- get_p_limits(
+  chart <- autospc_chart_p(data = test_data, x = "x", y = "y", n = "n")
+
+  statistics <- get_p_limits(
     y = test_data$y,
     n = test_data$n
   )
+  limits <- limits_from_statistics(chart, statistics, test_data)
 
-  expect_equal(results$cl, test_p_limit_answer$cl)
-  expect_equal(results$lcl, test_p_limit_answer$lcl)
-  expect_equal(results$ucl, test_p_limit_answer$ucl)
+  expect_equal(statistics$cl, test_p_limit_answer$cl)
+  expect_equal(limits$lcl, test_p_limit_answer$lcl)
+  expect_equal(limits$ucl, test_p_limit_answer$ucl)
 })
 
 
@@ -52,11 +55,16 @@ test_that("P prime chart limits the same as qicharts2 v.0.7.2", {
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
-  results <- get_pp_limits(y = test_data$y, n = test_data$n, multiply = 100)
+  chart <- autospc_chart_pp(data = test_data, x = "x", y = "y", n = "n")
 
-  expect_equal(results$cl, test_pp_limit_answer$cl)
-  expect_equal(results$lcl, test_pp_limit_answer$lcl)
-  expect_equal(results$ucl, test_pp_limit_answer$ucl)
+  statistics <- get_pp_limits(
+    y = test_data$y, n = test_data$n, multiply = 100
+  )
+  limits <- limits_from_statistics(chart, statistics, test_data)
+
+  expect_equal(statistics$cl, test_pp_limit_answer$cl)
+  expect_equal(limits$lcl, test_pp_limit_answer$lcl)
+  expect_equal(limits$ucl, test_pp_limit_answer$ucl)
 })
 
 

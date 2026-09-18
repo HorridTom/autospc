@@ -257,14 +257,6 @@ limits_table_columns.autospc_chart_p <- function(chart) {
 }
 
 
-#' @describeIn sd_estimate_columns The limits depend on the row's denominator,
-#'   so the table carries `sd_estimate`.
-#' @noRd
-sd_estimate_columns.autospc_chart_p <- function(chart) {
-  return("sd_estimate")
-}
-
-
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' The limits of a P chart depend on the denominator, so they cannot simply be
@@ -279,9 +271,9 @@ extend_display_limits.autospc_chart_p <- function(chart,
                                                   limits_table,
                                                   counter) {
   return(extend_display_limits_at_denominators(
+    chart = chart,
     limits_table = limits_table,
-    counter = counter,
-    bounds = limit_bounds(chart)
+    counter = counter
   ))
 }
 
@@ -297,10 +289,10 @@ limits_for_missing_rows.autospc_chart_p <- function(chart,
                                                     period,
                                                     rows) {
   return(proportion_limits_for_missing_rows(
+    chart = chart,
     limits = NextMethod(),
     period = period,
-    rows = rows,
-    bounds = limit_bounds(chart)
+    rows = rows
   ))
 }
 
@@ -330,7 +322,7 @@ limits_for_extension_rows.autospc_chart_p <- function(chart,
     dplyr::pull(excluded) %>%
     which()
 
-  limits <- get_p_limits(
+  statistics <- get_p_limits(
     y = ext_calc_data$y,
     n = ext_calc_data$n,
     exclusion_points = exclusion_points,
@@ -338,11 +330,19 @@ limits_for_extension_rows.autospc_chart_p <- function(chart,
   )
 
   limits <- constrain_limits(
-    limits = limits,
+    limits = limits_from_statistics(
+      chart = chart,
+      statistics = statistics,
+      rows = ext_calc_data
+    ),
     bounds = limit_bounds(chart)
   )
 
-  return(lapply(limits[c("cl", "ucl", "lcl")], "[[", 1L))
+  return(list(
+    cl = statistics$cl[[1L]],
+    ucl = limits$ucl[[1L]],
+    lcl = limits$lcl[[1L]]
+  ))
 }
 
 
@@ -358,6 +358,18 @@ limit_bounds.autospc_chart_p <- function(chart) {
     low = 0,
     high = 100
   ))
+}
+
+
+#' The standard error at each of a set of rows
+#'
+#' The estimate is free of the denominator, so each row's standard error is the
+#' estimate over the square root of that row's denominator.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at.autospc_chart_p <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)) / sqrt(rows$n))
 }
 
 

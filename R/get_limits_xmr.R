@@ -35,15 +35,12 @@ get_x_limits <- function(y,
   )
 
   mean_x <- mean(y_excl, na.rm = TRUE)
-  sigma <- mr_lims$mean_mr / d2_constant()
-  ucl_x <- mean_x + (3 * sigma)
-  lcl_x <- mean_x - (3 * sigma)
+  sd_estimate <- mr_lims$mean_mr / d2_constant()
 
   # Lists the results
   return(list(
     cl = rep(mean_x, length(y)),
-    ucl = rep(ucl_x, length(y)),
-    lcl = rep(lcl_x, length(y))
+    sd_estimate = rep(sd_estimate, length(y))
   ))
 }
 
@@ -83,13 +80,17 @@ get_mr_limits <- function(mr,
   )
 
   cl <- mr_lims$mean_mr
-  ucl <- mr_lims$ucl_mr
-  lcl <- 0
+
+  # The upper limit is D4 times the mean moving range, so the standard
+  # deviation it implies is a third of the distance from the mean to it. Taken
+  # from the factor in use rather than from d3 over d2, so that the published
+  # D4 and the estimate agree under either setting of
+  # `autospc.rounded_constants`.
+  sd_estimate <- (mr_upper_limit_factor() - 1) * cl / 3
 
   return(list(
     cl = rep(cl, length(mr)),
-    ucl = rep(ucl, length(mr)),
-    lcl = rep(lcl, length(mr)),
+    sd_estimate = rep(sd_estimate, length(mr)),
     mr = mr
   ))
 }

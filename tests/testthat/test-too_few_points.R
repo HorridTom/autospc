@@ -34,7 +34,7 @@ test_that("Charts with fewer points than min period error handle", {
   # the same columns a series long enough for limits returns, the analysed
   # ones holding no value. aggregate_data() summarises to the columns the class
   # analyses, so a C chart drops n and a P chart keeps it
-  testthat::expect_equal(ncol(result_C), 21)
+  testthat::expect_equal(ncol(result_C), 22)
   testthat::expect_equal(ncol(result_P), 23)
   testthat::expect_warning(
     autospc(test_data, plot_chart = TRUE, chart_type = "C")
@@ -54,7 +54,7 @@ test_that("Charts with show_limits = FALSE behave as expected", {
 
   # expect full limits table to be returned regardless of show_limits status,
   # including the four columns describing the periods
-  testthat::expect_equal(ncol(result_C), 21)
+  testthat::expect_equal(ncol(result_C), 22)
   testthat::expect_equal(ncol(result_P), 23)
 
   testthat::expect_true(all(c(

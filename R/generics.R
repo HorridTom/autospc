@@ -94,6 +94,41 @@ limit_bounds <- function(chart) {
 }
 
 
+#' The standard error at each of a set of rows
+#'
+#' Limits sit three standard errors either side of the centre line. For most
+#' classes the standard deviation estimate is that standard error already,
+#' because the statistic is a single observation. A P or P' chart's estimate is
+#' free of the denominator, so each row's standard error is the estimate over
+#' the square root of that row's denominator.
+#'
+#' @param sd_estimate The period's standard deviation estimate, as one value or
+#'   as one per row.
+#' @param rows The rows to give a standard error to.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at <- function(chart, sd_estimate, rows) {
+  UseMethod("standard_error_at")
+}
+
+
+#' Control limits from a period's statistics
+#'
+#' The one place limits are formed. Three standard errors either side of the
+#' centre line, except where a class's limits are defined some other way.
+#'
+#' @param statistics The period's centre line and standard deviation estimate,
+#'   as `calculate_limits()` returns them.
+#' @param rows The rows to give limits to.
+#'
+#' @return list of two numeric vectors named ucl and lcl, one value per row
+#' @noRd
+limits_from_statistics <- function(chart, statistics, rows) {
+  UseMethod("limits_from_statistics")
+}
+
+
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' Called with `counter` already known to be within the table.
@@ -153,21 +188,6 @@ limits_for_missing_rows <- function(chart,
 #' @noRd
 limits_table_columns <- function(chart) {
   UseMethod("limits_table_columns")
-}
-
-
-#' The column a class needs in order to place its limits at any denominator
-#'
-#' A P or P' chart's limits sit at the centre line plus and minus three times
-#' `sd_estimate` over the square root of the row's denominator, so the analysis
-#' table carries `sd_estimate` and the limits can be placed at a denominator the
-#' data does not hold. The classes whose limits are the same at every row of a
-#' calculation period need no such column.
-#'
-#' @return A character vector, empty where the class needs no such column.
-#' @noRd
-sd_estimate_columns <- function(chart) {
-  UseMethod("sd_estimate_columns")
 }
 
 

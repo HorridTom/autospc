@@ -1,3 +1,32 @@
+# autospc 0.1.0.9022
+
+## A standard deviation estimate for every chart type
+
+`sd_estimate` is an estimate of the standard deviation of a single observation,
+on the same scale as the centre line. A P or P' chart carried it; the other four
+chart types calculated the same kind of estimate, formed their limits from it
+and then discarded it.
+
+* **Every chart type now returns `sd_estimate`.** A C, C', X or MR chart's
+  analysis table gains the column, so `plot_chart = FALSE` returns one column
+  more than before for those four types. The values already existed inside the
+  calculations - `sqrt(cl)` for a C chart, the mean moving range over d2 for an
+  X chart - and are now returned rather than thrown away.
+
+* **The limits are formed in one place**, three standard errors either side of
+  the centre line, rather than inside each of the six calculations. The standard
+  error is the estimate itself for the chart types whose limits do not vary with
+  a denominator, and the estimate over the square root of the row's denominator
+  for P and P'. An MR chart's lower limit remains zero, D3 being zero for a
+  subgroup of two.
+
+This change has no impact on the actual values for any chart's limits. The
+calculation is the same arithmetic in a different place, and the estimate is
+what the limits were already being formed from. A P' chart's limits can differ
+in the last bit or two, the largest difference measured being 1.4e-14, because
+they are now formed from `sd_estimate` rather than from a separately computed
+standard error.
+
 # autospc 0.1.0.9021
 
 ## Control limits constrained to the range the statistic can take

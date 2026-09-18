@@ -190,6 +190,25 @@ limit_bounds.autospc_chart_mr <- function(chart) {
 }
 
 
+#' Control limits from a period's statistics
+#'
+#' The upper limit is three standard errors above the centre line, as for every
+#' other class. The lower limit is zero: D3 is zero for a subgroup of two, so a
+#' moving range chart's lower limit is not three standard errors below the
+#' centre line but the bottom of the range itself, whether or not limits are
+#' being constrained.
+#'
+#' @return list of two numeric vectors named ucl and lcl
+#' @noRd
+limits_from_statistics.autospc_chart_mr <- function(chart, statistics, rows) {
+  limits <- NextMethod()
+
+  limits$lcl <- rep_len(0, length(limits$lcl))
+
+  return(limits)
+}
+
+
 # Presentation methods
 
 #' Chart name

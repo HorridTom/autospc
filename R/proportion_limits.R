@@ -37,31 +37,6 @@ sd_estimate_of <- function(rows) {
 }
 
 
-#' Calculate limits at given denominators
-#'
-#' Returns `cl` plus and minus `3 * sd_estimate / sqrt(n)`, one pair of limits
-#' for each element of `n`. The values are not constrained to the range a
-#' percentage can take; `constrain_limits()` does that.
-#'
-#' @param cl The centre line the limits sit either side of.
-#' @param sd_estimate The period's standard deviation estimate, from
-#'   `sd_estimate_of()`.
-#' @param n The denominators to calculate the limits at.
-#'
-#' @return list of two numeric vectors named ucl and lcl, each as long as `n`
-#' @noRd
-limits_at_denominators <- function(cl,
-                                   sd_estimate,
-                                   n) {
-  half_width <- 3 * sd_estimate / sqrt(n)
-
-  return(list(
-    ucl = cl + half_width,
-    lcl = cl - half_width
-  ))
-}
-
-
 #' Extend a calculation period's limits over the display rows
 #'
 #' Called by the `extend_display_limits()` methods of the P and P' classes.
@@ -78,9 +53,9 @@ limits_at_denominators <- function(cl,
 #' @return `limits_table`, with `cl`, `ucl`, `lcl`, `sd_estimate` and
 #'   `period_type` set on the rows from `counter` onwards
 #' @noRd
-extend_display_limits_at_denominators <- function(limits_table,
-                                                  counter,
-                                                  bounds) {
+extend_display_limits_at_denominators <- function(chart,
+                                                  limits_table,
+                                                  counter) {
   last_calculated <- counter - 1
 
   sd_estimate <- sd_estimate_of(limits_table[last_calculated, , drop = FALSE])
@@ -92,14 +67,13 @@ extend_display_limits_at_denominators <- function(limits_table,
   limits_table[display_rows, "sd_estimate"] <- sd_estimate
   limits_table[display_rows, "period_type"] <- "display"
 
-  display_limits <- limits_at_denominators(
-    cl = pbar,
-    sd_estimate = sd_estimate,
-    n = limits_table[["n"]][display_rows]
-  )
   constrained <- constrain_limits(
-    limits = display_limits,
-    bounds = bounds
+    limits = limits_from_statistics(
+      chart = chart,
+      statistics = list(cl = pbar, sd_estimate = sd_estimate),
+      rows = limits_table[display_rows, , drop = FALSE]
+    ),
+    bounds = limit_bounds(chart)
   )
 
   limits_table$ucl[display_rows] <- constrained$ucl
@@ -156,10 +130,10 @@ denominators_for_missing_rows <- function(period,
 #'
 #' @return `limits`, with `ucl` and `lcl` recalculated
 #' @noRd
-proportion_limits_for_missing_rows <- function(limits,
+proportion_limits_for_missing_rows <- function(chart,
+                                               limits,
                                                period,
-                                               rows,
-                                               bounds) {
+                                               rows) {
   sd_estimate <- sd_estimate_of(period)
 
   n <- denominators_for_missing_rows(period = period, rows = rows)
@@ -169,12 +143,12 @@ proportion_limits_for_missing_rows <- function(limits,
     return(limits)
   }
 
-  at_n <- limits_at_denominators(
-    cl = limits$cl[usable],
-    sd_estimate = sd_estimate,
-    n = n[usable]
+  at_n <- limits_from_statistics(
+    chart = chart,
+    statistics = list(cl = limits$cl[usable], sd_estimate = sd_estimate),
+    rows = data.frame(n = n[usable])
   )
-  constrained <- constrain_limits(limits = at_n, bounds = bounds)
+  constrained <- constrain_limits(limits = at_n, bounds = limit_bounds(chart))
 
   limits$ucl[usable] <- constrained$ucl
   limits$lcl[usable] <- constrained$lcl

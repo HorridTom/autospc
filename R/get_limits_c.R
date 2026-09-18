@@ -27,17 +27,14 @@ get_c_limits <- function(y,
   }
 
   cl <- mean(y_excl, na.rm = TRUE)
-  stdev <- sqrt(cl)
 
-  cl <- cl
-  ucl <- cl + 3 * stdev
-  lcl <- cl - 3 * stdev
+  # the standard deviation of a Poisson count is the square root of its mean
+  sd_estimate <- sqrt(cl)
 
-  list(
+  return(list(
     cl = rep(cl, length(y)),
-    ucl = rep(ucl, length(y)),
-    lcl = rep(lcl, length(y))
-  )
+    sd_estimate = rep(sd_estimate, length(y))
+  ))
 }
 
 
@@ -74,9 +71,8 @@ get_cp_limits <- function(y,
   cl <- mean(y_excl, na.rm = TRUE)
 
   n_excl <- 1 # Makes explicit the relationship with u-prime charts
-  cl <- cl
-  stdev <- sqrt(cl / n_excl)
-  z_i <- (y_excl - cl) / stdev
+  poisson_sd <- sqrt(cl / n_excl)
+  z_i <- (y_excl - cl) / poisson_sd
 
   mr <- abs(diff(z_i))
   mr_lims <- mr_limits(
@@ -86,13 +82,10 @@ get_cp_limits <- function(y,
 
   sigma_z <- mr_lims$mean_mr / d2_constant()
 
-  stdev <- stdev * sigma_z
-  ucl <- cl + 3 * stdev
-  lcl <- cl - 3 * stdev
+  sd_estimate <- poisson_sd * sigma_z
 
-  list(
+  return(list(
     cl = rep(cl, length(y)),
-    ucl = rep(ucl, length(y)),
-    lcl = rep(lcl, length(y))
-  )
+    sd_estimate = rep(sd_estimate, length(y))
+  ))
 }

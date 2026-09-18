@@ -49,15 +49,21 @@ find_extremes <- function(data,
   while (i <= chart$max_exclusions) {
     calculation_period <- data[counter:(counter + period_length - 1), ]
 
-    limits_list <- calculate_limits(
+    statistics <- calculate_limits(
       chart = chart,
       period = calculation_period,
       exclusion_points = exclusion_points
     )
 
-    calculation_period$cl <- limits_list$cl
-    calculation_period$ucl <- limits_list$ucl
-    calculation_period$lcl <- limits_list$lcl
+    limits <- limits_from_statistics(
+      chart = chart,
+      statistics = statistics,
+      rows = calculation_period
+    )
+
+    calculation_period$cl <- statistics$cl
+    calculation_period$ucl <- limits$ucl
+    calculation_period$lcl <- limits$lcl
 
     calculation_period <- calculation_period %>%
       dplyr::select(x, series, ucl, lcl, cl)

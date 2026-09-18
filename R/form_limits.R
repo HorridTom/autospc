@@ -18,24 +18,26 @@ form_calculation_limits <- function(data,
 
   calculation_period <- data[counter:(counter + period_length - 1), ]
 
-  # Calculation of limits excluding extremes for selected section of data
-  limits_list <- calculate_limits(
+  # Calculation of statistics excluding extremes for selected section of data
+  statistics <- calculate_limits(
     chart = chart,
     period = calculation_period,
     exclusion_points = exclusion_points
   )
 
-  limits_list <- constrain_limits(
-    limits = limits_list,
+  limits <- constrain_limits(
+    limits = limits_from_statistics(
+      chart = chart,
+      statistics = statistics,
+      rows = calculation_period
+    ),
     bounds = limit_bounds(chart)
   )
 
-  calculation_period$cl <- limits_list$cl
-  calculation_period$ucl <- limits_list$ucl
-  calculation_period$lcl <- limits_list$lcl
-
-  # only the classes whose limits vary with the denominator return this
-  calculation_period$sd_estimate <- limits_list$sd_estimate
+  calculation_period$cl <- statistics$cl
+  calculation_period$ucl <- limits$ucl
+  calculation_period$lcl <- limits$lcl
+  calculation_period$sd_estimate <- statistics$sd_estimate
 
   extra_columns <- limits_table_columns(chart)
 

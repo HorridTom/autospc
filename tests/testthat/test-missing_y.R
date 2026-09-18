@@ -310,12 +310,14 @@ test_that("a row with no observation says which period it is in", {
 })
 
 
-test_that("a chart without an sd estimate still says which period a gap is in", {
+test_that("a chart whose limits do not vary with n says where a gap sits", {
   result <- analyse(gapped(23L))
 
-  expect_false("sd_estimate" %in% names(result))
+  # the C chart's limits are the same at every row of a period, so the gap row
+  # takes them by carrying the period forward rather than by recalculating
   expect_identical(result$plot_period[23], result$plot_period[22])
   expect_identical(result$period_type[23], result$period_type[22])
+  expect_identical(result$sd_estimate[23], result$sd_estimate[22])
 })
 
 

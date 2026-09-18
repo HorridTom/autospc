@@ -37,17 +37,12 @@ get_p_limits <- function(y,
   # the square root of that denominator
   sd_estimate <- sqrt(cl * (1 - cl)) * multiply
 
-  standard_error <- sqrt(cl * (1 - cl) / n)
   cl <- cl * multiply
-  ucl <- cl + 3 * standard_error * multiply
-  lcl <- cl - 3 * standard_error * multiply
 
-  list(
+  return(list(
     cl = rep(cl, length(y)),
-    ucl = ucl,
-    lcl = lcl,
     sd_estimate = rep(sd_estimate, length(y))
-  )
+  ))
 }
 
 
@@ -109,28 +104,15 @@ get_pp_limits <- function(y,
 
   sigma_z <- amr / d2_constant()
 
-  # Recalculate the standard error with excluded data
-  if (use_nbar_for_stdev) {
-    n <- mean(n,
-      na.rm = TRUE
-    )
-  }
-  standard_error <- sqrt(cl * (1 - cl) / n)
-  standard_error <- standard_error * sigma_z
-
   # an estimate of the standard deviation of a single observation, on the same
   # scale as the centre line, including Laney's correction. The standard error
   # at a denominator is this over the square root of that denominator
   sd_estimate <- sqrt(cl * (1 - cl)) * sigma_z * multiply
 
   cl <- cl * multiply
-  ucl <- cl + 3 * standard_error * multiply
-  lcl <- cl - 3 * standard_error * multiply
 
-  list(
+  return(list(
     cl = rep(cl, length(y)),
-    ucl = ucl,
-    lcl = lcl,
     sd_estimate = rep(sd_estimate, length(y))
-  )
+  ))
 }

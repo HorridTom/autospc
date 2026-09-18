@@ -279,6 +279,7 @@ display_table <- data.frame(
   ucl = c(rep(18, 3), rep(NA_real_, 3)),
   lcl = c(rep(4, 3), rep(NA_real_, 3)),
   cl = c(rep(11, 3), rep(NA_real_, 3)),
+  sd_estimate = c(rep(7 / 3, 3), rep(NA_real_, 3)),
   period_type = c(
     rep("calculation", 3),
     rep(NA_character_, 3)

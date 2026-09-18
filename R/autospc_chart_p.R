@@ -234,7 +234,7 @@ prepare_data.autospc_chart_p <- function(chart) {
 calculate_limits.autospc_chart_p <- function(chart,
                                              period,
                                              exclusion_points) {
-  limits <- get_p_limits(
+  limits <- get_p_statistics(
     y = period$y,
     n = period$n,
     exclusion_points = exclusion_points,
@@ -257,14 +257,6 @@ limits_table_columns.autospc_chart_p <- function(chart) {
 }
 
 
-#' @describeIn sd_estimate_columns The limits depend on the row's denominator,
-#'   so the table carries `sd_estimate`.
-#' @noRd
-sd_estimate_columns.autospc_chart_p <- function(chart) {
-  return("sd_estimate")
-}
-
-
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' The limits of a P chart depend on the denominator, so they cannot simply be
@@ -279,9 +271,9 @@ extend_display_limits.autospc_chart_p <- function(chart,
                                                   limits_table,
                                                   counter) {
   return(extend_display_limits_at_denominators(
+    chart = chart,
     limits_table = limits_table,
-    counter = counter,
-    bounds = limit_bounds(chart)
+    counter = counter
   ))
 }
 
@@ -297,52 +289,50 @@ limits_for_missing_rows.autospc_chart_p <- function(chart,
                                                     period,
                                                     rows) {
   return(proportion_limits_for_missing_rows(
+    chart = chart,
     limits = NextMethod(),
     period = period,
-    rows = rows,
-    bounds = limit_bounds(chart)
+    rows = rows
   ))
 }
 
 
 #' Limits to use beyond the end of the data
 #'
-#' The limits of a P chart vary with the denominator, so there is no single set
-#' to carry forward. They are recalculated from the final calculation period
-#' with every denominator replaced by the period's mean, giving one set of
-#' values for the whole extension.
+#' The limits of a P chart vary with the denominator, and an extension row has
+#' no denominator of its own. The statistics come from the final calculation
+#' period, and the limits are placed at that period's mean denominator, giving
+#' one set of values for the whole extension.
 #'
 #' @return list of single values, named cl, lcl and ucl
 #' @noRd
 limits_for_extension_rows.autospc_chart_p <- function(chart,
                                                       period) {
-  ext_calc_data <- period %>%
-    dplyr::mutate(
-      n = dplyr::if_else(is.na(n),
-        NA_real_,
-        mean(n,
-          na.rm = TRUE
-        )
-      )
-    )
-
-  exclusion_points <- ext_calc_data %>%
+  exclusion_points <- period %>%
     dplyr::pull(excluded) %>%
     which()
 
-  limits <- get_p_limits(
-    y = ext_calc_data$y,
-    n = ext_calc_data$n,
+  statistics <- get_p_statistics(
+    y = period$y,
+    n = period$n,
     exclusion_points = exclusion_points,
     multiply = 100
   )
 
   limits <- constrain_limits(
-    limits = limits,
+    limits = limits_from_statistics(
+      chart = chart,
+      statistics = statistics,
+      rows = at_mean_denominator(period)
+    ),
     bounds = limit_bounds(chart)
   )
 
-  return(lapply(limits[c("cl", "ucl", "lcl")], "[[", 1L))
+  return(list(
+    cl = statistics$cl[[1L]],
+    ucl = limits$ucl[[1L]],
+    lcl = limits$lcl[[1L]]
+  ))
 }
 
 
@@ -358,6 +348,18 @@ limit_bounds.autospc_chart_p <- function(chart) {
     low = 0,
     high = 100
   ))
+}
+
+
+#' The standard error at each of a set of rows
+#'
+#' The estimate is free of the denominator, so each row's standard error is the
+#' estimate over the square root of that row's denominator.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at.autospc_chart_p <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)) / sqrt(rows$n))
 }
 
 

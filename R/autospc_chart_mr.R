@@ -166,7 +166,7 @@ calculate_limits.autospc_chart_mr <- function(chart,
                                               period,
                                               exclusion_points) {
   # the series of an MR chart is the moving ranges, put there by prepare_data()
-  limits <- get_mr_limits(
+  limits <- get_mr_statistics(
     mr = period$series,
     mr_screen_max_loops = 0L,
     exclusion_points = exclusion_points
@@ -187,6 +187,25 @@ limit_bounds.autospc_chart_mr <- function(chart) {
     low = 0,
     high = Inf
   ))
+}
+
+
+#' Control limits from a period's statistics
+#'
+#' The upper limit is three standard errors above the centre line, as for every
+#' other class. The lower limit is zero: D3 is zero for a subgroup of two, so a
+#' moving range chart's lower limit is not three standard errors below the
+#' centre line but the bottom of the range itself, whether or not limits are
+#' being constrained.
+#'
+#' @return list of two numeric vectors named ucl and lcl
+#' @noRd
+limits_from_statistics.autospc_chart_mr <- function(chart, statistics, rows) {
+  limits <- NextMethod()
+
+  limits$lcl <- rep_len(0, length(limits$lcl))
+
+  return(limits)
 }
 
 

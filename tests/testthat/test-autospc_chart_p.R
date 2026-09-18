@@ -202,13 +202,13 @@ test_that("aggregate_data returns a chart and leaves data_original untouched", {
 })
 
 
-test_that("calculate_limits matches get_p_limits", {
+test_that("calculate_limits matches get_p_statistics", {
   expect_identical(
     calculate_limits(chart_p(pre_agg_data),
       period = proportion_period_data,
       exclusion_points = NULL
     ),
-    get_p_limits(
+    get_p_statistics(
       y = proportion_period_data$y,
       n = proportion_period_data$n,
       exclusion_points = NULL,
@@ -240,7 +240,7 @@ test_that("calculate_limits passes exclusion_points through", {
       period = proportion_period_data,
       exclusion_points = 4L
     ),
-    get_p_limits(
+    get_p_statistics(
       y = proportion_period_data$y,
       n = proportion_period_data$n,
       exclusion_points = 4L,

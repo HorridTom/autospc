@@ -46,7 +46,7 @@ analysis_table_columns <- function(chart) {
     "ucl",
     "lcl",
     "cl",
-    sd_estimate_columns(chart),
+    "sd_estimate",
     "period_type",
     "excluded",
     "break_point",

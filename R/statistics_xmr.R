@@ -1,9 +1,9 @@
 # Get i limits
 # Input y as a vector. returns cl, ucl and lcl as a list.
-get_x_limits <- function(y,
-                         na.rm = TRUE,
-                         mr_screen_max_loops = 1,
-                         exclusion_points = NULL) {
+get_x_statistics <- function(y,
+                             na.rm = TRUE,
+                             mr_screen_max_loops = 1,
+                             exclusion_points = NULL) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -35,15 +35,12 @@ get_x_limits <- function(y,
   )
 
   mean_x <- mean(y_excl, na.rm = TRUE)
-  sigma <- mr_lims$mean_mr / d2_constant()
-  ucl_x <- mean_x + (3 * sigma)
-  lcl_x <- mean_x - (3 * sigma)
+  sd_estimate <- mr_lims$mean_mr / d2_constant()
 
   # Lists the results
   return(list(
     cl = rep(mean_x, length(y)),
-    ucl = rep(ucl_x, length(y)),
-    lcl = rep(lcl_x, length(y))
+    sd_estimate = rep(sd_estimate, length(y))
   ))
 }
 
@@ -66,10 +63,10 @@ moving_ranges <- function(y,
 
 
 # Get moving range limits
-get_mr_limits <- function(mr,
-                          na.rm = TRUE,
-                          mr_screen_max_loops = 0,
-                          exclusion_points = NULL) {
+get_mr_statistics <- function(mr,
+                              na.rm = TRUE,
+                              mr_screen_max_loops = 0,
+                              exclusion_points = NULL) {
   # Exclude exclusion points from calculations
   if (!is.null(exclusion_points) & length(exclusion_points) > 0) {
     mr_excl <- mr[-exclusion_points]
@@ -83,13 +80,17 @@ get_mr_limits <- function(mr,
   )
 
   cl <- mr_lims$mean_mr
-  ucl <- mr_lims$ucl_mr
-  lcl <- 0
+
+  # The upper limit is D4 times the mean moving range, so the standard
+  # deviation it implies is a third of the distance from the mean to it. Taken
+  # from the factor in use rather than from d3 over d2, so that the published
+  # D4 and the estimate agree under either setting of
+  # `autospc.rounded_constants`.
+  sd_estimate <- (mr_upper_limit_factor() - 1) * cl / 3
 
   return(list(
     cl = rep(cl, length(mr)),
-    ucl = rep(ucl, length(mr)),
-    lcl = rep(lcl, length(mr)),
+    sd_estimate = rep(sd_estimate, length(mr)),
     mr = mr
   ))
 }

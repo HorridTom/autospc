@@ -166,13 +166,13 @@ test_that("chart_type_label returns the C chart label", {
 })
 
 
-test_that("calculate_limits matches get_c_limits", {
+test_that("calculate_limits matches get_c_statistics", {
   expect_identical(
     calculate_limits(test_chart_c(),
       period = count_period_data,
       exclusion_points = NULL
     ),
-    get_c_limits(y = count_period_data$series, exclusion_points = NULL)
+    get_c_statistics(y = count_period_data$series, exclusion_points = NULL)
   )
 })
 
@@ -183,7 +183,7 @@ test_that("calculate_limits passes exclusion_points through", {
       period = count_period_data,
       exclusion_points = 6L
     ),
-    get_c_limits(y = count_period_data$series, exclusion_points = 6L)
+    get_c_statistics(y = count_period_data$series, exclusion_points = 6L)
   )
 
   # excluding the high point must actually lower the centre line, otherwise the

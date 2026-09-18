@@ -1,8 +1,8 @@
 # Get c chart limits
 # Input y data as vector. Returns cl, ucl and lcl as named list.
-get_c_limits <- function(y,
-                         exclusion_points = NULL,
-                         na.rm = TRUE) {
+get_c_statistics <- function(y,
+                             exclusion_points = NULL,
+                             na.rm = TRUE) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -27,27 +27,24 @@ get_c_limits <- function(y,
   }
 
   cl <- mean(y_excl, na.rm = TRUE)
-  stdev <- sqrt(cl)
 
-  cl <- cl
-  ucl <- cl + 3 * stdev
-  lcl <- cl - 3 * stdev
+  # the standard deviation of a Poisson count is the square root of its mean
+  sd_estimate <- sqrt(cl)
 
-  list(
+  return(list(
     cl = rep(cl, length(y)),
-    ucl = rep(ucl, length(y)),
-    lcl = rep(lcl, length(y))
-  )
+    sd_estimate = rep(sd_estimate, length(y))
+  ))
 }
 
 
 # Get C prime limits
 # This is the same as U prime with n = 1
 # Input y and n data as vectors. Returns cl, ucl and lcl as named list.
-get_cp_limits <- function(y,
-                          exclusion_points = NULL,
-                          na.rm = TRUE,
-                          mr_screen_max_loops = 1) {
+get_cp_statistics <- function(y,
+                              exclusion_points = NULL,
+                              na.rm = TRUE,
+                              mr_screen_max_loops = 1) {
   # Errors if data is not in the right format
   if (length(y) == 0) {
     stop("The input data has zero observations.")
@@ -74,9 +71,8 @@ get_cp_limits <- function(y,
   cl <- mean(y_excl, na.rm = TRUE)
 
   n_excl <- 1 # Makes explicit the relationship with u-prime charts
-  cl <- cl
-  stdev <- sqrt(cl / n_excl)
-  z_i <- (y_excl - cl) / stdev
+  poisson_sd <- sqrt(cl / n_excl)
+  z_i <- (y_excl - cl) / poisson_sd
 
   mr <- abs(diff(z_i))
   mr_lims <- mr_limits(
@@ -86,13 +82,10 @@ get_cp_limits <- function(y,
 
   sigma_z <- mr_lims$mean_mr / d2_constant()
 
-  stdev <- stdev * sigma_z
-  ucl <- cl + 3 * stdev
-  lcl <- cl - 3 * stdev
+  sd_estimate <- poisson_sd * sigma_z
 
-  list(
+  return(list(
     cl = rep(cl, length(y)),
-    ucl = rep(ucl, length(y)),
-    lcl = rep(lcl, length(y))
-  )
+    sd_estimate = rep(sd_estimate, length(y))
+  ))
 }

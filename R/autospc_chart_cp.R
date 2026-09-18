@@ -129,7 +129,7 @@ aggregate_data.autospc_chart_cp <- function(chart) {
 calculate_limits.autospc_chart_cp <- function(chart,
                                               period,
                                               exclusion_points) {
-  limits <- get_cp_limits(
+  limits <- get_cp_statistics(
     y = period$series,
     exclusion_points = exclusion_points,
     mr_screen_max_loops = chart$mr_screen_max_loops

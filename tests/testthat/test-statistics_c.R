@@ -25,11 +25,14 @@ test_c_limit_answer <- readRDS(file.path(
 ))
 
 test_that("C chart limits the same as qicharts2 v.0.7.2", {
-  results <- get_c_limits(y = test_data$y)
+  chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
 
-  expect_equal(results$cl, test_c_limit_answer$cl)
-  expect_equal(results$lcl, test_c_limit_answer$lcl)
-  expect_equal(results$ucl, test_c_limit_answer$ucl)
+  statistics <- get_c_statistics(y = test_data$y)
+  limits <- limits_from_statistics(chart, statistics, test_data)
+
+  expect_equal(statistics$cl, test_c_limit_answer$cl)
+  expect_equal(limits$lcl, test_c_limit_answer$lcl)
+  expect_equal(limits$ucl, test_c_limit_answer$ucl)
 })
 
 
@@ -49,9 +52,12 @@ test_that("C prime chart limits the same as qicharts2 v.0.7.2", {
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
-  results <- get_cp_limits(y = test_data$y)
+  chart <- autospc_chart_cp(data = test_data, x = "x", y = "y")
 
-  expect_equal(results$cl, test_cp_limit_answer$cl)
-  expect_equal(results$lcl, test_cp_limit_answer$lcl)
-  expect_equal(results$ucl, test_cp_limit_answer$ucl)
+  statistics <- get_cp_statistics(y = test_data$y)
+  limits <- limits_from_statistics(chart, statistics, test_data)
+
+  expect_equal(statistics$cl, test_cp_limit_answer$cl)
+  expect_equal(limits$lcl, test_cp_limit_answer$lcl)
+  expect_equal(limits$ucl, test_cp_limit_answer$ucl)
 })

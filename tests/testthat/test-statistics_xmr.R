@@ -18,14 +18,17 @@ test_that("X chart limits the same as live qicharts2 v.0.7.2", {
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
-  results <- get_x_limits(
+  chart <- autospc_chart_x(data = test_data, x = "x", y = "y")
+
+  statistics <- get_x_statistics(
     y = test_data$y,
     mr_screen_max_loops = 1
   )
+  limits <- limits_from_statistics(chart, statistics, test_data)
 
-  expect_equal(results$cl, test_individual_answer$cl)
-  expect_equal(results$lcl, test_individual_answer$lcl)
-  expect_equal(results$ucl, test_individual_answer$ucl)
+  expect_equal(statistics$cl, test_individual_answer$cl)
+  expect_equal(limits$lcl, test_individual_answer$lcl)
+  expect_equal(limits$ucl, test_individual_answer$ucl)
 })
 
 # test that moving range limits that are above ucl_mr are removed when
@@ -46,21 +49,30 @@ test_that("X chart limits with mr screening remove extreme moving ranges", {
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
-  results <- get_x_limits(
+  chart <- autospc_chart_x(data = extreme_mr_data, x = "x", y = "y")
+
+  statistics <- get_x_statistics(
     y = extreme_mr_data$y,
     mr_screen_max_loops = 1
   )
+  limits <- limits_from_statistics(chart, statistics, extreme_mr_data)
 
-  expect_equal(results$cl, test_mr_answer$cl)
-  expect_equal(results$lcl, test_mr_answer$lcl)
-  expect_equal(results$ucl, test_mr_answer$ucl)
+  expect_equal(statistics$cl, test_mr_answer$cl)
+  expect_equal(limits$lcl, test_mr_answer$lcl)
+  expect_equal(limits$ucl, test_mr_answer$ucl)
 })
 
 # ...and that they are not when mr_screen_max_loops = 0
 test_that("X chart limits correct without mr screening", {
-  results <- get_x_limits(
+  chart <- autospc_chart_x(data = extreme_mr_data, x = "x", y = "y")
+
+  statistics <- get_x_statistics(
     y = extreme_mr_data$y,
     mr_screen_max_loops = 0
+  )
+  results <- c(
+    statistics,
+    limits_from_statistics(chart, statistics, extreme_mr_data)
   )
 
   expect_equal(results$cl,

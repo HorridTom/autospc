@@ -28,12 +28,15 @@ test_that("X chart limits the same as qicharts2 v.0.7.2", {
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
-  results <- get_x_limits(
+  chart <- autospc_chart_x(data = test_data, x = "x", y = "y")
+
+  statistics <- get_x_statistics(
     y = test_data$y,
     exclusion_points = c(6, 15)
   )
+  limits <- limits_from_statistics(chart, statistics, test_data)
 
-  expect_equal(results$cl, test_x_chart_exclusions_answer$cl)
-  expect_equal(results$lcl, test_x_chart_exclusions_answer$lcl)
-  expect_equal(results$ucl, test_x_chart_exclusions_answer$ucl)
+  expect_equal(statistics$cl, test_x_chart_exclusions_answer$cl)
+  expect_equal(limits$lcl, test_x_chart_exclusions_answer$lcl)
+  expect_equal(limits$ucl, test_x_chart_exclusions_answer$ucl)
 })

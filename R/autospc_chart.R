@@ -398,14 +398,6 @@ limits_table_columns.autospc_chart <- function(chart) {
 }
 
 
-#' @describeIn sd_estimate_columns The limits are the same at every row of a
-#'   calculation period, so no column is needed to place them elsewhere.
-#' @noRd
-sd_estimate_columns.autospc_chart <- function(chart) {
-  return(character(0))
-}
-
-
 #' Extend the limits of the preceding calculation period over the display period
 #'
 #' Carries the last calculated centre line and limits forward unchanged.
@@ -422,6 +414,8 @@ extend_display_limits.autospc_chart <- function(chart,
   limits_table[display_rows, "ucl"] <- limits_table[last_calculated, "ucl"]
   limits_table[display_rows, "lcl"] <- limits_table[last_calculated, "lcl"]
   limits_table[display_rows, "cl"] <- limits_table[last_calculated, "cl"]
+  limits_table[display_rows, "sd_estimate"] <-
+    limits_table[last_calculated, "sd_estimate"]
   limits_table[display_rows, "period_type"] <- "display"
 
   return(limits_table)
@@ -561,6 +555,39 @@ limit_bounds.autospc_chart <- function(chart) {
   return(list(
     low = -Inf,
     high = Inf
+  ))
+}
+
+
+#' The standard error at each of a set of rows
+#'
+#' The estimate itself, at every row. Overridden by the classes whose limits
+#' vary with the denominator.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at.autospc_chart <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)))
+}
+
+
+#' Control limits from a period's statistics
+#'
+#' Three standard errors either side of the centre line. Overridden by the
+#' moving range chart, whose lower limit is defined differently.
+#'
+#' @return list of two numeric vectors named ucl and lcl
+#' @noRd
+limits_from_statistics.autospc_chart <- function(chart, statistics, rows) {
+  half_width <- 3 * standard_error_at(
+    chart = chart,
+    sd_estimate = statistics$sd_estimate,
+    rows = rows
+  )
+
+  return(list(
+    ucl = statistics$cl + half_width,
+    lcl = statistics$cl - half_width
   ))
 }
 

@@ -411,10 +411,12 @@ test_that("prepare_data turns counts into percentages and keeps the count", {
 
 
 test_that("prepare_data gives NA for a zero or missing denominator", {
-  # rather than NaN or Inf, which would propagate into the limits
+  # rather than NaN or Inf, which would propagate into the limits. A zero
+  # denominator is paired with a zero numerator, that being the only numerator
+  # a subgroup with no opportunities can have
   counts <- data.frame(
     x = 1:3,
-    y = c(10, 10, 10),
+    y = c(10, 0, 10),
     n = c(100, 0, NA_real_)
   )
 
@@ -423,6 +425,20 @@ test_that("prepare_data gives NA for a zero or missing denominator", {
   )
 
   expect_identical(prepared$data$series, c(10, NA_real_, NA_real_))
+})
+
+
+test_that("a numerator above a zero denominator is refused", {
+  counts <- data.frame(
+    x = 1:3,
+    y = c(10, 10, 10),
+    n = c(100, 0, NA_real_)
+  )
+
+  expect_error(
+    autospc_chart_p(data = counts, x = "x", y = "y", n = "n"),
+    "For a P chart, y must be a count from 0 to n"
+  )
 })
 
 

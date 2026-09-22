@@ -49,19 +49,54 @@ make_data_column_validation_data <- function() {
     return(av)
   }
 
+  # Simulate a numerator column of a specified type, every element of which
+  # lies between zero and the denominator on its row. A P or P' chart requires
+  # that, so a fixture that broke it would be testing a chart the package
+  # refuses to build rather than the column types it is meant to cover.
+  # Rounding is monotonic, so a numerator within its denominator here is still
+  # within it after `round_counts()`.
+  sim_y_within_n <- function(av_type,
+                             n_col,
+                             num_rows) {
+    ceiling_per_row <- pmax(n_col, 0)
+
+    y <- switch(av_type,
+      "integer" = as.integer(
+        floor(stats::runif(num_rows) * (floor(ceiling_per_row) + 1))
+      ),
+      "double - int" = as.double(
+        floor(stats::runif(num_rows) * (floor(ceiling_per_row) + 1))
+      ),
+      "double - nonint" = stats::runif(num_rows) * ceiling_per_row
+    )
+
+    return(y)
+  }
+
   # Assemble columns of specified types into a tibble
   make_sig_test_df <- function(y_type,
                                n_type,
                                num_rows) {
-    y_col <- sim_av(
-      av_type = y_type,
-      num_rows = num_rows
-    )
-
     n_col <- sim_av(
       av_type = n_type,
       num_rows = num_rows
     )
+
+    numeric_pair <- is.numeric(n_col) &&
+      y_type %in% c("integer", "double - int", "double - nonint")
+
+    y_col <- if (numeric_pair) {
+      sim_y_within_n(
+        av_type = y_type,
+        n_col = n_col,
+        num_rows = num_rows
+      )
+    } else {
+      sim_av(
+        av_type = y_type,
+        num_rows = num_rows
+      )
+    }
 
     test_df <- tibble::tibble(
       x = 1L:num_rows,
@@ -88,6 +123,8 @@ make_data_column_validation_data <- function() {
       return(df)
     }
   )
+
+  set.seed(5678L)
 
   sig_test_dfs_y <- lapply(
     c(1:nrow(df_sigs_y)),

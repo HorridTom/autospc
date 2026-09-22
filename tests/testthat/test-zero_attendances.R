@@ -52,12 +52,14 @@ test_data2 <- data.frame(
 )
 
 
-# zeros in both y and n in calc period
+# zeros in both y and n in calc period. The n column has four zeros, rows 10 to
+# 13, so the y column does too: a subgroup with no opportunities can only have
+# had no events.
 test_data3 <- data.frame(
   x = 1:50,
   y = c(
     53, 53, 53, 45, 49, 54, 48, 48,
-    55, 0, 0, 51, 53, 52, 49, 51,
+    55, 0, 0, 0, 0, 52, 49, 51,
     52, 50, 54, 47, 27, 25, 23,
     25, 27, 29, 21, 27,
     26, 28, 20, 22,
@@ -79,12 +81,9 @@ test_data3 <- data.frame(
 )
 
 
-test_that("P charts with zero attendances error handle", {
-  result1 <- autospc(test_data1,
-    chart_type = "P'", plot_chart = FALSE, period_min = 21
-  ) %>%
-    dplyr::select(x, series, y, n, ucl, lcl, cl)
-
+test_that("a subgroup with no attendances and no events draws", {
+  # a week with no patients at a small clinic: no denominator and no numerator,
+  # so no proportion, and the limits carry across it
   result2 <- autospc(test_data2,
     chart_type = "P'", plot_chart = FALSE, period_min = 21
   ) %>%
@@ -94,13 +93,6 @@ test_that("P charts with zero attendances error handle", {
     chart_type = "P'", plot_chart = FALSE, period_min = 21
   ) %>%
     dplyr::select(x, series, y, n, ucl, lcl, cl)
-
-  # a subgroup with no attendances has no proportion, so no point is plotted,
-  # and the limits carry across it
-  testthat::expect_equal(all(is.na(result1$series[24:28])), TRUE)
-  testthat::expect_equal(all(!is.na(result1$ucl[24:28])), TRUE)
-  testthat::expect_equal(all(!is.na(result1$lcl[24:28])), TRUE)
-  testthat::expect_equal(all(!is.na(result1$cl[24:28])), TRUE)
 
   testthat::expect_equal(all(is.na(result2$series[24:28])), TRUE)
   testthat::expect_equal(all(!is.na(result2$ucl[24:28])), TRUE)
@@ -114,7 +106,20 @@ test_that("P charts with zero attendances error handle", {
 
   # the numerator is an observation in its own right, so it is kept where the
   # denominator is zero. It is only the proportion it would give that is missing
-  testthat::expect_false(any(is.na(result1$y[24:28])))
   testthat::expect_false(any(is.na(result2$y[24:28])))
   testthat::expect_false(any(is.na(result3$y[10:13])))
+})
+
+
+test_that("events recorded against no attendances are refused", {
+  # test_data1 has a numerator of 28 against a denominator of 0, which says 28
+  # events happened in a subgroup that had no opportunities for one. That is
+  # data entered wrongly rather than a quiet week, so the chart is refused
+  # rather than drawn with those subgroups blank.
+  testthat::expect_error(
+    autospc(test_data1,
+      chart_type = "P'", plot_chart = FALSE, period_min = 21
+    ),
+    "y must be a count from 0 to n"
+  )
 })

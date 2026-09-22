@@ -121,6 +121,12 @@ test_that("every visualisation parameter reaches the plot object", {
       given[[parameter]] <- !autospc_default(parameter)
     }
 
+    if (identical(parameter, "override_y_lim")) {
+      # a numeric parameter that is checked against the series needs a value
+      # that passes that check too
+      given[[parameter]] <- 20
+    }
+
     if (is.character(autospc_default(parameter))) {
       # a character parameter that is checked for more than being a string
       # needs a value that passes that check too

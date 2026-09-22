@@ -124,8 +124,12 @@
 #' @param use_caption Boolean controlling whether the caption is displayed.
 #' @param override_x_title String specifying horizontal axis label.
 #' @param override_y_title String specifying vertical axis label.
-#' @param override_y_lim Optional numeric specifying upper limit of the
-#' vertical axis.
+#' @param override_y_lim Optional numeric specifying the ends of the
+#' vertical axis. A single number specifies the upper end. A vector of two
+#' numbers specifies the lower and upper ends, and NA in either position leaves
+#' that end as the chart would have set it. A range that would leave a data
+#' point outside the axis is an error; however, control limits and annotations
+#' may fall outside the range.
 #' @param x_break Optional numeric specifying spacing of horizontal axis breaks.
 #' @param x_date_format Optional string format for date labels on horizontal
 #' axis. Passed to scales::date_format.

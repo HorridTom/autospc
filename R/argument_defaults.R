@@ -89,7 +89,7 @@ autospc_numeric_arguments <- function() {
     annotation_arrow_curve = "number",
     upper_annotation_sf = "number",
     lower_annotation_sf = "number",
-    override_y_lim = "number",
+    override_y_lim = "axis_range",
     x_break = "axis_value",
     x_pad_end = "axis_value",
     extend_limits_to = "axis_value"

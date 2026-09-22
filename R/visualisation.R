@@ -100,12 +100,14 @@ create_spc_plot <- function(plot_data,
       caption = paste0(caption)
     ) +
     ggplot2::scale_y_continuous(
-      limits = c(
-        axis_extents$ylimlow,
-        axis_extents$ylimhigh
-      ),
       breaks = scales::breaks_pretty(),
       labels = scales::label_number(big.mark = ",")
+    ) +
+    ggplot2::coord_cartesian(
+      ylim = c(
+        axis_extents$ylimlow,
+        axis_extents$ylimhigh
+      )
     )
 
   # Add floating median to chart if needed
@@ -256,14 +258,16 @@ create_timeseries_plot <- function(table,
       y = visualisation_params$override_y_title
     ) +
     ggplot2::scale_y_continuous(
-      limits = c(
-        axis_extents$ylimlow,
-        axis_extents$ylimhigh
-      ),
       breaks = scales::breaks_pretty(),
       labels = scales::number_format(
         accuracy = 1,
         big.mark = ","
+      )
+    ) +
+    ggplot2::coord_cartesian(
+      ylim = c(
+        axis_extents$ylimlow,
+        axis_extents$ylimhigh
       )
     )
 

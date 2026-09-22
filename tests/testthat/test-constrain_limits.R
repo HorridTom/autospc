@@ -186,7 +186,7 @@ test_that("an individuals chart's limits are the same either way", {
 
 test_that("the y axis follows limits that reach outside 0 to 100", {
   axis_of <- function(plot) {
-    return(ggplot2::layer_scales(plot)$y$get_limits())
+    return(ggplot2::ggplot_build(plot)$layout$coord$limits$y)
   }
 
   expect_identical(axis_of(p_chart()), c(0, 110))

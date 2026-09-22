@@ -415,6 +415,90 @@ match_axis_value <- function(value,
 }
 
 
+#' Check that one argument is a range on the vertical axis
+#'
+#' A single number is the upper end, which is what override_y_lim accepted
+#' before it took two. Two numbers are the lower and upper ends, and NA in
+#' either position leaves that end to `y_axis_range()`.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_axis_range <- function(value,
+                             name,
+                             call = rlang::caller_env()) {
+  is_range <- is.numeric(value) &&
+    length(value) %in% c(1L, 2L) &&
+    all(is.na(value) | is.finite(value)) &&
+    !all(is.na(value)) &&
+    (length(value) == 1L || isTRUE(value[[1L]] < value[[2L]]) ||
+      any(is.na(value)))
+
+  if (!is_range) {
+    rlang::abort(
+      sprintf(
+        paste(
+          "`%s` must be a number giving the upper end of the vertical",
+          "axis, or two numbers giving its lower and upper ends, with NA",
+          "for an end to leave as it is, not %s."
+        ),
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Stop unless every drawn point of the series is inside the vertical axis
+#'
+#' A point outside the axis is not drawn, and a point that is not drawn cannot
+#' be read. Control limits and centre line annotations are not checked, because
+#' the axis zooms rather than clips and so leaves them outside the panel rather
+#' than dropping them.
+#'
+#' @param series The values the chart plots.
+#' @param low The lower end of the vertical axis.
+#' @param high The upper end of the vertical axis.
+#' @param name The argument the range came from.
+#'
+#' @return `NULL`, or an error naming the argument.
+#' @noRd
+require_series_within_axis <- function(series,
+                                       low,
+                                       high,
+                                       name,
+                                       call = rlang::caller_env()) {
+  drawn <- series[!is.na(series)]
+
+  outside <- drawn < low | drawn > high
+
+  if (!any(outside)) {
+    return(invisible(NULL))
+  }
+
+  rlang::abort(
+    sprintf(
+      paste(
+        "`%s` of %s to %s leaves %d of %d data points outside the",
+        "vertical axis, where they would not be drawn. The series runs",
+        "from %s to %s."
+      ),
+      name,
+      format(low),
+      format(high),
+      sum(outside),
+      length(drawn),
+      format(round(min(drawn), 2L)),
+      format(round(max(drawn), 2L))
+    ),
+    call = call
+  )
+}
+
+
 #' Whether an argument was left at a NULL default
 #'
 #' An argument `autospc()` declares as NULL accepts NULL, so there is nothing
@@ -590,11 +674,11 @@ validate_argument_values <- function(arguments,
       next
     }
 
-    arguments[[name]] <- if (identical(kinds[[name]], "axis_value")) {
-      match_axis_value(value, name, call = call)
-    } else {
+    arguments[[name]] <- switch(kinds[[name]],
+      axis_value = match_axis_value(value, name, call = call),
+      axis_range = match_axis_range(value, name, call = call),
       match_number(value, name, kinds[[name]], call = call)
-    }
+    )
   }
 
   for (name in autospc_string_arguments()) {

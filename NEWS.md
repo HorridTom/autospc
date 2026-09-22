@@ -1,3 +1,29 @@
+# autospc 0.1.0.9023
+
+## Both ends of the vertical axis can be specified
+
+`override_y_lim` set the upper end of the vertical axis and nothing else. The
+lower end could not be set at all. Specifying a value below the centre line made
+the chart fail to draw.
+
+* **`override_y_lim` takes the lower end as well.** A single number is still the
+  upper end, so every call that worked before works unchanged. A vector of two
+  numbers specifies the lower and upper ends, and `NA` in either position leaves
+  that end as the chart would have set it - `c(-10, NA)` moves the bottom and
+  leaves the top alone.
+
+* **The axis zooms rather than clips.** The ends are now given to
+  `coord_cartesian()` rather than to `scale_y_continuous()`. Before, anything
+  outside the axis was turned into NA and dropped from the drawing without a
+  warning, so a narrowed axis could lose a control limit entirely. Now nothing
+  is dropped: a limit or a centre line annotation outside the axis simply sits
+  outside the panel.
+
+* **A range that would leave a data point outside the axis is an error.** A
+  limit or an annotation may fall outside the axis, because a reader can see a
+  line leave the panel. A data point cannot, so a range that would hide one is
+  refused, naming the range asked for and the range the series needs.
+
 # autospc 0.1.0.9022
 
 ## A standard deviation estimate for every chart type

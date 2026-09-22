@@ -187,8 +187,12 @@ Arguments that control aspects of chart visualisation
 
 \item{override_y_title}{String specifying vertical axis label.}
 
-\item{override_y_lim}{Optional numeric specifying upper limit of the
-vertical axis.}
+\item{override_y_lim}{Optional numeric specifying the ends of the
+vertical axis. A single number is the upper end. Two numbers are the
+lower and upper ends, and NA in either position leaves that end as the
+chart would have set it. A range that would leave a data point outside
+the axis is an error; control limits and centre line annotations may
+fall outside it.}
 
 \item{x_break}{Optional numeric specifying spacing of horizontal axis breaks.}
 

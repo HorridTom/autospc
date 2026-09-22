@@ -346,8 +346,8 @@ test_that("it records the axis extents it was drawn with", {
     c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh")
   )
 
-  # what is recorded is what the y scale was given, before ggplot expands it
-  limits <- ggplot2::ggplot_build(plot)$layout$panel_scales_y[[1]]$limits
+  # what is recorded is what the coord was given, before ggplot expands it
+  limits <- ggplot2::ggplot_build(plot)$layout$coord$limits$y
 
   expect_identical(limits, c(
     autospc_plot_axis_extents(plot, value = "ylimlow"),

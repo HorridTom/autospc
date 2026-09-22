@@ -236,7 +236,22 @@ axis_specifications <- function(table,
   }
 
   if (!is.null(visualisation_params$override_y_lim)) {
-    ylimhigh <- visualisation_params$override_y_lim
+    requested <- requested_y_limits(visualisation_params$override_y_lim)
+
+    if (!is.na(requested[[1L]])) {
+      ylimlow <- requested[[1L]]
+    }
+
+    if (!is.na(requested[[2L]])) {
+      ylimhigh <- requested[[2L]]
+    }
+
+    require_series_within_axis(
+      series = table$series,
+      low = ylimlow,
+      high = ylimhigh,
+      name = "override_y_lim"
+    )
   }
 
   # The y axis title comes from the chart where the caller gave none. The x
@@ -261,6 +276,26 @@ axis_specifications <- function(table,
       y = y_title
     )
   ))
+}
+
+
+#' The ends of the vertical axis a caller asked for
+#'
+#' A single number is the upper end. Two numbers are the lower and upper ends.
+#' NA in either position says to leave that end as `y_axis_range()` set it.
+#'
+#' @param override_y_lim The value of the `override_y_lim` argument.
+#'
+#' @return A numeric vector of two, the lower end and the upper end.
+#' @noRd
+requested_y_limits <- function(override_y_lim) {
+  ends <- as.numeric(override_y_lim)
+
+  if (length(ends) == 1L) {
+    return(c(NA_real_, ends))
+  }
+
+  return(ends)
 }
 
 

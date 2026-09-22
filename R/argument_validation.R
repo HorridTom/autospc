@@ -212,6 +212,108 @@ require_unique <- function(data,
 }
 
 
+#' Name the rows a check objected to, up to five of them
+#'
+#' @param data The data the check looked at.
+#' @param rows The positions of the rows it objected to.
+#' @param columns The columns whose values to show for each row.
+#'
+#' @return A character scalar, ready to follow a sentence.
+#' @noRd
+offending_rows <- function(data,
+                           rows,
+                           columns) {
+  shown <- utils::head(rows, 5L)
+
+  described <- vapply(shown, function(row) {
+    values <- vapply(columns, function(column) {
+      return(paste0(column, " = ", data[[column]][[row]]))
+    }, character(1))
+
+    return(paste0("row ", row, " (", paste(values, collapse = ", "), ")"))
+  }, character(1))
+
+  listed <- paste(described, collapse = ", ")
+
+  if (length(rows) > length(shown)) {
+    listed <- paste0(
+      listed, ", and ",
+      length(rows) - length(shown), " more"
+    )
+  }
+
+  return(paste0(listed, "."))
+}
+
+
+#' Stop unless every count lies between zero and its denominator
+#'
+#' The error text is passed in as `message` so that each class can name itself.
+#' The rows outside the range are named after it, up to five of them, so that
+#' the caller can find them. A row whose `y` or `n` is NA is not checked, and
+#' data with no `n` column holds individual binary observations, for which the
+#' range cannot be exceeded.
+#'
+#' A denominator of zero is a subgroup that had no opportunities, which the
+#' analysis gives no value of its own. Its numerator has to be zero: some
+#' events in no opportunities is a contradiction rather than a quiet subgroup.
+#'
+#' @return invisible TRUE, or an error with `message` as its text
+#' @noRd
+require_counts_within_denominator <- function(data,
+                                              message) {
+  if (!"n" %in% colnames(data)) {
+    return(invisible(TRUE))
+  }
+
+  comparable <- !is.na(data$y) & !is.na(data$n)
+
+  outside <- which(comparable & (data$y < 0 | data$y > data$n))
+
+  if (length(outside) == 0L) {
+    return(invisible(TRUE))
+  }
+
+  stop(
+    paste0(
+      message, " Outside it: ",
+      offending_rows(data = data, rows = outside, columns = c("y", "n"))
+    ),
+    call. = FALSE
+  )
+}
+
+
+#' Stop unless every denominator is zero or more
+#'
+#' A denominator of zero is left to the analysis, which gives such a row no
+#' value of its own. A negative one has no meaning and gives the row a negative
+#' percentage and a NaN control limit, so it is refused here.
+#'
+#' @return invisible TRUE, or an error with `message` as its text
+#' @noRd
+require_denominator_not_negative <- function(data,
+                                             message) {
+  if (!"n" %in% colnames(data)) {
+    return(invisible(TRUE))
+  }
+
+  negative <- which(!is.na(data$n) & data$n < 0)
+
+  if (length(negative) == 0L) {
+    return(invisible(TRUE))
+  }
+
+  stop(
+    paste0(
+      message, " Negative: ",
+      offending_rows(data = data, rows = negative, columns = "n")
+    ),
+    call. = FALSE
+  )
+}
+
+
 is_whole_number <- function(x,
                             tol = .Machine$double.eps^0.5) {
   return(abs(x - round(x)) < tol)

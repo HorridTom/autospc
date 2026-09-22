@@ -139,7 +139,38 @@ autospc_chart_pp <- function(data,
 
   autospc_chart_pp_object <- round_counts(autospc_chart_pp_object)
 
+  check_counts_pp(autospc_chart_pp_object$data)
+
   return(autospc_chart_pp_object)
+}
+
+
+#' Stop unless the counts a P' chart was given are usable
+#'
+#' Runs after `round_counts()`, so a numerator of 10.4 against a denominator of
+#' 10 is checked as the 10 it was rounded to rather than refused for the
+#' fraction it arrived with.
+#'
+#' @param data The chart's data.
+#'
+#' @return invisible TRUE, or an error naming the rows at fault
+#' @noRd
+check_counts_pp <- function(data) {
+  require_denominator_not_negative(
+    data = data,
+    message = paste(
+      "For a P' chart, n cannot be negative."
+    )
+  )
+
+  require_counts_within_denominator(
+    data = data,
+    message = paste(
+      "For a P' chart, y must be a count from 0 to n."
+    )
+  )
+
+  return(invisible(TRUE))
 }
 
 

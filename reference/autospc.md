@@ -289,7 +289,12 @@ autospc(
 
 - override_y_lim:
 
-  Optional numeric specifying upper limit of the vertical axis.
+  Optional numeric specifying the ends of the vertical axis. A single
+  number specifies the upper end. A vector of two numbers specifies the
+  lower and upper ends, and NA in either position leaves that end as the
+  chart would have set it. A range that would leave a data point outside
+  the axis is an error; however, control limits and annotations may fall
+  outside the range.
 
 - x_break:
 

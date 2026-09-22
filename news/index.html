@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9022</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9023</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,16 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9023" id="autospc-0109023">autospc 0.1.0.9023<a class="anchor" aria-label="anchor" href="#autospc-0109023"></a></h2>
+<div class="section level3">
+<h3 id="both-ends-of-the-vertical-axis-can-be-specified-0-1-0-9023">Both ends of the vertical axis can be specified<a class="anchor" aria-label="anchor" href="#both-ends-of-the-vertical-axis-can-be-specified-0-1-0-9023"></a></h3>
+<p><code>override_y_lim</code> set the upper end of the vertical axis and nothing else. The lower end could not be set at all. Specifying a value below the centre line made the chart fail to draw.</p>
+<ul><li><p><strong><code>override_y_lim</code> takes the lower end as well.</strong> A single number is still the upper end, so every call that worked before works unchanged. A vector of two numbers specifies the lower and upper ends, and <code>NA</code> in either position leaves that end as the chart would have set it - <code>c(-10, NA)</code> moves the bottom and leaves the top alone.</p></li>
+<li><p><strong>The axis zooms rather than clips.</strong> The ends are now given to <code>coord_cartesian()</code> rather than to <code>scale_y_continuous()</code>. Before, anything outside the axis was turned into NA and dropped from the drawing without a warning, so a narrowed axis could lose a control limit entirely. Now nothing is dropped: a limit or a centre line annotation outside the axis simply sits outside the panel.</p></li>
+<li><p><strong>A range that would leave a data point outside the axis is an error.</strong> A limit or an annotation may fall outside the axis, because a reader can see a line leave the panel. A data point cannot, so a range that would hide one is refused, naming the range asked for and the range the series needs.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9022" id="autospc-0109022">autospc 0.1.0.9022<a class="anchor" aria-label="anchor" href="#autospc-0109022"></a></h2>
 <div class="section level3">

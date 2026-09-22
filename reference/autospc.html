@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9022</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9023</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -334,8 +334,12 @@ therefore makes an analysed chart several times larger.</p><div class="section">
 
 
 <dt id="arg-override-y-lim">override_y_lim<a class="anchor" aria-label="anchor" href="#arg-override-y-lim"></a></dt>
-<dd><p>Optional numeric specifying upper limit of the
-vertical axis.</p></dd>
+<dd><p>Optional numeric specifying the ends of the
+vertical axis. A single number specifies the upper end. A vector of two
+numbers specifies the lower and upper ends, and NA in either position leaves
+that end as the chart would have set it. A range that would leave a data
+point outside the axis is an error; however, control limits and annotations
+may fall outside the range.</p></dd>
 
 
 <dt id="arg-x-break">x_break<a class="anchor" aria-label="anchor" href="#arg-x-break"></a></dt>

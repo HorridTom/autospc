@@ -253,7 +253,11 @@ plot_auto_SPC(
 
 - override_y_lim:
 
-  Optional numeric specifying upper limit of the vertical axis.
+  Optional numeric specifying the ends of the vertical axis. A single
+  number is the upper end. Two numbers are the lower and upper ends, and
+  NA in either position leaves that end as the chart would have set it.
+  A range that would leave a data point outside the axis is an error;
+  control limits and centre line annotations may fall outside it.
 
 - x_break:
 

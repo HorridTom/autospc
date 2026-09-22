@@ -1,5 +1,38 @@
 # Changelog
 
+## autospc 0.1.0.9024
+
+### A P or P’ chart refuses invalid counts it cannot plot
+
+A P or P’ chart with `n` specified already required `y` and `n` to be
+counts, rounding either of them to a whole number with a warning.
+Nothing checked that the count was valid and could be plotted, so a
+numerator above its denominator or below zero was accepted and drawn at
+an impossible percentage. These values were also included in
+calculations for the centre line and the control limits.
+
+- **`y` must be a count from 0 to `n`.** A numerator outside that range
+  gives an error naming the rows at fault and their values, up to five
+  of them, with the rest counted. The check runs after the counts are
+  rounded, so `y = 10.4` against `n = 10` passes.
+
+- **`n` cannot be negative.** A negative denominator gave the row a
+  negative percentage and a NaN control limit. Where both rules are
+  broken the denominator is reported.
+
+- **A subgroup with no opportunities is still drawn**, as it was before:
+  `n = 0` with `y = 0` has no proportion, so no point is plotted and the
+  limits carry across it - e.g. a week with no patients at a small
+  clinic. `n = 0` with a numerator above zero is refused, some events in
+  no opportunities being a contradiction.
+
+This is a breaking change for data that was never valid. A series
+carrying a numerator outside 0 to `n`, or a negative denominator, will
+now raise an error where before it drew a chart whose centre line and
+limits incorporated the problematic data.
+
+Nothing changes for a series whose counts are valid.
+
 ## autospc 0.1.0.9023
 
 ### Both ends of the vertical axis can be specified

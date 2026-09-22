@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9023</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9024</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,18 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9024" id="autospc-0109024">autospc 0.1.0.9024<a class="anchor" aria-label="anchor" href="#autospc-0109024"></a></h2>
+<div class="section level3">
+<h3 id="a-p-or-p-chart-refuses-invalid-counts-it-cannot-plot-0-1-0-9024">A P or P’ chart refuses invalid counts it cannot plot<a class="anchor" aria-label="anchor" href="#a-p-or-p-chart-refuses-invalid-counts-it-cannot-plot-0-1-0-9024"></a></h3>
+<p>A P or P’ chart with <code>n</code> specified already required <code>y</code> and <code>n</code> to be counts, rounding either of them to a whole number with a warning. Nothing checked that the count was valid and could be plotted, so a numerator above its denominator or below zero was accepted and drawn at an impossible percentage. These values were also included in calculations for the centre line and the control limits.</p>
+<ul><li><p><strong><code>y</code> must be a count from 0 to <code>n</code>.</strong> A numerator outside that range gives an error naming the rows at fault and their values, up to five of them, with the rest counted. The check runs after the counts are rounded, so <code>y = 10.4</code> against <code>n = 10</code> passes.</p></li>
+<li><p><strong><code>n</code> cannot be negative.</strong> A negative denominator gave the row a negative percentage and a NaN control limit. Where both rules are broken the denominator is reported.</p></li>
+<li><p><strong>A subgroup with no opportunities is still drawn</strong>, as it was before: <code>n = 0</code> with <code>y = 0</code> has no proportion, so no point is plotted and the limits carry across it - e.g. a week with no patients at a small clinic. <code>n = 0</code> with a numerator above zero is refused, some events in no opportunities being a contradiction.</p></li>
+</ul><p>This is a breaking change for data that was never valid. A series carrying a numerator outside 0 to <code>n</code>, or a negative denominator, will now raise an error where before it drew a chart whose centre line and limits incorporated the problematic data.</p>
+<p>Nothing changes for a series whose counts are valid.</p>
+</div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9023" id="autospc-0109023">autospc 0.1.0.9023<a class="anchor" aria-label="anchor" href="#autospc-0109023"></a></h2>
 <div class="section level3">

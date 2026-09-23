@@ -1,5 +1,36 @@
 # Changelog
 
+## autospc 0.1.0.9025
+
+### Consistent limits for rows outside the calculation period
+
+Limits in display periods, limits extended beyond the data, and limits
+over subgroups with no observation now all derive their limits in the
+same way. For almost every chart this changes nothing. Two small
+differences affect P and P’ charts only.
+
+- **A P’ chart’s extended limits match the period they extend.** Where
+  the final calculation period held a missing subgroup (i.e. with no
+  observation), the extended limits were based on a slightly different
+  standard deviation estimate from the one the period’s own limits used,
+  and from the `sd_estimate` reported on the extension rows. They now
+  use the period’s estimate. Only the extended limits were affected.
+
+- **A mean denominator leaves out excluded points and subgroups with no
+  observation.** Where a row has no denominator of its own, its P or P’
+  limits are placed at a mean denominator: the final calculation
+  period’s for extended limits, and that of the period it sits in for a
+  subgroup whose `n` is missing or zero. That mean now counts only the
+  subgroups whose values are used in the analysis, leaving out excluded
+  points and subgroups with no observation. Extension limits move
+  slightly where the final calculation period holds either, as do the
+  limits of a subgroup with no `n` in a period holding an excluded
+  point.
+
+No centre line, and no control limit at a subgroup with an observation,
+changes. Therefore no rule breaks or re-establishment decisions were
+affected.
+
 ## autospc 0.1.0.9024
 
 ### A P or P’ chart refuses invalid counts it cannot plot

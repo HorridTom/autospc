@@ -103,10 +103,9 @@ compact_series <- function(chart,
 #' per row of the prepared series, with the limits carried across a gap between
 #' two observations and left missing beyond the first and last of them.
 #'
-#' `limits_for_missing_rows()` gives the limits to carry across. The
-#' observations either side of a gap belong to the same period as it and
-#' already hold that period's limits, so the values are read from one of those
-#' observations rather than calculated again.
+#' The observations either side of a gap belong to the same period as it and
+#' already hold that period's centre line and standard deviation estimate, so
+#' the gap's limits are formed from those.
 #'
 #' @param limits_table The analysed table, one row per observation.
 #' @param data The prepared series, one row per row.
@@ -149,30 +148,6 @@ restore_missing_rows <- function(limits_table,
 }
 
 
-#' An observation of the period to read the period's limits from
-#'
-#' Used to give limits to the rows of the period that hold no observation. A
-#' period holds one centre line throughout, and one standard deviation estimate
-#' for the classes whose limits vary with the denominator, so the first
-#' observation that has
-#' both a centre line and an upper limit serves as well as any other.
-#'
-#' @param period The rows of the period that hold an observation.
-#'
-#' @return the first row of `period` whose `cl` and `ucl` are both present, or
-#'   NULL where no row has both
-#' @noRd
-row_holding_period_limits <- function(period) {
-  has_limits <- !is.na(period$cl) & !is.na(period$ucl)
-
-  if (!any(has_limits)) {
-    return(NULL)
-  }
-
-  return(period[which(has_limits)[1L], , drop = FALSE])
-}
-
-
 #' Give the rows between two observations the limits of their period
 #'
 #' Each row with no observation is given the limits of the period that the
@@ -205,10 +180,20 @@ carry_limits_across_gaps <- function(restored,
     period_rows <- restored[observed & period_of == period, , drop = FALSE]
     rows <- gaps[period_of[gaps] == period]
 
-    period_limits <- limits_for_missing_rows(
+    gap_rows <- restored[rows, , drop = FALSE]
+
+    if (has_denominator(chart)) {
+      gap_rows$n <- denominators_for_missing_rows(
+        chart = chart,
+        period = period_rows,
+        rows = gap_rows
+      )
+    }
+
+    period_limits <- limits_at_rows(
       chart = chart,
-      period = period_rows,
-      rows = restored[rows, , drop = FALSE]
+      statistics = period_statistics(period_rows),
+      rows = gap_rows
     )
 
     restored$cl[rows] <- period_limits$cl
@@ -223,7 +208,7 @@ carry_limits_across_gaps <- function(restored,
     restored$cl_change[rows] <- 0
 
     if ("sd_estimate" %in% names(restored)) {
-      restored$sd_estimate[rows] <- sd_estimate_of(period_rows)
+      restored$sd_estimate[rows] <- period_limits$sd_estimate
     }
   }
 

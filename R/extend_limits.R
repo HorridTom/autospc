@@ -7,9 +7,9 @@
 #
 # This file holds the functionality for (b).
 #
-# The other two are elsewhere and named accordingly:
-# (a) is `extend_display_limits()`, and (c) is `limits_for_missing_rows()`, both
-# autospc_chart generics with methods in the chart class files.
+# The other two are `form_display_limits()` for (a) and
+# `carry_limits_across_gaps()` for (c). All three form their limits with
+# `limits_at_rows()`.
 
 
 #' The columns an extension row is defined by
@@ -91,6 +91,34 @@ final_period_start <- function(table) {
 }
 
 
+#' The limits of the extension beyond the end of the data
+#'
+#' Formed from the final calculation period's centre line and standard
+#' deviation estimate. An extension row has no denominator of its own, so for
+#' the classes whose limits vary with it the limits are formed at the mean
+#' denominator of the final period's observations, leaving out the excluded
+#' points, giving one set of values for the whole extension.
+#'
+#' @param final_period The rows of the final calculation period.
+#'
+#' @return list of single values, named cl, ucl, lcl and sd_estimate
+#' @noRd
+extension_limits <- function(chart,
+                             final_period) {
+  at <- dplyr::slice_head(final_period, n = 1L)
+
+  if (has_denominator(chart)) {
+    at$n <- mean_denominator(chart, period = final_period)
+  }
+
+  return(limits_at_rows(
+    chart = chart,
+    statistics = period_statistics(final_period),
+    rows = at
+  ))
+}
+
+
 #' One row of the extension beyond the end of the data
 #'
 #' Copied from the last row of the table, so column types match the table, then
@@ -104,8 +132,8 @@ final_period_start <- function(table) {
 #'
 #' @param table The analysed table.
 #' @param x_value Where on the horizontal axis the row sits.
-#' @param limits The limits for the extension, as
-#'   `limits_for_extension_rows()` gives them.
+#' @param limits The limits for the extension, as `extension_limits()` gives
+#'   them.
 #' @param final_period The rows of the final calculation period.
 #'
 #' @return A one-row data frame with the columns of `table`.
@@ -138,7 +166,7 @@ extension_row <- function(table,
   row$cl_change <- 0
 
   if ("sd_estimate" %in% names(row)) {
-    row$sd_estimate <- sd_estimate_of(final_period)
+    row$sd_estimate <- limits$sd_estimate
   }
 
   # assigning into the column rather than replacing it keeps the column's type
@@ -215,8 +243,8 @@ extension_step <- function(x_values,
 #'
 #' The functionality for the `extend_limits_to` argument. Rows are added to the
 #' table at the first point past the last x of the data and at
-#' `extend_limits_to`, both holding the limits `limits_for_extension_rows()`
-#' gives for the final calculation period, and no observation. Drawing a line
+#' `extend_limits_to`, both holding the limits `extension_limits()` gives for
+#' the final calculation period, and no observation. Drawing a line
 #' through them puts the limits across the extension.
 #'
 #' There are two such rows, except where the step from the last subgroup
@@ -251,9 +279,9 @@ extend_limits_beyond_data <- function(table,
   final_period <- table %>%
     dplyr::filter(plot_period == last_calc_period)
 
-  limits <- limits_for_extension_rows(
+  limits <- extension_limits(
     chart = chart,
-    period = final_period
+    final_period = final_period
   )
 
   step <- extension_step(

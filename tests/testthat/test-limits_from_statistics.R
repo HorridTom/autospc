@@ -103,9 +103,11 @@ test_that("extension rows are formed from the estimate the table carries", {
     extension <- table[table$limit_extension, ]
 
     # the extension carries one pair of limits, placed at the mean denominator
-    # of the period it is carried from
+    # of the observations of the period it is carried from, leaving out the
+    # excluded points
+    counted <- !is.na(final$series) & final$excluded %in% FALSE
     implied <- (extension$ucl[1] - extension$cl[1]) *
-      sqrt(mean(final$n, na.rm = TRUE)) / 3
+      sqrt(mean(final$n[counted])) / 3
 
     expect_equal(implied, extension$sd_estimate[1], label = chart_type)
     expect_equal(extension$cl[1], final$cl[1], label = chart_type)

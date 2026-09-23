@@ -478,3 +478,55 @@ test_that("the step does not reach past the end of a short extension", {
 
   expect_false(is.unsorted(result$x))
 })
+
+
+test_that("the extension takes the limits of the final period", {
+  chart <- structure(list(), class = c("autospc_chart_c", "autospc_chart"))
+  final_period <- data.frame(
+    cl = c(NA_real_, 11, 11),
+    sd_estimate = c(NA_real_, 7 / 3, 7 / 3)
+  )
+
+  limits <- extension_limits(chart, final_period = final_period)
+
+  expect_equal(limits, list(cl = 11, ucl = 18, lcl = 4, sd_estimate = 7 / 3))
+})
+
+
+test_that("a P' extension uses the final period's standard deviation estimate", {
+  # two missing values inside the calculation period, where an estimate
+  # calculated again from the rows of the period would differ from the one the
+  # period's own limits were formed from
+  data <- ed_attendances_monthly[1:30, ]
+  data$within_4h[c(5, 10)] <- NA
+
+  result <- autospc(data,
+    chart_type = "P'",
+    x = "month_start",
+    y = "within_4h",
+    n = "att_all",
+    plot_chart = FALSE,
+    extend_limits_to = as.Date("2018-06-01")
+  )
+
+  extension <- result[result$limit_extension, ]
+  final_period <- result[result$period_type %in% "calculation" &
+    !result$limit_extension, ]
+  last <- final_period[nrow(final_period), ]
+
+  # the extension sits at the mean denominator of the observations that are
+  # not excluded
+  counted <- !is.na(final_period$series) & final_period$excluded %in% FALSE
+
+  expect_identical(
+    extension$sd_estimate,
+    rep(last$sd_estimate, nrow(extension))
+  )
+  expect_equal(
+    extension$ucl,
+    rep(
+      last$cl + 3 * last$sd_estimate / sqrt(mean(final_period$n[counted])),
+      nrow(extension)
+    )
+  )
+})

@@ -288,7 +288,7 @@ test_that("limits_table_columns keeps y and n", {
 })
 
 
-test_that("extend_display_limits recomputes the limits at each denominator", {
+test_that("display limits are recalculated at each denominator", {
   # the limits of a P' chart depend on n, so they cannot be carried forward.
   # The standard deviation estimate of the last calculated period is carried
   # forward and reapplied at each display point's own denominator - so a point
@@ -307,9 +307,10 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
     )
   )
 
-  extended <- extend_display_limits(chart_pp(pp_pre_agg_data),
+  extended <- form_display_limits(
     limits_table = table,
-    counter = 4
+    counter = 4,
+    chart = chart_pp(pp_pre_agg_data)
   )
 
   # the period carries a standard deviation estimate of 20, so the limits sit
@@ -326,7 +327,7 @@ test_that("extend_display_limits recomputes the limits at each denominator", {
 })
 
 
-test_that("extend_display_limits constrains the recomputed limits to 0 and 100", {
+test_that("display limits are constrained to 0 and 100", {
   # percentages, so a limit outside 0-100 is meaningless
   table <- data.frame(
     x = 1:5,
@@ -342,9 +343,10 @@ test_that("extend_display_limits constrains the recomputed limits to 0 and 100",
     )
   )
 
-  extended <- extend_display_limits(chart_pp(pp_pre_agg_data),
+  extended <- form_display_limits(
     limits_table = table,
-    counter = 4
+    counter = 4,
+    chart = chart_pp(pp_pre_agg_data)
   )
 
   expect_true(all(extended$ucl[4:5] <= 100))
@@ -352,57 +354,27 @@ test_that("extend_display_limits constrains the recomputed limits to 0 and 100",
 })
 
 
-test_that("limits_for_extension_rows recalculates from the final period", {
-  # the limits of a P' chart vary with n, so there is no single set to carry
-  # forward. They are recalculated from the final calculation period, giving
-  # one set of values for the whole extension.
+test_that("the extension's limits sit at the final period's mean denominator", {
+  # an extension row has no denominator of its own, so one set of limits is
+  # formed for the whole extension from the period's centre line and standard
+  # deviation estimate. The mean leaves out the row with no observation and
+  # the excluded point, whose denominators would move it.
   final_period <- data.frame(
-    y = c(10, 15, 40, 24, 18), # counts
-    n = c(100, 100, 200, 200, 100),
-    excluded = rep(FALSE, 5),
-    cl = rep(99, 5), # deliberately wrong,
-    lcl = rep(99, 5), # so a method that
-    ucl = rep(99, 5)
-  ) # echoes them fails
-
-  limits <- limits_for_extension_rows(chart_pp(pp_pre_agg_data),
-    period = final_period
+    series = c(15, 15, 15, 15, 15, NA, 60),
+    n = c(100, 100, 200, 200, 100, 1000, 10),
+    excluded = c(FALSE, FALSE, FALSE, FALSE, FALSE, NA, TRUE),
+    cl = rep(15, 7),
+    sd_estimate = rep(20, 7)
   )
 
-  expect_named(limits, c("cl", "ucl", "lcl"), ignore.order = TRUE)
-  expect_length(limits$cl, 1L)
-
-  # the centre line is the pooled proportion of the period, not anything taken
-  # from the cl column
-  pooled <- sum(final_period$y) / sum(final_period$n) * 100
-
-  expect_equal(limits$cl, pooled)
-  expect_gt(limits$ucl, limits$cl)
-  expect_lt(limits$lcl, limits$cl)
-})
-
-
-test_that("limits_for_extension_rows leaves out the excluded points", {
-  base_period <- data.frame(
-    y = c(15, 15, 15, 60, 15),
-    n = rep(100, 5),
-    excluded = rep(FALSE, 5),
-    cl = rep(15, 5),
-    lcl = rep(5, 5),
-    ucl = rep(25, 5)
+  limits <- extension_limits(chart_pp(pp_pre_agg_data),
+    final_period = final_period
   )
 
-  excluded_period <- base_period
-  excluded_period$excluded <- c(FALSE, FALSE, FALSE, TRUE, FALSE)
-
-  with_spike <- limits_for_extension_rows(chart_pp(pp_pre_agg_data),
-    period = base_period
-  )
-  without_spike <- limits_for_extension_rows(chart_pp(pp_pre_agg_data),
-    period = excluded_period
-  )
-
-  expect_lt(without_spike$cl, with_spike$cl)
+  expect_identical(limits$cl, 15)
+  expect_identical(limits$sd_estimate, 20)
+  expect_equal(limits$ucl, 15 + 3 * 20 / sqrt(140))
+  expect_equal(limits$lcl, 15 - 3 * 20 / sqrt(140))
 })
 
 

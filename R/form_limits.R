@@ -122,20 +122,42 @@ form_calculation_limits <- function(data,
 }
 
 
-# Function to form display limits (period extension)
+#' Give the display rows the limits of the preceding calculation period
+#'
+#' Every row from `counter` to the end of the table is given limits formed at
+#' that row from the centre line and standard deviation estimate of the row at
+#' `counter - 1`, the last row of the calculation period.
+#'
+#' @param limits_table The limits table being built.
+#' @param counter The first display row.
+#'
+#' @return `limits_table`, with the display rows filled in
+#' @noRd
 form_display_limits <- function(limits_table, counter, chart) {
   if (counter > nrow(limits_table)) {
     # No display limits needed - no data beyond calculation period
     return(limits_table)
   }
 
-  limits_table <- extend_display_limits(
+  calculated <- dplyr::slice_head(limits_table, n = counter - 1L)
+  display <- dplyr::slice(limits_table, counter:nrow(limits_table))
+
+  limits <- limits_at_rows(
     chart = chart,
-    limits_table = limits_table,
-    counter = counter
+    statistics = period_statistics(dplyr::slice_tail(calculated, n = 1L)),
+    rows = display
   )
 
-  return(limits_table)
+  display <- display %>%
+    dplyr::mutate(
+      cl = limits$cl,
+      ucl = limits$ucl,
+      lcl = limits$lcl,
+      sd_estimate = limits$sd_estimate,
+      period_type = "display"
+    )
+
+  return(dplyr::bind_rows(calculated, display))
 }
 
 

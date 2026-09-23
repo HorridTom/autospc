@@ -129,57 +129,6 @@ limits_from_statistics <- function(chart, statistics, rows) {
 }
 
 
-#' Extend the limits of the preceding calculation period over the display period
-#'
-#' Called with `counter` already known to be within the table.
-#'
-#' @param limits_table the limits table so far
-#' @param counter row number of the first display point
-#'
-#' @return `limits_table`, with the display rows filled in
-#' @noRd
-extend_display_limits <- function(chart,
-                                  limits_table,
-                                  counter) {
-  UseMethod("extend_display_limits")
-}
-
-
-#' Limits for the rows the extension adds beyond the end of the data
-#'
-#' Used when `extend_limits_to` carries the final period's limits out past the
-#' last data point. One set of values for the whole extension.
-#'
-#' @param period the final calculation period
-#'
-#' @return list of single values, named cl, lcl and ucl
-#' @noRd
-limits_for_extension_rows <- function(chart,
-                                      period) {
-  UseMethod("limits_for_extension_rows")
-}
-
-
-#' Limits for the rows that hold no observation
-#'
-#' The algorithm walks only the rows that hold an observation, so a row with no
-#' `series` value is given its limits afterwards, from the period that the
-#' observations either side of it belong to. Overridden by the classes whose
-#' limits vary with the denominator.
-#'
-#' @param period the rows of the period that hold an observation
-#' @param rows the rows that hold no observation, to be given limits
-#'
-#' @return list of three vectors, named cl, ucl and lcl, one value per row of
-#'   `rows`
-#' @noRd
-limits_for_missing_rows <- function(chart,
-                                    period,
-                                    rows) {
-  UseMethod("limits_for_missing_rows")
-}
-
-
 #' Columns the limits table carries beside the series under analysis
 #'
 #' The names are inserted between `series` and `ucl`, so the order matters.

@@ -126,7 +126,7 @@ autospc_chart_elements <- function() {
 #' @return A character vector of chart types.
 #' @noRd
 autospc_chart_types <- function() {
-  chart_types <- c("XMR", "X", "MR", "C", "C'", "P", "P'")
+  chart_types <- c(names(autospc_pair_types()), "X", "MR", "C", "C'", "P", "P'")
 
   return(chart_types)
 }
@@ -153,18 +153,14 @@ autospc_chart_parameters <- function() {
 
 #' The charts a chart type asks for
 #'
-#' `chart_type = "XMR"` asks for two charts, an X and an MR of the same series.
-#' Every other chart type asks for one. This is the only place a chart type is
-#' read as a string rather than dispatched on: everything after it holds chart
-#' objects.
+#' A pair's chart type, such as `"XMR"`, asks for two charts, named `location`
+#' and `dispersion` as `autospc_pair_types()` gives them. Every other chart type
+#' asks for one, unnamed. This is the only place a chart type is read as a
+#' string rather than dispatched on: everything after it holds chart objects.
 #'
-#' **The charts come back in drawing order, so a pair is X then MR.**
-#' `is_xmr_pair()`, the moving range panel and `as.data.frame()` all read that
-#' order, and `facet_stages()` takes the first.
-#'
-#' Both halves of a pair are built from the same data, because neither X nor MR
-#' aggregates and `prepare_data.autospc_chart_mr()` derives the moving ranges
-#' from `y`.
+#' Both halves of a pair are built from the same data, and each class prepares
+#' its own series from it: `prepare_data.autospc_chart_mr()` derives the moving
+#' ranges from `y`.
 #'
 #' Callers pass a `chart_type` that `validate_chart_type()` has already
 #' accepted, so anything reaching here is one of `autospc_chart_types()`.
@@ -177,9 +173,9 @@ build_charts <- function(chart_type,
                          y,
                          n,
                          ...) {
-  if (identical(chart_type, "XMR")) {
-    chart_types <- c(location = "X", dispersion = "MR")
-  } else {
+  chart_types <- autospc_pair_types()[[chart_type]]
+
+  if (is.null(chart_types)) {
     chart_types <- chart_type
   }
 
@@ -198,22 +194,107 @@ build_charts <- function(chart_type,
 }
 
 
-#' Are these two charts an XmR pair?
+#' The chart types that are pairs, and the two charts each asks for
 #'
-#' An X chart and the MR chart of the same series, in that order - which is how
-#' `autospc(chart_type = "XMR")` puts them on the plot object.
+#' A pair is one analysis shown as two charts: a chart of location and a chart
+#' of dispersion. Each element is named by the pair's chart type and holds the
+#' chart types of its two halves, named `location` and `dispersion`. A pair is
+#' registered here and nowhere else.
+#'
+#' @return A named list of named character vectors.
+#' @noRd
+autospc_pair_types <- function() {
+  return(list(
+    XMR = c(location = "X", dispersion = "MR")
+  ))
+}
+
+
+#' The chart type of the pair these charts make
+#'
+#' The charts make a pair where they are named `location` and `dispersion`, in
+#' that order, and their chart types are those of a pair in
+#' `autospc_pair_types()`.
+#'
+#' @param charts A list of `autospc_chart` objects.
+#'
+#' @return The pair's chart type, or NULL where the charts are not a pair.
+#' @noRd
+pair_type <- function(charts) {
+  if (!identical(names(charts), c("location", "dispersion"))) {
+    return(NULL)
+  }
+
+  # an anonymous function, so that the unregistered methods are found from the
+  # package namespace rather than from inside vapply()
+  halves <- vapply(
+    charts,
+    function(chart) chart_type_label(chart),
+    character(1L)
+  )
+
+  for (type in names(autospc_pair_types())) {
+    if (identical(autospc_pair_types()[[type]], halves)) {
+      return(type)
+    }
+  }
+
+  return(NULL)
+}
+
+
+#' Are these charts a pair?
 #'
 #' @param charts A list of `autospc_chart` objects.
 #'
 #' @return TRUE or FALSE
 #' @noRd
-is_xmr_pair <- function(charts) {
-  if (length(charts) != 2L) {
-    return(FALSE)
+is_chart_pair <- function(charts) {
+  return(!is.null(pair_type(charts)))
+}
+
+
+#' The chart type of a pair's location chart
+#'
+#' A pair's chart type gives the chart type of its location half. Any other
+#' chart type, including NULL, is returned unchanged.
+#'
+#' @param chart_type A chart type, as the caller gave it.
+#'
+#' @return A chart type.
+#' @noRd
+location_chart_type <- function(chart_type) {
+  if (is.character(chart_type) && length(chart_type) == 1L &&
+    chart_type %in% names(autospc_pair_types())) {
+    return(autospc_pair_types()[[chart_type]][["location"]])
   }
 
-  return(inherits(charts[[1]], "autospc_chart_x") &&
-    inherits(charts[[2]], "autospc_chart_mr"))
+  return(chart_type)
+}
+
+
+#' The location half of a pair, or the one element of a list that holds one
+#'
+#' Used for a list of charts or of their plot data, which holds the two halves
+#' of a pair by name, or a single chart.
+#'
+#' @param items A list holding a `location` element, or one element.
+#'
+#' @return The `location` element, or the one element.
+#' @noRd
+location_component <- function(items) {
+  if ("location" %in% names(items)) {
+    return(items$location)
+  }
+
+  if (length(items) != 1L) {
+    stop(
+      "Expected a pair named location and dispersion, or a single chart.",
+      call. = FALSE
+    )
+  }
+
+  return(items[[1L]])
 }
 
 

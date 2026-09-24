@@ -140,6 +140,18 @@ limits_table_columns <- function(chart) {
 }
 
 
+#' Columns a dispersion chart adds when its pair is joined wide
+#'
+#' Only the dispersion chart of a pair has an answer, so there is no default.
+#'
+#' @return named character vector: the name each column takes in the joined
+#'   table, holding the name of the dispersion chart's column it comes from
+#' @noRd
+paired_columns <- function(chart) {
+  UseMethod("paired_columns")
+}
+
+
 #' The centre line label, formatted
 #'
 #' Everything about how a centre line value is written: the rounding, which

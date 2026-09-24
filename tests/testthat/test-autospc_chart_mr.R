@@ -245,3 +245,11 @@ test_that("the moving range label separates thousands", {
     "1,234"
   )
 })
+
+
+test_that("the moving range chart names the columns it adds to its pair", {
+  expect_identical(
+    paired_columns(test_chart_mr()),
+    c(mr = "series", amr = "cl", url = "ucl", lrl = "lcl")
+  )
+})

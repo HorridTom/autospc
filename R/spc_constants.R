@@ -1,5 +1,5 @@
-# The SPC constants for a subgroup of two, and the option that chooses between
-# the exact values and the published rounded ones.
+# The SPC constants, and the option that chooses between the exact values and
+# the published rounded ones.
 
 
 #' Whether to use the rounded constants
@@ -52,4 +52,30 @@ mr_upper_limit_factor <- function() {
   d3 <- sqrt(2 * (1 - 2 / pi))
 
   return(1 + 3 * d3 / d2_constant())
+}
+
+
+#' c4 for subgroups of the given sizes
+#'
+#' The mean of the sample standard deviation of n observations from a normal
+#' distribution, in standard deviations, so an unbiased estimate of the standard
+#' deviation is a subgroup's sample standard deviation over it. Always the exact
+#' value, whatever `autospc.rounded_constants` is set to.
+#'
+#' Computed through `lgamma()` rather than `gamma()`, which overflows for
+#' subgroups of more than about 340.
+#'
+#' @param n Subgroup sizes.
+#'
+#' @return numeric vector the length of `n`, NA where `n` is NA or less than 2
+#' @noRd
+c4_constant <- function(n) {
+  c4 <- rep(NA_real_, length(n))
+
+  valid <- !is.na(n) & n >= 2
+  m <- n[valid]
+
+  c4[valid] <- sqrt(2 / (m - 1)) * exp(lgamma(m / 2) - lgamma((m - 1) / 2))
+
+  return(c4)
 }

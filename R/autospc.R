@@ -284,9 +284,9 @@ autospc <- function(data,
       )
     )
 
-    # show_mr = FALSE drew the X chart of a pair on its own
-    if (isFALSE(show_mr) && identical(chart_type, "XMR")) {
-      chart_type <- "X"
+    # show_mr = FALSE drew the location chart of a pair on its own
+    if (isFALSE(show_mr)) {
+      chart_type <- location_chart_type(chart_type)
     }
   }
 
@@ -328,7 +328,7 @@ autospc <- function(data,
 
   validate_chart_type(chart_type)
 
-  # Build the chart objects: one chart, or an XmR pair.
+  # Build the chart objects: one chart, or a pair.
   charts <- rlang::exec(build_charts,
     chart_type = chart_type,
     data = data,
@@ -346,7 +346,7 @@ autospc <- function(data,
   # chart. Both halves of a pair answer the same.
   visualisation_params <- resolve_default_visualisation_params(
     visualisation_params = visualisation_params,
-    chart = charts[[1]]
+    chart = location_component(charts)
   )
 
   report_analysis(

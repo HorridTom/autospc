@@ -86,11 +86,8 @@ facet_stages <- function(data,
     dots_exprs$show_mr <- NULL
   }
 
-  # facet_stages() has never drawn the moving range chart, so chart_type =
-  # "XMR" is faceted as an X chart.
-  if (identical(dots_exprs$chart_type, "XMR")) {
-    dots_exprs$chart_type <- "X"
-  }
+  # facet_stages() draws no pairs, so a pair is faceted as its location chart.
+  dots_exprs$chart_type <- location_chart_type(dots_exprs$chart_type)
 
   xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
 
@@ -177,7 +174,7 @@ facet_stages <- function(data,
         !!!chart_args
       )
 
-      return(analyse_charts(facet)[[1]])
+      return(location_component(analyse_charts(facet)))
     }
   )
 

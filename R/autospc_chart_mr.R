@@ -209,6 +209,18 @@ limits_from_statistics.autospc_chart_mr <- function(chart, statistics, rows) {
 }
 
 
+#' Columns the moving range chart adds when its pair is joined wide
+#'
+#' The moving range and its centre line and limits, as `mr`, `amr`, `url` and
+#' `lrl`.
+#'
+#' @return named character vector
+#' @noRd
+paired_columns.autospc_chart_mr <- function(chart) {
+  return(c(mr = "series", amr = "cl", url = "ucl", lrl = "lcl"))
+}
+
+
 # Presentation methods
 
 #' Chart name

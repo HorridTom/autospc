@@ -334,9 +334,9 @@ resolve_default_visualisation_params <- function(visualisation_params,
 #' go in; the plot object comes out, carrying the charts and the presentation
 #' it was drawn with.
 #'
-#' The charts are in drawing order, so the first is the chart the plot is drawn
-#' from and the second, for an XmR pair, is its moving range panel. A faceted
-#' plot is drawn from every facet at once.
+#' The plot is drawn from the only chart, or from the location chart of a pair,
+#' whose dispersion chart is drawn as a second panel. A faceted plot is drawn
+#' from every facet at once.
 #'
 #' A series with limits is drawn as an SPC chart, and one without as a plain
 #' time series - which draws the first chart alone, so that is the chart the
@@ -380,7 +380,7 @@ autospc_plot <- function(charts,
     ))
   }
 
-  main <- plot_data[[1]]
+  main <- location_component(plot_data)
 
   visualisation_params["override_x_title"] <- list(main$axis_titles$x)
   visualisation_params["override_y_title"] <- list(main$axis_titles$y)
@@ -391,9 +391,9 @@ autospc_plot <- function(charts,
   if (!limits_drawn) {
     # A pair without limits is drawn as the location chart alone. A faceted
     # plot keeps every facet, and its plot data is already one element.
-    if (!faceted) {
-      charts <- charts[1]
-      plot_data <- plot_data[1]
+    if (!faceted && is_chart_pair(charts)) {
+      charts <- charts["location"]
+      plot_data <- plot_data["location"]
     }
 
     plot <- create_timeseries_plot(

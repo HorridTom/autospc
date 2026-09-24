@@ -1,7 +1,7 @@
-#' Draw an SPC chart, or an XmR pair
+#' Draw an SPC chart, or a pair
 #'
-#' An XmR pair is drawn as two panels stacked by `cowplot::plot_grid()`, the
-#' moving range one drawn here from the dispersion chart's plot data.
+#' A pair is drawn as two panels stacked by `cowplot::plot_grid()`, the
+#' dispersion one drawn here from the dispersion chart's plot data.
 #'
 #' `main` below is the plot data the plot is drawn from: the location chart of a
 #' pair, the only chart of a single chart plot, or every facet at once of a
@@ -20,15 +20,16 @@
 create_spc_plot <- function(plot_data,
                             visualisation_params,
                             faceted = FALSE) {
-  main <- plot_data[[1]]
+  main <- location_component(plot_data)
 
   chart <- main$chart
   table <- main$table
   axis_extents <- main$axis_extents
 
-  pair <- is_xmr_pair(lapply(plot_data, function(each) each$chart))
+  charts <- lapply(plot_data, function(each) each$chart)
+  pair <- is_chart_pair(charts)
 
-  chart_type <- if (pair) "XMR" else chart_type_label(chart)
+  chart_type <- if (pair) pair_type(charts) else chart_type_label(chart)
 
   # A stage without limits carries no highlight, so its points take the
   # unhighlighted colour rather than the colour for a missing value.
@@ -151,7 +152,7 @@ create_spc_plot <- function(plot_data,
       )
   }
 
-  # Combine X and MR charts if needed
+  # Stack the dispersion panel under a pair's location chart
   if (pair) {
     spc_plot <- spc_plot +
       ggplot2::labs(
@@ -163,7 +164,7 @@ create_spc_plot <- function(plot_data,
         axis.ticks.x = ggplot2::element_blank()
       )
 
-    p_mr <- draw_mr_panel(
+    dispersion_plot <- draw_dispersion_panel(
       plot_data = plot_data$dispersion,
       visualisation_params = visualisation_params
     ) +
@@ -173,11 +174,11 @@ create_spc_plot <- function(plot_data,
 
     spc_plot_no_legend <- spc_plot +
       ggplot2::theme(legend.position = "none")
-    p_mr_no_legend <- p_mr +
+    dispersion_plot_no_legend <- dispersion_plot +
       ggplot2::theme(legend.position = "none")
 
     spc_plot <- cowplot::plot_grid(
-      cowplot::plot_grid(spc_plot_no_legend, p_mr_no_legend,
+      cowplot::plot_grid(spc_plot_no_legend, dispersion_plot_no_legend,
         ncol = 1,
         align = "v"
       ),
@@ -191,19 +192,19 @@ create_spc_plot <- function(plot_data,
 }
 
 
-#' Draw the moving range panel of an XmR pair
+#' Draw the dispersion panel of a pair
 #'
-#' The panel carries no title or subtitle, and the axis titles are the moving
-#' range chart's own. Called by `create_spc_plot()` for a pair.
+#' The panel carries no title or subtitle, and the axis titles are the
+#' dispersion chart's own. Called by `create_spc_plot()` for a pair.
 #'
-#' @param plot_data The moving range chart's plot data.
-#' @param visualisation_params The visualisation parameters, shared with the X
-#'   chart.
+#' @param plot_data The dispersion chart's plot data.
+#' @param visualisation_params The visualisation parameters, shared with the
+#'   location chart.
 #'
 #' @return A ggplot.
 #' @noRd
-draw_mr_panel <- function(plot_data,
-                          visualisation_params) {
+draw_dispersion_panel <- function(plot_data,
+                                  visualisation_params) {
   visualisation_params["title"] <- list(NULL)
   visualisation_params["subtitle"] <- list(NULL)
   visualisation_params["override_x_title"] <- list(plot_data$axis_titles$x)

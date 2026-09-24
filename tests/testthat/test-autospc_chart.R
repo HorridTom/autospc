@@ -325,11 +325,11 @@ test_that("XMR asks for two charts, X then MR", {
     n = "n"
   )
 
-  expect_length(charts, 2L)
+  expect_named(charts, c("location", "dispersion"))
 
-  expect_s3_class(charts[[1]], "autospc_chart_x")
+  expect_s3_class(charts$location, "autospc_chart_x")
 
-  expect_s3_class(charts[[2]], "autospc_chart_mr")
+  expect_s3_class(charts$dispersion, "autospc_chart_mr")
 })
 
 
@@ -471,4 +471,87 @@ test_that("labels may flip below the line by default", {
   chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
 
   expect_false(labels_stay_above(chart))
+})
+
+
+# the pair lookup and the functions that read it
+
+xmr_pair <- function() {
+  build_charts(
+    chart_type = "XMR",
+    data = factory_data,
+    x = "x",
+    y = "y",
+    n = "n"
+  )
+}
+
+
+test_that("every pair's halves are chart types, named location and dispersion", {
+  for (pair in names(autospc_pair_types())) {
+    halves <- autospc_pair_types()[[pair]]
+
+    expect_named(halves, c("location", "dispersion"))
+    expect_true(all(halves %in% autospc_chart_types()), info = pair)
+  }
+})
+
+
+test_that("the chart types are the pairs followed by the single charts", {
+  expect_identical(
+    autospc_chart_types(),
+    c("XMR", "X", "MR", "C", "C'", "P", "P'")
+  )
+})
+
+
+test_that("a pair built for XMR is recognised as XMR", {
+  expect_identical(pair_type(xmr_pair()), "XMR")
+  expect_true(is_chart_pair(xmr_pair()))
+})
+
+
+test_that("the halves of a pair are recognised by name, not by position", {
+  pair <- xmr_pair()
+
+  # the right classes in the right order, without the names
+  expect_false(is_chart_pair(unname(pair)))
+
+  # the names attached to the wrong halves
+  swapped <- list(location = pair$dispersion, dispersion = pair$location)
+  expect_false(is_chart_pair(swapped))
+})
+
+
+test_that("two charts that are not a registered pair are not a pair", {
+  pair <- xmr_pair()
+  c_chart <- build_charts(
+    chart_type = "C",
+    data = factory_data,
+    x = "x",
+    y = "y",
+    n = "n"
+  )[[1L]]
+
+  expect_null(pair_type(list(location = pair$location, dispersion = c_chart)))
+  expect_false(is_chart_pair(list(location = pair$location)))
+})
+
+
+test_that("a pair's chart type gives its location chart's type", {
+  expect_identical(location_chart_type("XMR"), "X")
+  expect_identical(location_chart_type("C"), "C")
+  expect_null(location_chart_type(NULL))
+
+  # facet_stages() passes the chart_type expression as the caller wrote it
+  expect_identical(location_chart_type(quote(my_type)), quote(my_type))
+})
+
+
+test_that("location_component takes a pair's location half or a list's one element", {
+  pair <- xmr_pair()
+
+  expect_identical(location_component(pair), pair$location)
+  expect_identical(location_component(list(pair$location)), pair$location)
+  expect_error(location_component(unname(pair)), "location and dispersion")
 })

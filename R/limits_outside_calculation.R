@@ -6,10 +6,11 @@
 
 #' Control limits at a set of rows from a period's statistics
 #'
-#' Formed at each row by `limits_from_statistics()` and constrained to the
-#' range the plotted statistic can take, so a row whose limits vary with the
-#' denominator is given limits at its own `n`. Where `statistics` is NULL every
-#' row is given NA.
+#' The standard deviation estimate at each row is formed by `sd_estimate_at()`,
+#' and the limits by `limits_from_statistics()`, constrained to the range the
+#' plotted statistic can take, so a row whose limits vary with the denominator
+#' is given limits at its own `n`. Where `statistics` is NULL every row is
+#' given NA.
 #'
 #' @param statistics A period's centre line and standard deviation estimate, as
 #'   `period_statistics()` gives them.
@@ -33,10 +34,16 @@ limits_at_rows <- function(chart,
     ))
   }
 
+  sd_estimate <- sd_estimate_at(
+    chart = chart,
+    statistics = statistics,
+    rows = rows
+  )
+
   limits <- constrain_limits(
     limits = limits_from_statistics(
       chart = chart,
-      statistics = statistics,
+      statistics = list(cl = statistics$cl, sd_estimate = sd_estimate),
       rows = rows
     ),
     bounds = limit_bounds(chart)
@@ -46,22 +53,24 @@ limits_at_rows <- function(chart,
     cl = rep_len(statistics$cl, nrow(rows)),
     ucl = limits$ucl,
     lcl = limits$lcl,
-    sd_estimate = rep_len(statistics$sd_estimate, nrow(rows))
+    sd_estimate = sd_estimate
   ))
 }
 
 
 #' A period's centre line and standard deviation estimate
 #'
-#' Read from the first row that holds both. A period holds one centre line and
-#' one standard deviation estimate throughout, so any such row serves. Read
-#' from the table rather than worked back out of the limits, which would give
-#' the wrong answer for a row whose limits have been constrained.
+#' Read from the first row that holds both, with `sbar` from the same row where
+#' the table has that column. A period holds one centre line throughout, and
+#' either one standard deviation estimate or, where the estimate varies with the
+#' subgroup size, one `sbar`, so any such row serves. Read from the table rather
+#' than worked back out of the limits, which would give the wrong answer for a
+#' row whose limits have been constrained.
 #'
 #' @param rows Rows of a limits table.
 #'
-#' @return list of single values named cl and sd_estimate, or NULL where no row
-#'   holds both
+#' @return list of single values named cl and sd_estimate, and sbar where the
+#'   table has it, or NULL where no row holds both cl and sd_estimate
 #' @noRd
 period_statistics <- function(rows) {
   if (!all(c("cl", "sd_estimate") %in% names(rows))) {
@@ -76,10 +85,16 @@ period_statistics <- function(rows) {
 
   first <- holding[1L]
 
-  return(list(
+  statistics <- list(
     cl = as.numeric(rows$cl[first]),
     sd_estimate = as.numeric(rows$sd_estimate[first])
-  ))
+  )
+
+  if ("sbar" %in% names(rows)) {
+    statistics$sbar <- as.numeric(rows$sbar[first])
+  }
+
+  return(statistics)
 }
 
 

@@ -58,6 +58,22 @@ test_that("limits_at_rows gives NA to every row where there are no statistics", 
 })
 
 
+# sd_estimate_at
+
+
+test_that("the default gives every row the period's one estimate", {
+  chart <- structure(list(), class = c("autospc_chart_c", "autospc_chart"))
+
+  expect_identical(
+    sd_estimate_at(chart,
+      statistics = list(cl = 11, sd_estimate = 7 / 3),
+      rows = data.frame(x = 1:3)
+    ),
+    rep(7 / 3, 3)
+  )
+})
+
+
 # period_statistics
 
 
@@ -68,6 +84,20 @@ test_that("period_statistics reads the first row that holds both", {
   )
 
   expect_identical(period_statistics(rows), list(cl = 10, sd_estimate = 150))
+})
+
+
+test_that("period_statistics reads sbar from the same row where it is there", {
+  rows <- data.frame(
+    cl = c(10, 10, 10),
+    sd_estimate = c(NA_real_, 4, 5),
+    sbar = c(3, 3.5, 3.5)
+  )
+
+  expect_identical(
+    period_statistics(rows),
+    list(cl = 10, sd_estimate = 4, sbar = 3.5)
+  )
 })
 
 

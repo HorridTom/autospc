@@ -563,6 +563,17 @@ limit_bounds.autospc_chart <- function(chart) {
 }
 
 
+#' A period's standard deviation estimate at each of a set of rows
+#'
+#' The period's one estimate, at every row.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+sd_estimate_at.autospc_chart <- function(chart, statistics, rows) {
+  return(rep_len(statistics$sd_estimate, nrow(rows)))
+}
+
+
 #' The standard error at each of a set of rows
 #'
 #' The estimate itself, at every row. Overridden by the classes whose limits

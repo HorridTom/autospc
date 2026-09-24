@@ -94,6 +94,22 @@ limit_bounds <- function(chart) {
 }
 
 
+#' A period's standard deviation estimate at each of a set of rows
+#'
+#' For most classes the estimate is one value for the whole period. Where it
+#' depends on each row's subgroup size, the class forms it at each row from the
+#' period's statistics.
+#'
+#' @param statistics A period's statistics, as `period_statistics()` gives them.
+#' @param rows The rows to give an estimate to.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+sd_estimate_at <- function(chart, statistics, rows) {
+  UseMethod("sd_estimate_at")
+}
+
+
 #' The standard error at each of a set of rows
 #'
 #' Limits sit three standard errors either side of the centre line. For most

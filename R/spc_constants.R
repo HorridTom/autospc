@@ -1,5 +1,10 @@
 # The SPC constants, and the option that chooses between the exact values and
 # the published rounded ones.
+#
+# A constant written in upper case in the literature is named with its letter
+# doubled - A3 is `aa3_constant()` - because an upper-case constant and the
+# lower-case one of the same letter and number are different constants: d3 and
+# D3, for instance.
 
 
 #' Whether to use the rounded constants
@@ -78,4 +83,55 @@ c4_constant <- function(n) {
   c4[valid] <- sqrt(2 / (m - 1)) * exp(lgamma(m / 2) - lgamma((m - 1) / 2))
 
   return(c4)
+}
+
+
+#' A3 for subgroups of the given sizes
+#'
+#' The half-width of an Xbar chart's control limits as a multiple of sbar:
+#' three over c4 times the square root of the subgroup size. Rounded to three
+#' decimal places, as the published tables give it, where
+#' `autospc.rounded_constants` is TRUE.
+#'
+#' @param n Subgroup sizes.
+#'
+#' @return numeric vector the length of `n`, NA where `n` is NA or less than 2
+#' @noRd
+aa3_constant <- function(n) {
+  a3 <- rep(NA_real_, length(n))
+
+  valid <- !is.na(n) & n >= 2
+  m <- n[valid]
+
+  a3[valid] <- 3 / (c4_constant(m) * sqrt(m))
+
+  if (rounded_constants_enabled()) {
+    return(round(a3, 3))
+  }
+
+  return(a3)
+}
+
+
+#' B4 for subgroups of the given sizes
+#'
+#' An S chart's upper control limit as a multiple of sbar: one plus three
+#' standard deviations of a subgroup's sample standard deviation,
+#' `sqrt(1 - c4^2)`, over c4. Rounded to three decimal places, as the published
+#' tables give it, where `autospc.rounded_constants` is TRUE.
+#'
+#' @param n Subgroup sizes.
+#'
+#' @return numeric vector the length of `n`, NA where `n` is NA or less than 2
+#' @noRd
+bb4_constant <- function(n) {
+  c4 <- c4_constant(n)
+
+  b4 <- 1 + 3 * sqrt(1 - c4^2) / c4
+
+  if (rounded_constants_enabled()) {
+    return(round(b4, 3))
+  }
+
+  return(b4)
 }

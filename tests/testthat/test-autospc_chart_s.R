@@ -105,6 +105,45 @@ test_that("the display rows' limits are formed at each row's own size", {
 })
 
 
+test_that("the extension's limits sit at the final period's mean size", {
+  chart <- autospc_chart_s(
+    data = s_data(), x = "x", y = "y",
+    period_min = 21L, baseline_only = TRUE, extend_limits_to = 40L
+  )
+  table <- analyse_charts(list(chart))[[1]]$result$table
+
+  extension <- table[table$limit_extension, ]
+  final <- table[table$period_type %in% "calculation" &
+    !table$limit_extension, ]
+
+  # the subgroup of one has no standard deviation, so it does not count
+  counted <- !is.na(final$series) & !final$excluded
+  constants <- b_constants(mean(final$n[counted]))
+
+  expect_gt(nrow(extension), 0L)
+  expect_equal(
+    extension$ucl,
+    rep(constants$b4 * final$cl[1], nrow(extension))
+  )
+  expect_equal(
+    extension$lcl,
+    rep(constants$b3 * final$cl[1], nrow(extension))
+  )
+})
+
+
+test_that("a subgroup with no observation is a gap with limits at its size", {
+  data <- s_data()
+  data$y[data$x == 24] <- NA
+
+  table <- analysed_s(data)
+
+  expect_true(is.na(table$series[24]))
+  expect_identical(table$n[24], 9L)
+  expect_equal(table$ucl[24], b_constants(9)$b4 * table$cl[24])
+})
+
+
 test_that("the published B4 is used where the option asks for it", {
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))

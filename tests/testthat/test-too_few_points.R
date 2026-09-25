@@ -228,7 +228,8 @@ test_that("a short series returns the columns a full one does", {
     return(data.frame(
       x = seq_len(rows),
       y = as.integer(stats::rpois(rows, 50)),
-      n = rep(100L, rows)
+      n = rep(100L, rows),
+      s = rep(c(4, 5, 6), length.out = rows)
     ))
   }
 
@@ -239,14 +240,14 @@ test_that("a short series returns the columns a full one does", {
     return(suppressWarnings(
       autospc(data,
         chart_type = chart_type,
-        x = "x", y = "y", n = "n",
+        x = "x", y = "y", n = "n", s = "s",
         period_min = 21L,
         plot_chart = FALSE
       )
     ))
   }
 
-  for (chart_type in c("C", "C'", "P", "P'", "X", "MR", "XMR")) {
+  for (chart_type in autospc_chart_types()) {
     from_short <- analyse(short, chart_type)
     from_full <- analyse(full, chart_type)
 

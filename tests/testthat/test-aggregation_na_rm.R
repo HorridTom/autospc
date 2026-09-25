@@ -146,6 +146,28 @@ test_that("aggregation_na_rm reaches every chart type that sums observations", {
 })
 
 
+test_that("aggregation_na_rm reaches the charts that combine observations", {
+  # subgroup 3 is rows 7 to 9 of the count data, holding 4, 5 and 3, so
+  # discarding row 7 leaves 5 and 3
+  for (chart_type in c("Xbar", "S")) {
+    expect_true(
+      is.na(analyse(counts(7L), chart_type)$series[3]),
+      info = chart_type
+    )
+  }
+
+  expect_identical(
+    analyse(counts(7L), "Xbar", aggregation_na_rm = TRUE)$series[3],
+    4
+  )
+
+  expect_equal(
+    analyse(counts(7L), "S", aggregation_na_rm = TRUE)$series[3],
+    sqrt(2)
+  )
+})
+
+
 test_that("aggregation_na_rm does nothing to a chart that does not aggregate", {
   d <- data.frame(
     x = 1:40,

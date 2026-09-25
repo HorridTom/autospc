@@ -5,7 +5,8 @@
 integer_counts <- data.frame(
   x = 1:30,
   y = rep(c(10L, 12L, 11L, 13L, 9L, 14L), 5L),
-  n = rep(100L, 30)
+  n = rep(100L, 30),
+  s = rep(c(2L, 3L, 4L), 10L)
 )
 
 double_counts <- data.frame(
@@ -60,7 +61,7 @@ test_that("a proportion chart keeps the type of its denominator", {
 
 
 test_that("the limits are doubles whatever the counts were", {
-  for (chart_type in c("C", "C'", "X", "MR", "P", "P'")) {
+  for (chart_type in autospc_chart_types()) {
     result <- analysed(integer_counts, chart_type)
 
     expect_identical(typeof(result$cl), "double", info = chart_type)

@@ -1,10 +1,17 @@
 # The standard deviation estimate on the analysis table, and the limits formed
 # from it.
 
+# n and s are read by the P, P', Xbar and S charts, where n is the denominator
+# or the subgroup size, and ignored by the others
 statistics_series <- function() {
   set.seed(4)
 
-  return(data.frame(x = 1:40, y = as.integer(stats::rpois(40, 12))))
+  return(data.frame(
+    x = 1:40,
+    y = as.integer(stats::rpois(40, 12)),
+    n = rep(100L, 40),
+    s = rep(c(2.5, 3, 3.5, 4), 10L)
+  ))
 }
 
 
@@ -17,7 +24,7 @@ analysed <- function(chart_type, ...) {
 
 
 test_that("every chart type returns an estimate on every row", {
-  for (chart_type in c("C", "C'", "X", "MR")) {
+  for (chart_type in autospc_chart_types()) {
     table <- analysed(chart_type)
 
     expect_true("sd_estimate" %in% colnames(table), label = chart_type)

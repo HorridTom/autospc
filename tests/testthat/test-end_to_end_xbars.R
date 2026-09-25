@@ -32,6 +32,57 @@ xbars_summaries <- function(observations = xbars_observations()) {
 s_columns <- c("subgroup_s", "scl", "s_ucl", "s_lcl")
 
 
+# qicharts2 cross-check for equal subgroup sizes. Where every subgroup is the
+# same size, qicharts2's Xbar and S centre lines and limits are Provost and
+# Murray's. correct_answer_XbarS was generated with qicharts2 0.8.1:
+#
+# make_data <- function(size, seed) {
+#   set.seed(seed)
+#   data.frame(
+#     x = rep(1:25, each = size),
+#     y = round(stats::rnorm(25 * size, 50, 5), 1)
+#   )
+# }
+# xbars_e2e_data <- list(
+#   size_5 = make_data(5L, 1605),
+#   size_8 = make_data(8L, 1606)
+# )
+# correct_answer_XbarS <- lapply(xbars_e2e_data, function(d) {
+#   q_x <- qicharts2::qic(x, y, data = d, chart = "xbar", return.data = TRUE)
+#   q_s <- qicharts2::qic(x, y, data = d, chart = "s", return.data = TRUE)
+#   data.frame(
+#     x = q_x$x, y = q_x$y, cl = q_x$cl, ucl = q_x$ucl, lcl = q_x$lcl,
+#     subgroup_s = q_s$y, scl = q_s$cl, s_ucl = q_s$ucl, s_lcl = q_s$lcl
+#   )
+# })
+#
+# Subgroups of 5 have an S chart lower limit of zero, and subgroups of 8 one
+# above zero.
+
+xbars_e2e_data <- readRDS(file.path("testdata", "test_xbars_e2e_data.rds"))
+
+correct_answer_XbarS <- readRDS(file.path(
+  "testdata",
+  "test_data_end_to_end",
+  "correct_answer_XbarS.rds"
+))
+
+
+test_that("XbarS agrees with qicharts2 for equal subgroup sizes", {
+  for (size in names(xbars_e2e_data)) {
+    results <- autospc(xbars_e2e_data[[size]],
+      chart_type = "XbarS",
+      period_min = 25L,
+      plot_chart = FALSE
+    )
+
+    expected <- correct_answer_XbarS[[size]]
+
+    expect_equal(results[names(expected)], expected, info = size)
+  }
+})
+
+
 test_that("an XbarS table holds the Xbar analysis and the S analysis", {
   pair_table <- autospc(xbars_observations(),
     chart_type = "XbarS",

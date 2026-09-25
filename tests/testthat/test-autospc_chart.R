@@ -12,6 +12,13 @@ factory_classes <- c(
   "S" = "autospc_chart_s"
 )
 
+test_that("the class mapping covers every chart type that is not a pair", {
+  expect_setequal(
+    names(factory_classes),
+    setdiff(autospc_chart_types(), names(autospc_pair_types()))
+  )
+})
+
 # n is the denominator for P and P', and n and s the subgroup size and
 # standard deviation for Xbar and S. The other types select only x and y.
 factory_data <- data.frame(

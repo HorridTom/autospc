@@ -5,7 +5,8 @@
 return_class_data <- data.frame(
   x = 1:30,
   y = rep(c(10L, 12L, 11L, 13L, 9L, 14L), 5L),
-  n = rep(100L, 30)
+  n = rep(100L, 30),
+  s = rep(c(2.5, 3, 3.5), 10L)
 )
 
 return_class_tibble <- tibble::as_tibble(return_class_data)
@@ -21,7 +22,7 @@ analysed_frame <- function(data, chart_type) {
 
 
 test_that("autospc returns a plain data frame for every chart type", {
-  for (chart_type in c("C", "C'", "P", "P'", "X", "MR", "XMR")) {
+  for (chart_type in autospc_chart_types()) {
     expect_identical(class(analysed_frame(return_class_data, chart_type)),
       "data.frame",
       info = chart_type
@@ -31,7 +32,7 @@ test_that("autospc returns a plain data frame for every chart type", {
 
 
 test_that("a tibble in does not make a tibble out", {
-  for (chart_type in c("C", "C'", "P", "P'", "X", "MR", "XMR")) {
+  for (chart_type in autospc_chart_types()) {
     expect_identical(class(analysed_frame(return_class_tibble, chart_type)),
       "data.frame",
       info = chart_type

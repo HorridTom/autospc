@@ -120,14 +120,14 @@ aggregate_data.autospc_chart_s <- function(chart) {
 
 #' Turn the aggregated data into the series the algorithm analyses
 #'
-#' An S chart analyses the subgroup standard deviations, so the series is `s`
-#' and `y` keeps the subgroup means. A subgroup of one has no standard
+#' An S chart analyses the subgroup standard deviations, so `s` becomes the
+#' series and `y` keeps the subgroup means. A subgroup of one has no standard
 #' deviation, so its row holds no observation.
 #'
 #' @return autospc_chart_s object
 #' @noRd
 prepare_data.autospc_chart_s <- function(chart) {
-  chart$data$series <- chart$data$s
+  chart$data <- dplyr::rename(chart$data, series = s)
 
   return(chart)
 }

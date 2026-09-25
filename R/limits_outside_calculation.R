@@ -17,8 +17,8 @@
 #' @param rows The rows to give limits to, holding `n` for the classes whose
 #'   limits vary with the denominator.
 #'
-#' @return list of four numeric vectors named cl, ucl, lcl and sd_estimate, one
-#'   value per row of `rows`
+#' @return list of four numeric vectors named cl, ucl, lcl and sd_estimate, and
+#'   sbar where `statistics` holds it, one value per row of `rows`
 #' @noRd
 limits_at_rows <- function(chart,
                            statistics,
@@ -49,35 +49,47 @@ limits_at_rows <- function(chart,
     bounds = limit_bounds(chart)
   )
 
-  return(list(
+  at_rows <- list(
     cl = rep_len(statistics$cl, nrow(rows)),
     ucl = limits$ucl,
     lcl = limits$lcl,
     sd_estimate = sd_estimate
-  ))
+  )
+
+  if (!is.null(statistics$sbar)) {
+    at_rows$sbar <- rep_len(statistics$sbar, nrow(rows))
+  }
+
+  return(at_rows)
 }
 
 
 #' A period's centre line and standard deviation estimate
 #'
-#' Read from the first row that holds both, with `sbar` from the same row where
-#' the table has that column. A period holds one centre line throughout, and
-#' either one standard deviation estimate or, where the estimate varies with the
-#' subgroup size, one `sbar`, so any such row serves. Read from the table rather
-#' than worked back out of the limits, which would give the wrong answer for a
-#' row whose limits have been constrained.
+#' Read from the first row that holds the centre line and either the standard
+#' deviation estimate or `sbar`, with `sbar` from the same row where the table
+#' has that column. A period holds one centre line throughout, and either one
+#' standard deviation estimate or, where the estimate varies with the subgroup
+#' size, one `sbar`, so any such row serves. A subgroup of one on an Xbar chart
+#' holds `sbar` but no estimate, because the estimate is formed at its size.
 #'
 #' @param rows Rows of a limits table.
 #'
 #' @return list of single values named cl and sd_estimate, and sbar where the
-#'   table has it, or NULL where no row holds both cl and sd_estimate
+#'   table has it, or NULL where no row holds them
 #' @noRd
 period_statistics <- function(rows) {
   if (!all(c("cl", "sd_estimate") %in% names(rows))) {
     return(NULL)
   }
 
-  holding <- which(!is.na(rows$cl) & !is.na(rows$sd_estimate))
+  holding <- !is.na(rows$cl) & !is.na(rows$sd_estimate)
+
+  if ("sbar" %in% names(rows)) {
+    holding <- holding | (!is.na(rows$cl) & !is.na(rows$sbar))
+  }
+
+  holding <- which(holding)
 
   if (length(holding) == 0L) {
     return(NULL)

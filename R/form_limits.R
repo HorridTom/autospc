@@ -34,15 +34,20 @@ form_calculation_limits <- function(data,
     bounds = limit_bounds(chart)
   )
 
-  calculation_period$cl <- statistics$cl
-  calculation_period$ucl <- limits$ucl
-  calculation_period$lcl <- limits$lcl
-  calculation_period$sd_estimate <- statistics$sd_estimate
+  statistic_columns <- period_statistics_columns(chart)
+
+  calculation_period <- calculation_period %>%
+    dplyr::mutate(
+      cl = statistics$cl,
+      ucl = limits$ucl,
+      lcl = limits$lcl,
+      !!!statistics[statistic_columns]
+    )
 
   extra_columns <- limits_table_columns(chart)
 
   calculation_period <- calculation_period %>%
-    dplyr::select(x, series, ucl, lcl, cl, dplyr::any_of("sd_estimate")) %>%
+    dplyr::select(x, series, ucl, lcl, cl, dplyr::all_of(statistic_columns)) %>%
     dplyr::mutate(period_type = "calculation") %>%
     dplyr::mutate(
       excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F)
@@ -61,7 +66,7 @@ form_calculation_limits <- function(data,
     limits_table <- limits_table %>%
       dplyr::select(
         x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
-        dplyr::any_of("sd_estimate"),
+        dplyr::all_of(statistic_columns),
         period_type, excluded,
         dplyr::any_of("run_break"),
         dplyr::any_of("log")
@@ -92,13 +97,18 @@ form_calculation_limits <- function(data,
         is.na(excluded.y), excluded.x, excluded.y
       ))
 
-    if ("sd_estimate.y" %in% names(limits_table)) {
-      limits_table$sd_estimate <- dplyr::if_else(
-        is.na(limits_table$sd_estimate.y),
-        limits_table$sd_estimate.x,
-        limits_table$sd_estimate.y
+    # the new period's value where it has one, the value carried before where
+    # it has not, for each period statistic
+    merged_statistics <- lapply(statistic_columns, function(column) {
+      dplyr::coalesce(
+        limits_table[[paste0(column, ".y")]],
+        limits_table[[paste0(column, ".x")]]
       )
-    }
+    })
+    names(merged_statistics) <- statistic_columns
+
+    limits_table <- limits_table %>%
+      dplyr::mutate(!!!merged_statistics)
 
     limits_table <- limits_table %>%
       dplyr::mutate(break_point = (break_point |
@@ -107,7 +117,7 @@ form_calculation_limits <- function(data,
     limits_table <- limits_table %>%
       dplyr::select(
         x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
-        dplyr::any_of("sd_estimate"),
+        dplyr::all_of(statistic_columns),
         period_type, excluded,
         dplyr::contains("break_point"),
         dplyr::contains("rule"),
@@ -149,13 +159,7 @@ form_display_limits <- function(limits_table, counter, chart) {
   )
 
   display <- display %>%
-    dplyr::mutate(
-      cl = limits$cl,
-      ucl = limits$ucl,
-      lcl = limits$lcl,
-      sd_estimate = limits$sd_estimate,
-      period_type = "display"
-    )
+    dplyr::mutate(!!!limits, period_type = "display")
 
   return(dplyr::bind_rows(calculated, display))
 }

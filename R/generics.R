@@ -110,6 +110,18 @@ sd_estimate_at <- function(chart, statistics, rows) {
 }
 
 
+#' The period statistics a limits table carries beside the limits
+#'
+#' Every row of a period carries these, so that limits can be formed at rows
+#' outside the calculation from any one of them.
+#'
+#' @return character vector
+#' @noRd
+period_statistics_columns <- function(chart) {
+  UseMethod("period_statistics_columns")
+}
+
+
 #' The standard error at each of a set of rows
 #'
 #' Limits sit three standard errors either side of the centre line. For most

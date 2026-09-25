@@ -89,7 +89,7 @@ test_that("period_statistics reads the first row that holds both", {
 
 test_that("period_statistics reads sbar from the same row where it is there", {
   rows <- data.frame(
-    cl = c(10, 10, 10),
+    cl = c(NA_real_, 10, 10),
     sd_estimate = c(NA_real_, 4, 5),
     sbar = c(3, 3.5, 3.5)
   )
@@ -97,6 +97,21 @@ test_that("period_statistics reads sbar from the same row where it is there", {
   expect_identical(
     period_statistics(rows),
     list(cl = 10, sd_estimate = 4, sbar = 3.5)
+  )
+})
+
+
+test_that("a row with sbar and no estimate holds a period's statistics", {
+  # an Xbar chart's subgroup of one has no estimate at its size
+  rows <- data.frame(
+    cl = c(10, 10),
+    sd_estimate = c(NA_real_, 4),
+    sbar = c(3.5, 3.5)
+  )
+
+  expect_identical(
+    period_statistics(rows),
+    list(cl = 10, sd_estimate = NA_real_, sbar = 3.5)
   )
 })
 

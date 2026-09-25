@@ -574,6 +574,18 @@ sd_estimate_at.autospc_chart <- function(chart, statistics, rows) {
 }
 
 
+#' The period statistics a limits table carries beside the limits
+#'
+#' The standard deviation estimate. Overridden by the classes whose estimate
+#' varies with the subgroup size.
+#'
+#' @return character vector
+#' @noRd
+period_statistics_columns.autospc_chart <- function(chart) {
+  return("sd_estimate")
+}
+
+
 #' The standard error at each of a set of rows
 #'
 #' The estimate itself, at every row. Overridden by the classes whose limits

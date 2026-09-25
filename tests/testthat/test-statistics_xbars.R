@@ -64,3 +64,31 @@ test_that("three Xbar standard errors are the published A3 times sbar", {
 test_that("sbar is missing where no subgroup holds a standard deviation", {
   expect_identical(sbar_of(n = c(1, 1), s = c(NA_real_, NA_real_)), NA_real_)
 })
+
+
+test_that("the S centre line is sbar, weighted by subgroup size", {
+  statistics <- get_s_statistics(s = c(2, 3, 1), n = c(4, 6, 5))
+
+  expect_equal(statistics$cl, rep((8 + 18 + 5) / 15, 3))
+})
+
+
+test_that("the S estimate is that of a subgroup's standard deviation", {
+  n <- c(4, 6, 5)
+  statistics <- get_s_statistics(s = c(2, 3, 1), n = n)
+
+  sbar <- 31 / 15
+  c4 <- c4_constant(n)
+
+  expect_equal(statistics$sd_estimate, sbar * sqrt(1 - c4^2) / c4)
+})
+
+
+test_that("an excluded subgroup does not count towards the S centre line", {
+  statistics <- get_s_statistics(
+    s = c(2, 3, 1), n = c(4, 6, 5),
+    exclusion_points = 2L
+  )
+
+  expect_equal(statistics$cl[[1]], (8 + 5) / 9)
+})

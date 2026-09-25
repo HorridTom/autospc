@@ -37,7 +37,7 @@ autospc_default <- function(name) {
 autospc_flag_arguments <- function() {
   names_wanted <- setdiff(
     names(formals(autospc)),
-    c("data", "x", "y", "n", autospc_deprecated_arguments())
+    c("data", autospc_column_arguments(), autospc_deprecated_arguments())
   )
 
   is_flag <- vapply(

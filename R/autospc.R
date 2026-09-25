@@ -13,6 +13,8 @@
 #' @param y Name of column (passed using tidyselect semantics) to use as:
 #' \itemize{
 #'  \item the variable to be plotted for XMR charts,
+#'  \item the measurement for XbarS charts or, where `n` and `s` are given, the
+#'  mean of the measurements each row summarises,
 #'  \item count (plotted on the vertical axis) for C and C' charts,
 #'  \item numerator of the proportion (plotted on the vertical axis) for P and
 #'  P' charts.
@@ -20,7 +22,14 @@
 #'  See \code{vignette("data-requirements", package = "autospc")} for more
 #'  details.
 #' @param n Name of column (passed using tidyselect semantics) to use as
-#' denominator for P and P' charts.
+#' denominator for P and P' charts, and for XbarS charts as the number of
+#' measurements each row summarises.
+#' \cr
+#' See \code{vignette("data-requirements", package = "autospc")} for more
+#' details.
+#' @param s Name of column (passed using tidyselect semantics) holding the
+#' sample standard deviation of the measurements each row summarises, for XbarS
+#' charts. Rows that share an `x` are combined into one subgroup.
 #' \cr
 #' See \code{vignette("data-requirements", package = "autospc")} for more
 #' details.
@@ -33,7 +42,8 @@
 #' subgroup is discarded the subgroup itself is missing. Has no effect on data
 #' that is already one row per subgroup, or on X and MR charts.
 #' @param chart_type The type of chart you wish to plot. Must must have length
-#' one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
+#' one. Available options are: "XMR", "X", "MR", "XbarS", "Xbar", "S", "C",
+#' "C'", "P", "P'".
 #'
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish
@@ -164,16 +174,18 @@
 #' @param annotation_arrow_curve Numeric curvature of the annotation arrows
 #'
 #' @return With `plot_chart = TRUE` (the default), an `autospc_plot`: a ggplot
-#' of the chart, or of the pair for `chart_type = "XMR"`, which also carries the
-#' analysed chart objects it was drawn from and the parameters it was drawn
-#' with. Anything that works on a ggplot works on it, including `+`, `print()`
-#' and `ggplot2::ggsave()`, and `as.data.frame()` gives the analysis behind it.
+#' of the chart, or of the pair for `chart_type = "XMR"` or `"XbarS"`, which
+#' also carries the analysed chart objects it was drawn from and the parameters
+#' it was drawn with. Anything that works on a ggplot works on it, including
+#' `+`, `print()` and `ggplot2::ggsave()`, and `as.data.frame()` gives the
+#' analysis behind it.
 #'
 #' With `plot_chart = FALSE`, a data frame: the subgroup-aggregated data with
 #' the centre line, the control limits and the rest of the analytic output
 #' appended as columns. `series` holds the values analysed and plotted, which
-#' are the moving ranges on an MR chart and percentages on a P or P' chart;
-#' `y` holds the values as supplied and aggregated.
+#' are the moving ranges on an MR chart, the subgroup standard deviations on an
+#' S chart and percentages on a P or P' chart; `y` holds the values as supplied
+#' and aggregated.
 #'
 #' @examples
 #' # Using a C' chart to track changes in the count of monthly attendance
@@ -207,6 +219,7 @@ autospc <- function(data,
                     x,
                     y,
                     n,
+                    s,
                     aggregation_na_rm = FALSE,
                     chart_type = NULL,
                     ## Algorithm Parameters
@@ -293,7 +306,10 @@ autospc <- function(data,
   x_name <- resolve_column_name(rlang::enquo(x), fallback = "x")
   y_name <- resolve_column_name(rlang::enquo(y), fallback = "y")
   n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")
+  s_name <- resolve_column_name(rlang::enquo(s), fallback = "s")
 
+  # `[[` gives NULL for a column that is not in the data, which the checks
+  # below report
   check_x_type(data[[x_name]])
 
   data <- drop_missing_x(data, x_column = x_name)
@@ -303,7 +319,7 @@ autospc <- function(data,
   arguments <- mget(setdiff(
     names(formals()),
     c(
-      "data", "x", "y", "n",
+      "data", autospc_column_arguments(),
       autospc_deprecated_arguments()
     )
   ))
@@ -335,6 +351,7 @@ autospc <- function(data,
     x = x_name,
     y = y_name,
     n = n_name,
+    s = s_name,
     !!!chart_args
   )
 

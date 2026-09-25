@@ -7,13 +7,18 @@ factory_classes <- c(
   "P" = "autospc_chart_p",
   "P'" = "autospc_chart_pp",
   "X" = "autospc_chart_x",
-  "MR" = "autospc_chart_mr"
+  "MR" = "autospc_chart_mr",
+  "Xbar" = "autospc_chart_xbar",
+  "S" = "autospc_chart_s"
 )
 
+# n is the denominator for P and P', and n and s the subgroup size and
+# standard deviation for Xbar and S. The other types select only x and y.
 factory_data <- data.frame(
   x = 1:5,
   y = c(3, 4, 2, 5, 3),
-  n = rep(20L, 5)
+  n = rep(20L, 5),
+  s = c(1.2, 0.8, 1.5, 1.1, 0.9)
 )
 
 
@@ -106,7 +111,8 @@ test_that("autospc_chart returns the right class for every type it handles", {
       data = factory_data,
       x = "x",
       y = "y",
-      n = "n"
+      n = "n",
+      s = "s"
     )
 
     expect_identical(class(chart),
@@ -117,9 +123,10 @@ test_that("autospc_chart returns the right class for every type it handles", {
 })
 
 
-test_that("n is not required by the types that do not use it", {
-  # only the P and P' branches use n, and R does not evaluate an argument that
-  # nothing looks at, so the other four must build with no n supplied
+test_that("n and s are not required by the types that do not use them", {
+  # only the P, P', Xbar and S branches use n, and only the Xbar and S branches
+  # use s. R does not evaluate an argument that nothing looks at, so the other
+  # four must build with neither supplied
   for (chart_type in c("C", "C'", "X", "MR")) {
     expect_no_error(autospc_chart(
       chart_type = chart_type,
@@ -299,14 +306,17 @@ test_that("the classes with no override keep y and nothing else", {
 
 # build_charts()
 
-test_that("every chart type except XMR asks for one chart of its own type", {
-  for (chart_type in setdiff(autospc_chart_types(), "XMR")) {
+test_that("every chart type except the pairs asks for one chart of its type", {
+  single_types <- setdiff(autospc_chart_types(), names(autospc_pair_types()))
+
+  for (chart_type in single_types) {
     charts <- build_charts(
       chart_type = chart_type,
       data = factory_data,
       x = "x",
       y = "y",
-      n = "n"
+      n = "n",
+      s = "s"
     )
 
     expect_length(charts, 1L)
@@ -330,6 +340,24 @@ test_that("XMR asks for two charts, X then MR", {
   expect_s3_class(charts$location, "autospc_chart_x")
 
   expect_s3_class(charts$dispersion, "autospc_chart_mr")
+})
+
+
+test_that("XbarS asks for two charts, Xbar then S", {
+  charts <- build_charts(
+    chart_type = "XbarS",
+    data = factory_data,
+    x = "x",
+    y = "y",
+    n = "n",
+    s = "s"
+  )
+
+  expect_named(charts, c("location", "dispersion"))
+
+  expect_s3_class(charts$location, "autospc_chart_xbar")
+
+  expect_s3_class(charts$dispersion, "autospc_chart_s")
 })
 
 
@@ -370,7 +398,8 @@ test_that("every chart type a user can pass can be built", {
       data = factory_data,
       x = "x",
       y = "y",
-      n = "n"
+      n = "n",
+      s = "s"
     ))
   }
 })
@@ -449,7 +478,8 @@ test_that("every chart type survives the round trip to its class and back", {
       data = factory_data,
       x = "x",
       y = "y",
-      n = "n"
+      n = "n",
+      s = "s"
     )
 
     expect_identical(chart_type_label(chart), chart_type, info = chart_type)
@@ -497,10 +527,10 @@ test_that("every pair's halves are chart types, named location and dispersion", 
 })
 
 
-test_that("the chart types are the pairs followed by the single charts", {
+test_that("each pair is followed by its halves, then the other chart types", {
   expect_identical(
     autospc_chart_types(),
-    c("XMR", "X", "MR", "C", "C'", "P", "P'")
+    c("XMR", "X", "MR", "XbarS", "Xbar", "S", "C", "C'", "P", "P'")
   )
 })
 
@@ -508,6 +538,21 @@ test_that("the chart types are the pairs followed by the single charts", {
 test_that("a pair built for XMR is recognised as XMR", {
   expect_identical(pair_type(xmr_pair()), "XMR")
   expect_true(is_chart_pair(xmr_pair()))
+})
+
+
+test_that("a pair built for XbarS is recognised as XbarS", {
+  pair <- build_charts(
+    chart_type = "XbarS",
+    data = factory_data,
+    x = "x",
+    y = "y",
+    n = "n",
+    s = "s"
+  )
+
+  expect_identical(pair_type(pair), "XbarS")
+  expect_true(is_chart_pair(pair))
 })
 
 
@@ -540,6 +585,7 @@ test_that("two charts that are not a registered pair are not a pair", {
 
 test_that("a pair's chart type gives its location chart's type", {
   expect_identical(location_chart_type("XMR"), "X")
+  expect_identical(location_chart_type("XbarS"), "Xbar")
   expect_identical(location_chart_type("C"), "C")
   expect_null(location_chart_type(NULL))
 

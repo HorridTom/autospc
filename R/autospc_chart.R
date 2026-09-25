@@ -121,12 +121,20 @@ autospc_chart_elements <- function() {
 
 #' Chart types accepted by autospc()
 #'
-#' The single source of truth for the user-facing chart_type values.
+#' The single source of truth for the user-facing chart_type values. Each pair
+#' is followed by its location and dispersion chart types, then come the chart
+#' types that belong to no pair.
 #'
 #' @return A character vector of chart types.
 #' @noRd
 autospc_chart_types <- function() {
-  chart_types <- c(names(autospc_pair_types()), "X", "MR", "C", "C'", "P", "P'")
+  pair_types <- autospc_pair_types()
+
+  paired <- unlist(lapply(names(pair_types), function(pair) {
+    c(pair, unname(pair_types[[pair]]))
+  }))
+
+  chart_types <- c(paired, "C", "C'", "P", "P'")
 
   return(chart_types)
 }
@@ -172,6 +180,7 @@ build_charts <- function(chart_type,
                          x,
                          y,
                          n,
+                         s,
                          ...) {
   chart_types <- autospc_pair_types()[[chart_type]]
 
@@ -186,6 +195,7 @@ build_charts <- function(chart_type,
       x = x,
       y = y,
       n = n,
+      s = s,
       ...
     )
   })
@@ -205,7 +215,8 @@ build_charts <- function(chart_type,
 #' @noRd
 autospc_pair_types <- function() {
   return(list(
-    XMR = c(location = "X", dispersion = "MR")
+    XMR = c(location = "X", dispersion = "MR"),
+    XbarS = c(location = "Xbar", dispersion = "S")
   ))
 }
 
@@ -300,8 +311,9 @@ location_component <- function(items) {
 
 #' Create an autospc_chart object of the class given by chart_type
 #'
-#' Only the P and P' branches use `n`, and R does not evaluate an argument that
-#' nothing looks at, so `n` may be left out for the other chart types.
+#' Only the P, P', Xbar and S branches use `n`, and only the Xbar and S
+#' branches use `s`. R does not evaluate an argument that nothing looks at, so
+#' either may be left out for the other chart types.
 #'
 #' The final `stop()` is the default branch. Without it a chart type with no
 #' matching branch would return NULL without printing anything.
@@ -313,6 +325,7 @@ autospc_chart <- function(chart_type,
                           x,
                           y,
                           n,
+                          s,
                           ...) {
   autospc_chart_object <- switch(chart_type,
     "C" = autospc_chart_c(data = data, x = x, y = y, ...),
@@ -321,6 +334,8 @@ autospc_chart <- function(chart_type,
     "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
     "X" = autospc_chart_x(data = data, x = x, y = y, ...),
     "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
+    "Xbar" = autospc_chart_xbar(data = data, x = x, y = y, n = n, s = s, ...),
+    "S" = autospc_chart_s(data = data, x = x, y = y, n = n, s = s, ...),
     stop("No autospc_chart class for chart_type: ", chart_type, call. = FALSE)
   )
 

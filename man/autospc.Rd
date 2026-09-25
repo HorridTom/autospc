@@ -9,6 +9,7 @@ autospc(
   x,
   y,
   n,
+  s,
   aggregation_na_rm = FALSE,
   chart_type = NULL,
   period_min = 21L,
@@ -69,6 +70,8 @@ are excluded, with a warning; see the Options section of
 \item{y}{Name of column (passed using tidyselect semantics) to use as:
 \itemize{
 \item the variable to be plotted for XMR charts,
+\item the measurement for XbarS charts or, where \code{n} and \code{s} are given, the
+mean of the measurements each row summarises,
 \item count (plotted on the vertical axis) for C and C' charts,
 \item numerator of the proportion (plotted on the vertical axis) for P and
 P' charts.
@@ -77,7 +80,15 @@ See \code{vignette("data-requirements", package = "autospc")} for more
 details.}
 
 \item{n}{Name of column (passed using tidyselect semantics) to use as
-denominator for P and P' charts.
+denominator for P and P' charts, and for XbarS charts as the number of
+measurements each row summarises.
+\cr
+See \code{vignette("data-requirements", package = "autospc")} for more
+details.}
+
+\item{s}{Name of column (passed using tidyselect semantics) holding the
+sample standard deviation of the measurements each row summarises, for XbarS
+charts. Rows that share an \code{x} are combined into one subgroup.
 \cr
 See \code{vignette("data-requirements", package = "autospc")} for more
 details.}
@@ -92,7 +103,8 @@ subgroup is discarded the subgroup itself is missing. Has no effect on data
 that is already one row per subgroup, or on X and MR charts.}
 
 \item{chart_type}{The type of chart you wish to plot. Must must have length
-one. Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
+one. Available options are: "XMR", "X", "MR", "XbarS", "Xbar", "S", "C",
+"C'", "P", "P'".
 \subsection{Algorithm Parameters}{
 
 Parameters that control behaviour of the algorithm used to re-establish
@@ -272,16 +284,18 @@ connecting centre line labels to the centre line they refer to}
 }
 \value{
 With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: a ggplot
-of the chart, or of the pair for \code{chart_type = "XMR"}, which also carries the
-analysed chart objects it was drawn from and the parameters it was drawn
-with. Anything that works on a ggplot works on it, including \code{+}, \code{print()}
-and \code{ggplot2::ggsave()}, and \code{as.data.frame()} gives the analysis behind it.
+of the chart, or of the pair for \code{chart_type = "XMR"} or \code{"XbarS"}, which
+also carries the analysed chart objects it was drawn from and the parameters
+it was drawn with. Anything that works on a ggplot works on it, including
+\code{+}, \code{print()} and \code{ggplot2::ggsave()}, and \code{as.data.frame()} gives the
+analysis behind it.
 
 With \code{plot_chart = FALSE}, a data frame: the subgroup-aggregated data with
 the centre line, the control limits and the rest of the analytic output
 appended as columns. \code{series} holds the values analysed and plotted, which
-are the moving ranges on an MR chart and percentages on a P or P' chart;
-\code{y} holds the values as supplied and aggregated.
+are the moving ranges on an MR chart, the subgroup standard deviations on an
+S chart and percentages on a P or P' chart; \code{y} holds the values as supplied
+and aggregated.
 }
 \description{
 \code{autospc()} creates a statistical process control chart from a

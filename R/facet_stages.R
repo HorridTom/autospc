@@ -89,11 +89,14 @@ facet_stages <- function(data,
   # facet_stages() draws no pairs, so a pair is faceted as its location chart.
   dots_exprs$chart_type <- location_chart_type(dots_exprs$chart_type)
 
-  xyn_exprs <- dots_exprs[which(names(dots_exprs) %in% c("x", "y", "n"))]
+  column_exprs <- dots_exprs[
+    which(names(dots_exprs) %in% autospc_column_arguments())
+  ]
 
-  # x, y and n name columns and must not be evaluated. Everything else is a
+  # x, y, n and s name columns and must not be evaluated. Everything else is a
   # value, and takes its default from autospc() where the caller gave none.
-  given <- lapply(dots_exprs[which(!names(dots_exprs) %in% c("x", "y", "n"))],
+  given <- lapply(
+    dots_exprs[which(!names(dots_exprs) %in% autospc_column_arguments())],
     eval,
     envir = caller
   )
@@ -102,9 +105,11 @@ facet_stages <- function(data,
 
   arguments <- validate_argument_values(arguments)
 
+  # `[[` gives NULL for a column that is not in the data, which the checks
+  # below report
   arguments <- validate_arguments_against_data(
     arguments,
-    x_values = data[[column_name_of(xyn_exprs, field = "x")]]
+    x_values = data[[column_name_of(column_exprs, field = "x")]]
   )
 
   arguments <- validate_algorithm_parameters(
@@ -120,17 +125,18 @@ facet_stages <- function(data,
   validate_chart_type(chart_type)
 
   # Construct one chart from the whole series. It is not analysed: it is
-  # constructed for chart$data, which has the columns renamed to x, y and n, has
-  # been checked against the column requirements for the chart type, and has any
-  # counts rounded. Doing this here means each of those happens once per call
-  # rather than once per facet. aggregation_na_rm is the only chart parameter
-  # passed, because it is the only one that affects chart$data.
+  # constructed for chart$data, which has the columns renamed to x, y, n and s,
+  # has been checked against the column requirements for the chart type, and has
+  # any counts rounded. Doing this here means each of those happens once per
+  # call rather than once per facet. aggregation_na_rm is the only chart
+  # parameter passed, because it is the only one that affects chart$data.
   whole_series <- autospc_chart(
     chart_type = chart_type,
     data = data,
-    x = column_name_of(xyn_exprs, field = "x"),
-    y = column_name_of(xyn_exprs, field = "y"),
-    n = column_name_of(xyn_exprs, field = "n"),
+    x = column_name_of(column_exprs, field = "x"),
+    y = column_name_of(column_exprs, field = "y"),
+    n = column_name_of(column_exprs, field = "n"),
+    s = column_name_of(column_exprs, field = "s"),
     aggregation_na_rm = arguments$aggregation_na_rm
   )
 
@@ -164,13 +170,14 @@ facet_stages <- function(data,
     data_splits_list,
     function(split) {
       # The split came from the chart of the whole series, so its columns are
-      # already named x, y and n.
+      # already named x, y, n and s.
       facet <- rlang::exec(build_charts,
         chart_type = chart_type,
         data = split,
         x = "x",
         y = "y",
         n = "n",
+        s = "s",
         !!!chart_args
       )
 
@@ -265,7 +272,7 @@ create_splits_list <- function(data,
     data_splits <- lapply(
       split_at,
       function(x) {
-        data[1:x, ]
+        dplyr::slice_head(data, n = x)
       }
     )
   }
@@ -279,8 +286,8 @@ create_splits_list <- function(data,
 #' One element per `autospc()` argument: the value the caller gave it, or the
 #' default from `autospc()`'s signature where the caller gave none.
 #'
-#' `data`, `x`, `y` and `n` are not among them. `data` is the data itself, and
-#' the other three hold column names rather than values. The deprecated
+#' `data`, `x`, `y`, `n` and `s` are not among them. `data` is the data itself,
+#' and the other four hold column names rather than values. The deprecated
 #' arguments are not among them either: their default is a sentinel rather than
 #' a value, and `facet_stages()` deals with the one it supports before this is
 #' called.
@@ -293,7 +300,7 @@ autospc_argument_values <- function(given) {
   names_wanted <- setdiff(
     names(formals(autospc)),
     c(
-      "data", "x", "y", "n",
+      "data", autospc_column_arguments(),
       autospc_deprecated_arguments()
     )
   )

@@ -29,7 +29,7 @@ xbars_summaries <- function(observations = xbars_observations()) {
     )
 }
 
-s_columns <- c("subgroup_s", "scl", "s_ucl", "s_lcl")
+s_columns <- c("subgroup_s", "s_cl", "s_ucl", "s_lcl")
 
 
 # qicharts2 cross-check for equal subgroup sizes. Where every subgroup is the
@@ -52,7 +52,7 @@ s_columns <- c("subgroup_s", "scl", "s_ucl", "s_lcl")
 #   q_s <- qicharts2::qic(x, y, data = d, chart = "s", return.data = TRUE)
 #   data.frame(
 #     x = q_x$x, y = q_x$y, cl = q_x$cl, ucl = q_x$ucl, lcl = q_x$lcl,
-#     subgroup_s = q_s$y, scl = q_s$cl, s_ucl = q_s$ucl, s_lcl = q_s$lcl
+#     subgroup_s = q_s$y, s_cl = q_s$cl, s_ucl = q_s$ucl, s_lcl = q_s$lcl
 #   )
 # })
 #
@@ -106,7 +106,7 @@ test_that("an XbarS table holds the Xbar analysis and the S analysis", {
   expect_identical(
     pair_table[s_columns],
     s_table %>%
-      dplyr::select(subgroup_s = series, scl = cl, s_ucl = ucl, s_lcl = lcl)
+      dplyr::select(subgroup_s = series, s_cl = cl, s_ucl = ucl, s_lcl = lcl)
   )
 })
 

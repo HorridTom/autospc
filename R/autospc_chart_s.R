@@ -210,12 +210,12 @@ sd_estimate_at.autospc_chart_s <- function(chart, statistics, rows) {
 #' Columns the S chart adds when its pair is joined wide
 #'
 #' The subgroup standard deviations and their centre line and limits, as
-#' `subgroup_s`, `scl`, `s_ucl` and `s_lcl`.
+#' `subgroup_s`, `s_cl`, `s_ucl` and `s_lcl`.
 #'
 #' @return named character vector
 #' @noRd
 paired_columns.autospc_chart_s <- function(chart) {
-  return(c(subgroup_s = "series", scl = "cl", s_ucl = "ucl", s_lcl = "lcl"))
+  return(c(subgroup_s = "series", s_cl = "cl", s_ucl = "ucl", s_lcl = "lcl"))
 }
 
 

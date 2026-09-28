@@ -160,7 +160,7 @@ test_that("the S chart names the columns it adds to its pair", {
 
   expect_identical(
     paired_columns(chart),
-    c(subgroup_s = "series", scl = "cl", s_ucl = "ucl", s_lcl = "lcl")
+    c(subgroup_s = "series", s_cl = "cl", s_ucl = "ucl", s_lcl = "lcl")
   )
 })
 

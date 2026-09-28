@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9025</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9026</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,19 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9026" id="autospc-0109026">autospc 0.1.0.9026<a class="anchor" aria-label="anchor" href="#autospc-0109026"></a></h2>
+<div class="section level3">
+<h3 id="xbars-charts-0-1-0-9026">XbarS charts<a class="anchor" aria-label="anchor" href="#xbars-charts-0-1-0-9026"></a></h3>
+<p><code>chart_type = "XbarS"</code> draws an Xbar chart of subgroup means above an S chart of subgroup standard deviations, as specified e.g. in Provost and Murray, <em>The Health Care Data Guide</em>. <code>chart_type = "Xbar"</code> and <code>chart_type = "S"</code> draw either chart on its own, and <code><a href="../reference/facet_stages.html">facet_stages()</a></code> facets an XbarS request as its Xbar chart.</p>
+<ul><li><p><strong>Two forms of data.</strong> Either one row per measurement, with <code>y</code> the measurement, or rows that each summarise some measurements, with <code>y</code> their mean, <code>n</code> their number and the new argument <code>s</code> their sample standard deviation. In either form, rows that share an <code>x</code> are combined into one subgroup, so e.g. with <code>x = month</code>, data with one row per practice per month gives one subgroup per month. See <code><a href="../articles/data-requirements.html">vignette("data-requirements")</a></code>.</p></li>
+<li><p><strong>Subgroups of different sizes.</strong> As is standard, the Xbar centre line is the mean of the subgroup means weighted by subgroup size, the S centre line is the mean of the subgroup standard deviations weighted in the same way, and the limits of both charts vary with each subgroup’s size. The S chart’s lower limit is zero for subgroups of fewer than six.</p></li>
+<li><p><strong>A subgroup of one</strong> is plotted on the Xbar chart and counts towards its centre line, but has no control limits. It has no standard deviation, so it is not plotted on the S chart.</p></li>
+<li><p><strong>The two charts re-establish their limits independently</strong>, as the X and MR charts of an XMR chart do.</p></li>
+<li><p><code>plot_chart = FALSE</code> returns the Xbar chart’s table with the S chart’s columns beside it: <code>subgroup_s</code>, <code>s_cl</code>, <code>s_ucl</code> and <code>s_lcl</code>. The Xbar table carries <code>n</code>, <code>s</code> and <code>sbar</code>.</p></li>
+<li><p><code>options(autospc.rounded_constants = TRUE)</code> uses the published values of A3, B3 and B4, rounded to three decimal places, as it does d2 and D4 for XMR charts.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9025" id="autospc-0109025">autospc 0.1.0.9025<a class="anchor" aria-label="anchor" href="#autospc-0109025"></a></h2>
 <div class="section level3">

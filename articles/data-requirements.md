@@ -65,12 +65,83 @@ The data columns required for XMR, X and MR charts are as follows:
 - The variable of interest, to be plotted on the vertical axis, `y`.
   This must be of type `integer` or `double`.
 
-Unlike C/C’ charts (see Section [3](#c-and-c-charts)), XMR charts place
+Unlike C/C’ charts (see Section [4](#c-and-c-charts)), XMR charts place
 no further restriction on `y`: non-whole-number doubles are accepted
 without modification or warning, since they are suitable for continuous
 measurements as well as counts.
 
-## 3 C and C’ charts
+## 3 XbarS charts (and their components, Xbar and S charts)
+
+Xbar and S charts are for measurements taken in subgroups. The Xbar
+chart plots each subgroup’s mean and the S chart each subgroup’s sample
+standard deviation. For example, [Adeleke et
+al. (2019)](https://doi.org/10.1136/openhrt-2019-001086) used an XbarS
+chart as a balancing measure in an initiative to improve the care of
+patients with atrial fibrillation (AF) in 48 general practices in
+Hounslow, London. Each subgroup was a month, and each measurement the
+CHA₂DS₂-VASc stroke risk score of a patient newly diagnosed with AF in
+that month, so the chart showed whether the stroke risk of the patients
+being diagnosed changed as the initiative went on. Its supplementary
+file 6 shows the Xbar chart, whose limits vary from month to month with
+the number of patients diagnosed.
+
+*autospc* supports two ways of supplying the data: observation-level
+data, with one row per measurement, such as one row per newly diagnosed
+patient; or aggregated data, with each row giving the mean, number and
+standard deviation of some measurements, such as one row per practice
+per month. In both cases the `x` column is required as for the above
+chart types, and rows that share a value of `x` form one subgroup, so
+`x` may be repeated.
+
+### 3.1 Observation-level data (no `n` or `s` specified)
+
+If neither `n` nor `s` is specified, each row is one measurement, and
+`y` is the measurement. `y` must be of type `integer` or `double`, and
+*autospc* computes each subgroup’s mean, size and standard deviation
+from the rows that share its `x`.
+
+### 3.2 Aggregated data (`n` and `s` specified)
+
+If `n` and `s` are specified, each row summarises some measurements: `y`
+is their mean, `n` their number and `s` their sample standard deviation.
+All three must be of type `integer` or `double`. Where several rows
+share an `x`, as where each row holds one practice’s patients in a
+month, they are combined into one subgroup whose mean, size and standard
+deviation are those of all their measurements together.
+
+The two must be specified together. Specifying only one causes an error:
+
+> For Xbar, S and XbarS charts given one row per subgroup, n and s must
+> both be specified: y is then the subgroup mean, n its size and s its
+> sample standard deviation.
+
+A column called `n` or `s` in the data is used for that argument without
+being specified, as `n` is for P and P’ charts.
+
+Neither `n` nor `s` may be negative:
+
+> For Xbar, S and XbarS charts, n and s cannot be negative.
+
+The subgroup size `n` must be a whole number. Where it is of type
+`double` with at least one non-whole-number value, the values are
+rounded to the nearest whole number and a warning is issued:
+
+> At least one element of n has non-zero fractional part. Rounding to
+> the nearest whole number. Xbar, S and XbarS charts require n to be a
+> subgroup size, i.e. whole numbers only.
+
+### 3.3 Subgroups of one
+
+A subgroup of one has a mean but no standard deviation. It is plotted on
+the Xbar chart and counts towards its centre line, but has no control
+limits there. It is not plotted on the S chart, and has no control
+limits there either.
+
+An aggregated row with a mean and a size of two or more, but no standard
+deviation, is plotted on the Xbar chart with control limits, and is not
+plotted on the S chart.
+
+## 4 C and C’ charts
 
 The data columns required for C and C’ charts are as follows:
 
@@ -98,7 +169,7 @@ Any other type for `y`, including `logical`, will cause an error:
 
 > For a C or C’ chart, y must be of type integer or double.
 
-## 4 P and P’ charts
+## 5 P and P’ charts
 
 P and P’ charts are for proportions. They require a numerator (the count
 meeting some criterion) and a denominator (the total count). *autospc*
@@ -108,7 +179,7 @@ in which the data are available: observation-level data using a
 columns. In both cases the `x` column is required as for the above chart
 types.
 
-### 4.1 Observation-level data (no `n` specified)
+### 5.1 Observation-level data (no `n` specified)
 
 If `n` is not specified, *autospc* expects `y` to be a column of type
 `logical`, where each row represents an individual observation and the
@@ -124,12 +195,12 @@ error:
 > n is not specified and y is not of type logical. For P and P’ charts,
 > if n is not specified, y must be of type logical.
 
-### 4.2 Aggregated data (`n` specified)
+### 5.2 Aggregated data (`n` specified)
 
 If `n` is specified, *autospc* expects both `y` (the numerator) and `n`
 (the denominator) to be counts, i.e. whole numbers. Both columns must be
 of type `integer` or `double`, and the same whole-number checking logic
-described for C/C’ charts in Section [3](#c-and-c-charts) applies
+described for C/C’ charts in Section [4](#c-and-c-charts) applies
 independently to each:
 
 - **`integer`**: accepted without modification or warning.
@@ -163,16 +234,18 @@ an error:
 > For a P or P’ chart with n specified, n must be of type integer or
 > double.
 
-## 5 Summary
+## 6 Summary
 
-Table [5.1](#tab:summary-table) summarises the column requirements for
+Table [6.1](#tab:summary-table) summarises the column requirements for
 each chart type.
 
-| Chart type | y type(s) accepted | n type(s) accepted |
-|:---|:---|:---|
-| X / MR / XMR | `integer`, `double` | not used |
-| C / C’ | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | not used |
-| P / P’ (observation level) | `logical` | not used |
-| P / P’ (aggregated) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) |
+| Chart type | y type(s) accepted | n type(s) accepted | s type(s) accepted |
+|:---|:---|:---|:---|
+| X / MR / XMR | `integer`, `double` | not used | not used |
+| Xbar / S / XbarS (observation level) | `integer`, `double` | not used | not used |
+| Xbar / S / XbarS (aggregated) | `integer`, `double` (the subgroup mean) | `integer`, `double` (the subgroup size; whole numbers only; non-integer doubles are rounded with a warning) | `integer`, `double` (the subgroup’s sample standard deviation) |
+| C / C’ | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | not used | not used |
+| P / P’ (observation level) | `logical` | not used | not used |
+| P / P’ (aggregated) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | not used |
 
-Table 5.1: Summary of data column requirements by chart type. {.table}
+Table 6.1: Summary of data column requirements by chart type. {.table}

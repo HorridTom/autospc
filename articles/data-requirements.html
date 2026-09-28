@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9025</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9026</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,14 +129,88 @@ currently supported for <code>x</code> are: <code>Date</code>, <code>POSIXct</co
 <li>The variable of interest, to be plotted on the vertical axis, <code>y</code>. This must
 be of type <code>integer</code> or <code>double</code>.</li>
 </ul>
-<p>Unlike C/C’ charts (see Section <a href="#c-and-c-charts">3</a>), XMR charts place no
+<p>Unlike C/C’ charts (see Section <a href="#c-and-c-charts">4</a>), XMR charts place no
 further restriction on <code>y</code>: non-whole-number doubles are accepted without
 modification or warning, since they are suitable for continuous measurements
 as well as counts.</p>
 </div>
 <div class="section level2" number="3">
+<h2 id="xbars-charts-and-their-components-xbar-and-s-charts">
+<span class="header-section-number">3</span> XbarS charts (and their components, Xbar and S charts)<a class="anchor" aria-label="anchor" href="#xbars-charts-and-their-components-xbar-and-s-charts"></a>
+</h2>
+<p>Xbar and S charts are for measurements taken in subgroups. The Xbar chart plots
+each subgroup’s mean and the S chart each subgroup’s sample standard deviation.
+For example,
+<a href="https://doi.org/10.1136/openhrt-2019-001086" class="external-link">Adeleke et al. (2019)</a> used an
+XbarS chart as a balancing measure in an initiative to improve the care of
+patients with atrial fibrillation (AF) in 48 general practices in Hounslow,
+London. Each subgroup was a month, and each measurement the CHA<sub>2</sub>DS<sub>2</sub>-VASc
+stroke risk score of a patient newly diagnosed with AF in that month, so the
+chart showed whether the stroke risk of the patients being diagnosed changed as
+the initiative went on. Its supplementary file 6 shows the Xbar chart, whose
+limits vary from month to month with the number of patients diagnosed.</p>
+<p><em>autospc</em> supports two ways of supplying the data: observation-level data, with
+one row per measurement, such as one row per newly diagnosed patient; or
+aggregated data, with each row giving the mean, number and standard deviation of
+some measurements, such as one row per practice per month. In both cases the
+<code>x</code> column is required as for the above chart types, and rows that share a
+value of <code>x</code> form one subgroup, so <code>x</code> may be repeated.</p>
+<div class="section level3" number="3.1">
+<h3 id="observation-level-data-no-n-or-s-specified">
+<span class="header-section-number">3.1</span> Observation-level data (no <code>n</code> or <code>s</code> specified)<a class="anchor" aria-label="anchor" href="#observation-level-data-no-n-or-s-specified"></a>
+</h3>
+<p>If neither <code>n</code> nor <code>s</code> is specified, each row is one measurement, and <code>y</code> is
+the measurement. <code>y</code> must be of type <code>integer</code> or <code>double</code>, and <em>autospc</em>
+computes each subgroup’s mean, size and standard deviation from the rows that
+share its <code>x</code>.</p>
+</div>
+<div class="section level3" number="3.2">
+<h3 id="aggregated-data-n-and-s-specified">
+<span class="header-section-number">3.2</span> Aggregated data (<code>n</code> and <code>s</code> specified)<a class="anchor" aria-label="anchor" href="#aggregated-data-n-and-s-specified"></a>
+</h3>
+<p>If <code>n</code> and <code>s</code> are specified, each row summarises some measurements: <code>y</code> is
+their mean, <code>n</code> their number and <code>s</code> their sample standard deviation. All three
+must be of type <code>integer</code> or <code>double</code>. Where several rows share an <code>x</code>, as
+where each row holds one practice’s patients in a month, they are combined into
+one subgroup whose mean, size and standard deviation are those of all their
+measurements together.</p>
+<p>The two must be specified together. Specifying only one causes an error:</p>
+<blockquote>
+<p>For Xbar, S and XbarS charts given one row per subgroup, n and s must both
+be specified: y is then the subgroup mean, n its size and s its sample
+standard deviation.</p>
+</blockquote>
+<p>A column called <code>n</code> or <code>s</code> in the data is used for that argument without being
+specified, as <code>n</code> is for P and P’ charts.</p>
+<p>Neither <code>n</code> nor <code>s</code> may be negative:</p>
+<blockquote>
+<p>For Xbar, S and XbarS charts, n and s cannot be negative.</p>
+</blockquote>
+<p>The subgroup size <code>n</code> must be a whole number. Where it is of type <code>double</code>
+with at least one non-whole-number value, the values are rounded to the
+nearest whole number and a warning is issued:</p>
+<blockquote>
+<p>At least one element of n has non-zero fractional part. Rounding to the
+nearest whole number.
+Xbar, S and XbarS charts require n to be a subgroup size, i.e. whole
+numbers only.</p>
+</blockquote>
+</div>
+<div class="section level3" number="3.3">
+<h3 id="subgroups-of-one">
+<span class="header-section-number">3.3</span> Subgroups of one<a class="anchor" aria-label="anchor" href="#subgroups-of-one"></a>
+</h3>
+<p>A subgroup of one has a mean but no standard deviation. It is plotted on the
+Xbar chart and counts towards its centre line, but has no control limits there.
+It is not plotted on the S chart, and has no control limits there either.</p>
+<p>An aggregated row with a mean and a size of two or more, but no standard
+deviation, is plotted on the Xbar chart with control limits, and is not plotted
+on the S chart.</p>
+</div>
+</div>
+<div class="section level2" number="4">
 <h2 id="c-and-c-charts">
-<span class="header-section-number">3</span> C and C’ charts<a class="anchor" aria-label="anchor" href="#c-and-c-charts"></a>
+<span class="header-section-number">4</span> C and C’ charts<a class="anchor" aria-label="anchor" href="#c-and-c-charts"></a>
 </h2>
 <p>The data columns required for C and C’ charts are as follows:</p>
 <ul>
@@ -168,9 +242,9 @@ whole numbers only.</p>
 <p>For a C or C’ chart, y must be of type integer or double.</p>
 </blockquote>
 </div>
-<div class="section level2" number="4">
+<div class="section level2" number="5">
 <h2 id="p-and-p-charts">
-<span class="header-section-number">4</span> P and P’ charts<a class="anchor" aria-label="anchor" href="#p-and-p-charts"></a>
+<span class="header-section-number">5</span> P and P’ charts<a class="anchor" aria-label="anchor" href="#p-and-p-charts"></a>
 </h2>
 <p>P and P’ charts are for proportions. They require a numerator (the count meeting
 some criterion) and a denominator (the total count). <em>autospc</em> supports two ways
@@ -178,9 +252,9 @@ of supplying this information, depending on the form in which the data are
 available: observation-level data using a <code>logical</code> <code>y</code> column, or aggregated
 data using numeric <code>y</code> and <code>n</code> columns. In both cases the <code>x</code> column is required
 as for the above chart types.</p>
-<div class="section level3" number="4.1">
+<div class="section level3" number="5.1">
 <h3 id="observation-level-data-no-n-specified">
-<span class="header-section-number">4.1</span> Observation-level data (no <code>n</code> specified)<a class="anchor" aria-label="anchor" href="#observation-level-data-no-n-specified"></a>
+<span class="header-section-number">5.1</span> Observation-level data (no <code>n</code> specified)<a class="anchor" aria-label="anchor" href="#observation-level-data-no-n-specified"></a>
 </h3>
 <p>If <code>n</code> is not specified, <em>autospc</em> expects <code>y</code> to be a column of type <code>logical</code>,
 where each row represents an individual observation and the value of <code>y</code>
@@ -195,14 +269,14 @@ defined by <code>x</code>.</p>
 is not specified, y must be of type logical.</p>
 </blockquote>
 </div>
-<div class="section level3" number="4.2">
+<div class="section level3" number="5.2">
 <h3 id="aggregated-data-n-specified">
-<span class="header-section-number">4.2</span> Aggregated data (<code>n</code> specified)<a class="anchor" aria-label="anchor" href="#aggregated-data-n-specified"></a>
+<span class="header-section-number">5.2</span> Aggregated data (<code>n</code> specified)<a class="anchor" aria-label="anchor" href="#aggregated-data-n-specified"></a>
 </h3>
 <p>If <code>n</code> is specified, <em>autospc</em> expects both <code>y</code> (the numerator) and <code>n</code> (the
 denominator) to be counts, i.e. whole numbers. Both columns must be of type
 <code>integer</code> or <code>double</code>, and the same whole-number checking logic described
-for C/C’ charts in Section <a href="#c-and-c-charts">3</a> applies independently to each:</p>
+for C/C’ charts in Section <a href="#c-and-c-charts">4</a> applies independently to each:</p>
 <ul>
 <li><p><strong><code>integer</code></strong>: accepted without modification or warning.</p></li>
 <li><p><strong><code>double</code> with all whole-number values</strong>: accepted without modification or
@@ -235,24 +309,26 @@ error:</p>
 </blockquote>
 </div>
 </div>
-<div class="section level2" number="5">
+<div class="section level2" number="6">
 <h2 id="summary">
-<span class="header-section-number">5</span> Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+<span class="header-section-number">6</span> Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>Table <a href="#tab:summary-table">5.1</a> summarises the column requirements for each chart
+<p>Table <a href="#tab:summary-table">6.1</a> summarises the column requirements for each chart
 type.</p>
 <table class="table">
 <caption>
-<span id="tab:summary-table">Table 5.1: </span>Summary of data column requirements by chart type.</caption>
+<span id="tab:summary-table">Table 6.1: </span>Summary of data column requirements by chart type.</caption>
 <colgroup>
-<col width="13%">
-<col width="43%">
-<col width="43%">
+<col width="12%">
+<col width="29%">
+<col width="36%">
+<col width="21%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Chart type</th>
 <th align="left">y type(s) accepted</th>
 <th align="left">n type(s) accepted</th>
+<th align="left">s type(s) accepted</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -261,16 +337,36 @@ type.</p>
 <code>integer</code>, <code>double</code>
 </td>
 <td align="left">not used</td>
+<td align="left">not used</td>
+</tr>
+<tr class="even">
+<td align="left">Xbar / S / XbarS (observation level)</td>
+<td align="left">
+<code>integer</code>, <code>double</code>
+</td>
+<td align="left">not used</td>
+<td align="left">not used</td>
+</tr>
+<tr class="odd">
+<td align="left">Xbar / S / XbarS (aggregated)</td>
+<td align="left">
+<code>integer</code>, <code>double</code> (the subgroup mean)</td>
+<td align="left">
+<code>integer</code>, <code>double</code> (the subgroup size; whole numbers only; non-integer doubles are rounded with a warning)</td>
+<td align="left">
+<code>integer</code>, <code>double</code> (the subgroup’s sample standard deviation)</td>
 </tr>
 <tr class="even">
 <td align="left">C / C’</td>
 <td align="left">
 <code>integer</code>, <code>double</code> (whole numbers only; non-integer doubles are rounded with a warning)</td>
 <td align="left">not used</td>
+<td align="left">not used</td>
 </tr>
 <tr class="odd">
 <td align="left">P / P’ (observation level)</td>
 <td align="left"><code>logical</code></td>
+<td align="left">not used</td>
 <td align="left">not used</td>
 </tr>
 <tr class="even">
@@ -279,6 +375,7 @@ type.</p>
 <code>integer</code>, <code>double</code> (whole numbers only; non-integer doubles are rounded with a warning)</td>
 <td align="left">
 <code>integer</code>, <code>double</code> (whole numbers only; non-integer doubles are rounded with a warning)</td>
+<td align="left">not used</td>
 </tr>
 </tbody>
 </table>

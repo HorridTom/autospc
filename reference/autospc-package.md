@@ -16,22 +16,24 @@ partitioned into distinct periods.
 
 - `autospc.rounded_constants`:
 
-  Whether to use the published rounded values of the antibiasing
-  constants, rather than their exact values. `FALSE` unless set to
-  `TRUE`, so the exact values are used by default. Set
-  `options(autospc.rounded_constants = TRUE)` for limits that agree with
-  a hand calculation from a published table of constants.
+  Whether to use the published rounded values of the constants the
+  control limits are calculated with - d2 and D4 for X and MR charts,
+  A3, B3 and B4 for Xbar and S charts - rather than their exact values.
+  `FALSE` unless set to `TRUE`, so the exact values are used by default.
+  Set `options(autospc.rounded_constants = TRUE)` for limits that agree
+  with a hand calculation from a published table of constants.
 
 - `autospc.constrain_limits`:
 
   Whether to constrain control limits to the range the plotted statistic
-  can take: a count and a moving range at or above zero, a percentage
-  between 0 and 100. `TRUE` unless set to `FALSE`. Set
-  `options(autospc.constrain_limits = FALSE)` to draw the limits where
-  the arithmetic puts them, which shows how wide they are but
+  can take: a count, a moving range and a standard deviation at or above
+  zero, a percentage between 0 and 100. `TRUE` unless set to `FALSE`.
+  Set `options(autospc.constrain_limits = FALSE)` to draw the limits
+  where the arithmetic puts them, which shows how wide they are but
   potentially puts them at values the statistic could not take. The
   vertical axis follows the limits either way. An MR chart has a lower
-  limit of zero either way, as is standard.
+  limit of zero, and an S chart a lower limit of zero or above, either
+  way, as is standard.
 
 ## See also
 

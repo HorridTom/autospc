@@ -12,6 +12,7 @@ autospc(
   x,
   y,
   n,
+  s,
   aggregation_na_rm = FALSE,
   chart_type = NULL,
   period_min = 21L,
@@ -82,6 +83,9 @@ autospc(
 
   - the variable to be plotted for XMR charts,
 
+  - the measurement for XbarS charts or, where `n` and `s` are given,
+    the mean of the measurements each row summarises,
+
   - count (plotted on the vertical axis) for C and C' charts,
 
   - numerator of the proportion (plotted on the vertical axis) for P and
@@ -94,7 +98,17 @@ autospc(
 - n:
 
   Name of column (passed using tidyselect semantics) to use as
-  denominator for P and P' charts.  
+  denominator for P and P' charts, and for XbarS charts as the number of
+  measurements each row summarises.  
+  See
+  [`vignette("data-requirements", package = "autospc")`](https://horridtom.github.io/autospc/articles/data-requirements.md)
+  for more details.
+
+- s:
+
+  Name of column (passed using tidyselect semantics) holding the sample
+  standard deviation of the measurements each row summarises, for XbarS
+  charts. Rows that share an `x` are combined into one subgroup.  
   See
   [`vignette("data-requirements", package = "autospc")`](https://horridtom.github.io/autospc/articles/data-requirements.md)
   for more details.
@@ -114,7 +128,8 @@ autospc(
 - chart_type:
 
   The type of chart you wish to plot. Must must have length one.
-  Available options are: "XMR", "X", "MR", "C", "C'", "P", "P'".
+  Available options are: "XMR", "X", "MR", "XbarS", "Xbar", "S", "C",
+  "C'", "P", "P'".
 
   ### Algorithm Parameters
 
@@ -381,10 +396,10 @@ autospc(
 ## Value
 
 With `plot_chart = TRUE` (the default), an `autospc_plot`: a ggplot of
-the chart, or of the pair for `chart_type = "XMR"`, which also carries
-the analysed chart objects it was drawn from and the parameters it was
-drawn with. Anything that works on a ggplot works on it, including `+`,
-[`print()`](https://rdrr.io/r/base/print.html) and
+the chart, or of the pair for `chart_type = "XMR"` or `"XbarS"`, which
+also carries the analysed chart objects it was drawn from and the
+parameters it was drawn with. Anything that works on a ggplot works on
+it, including `+`, [`print()`](https://rdrr.io/r/base/print.html) and
 [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html),
 and [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) gives
 the analysis behind it.
@@ -392,8 +407,9 @@ the analysis behind it.
 With `plot_chart = FALSE`, a data frame: the subgroup-aggregated data
 with the centre line, the control limits and the rest of the analytic
 output appended as columns. `series` holds the values analysed and
-plotted, which are the moving ranges on an MR chart and percentages on a
-P or P' chart; `y` holds the values as supplied and aggregated.
+plotted, which are the moving ranges on an MR chart, the subgroup
+standard deviations on an S chart and percentages on a P or P' chart;
+`y` holds the values as supplied and aggregated.
 
 ## Examples
 

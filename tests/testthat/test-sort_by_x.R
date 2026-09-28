@@ -67,7 +67,7 @@ test_that("an MR chart gives the same result whatever order the rows arrive in",
 
 
 test_that("the series comes back in x order", {
-  for (chart_type in c("C", "C'", "X", "MR")) {
+  for (chart_type in c("C", "C'", "X", "MR", "Xbar", "S")) {
     result <- run_sorted(shuffled_data, chart_type)
 
     expect_identical(result$x, sort(result$x), info = chart_type)

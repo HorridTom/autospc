@@ -1,3 +1,41 @@
+# autospc 0.1.0.9026
+
+## XbarS charts
+
+`chart_type = "XbarS"` draws an Xbar chart of subgroup means above an S chart
+of subgroup standard deviations, as specified e.g. in Provost and Murray, *The
+Health Care Data Guide*. `chart_type = "Xbar"` and `chart_type = "S"` draw
+either chart on its own, and `facet_stages()` facets an XbarS request as its
+Xbar chart.
+
+* **Two forms of data.** Either one row per measurement, with `y` the
+  measurement, or rows that each summarise some measurements, with `y` their
+  mean, `n` their number and the new argument `s` their sample standard
+  deviation. In either form, rows that share an `x` are combined into one
+  subgroup, so e.g. with `x = month`, data with one row per practice per month
+  gives one subgroup per month. See `vignette("data-requirements")`.
+
+* **Subgroups of different sizes.** As is standard, the Xbar centre line is the
+  mean of the subgroup means weighted by subgroup size, the S centre line is the
+  mean of the subgroup standard deviations weighted in the same way, and the
+  limits of both charts vary with each subgroup's size. The S chart's lower
+  limit is zero for subgroups of fewer than six.
+
+* **A subgroup of one** is plotted on the Xbar chart and counts towards its
+  centre line, but has no control limits. It has no standard deviation, so it
+  is not plotted on the S chart.
+
+* **The two charts re-establish their limits independently**, as the X and MR
+  charts of an XMR chart do.
+
+* `plot_chart = FALSE` returns the Xbar chart's table with the S chart's
+  columns beside it: `subgroup_s`, `s_cl`, `s_ucl` and `s_lcl`. The Xbar table
+  carries `n`, `s` and `sbar`.
+
+* `options(autospc.rounded_constants = TRUE)` uses the published values of A3,
+  B3 and B4, rounded to three decimal places, as it does d2 and D4 for XMR
+  charts.
+
 # autospc 0.1.0.9025
 
 ## Consistent limits for rows outside the calculation period

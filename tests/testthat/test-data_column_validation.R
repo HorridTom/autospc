@@ -89,6 +89,14 @@ expected_conditions <- list(
     kind = "error",
     text = "For a C or C' chart, y must be of type integer or double."
   ),
+  y_missing_xbar = list(
+    kind = "error",
+    text = "y not specified. For Xbar, S and XbarS charts, y must be specified."
+  ),
+  y_type_xbar = list(
+    kind = "error",
+    text = "For Xbar, S and XbarS charts, y must be of type integer or double."
+  ),
   y_rounded_c = list(
     kind = "warning",
     text = paste0(
@@ -137,8 +145,9 @@ p_expectations <- matrix(
   )
 )
 
-# The other chart types use y alone. X, MR and XMR agree with each other, and
-# C agrees with C'.
+# The other chart types use y alone. X, MR and XMR agree with each other, C
+# agrees with C', and Xbar, S and XbarS agree with each other. Without n and s,
+# each row of an Xbar, S or XbarS chart's data is one measurement.
 x_expectations <- c(
   absent = "y_missing_x",
   logical = "y_type_x",
@@ -153,6 +162,14 @@ c_expectations <- c(
   integer = NA,
   `double whole` = NA,
   `double fractional` = "y_rounded_c"
+)
+
+xbar_expectations <- c(
+  absent = "y_missing_xbar",
+  logical = "y_type_xbar",
+  integer = NA,
+  `double whole` = NA,
+  `double fractional` = NA
 )
 
 
@@ -197,7 +214,8 @@ build_from_columns <- function(df,
     data = df,
     x = "x",
     y = "y",
-    n = "n"
+    n = "n",
+    s = "s"
   )
 }
 
@@ -274,16 +292,19 @@ for (chart_type in c("P", "P'")) {
 }
 
 
-for (chart_type in c("XMR", "X", "MR", "C", "C'")) {
+for (chart_type in c("XMR", "X", "MR", "XbarS", "Xbar", "S", "C", "C'")) {
   for (i in seq_along(data_column_validation_data_y)) {
     case <- data_column_validation_data_y[[i]]
     y_type <- column_type(case, "y")
 
-    expectations <- if (chart_type %in% c("C", "C'")) {
-      c_expectations
-    } else {
+    expectations <- switch(chart_type,
+      "C" = ,
+      "C'" = c_expectations,
+      "XbarS" = ,
+      "Xbar" = ,
+      "S" = xbar_expectations,
       x_expectations
-    }
+    )
 
     test_that(paste0(
       "column requirements: chart_type = ", chart_type,

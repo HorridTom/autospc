@@ -1,3 +1,6 @@
+# Analysis generics
+
+
 #' Round the count columns to whole numbers
 #'
 #' Called at construction, so that the counts are whole numbers before any
@@ -34,20 +37,6 @@ prepare_data <- function(chart) {
 }
 
 
-#' Number of points available for analysis
-#'
-#' Used to decide whether there is enough data to form a period.
-#'
-#' @param data a dataframe with a y column
-#'
-#' @return integer
-#' @noRd
-n_effective_points <- function(chart,
-                               data) {
-  UseMethod("n_effective_points")
-}
-
-
 #' The rows of a prepared series that hold an observation
 #'
 #' A row whose `series` value is missing because there was never a value to
@@ -62,6 +51,20 @@ n_effective_points <- function(chart,
 observed_rows <- function(chart,
                           data) {
   UseMethod("observed_rows")
+}
+
+
+#' Number of points available for analysis
+#'
+#' Used to decide whether there is enough data to form a period.
+#'
+#' @param data a dataframe with a y column
+#'
+#' @return integer
+#' @noRd
+n_effective_points <- function(chart,
+                               data) {
+  UseMethod("n_effective_points")
 }
 
 
@@ -81,16 +84,19 @@ calculate_limits <- function(chart,
 }
 
 
-#' The range the plotted statistic can take
+#' Control limits from a period's statistics
 #'
-#' Limits are constrained to this range, so that a chart does not draw a limit
-#' at a value the statistic could never take. A count cannot be negative, a
-#' percentage lies between 0 and 100, and an individuals value has no bound.
+#' The one place limits are formed. Three standard errors either side of the
+#' centre line, except where a class's limits are defined some other way.
 #'
-#' @return list of two numbers, low and high
+#' @param statistics The period's centre line and standard deviation estimate,
+#'   as `calculate_limits()` returns them.
+#' @param rows The rows to give limits to.
+#'
+#' @return list of two numeric vectors named ucl and lcl, one value per row
 #' @noRd
-limit_bounds <- function(chart) {
-  UseMethod("limit_bounds")
+limits_from_statistics <- function(chart, statistics, rows) {
+  UseMethod("limits_from_statistics")
 }
 
 
@@ -113,19 +119,28 @@ standard_error_at <- function(chart, sd_estimate, rows) {
 }
 
 
-#' Control limits from a period's statistics
+#' The range the plotted statistic can take
 #'
-#' The one place limits are formed. Three standard errors either side of the
-#' centre line, except where a class's limits are defined some other way.
+#' Limits are constrained to this range, so that a chart does not draw a limit
+#' at a value the statistic could never take. A count cannot be negative, a
+#' percentage lies between 0 and 100, and an individuals value has no bound.
 #'
-#' @param statistics The period's centre line and standard deviation estimate,
-#'   as `calculate_limits()` returns them.
-#' @param rows The rows to give limits to.
-#'
-#' @return list of two numeric vectors named ucl and lcl, one value per row
+#' @return list of two numbers, low and high
 #' @noRd
-limits_from_statistics <- function(chart, statistics, rows) {
-  UseMethod("limits_from_statistics")
+limit_bounds <- function(chart) {
+  UseMethod("limit_bounds")
+}
+
+
+#' The period statistics a limits table carries beside the limits
+#'
+#' Every row of a period carries these, so that limits can be formed at rows
+#' outside the calculation from any one of them.
+#'
+#' @return character vector
+#' @noRd
+period_statistics_columns <- function(chart) {
+  UseMethod("period_statistics_columns")
 }
 
 
@@ -138,6 +153,37 @@ limits_from_statistics <- function(chart, statistics, rows) {
 limits_table_columns <- function(chart) {
   UseMethod("limits_table_columns")
 }
+
+
+#' A period's standard deviation estimate at each of a set of rows
+#'
+#' For most classes the estimate is one value for the whole period. Where it
+#' depends on each row's subgroup size, the class forms it at each row from the
+#' period's statistics.
+#'
+#' @param statistics A period's statistics, as `period_statistics()` gives them.
+#' @param rows The rows to give an estimate to.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+sd_estimate_at <- function(chart, statistics, rows) {
+  UseMethod("sd_estimate_at")
+}
+
+
+#' Columns a dispersion chart adds when its pair is joined wide
+#'
+#' Only the dispersion chart of a pair has an answer, so there is no default.
+#'
+#' @return named character vector: the name each column takes in the joined
+#'   table, holding the name of the dispersion chart's column it comes from
+#' @noRd
+paired_columns <- function(chart) {
+  UseMethod("paired_columns")
+}
+
+
+# Presentation generics
 
 
 #' The centre line label, formatted

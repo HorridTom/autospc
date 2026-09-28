@@ -21,7 +21,7 @@
 #' @noRd
 extension_row_columns <- function() {
   column_names <- c(
-    "x", "cl", "ucl", "lcl", "sd_estimate",
+    "x", "cl", "ucl", "lcl", "sd_estimate", "sbar",
     "period_type", "period_start", "plot_period",
     "limit_change", "cl_change",
     "excluded", "break_point", "rule1", "rule2", "run_start",
@@ -167,6 +167,10 @@ extension_row <- function(table,
 
   if ("sd_estimate" %in% names(row)) {
     row$sd_estimate <- limits$sd_estimate
+  }
+
+  if ("sbar" %in% names(row)) {
+    row$sbar <- if (is.null(limits$sbar)) NA_real_ else limits$sbar
   }
 
   # assigning into the column rather than replacing it keeps the column's type

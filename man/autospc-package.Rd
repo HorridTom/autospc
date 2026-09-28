@@ -19,18 +19,19 @@ instance when drawing many charts to avoid many warnings. The warning
 carries the class \code{"autospc_missing_x_warning"}, so it can also be handled
 on its own with \code{withCallingHandlers()}.}
 \item{\code{autospc.rounded_constants}}{Whether to use the published rounded
-values of the antibiasing constants, rather than their exact values.
-\code{FALSE} unless set to \code{TRUE}, so the exact values are used by default. Set
-\code{options(autospc.rounded_constants = TRUE)} for limits that agree with a
-hand calculation from a published table of constants.}
+values of the constants the control limits are calculated with - d2 and D4
+for X and MR charts, A3, B3 and B4 for Xbar and S charts - rather than
+their exact values. \code{FALSE} unless set to \code{TRUE}, so the exact values are
+used by default. Set \code{options(autospc.rounded_constants = TRUE)} for limits
+that agree with a hand calculation from a published table of constants.}
 \item{\code{autospc.constrain_limits}}{Whether to constrain control limits to
-the range the plotted statistic can take: a count and a moving range at or
-above zero, a percentage between 0 and 100. \code{TRUE} unless set to \code{FALSE}.
-Set \code{options(autospc.constrain_limits = FALSE)} to draw the limits where
-the arithmetic puts them, which shows how wide they are but potentially
-puts them at values the statistic could not take. The vertical axis
-follows the limits either way. An MR chart has a lower limit of zero
-either way, as is standard.}
+the range the plotted statistic can take: a count, a moving range and a
+standard deviation at or above zero, a percentage between 0 and 100.
+\code{TRUE} unless set to \code{FALSE}. Set \code{options(autospc.constrain_limits = FALSE)} to draw the limits where the arithmetic puts them, which shows how
+wide they are but potentially puts them at values the statistic could not
+take. The vertical axis follows the limits either way. An MR chart has a
+lower limit of zero, and an S chart a lower limit of zero or above, either
+way, as is standard.}
 }
 }
 

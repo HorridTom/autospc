@@ -210,6 +210,14 @@ carry_limits_across_gaps <- function(restored,
     if ("sd_estimate" %in% names(restored)) {
       restored$sd_estimate[rows] <- period_limits$sd_estimate
     }
+
+    if ("sbar" %in% names(restored)) {
+      restored$sbar[rows] <- if (is.null(period_limits$sbar)) {
+        NA_real_
+      } else {
+        period_limits$sbar
+      }
+    }
   }
 
   return(restored)

@@ -147,3 +147,15 @@ require_named_columns <- function(data,
 
   invisible(TRUE)
 }
+
+
+#' The arguments of autospc() that name columns of the data
+#'
+#' They name columns rather than hold values, so they are not evaluated as
+#' values, and they have no default of their own.
+#'
+#' @return A character vector of argument names.
+#' @noRd
+autospc_column_arguments <- function() {
+  return(c("x", "y", "n", "s"))
+}

@@ -121,12 +121,20 @@ autospc_chart_elements <- function() {
 
 #' Chart types accepted by autospc()
 #'
-#' The single source of truth for the user-facing chart_type values.
+#' The single source of truth for the user-facing chart_type values. Each pair
+#' is followed by its location and dispersion chart types, then come the chart
+#' types that belong to no pair.
 #'
 #' @return A character vector of chart types.
 #' @noRd
 autospc_chart_types <- function() {
-  chart_types <- c("XMR", "X", "MR", "C", "C'", "P", "P'")
+  pair_types <- autospc_pair_types()
+
+  paired <- unlist(lapply(names(pair_types), function(pair) {
+    c(pair, unname(pair_types[[pair]]))
+  }))
+
+  chart_types <- c(paired, "C", "C'", "P", "P'")
 
   return(chart_types)
 }
@@ -153,18 +161,14 @@ autospc_chart_parameters <- function() {
 
 #' The charts a chart type asks for
 #'
-#' `chart_type = "XMR"` asks for two charts, an X and an MR of the same series.
-#' Every other chart type asks for one. This is the only place a chart type is
-#' read as a string rather than dispatched on: everything after it holds chart
-#' objects.
+#' A pair's chart type, such as `"XMR"`, asks for two charts, named `location`
+#' and `dispersion` as `autospc_pair_types()` gives them. Every other chart type
+#' asks for one, unnamed. This is the only place a chart type is read as a
+#' string rather than dispatched on: everything after it holds chart objects.
 #'
-#' **The charts come back in drawing order, so a pair is X then MR.**
-#' `is_xmr_pair()`, the moving range panel and `as.data.frame()` all read that
-#' order, and `facet_stages()` takes the first.
-#'
-#' Both halves of a pair are built from the same data, because neither X nor MR
-#' aggregates and `prepare_data.autospc_chart_mr()` derives the moving ranges
-#' from `y`.
+#' Both halves of a pair are built from the same data, and each class prepares
+#' its own series from it: `prepare_data.autospc_chart_mr()` derives the moving
+#' ranges from `y`.
 #'
 #' Callers pass a `chart_type` that `validate_chart_type()` has already
 #' accepted, so anything reaching here is one of `autospc_chart_types()`.
@@ -176,10 +180,11 @@ build_charts <- function(chart_type,
                          x,
                          y,
                          n,
+                         s,
                          ...) {
-  if (identical(chart_type, "XMR")) {
-    chart_types <- c(location = "X", dispersion = "MR")
-  } else {
+  chart_types <- autospc_pair_types()[[chart_type]]
+
+  if (is.null(chart_types)) {
     chart_types <- chart_type
   }
 
@@ -190,6 +195,7 @@ build_charts <- function(chart_type,
       x = x,
       y = y,
       n = n,
+      s = s,
       ...
     )
   })
@@ -198,29 +204,116 @@ build_charts <- function(chart_type,
 }
 
 
-#' Are these two charts an XmR pair?
+#' The chart types that are pairs, and the two charts each asks for
 #'
-#' An X chart and the MR chart of the same series, in that order - which is how
-#' `autospc(chart_type = "XMR")` puts them on the plot object.
+#' A pair is one analysis shown as two charts: a chart of location and a chart
+#' of dispersion. Each element is named by the pair's chart type and holds the
+#' chart types of its two halves, named `location` and `dispersion`. A pair is
+#' registered here and nowhere else.
+#'
+#' @return A named list of named character vectors.
+#' @noRd
+autospc_pair_types <- function() {
+  return(list(
+    XMR = c(location = "X", dispersion = "MR"),
+    XbarS = c(location = "Xbar", dispersion = "S")
+  ))
+}
+
+
+#' The chart type of the pair these charts make
+#'
+#' The charts make a pair where they are named `location` and `dispersion`, in
+#' that order, and their chart types are those of a pair in
+#' `autospc_pair_types()`.
+#'
+#' @param charts A list of `autospc_chart` objects.
+#'
+#' @return The pair's chart type, or NULL where the charts are not a pair.
+#' @noRd
+pair_type <- function(charts) {
+  if (!identical(names(charts), c("location", "dispersion"))) {
+    return(NULL)
+  }
+
+  # an anonymous function, so that the unregistered methods are found from the
+  # package namespace rather than from inside vapply()
+  halves <- vapply(
+    charts,
+    function(chart) chart_type_label(chart),
+    character(1L)
+  )
+
+  for (type in names(autospc_pair_types())) {
+    if (identical(autospc_pair_types()[[type]], halves)) {
+      return(type)
+    }
+  }
+
+  return(NULL)
+}
+
+
+#' Are these charts a pair?
 #'
 #' @param charts A list of `autospc_chart` objects.
 #'
 #' @return TRUE or FALSE
 #' @noRd
-is_xmr_pair <- function(charts) {
-  if (length(charts) != 2L) {
-    return(FALSE)
+is_chart_pair <- function(charts) {
+  return(!is.null(pair_type(charts)))
+}
+
+
+#' The chart type of a pair's location chart
+#'
+#' A pair's chart type gives the chart type of its location half. Any other
+#' chart type, including NULL, is returned unchanged.
+#'
+#' @param chart_type A chart type, as the caller gave it.
+#'
+#' @return A chart type.
+#' @noRd
+location_chart_type <- function(chart_type) {
+  if (is.character(chart_type) && length(chart_type) == 1L &&
+    chart_type %in% names(autospc_pair_types())) {
+    return(autospc_pair_types()[[chart_type]][["location"]])
   }
 
-  return(inherits(charts[[1]], "autospc_chart_x") &&
-    inherits(charts[[2]], "autospc_chart_mr"))
+  return(chart_type)
+}
+
+
+#' The location half of a pair, or the one element of a list that holds one
+#'
+#' Used for a list of charts or of their plot data, which holds the two halves
+#' of a pair by name, or a single chart.
+#'
+#' @param items A list holding a `location` element, or one element.
+#'
+#' @return The `location` element, or the one element.
+#' @noRd
+location_component <- function(items) {
+  if ("location" %in% names(items)) {
+    return(items$location)
+  }
+
+  if (length(items) != 1L) {
+    stop(
+      "Expected a pair named location and dispersion, or a single chart.",
+      call. = FALSE
+    )
+  }
+
+  return(items[[1L]])
 }
 
 
 #' Create an autospc_chart object of the class given by chart_type
 #'
-#' Only the P and P' branches use `n`, and R does not evaluate an argument that
-#' nothing looks at, so `n` may be left out for the other chart types.
+#' Only the P, P', Xbar and S branches use `n`, and only the Xbar and S
+#' branches use `s`. R does not evaluate an argument that nothing looks at, so
+#' either may be left out for the other chart types.
 #'
 #' The final `stop()` is the default branch. Without it a chart type with no
 #' matching branch would return NULL without printing anything.
@@ -232,6 +325,7 @@ autospc_chart <- function(chart_type,
                           x,
                           y,
                           n,
+                          s,
                           ...) {
   autospc_chart_object <- switch(chart_type,
     "C" = autospc_chart_c(data = data, x = x, y = y, ...),
@@ -240,6 +334,8 @@ autospc_chart <- function(chart_type,
     "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
     "X" = autospc_chart_x(data = data, x = x, y = y, ...),
     "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
+    "Xbar" = autospc_chart_xbar(data = data, x = x, y = y, n = n, s = s, ...),
+    "S" = autospc_chart_s(data = data, x = x, y = y, n = n, s = s, ...),
     stop("No autospc_chart class for chart_type: ", chart_type, call. = FALSE)
   )
 
@@ -321,7 +417,7 @@ assemble_chart_list <- function(
 }
 
 
-# Methods
+# Analysis methods
 
 
 #' Round the count columns to whole numbers
@@ -363,6 +459,13 @@ prepare_data.autospc_chart <- function(chart) {
 }
 
 
+#' @noRd
+observed_rows.autospc_chart <- function(chart,
+                                        data) {
+  return(!is.na(data$series))
+}
+
+
 #' Number of points available for analysis
 #'
 #' The non-missing values of `series`.
@@ -379,10 +482,64 @@ n_effective_points.autospc_chart <- function(chart,
 }
 
 
+#' Control limits from a period's statistics
+#'
+#' Three standard errors either side of the centre line. Overridden by the
+#' moving range chart, whose lower limit is defined differently.
+#'
+#' @return list of two numeric vectors named ucl and lcl
 #' @noRd
-observed_rows.autospc_chart <- function(chart,
-                                        data) {
-  return(!is.na(data$series))
+limits_from_statistics.autospc_chart <- function(chart, statistics, rows) {
+  half_width <- 3 * standard_error_at(
+    chart = chart,
+    sd_estimate = statistics$sd_estimate,
+    rows = rows
+  )
+
+  return(list(
+    ucl = statistics$cl + half_width,
+    lcl = statistics$cl - half_width
+  ))
+}
+
+
+#' The standard error at each of a set of rows
+#'
+#' The estimate itself, at every row. Overridden by the classes whose limits
+#' vary with the denominator.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at.autospc_chart <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)))
+}
+
+
+#' The range the plotted statistic can take
+#'
+#' No bound, which is right for an individuals value and is the safe answer for
+#' a class that has not said otherwise. Overridden by the classes whose
+#' statistic is a count, a moving range or a percentage.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart <- function(chart) {
+  return(list(
+    low = -Inf,
+    high = Inf
+  ))
+}
+
+
+#' The period statistics a limits table carries beside the limits
+#'
+#' The standard deviation estimate. Overridden by the classes whose estimate
+#' varies with the subgroup size.
+#'
+#' @return character vector
+#' @noRd
+period_statistics_columns.autospc_chart <- function(chart) {
+  return("sd_estimate")
 }
 
 
@@ -395,6 +552,17 @@ observed_rows.autospc_chart <- function(chart,
 #' @noRd
 limits_table_columns.autospc_chart <- function(chart) {
   return("y")
+}
+
+
+#' A period's standard deviation estimate at each of a set of rows
+#'
+#' The period's one estimate, at every row.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+sd_estimate_at.autospc_chart <- function(chart, statistics, rows) {
+  return(rep_len(statistics$sd_estimate, nrow(rows)))
 }
 
 
@@ -463,55 +631,6 @@ labels_stay_above.autospc_chart <- function(chart) {
 #' @noRd
 upper_annotation_sf_default.autospc_chart <- function(chart) {
   return(1.1)
-}
-
-
-#' The range the plotted statistic can take
-#'
-#' No bound, which is right for an individuals value and is the safe answer for
-#' a class that has not said otherwise. Overridden by the classes whose
-#' statistic is a count, a moving range or a percentage.
-#'
-#' @return list of two numbers, low and high
-#' @noRd
-limit_bounds.autospc_chart <- function(chart) {
-  return(list(
-    low = -Inf,
-    high = Inf
-  ))
-}
-
-
-#' The standard error at each of a set of rows
-#'
-#' The estimate itself, at every row. Overridden by the classes whose limits
-#' vary with the denominator.
-#'
-#' @return numeric, one value per row of `rows`
-#' @noRd
-standard_error_at.autospc_chart <- function(chart, sd_estimate, rows) {
-  return(rep_len(sd_estimate, nrow(rows)))
-}
-
-
-#' Control limits from a period's statistics
-#'
-#' Three standard errors either side of the centre line. Overridden by the
-#' moving range chart, whose lower limit is defined differently.
-#'
-#' @return list of two numeric vectors named ucl and lcl
-#' @noRd
-limits_from_statistics.autospc_chart <- function(chart, statistics, rows) {
-  half_width <- 3 * standard_error_at(
-    chart = chart,
-    sd_estimate = statistics$sd_estimate,
-    rows = rows
-  )
-
-  return(list(
-    ucl = statistics$cl + half_width,
-    lcl = statistics$cl - half_width
-  ))
 }
 
 

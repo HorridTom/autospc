@@ -102,8 +102,8 @@ faceted_plot_data <- function(plot_data,
 #' The charts as one table
 #'
 #' What `plot_chart = FALSE` returns, and what `as.data.frame()` on a plot
-#' returns. Each chart's analysed table, combined: an XmR pair goes out wide
-#' and the stages of a faceted plot stack long.
+#' returns. Each chart's analysed table, combined: a pair goes out wide and the
+#' stages of a faceted plot stack long.
 #'
 #' The columns `add_plot_columns()` adds are not here. They exist to place the
 #' centre line labels on a plot, so a call that asks for a table rather than a
@@ -132,9 +132,9 @@ charts_as_table <- function(charts,
 
 #' The plot data of several charts as one table
 #'
-#' An XmR pair goes out wide, the moving range and its limits beside the X
-#' columns. The facets of a faceted chart stack long, with `stage` saying which
-#' each row came from.
+#' A pair goes out wide, the dispersion chart's series and limits beside the
+#' location chart's columns. The facets of a faceted chart stack long, with
+#' `stage` saying which each row came from.
 #'
 #' @param plot_data The charts' plot data, as `build_plot_data()` gives it.
 #' @param faceted TRUE where the charts are the stages of a faceted plot. A
@@ -153,45 +153,46 @@ combine_plot_data <- function(plot_data,
 
   # The facets have returned above, so what is left is one chart, or the
   # location half of a pair with the dispersion half joined on.
-  main <- plot_data[[1]]
+  main <- location_component(plot_data)
 
   charts <- lapply(plot_data, function(each) each$chart)
 
-  if (!is_xmr_pair(charts)) {
+  if (!is_chart_pair(charts)) {
     return(main$table)
   }
 
-  return(join_mr_columns(
-    x_table = main$table,
-    mr_table = plot_data$dispersion$table
+  return(join_dispersion_columns(
+    location_table = main$table,
+    dispersion = plot_data$dispersion
   ))
 }
 
 
-#' Join the moving range analysis onto the X analysis
+#' Join a pair's dispersion analysis onto its location analysis
 #'
-#' An XmR pair is one analysis of one series shown as two charts, so it goes
-#' out wide: the moving range and its limits sit beside the X columns as `mr`,
-#' `amr`, `url` and `lrl`.
+#' A pair is one analysis of one series shown as two charts, so it goes out
+#' wide: the dispersion chart's series and limits sit beside the location
+#' chart's columns, under the names `paired_columns()` gives them.
+#'
+#' @param location_table The location chart's analysed table.
+#' @param dispersion The dispersion chart's plot data, holding its `chart` and
+#'   its `table`.
 #'
 #' @return A data frame.
 #' @noRd
-join_mr_columns <- function(x_table,
-                            mr_table) {
-  joined <- x_table %>%
+join_dispersion_columns <- function(location_table,
+                                    dispersion) {
+  columns <- paired_columns(dispersion$chart)
+
+  joined <- location_table %>%
     dplyr::left_join(
-      mr_table %>%
-        dplyr::select(x,
-          mr = series,
-          amr = cl,
-          url = ucl,
-          lrl = lcl
-        ),
+      dispersion$table %>%
+        dplyr::select(x, dplyr::all_of(columns)),
       by = c("x" = "x")
     ) %>%
     dplyr::select(
       x, series, y, cl, ucl, lcl,
-      mr, amr, url, lrl,
+      dplyr::all_of(names(columns)),
       dplyr::everything()
     )
 

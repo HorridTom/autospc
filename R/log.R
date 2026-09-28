@@ -327,7 +327,7 @@ report_analysis <- function(charts,
 
 #' The warning where a series has too few points for limits
 #'
-#' The halves of an XmR pair are short together, so neither is named. The count
+#' The halves of a pair are short together, so neither is named. The count
 #' is of points the analysis can use, which is fewer than the rows supplied
 #' where any of them hold no observation.
 #'
@@ -337,7 +337,9 @@ report_analysis <- function(charts,
 #' @noRd
 series_short_message <- function(labels,
                                  charts) {
-  points <- n_effective_points(charts[[1]], data = charts[[1]]$data)
+  chart <- location_component(charts)
+
+  points <- n_effective_points(chart, data = chart$data)
 
   return(too_few_points_message(
     paste("The input data has", points, "points,")

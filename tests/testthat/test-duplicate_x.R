@@ -1,6 +1,6 @@
 # On an X or MR chart each point is one row, so a repeated x has no place to be
-# plotted and is refused. The subgroup charts sum the rows that share an x, so
-# a repeated x is ordinary there.
+# plotted and is refused. The subgroup charts sum or combine the rows that share
+# an x, so a repeated x is ordinary there.
 
 repeated <- function(times = 2L, subgroups = 12L) {
   return(data.frame(
@@ -62,6 +62,17 @@ test_that("the subgroup charts still sum the rows that share an x", {
     )
 
     expect_identical(nrow(result), 12L)
+  }
+})
+
+
+test_that("the Xbar, S and XbarS charts combine the rows that share an x", {
+  for (chart_type in c("Xbar", "S", "XbarS")) {
+    result <- analyse(repeated(times = 3L), chart_type)
+
+    expect_identical(nrow(result), 12L, info = chart_type)
+
+    expect_identical(result$n, rep(3L, 12L), info = chart_type)
   }
 })
 

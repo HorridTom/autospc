@@ -152,15 +152,20 @@ calculate_limits.autospc_chart_s <- function(chart,
 }
 
 
-#' Columns the limits table carries beside the series under analysis
+#' Control limits from a period's statistics
 #'
-#' The subgroup mean as supplied, and the subgroup size the limits are
-#' calculated at.
+#' Three standard errors either side of the centre line, with the lower limit no
+#' lower than zero, whether or not limits are being constrained: B3 is zero for
+#' a subgroup of fewer than six.
 #'
-#' @return character vector
+#' @return list of two numeric vectors named ucl and lcl
 #' @noRd
-limits_table_columns.autospc_chart_s <- function(chart) {
-  return(c("y", "n"))
+limits_from_statistics.autospc_chart_s <- function(chart, statistics, rows) {
+  limits <- NextMethod()
+
+  limits$lcl <- pmax(limits$lcl, 0)
+
+  return(limits)
 }
 
 
@@ -178,6 +183,18 @@ limit_bounds.autospc_chart_s <- function(chart) {
 }
 
 
+#' Columns the limits table carries beside the series under analysis
+#'
+#' The subgroup mean as supplied, and the subgroup size the limits are
+#' calculated at.
+#'
+#' @return character vector
+#' @noRd
+limits_table_columns.autospc_chart_s <- function(chart) {
+  return(c("y", "n"))
+}
+
+
 #' A period's standard deviation estimate at each of a set of rows
 #'
 #' The standard deviation of a subgroup's sample standard deviation, at each
@@ -187,23 +204,6 @@ limit_bounds.autospc_chart_s <- function(chart) {
 #' @noRd
 sd_estimate_at.autospc_chart_s <- function(chart, statistics, rows) {
   return(s_sd_estimate(sbar = statistics$cl, n = rows$n))
-}
-
-
-#' Control limits from a period's statistics
-#'
-#' Three standard errors either side of the centre line, with the lower limit no
-#' lower than zero, whether or not limits are being constrained: B3 is zero for
-#' a subgroup of fewer than six.
-#'
-#' @return list of two numeric vectors named ucl and lcl
-#' @noRd
-limits_from_statistics.autospc_chart_s <- function(chart, statistics, rows) {
-  limits <- NextMethod()
-
-  limits$lcl <- pmax(limits$lcl, 0)
-
-  return(limits)
 }
 
 

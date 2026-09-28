@@ -91,167 +91,6 @@ autospc_chart_xbar <- function(data,
 }
 
 
-# Analysis methods
-
-
-#' Round the subgroup sizes to whole numbers
-#'
-#' Where the data has no n column each row is one observation, and there is
-#' nothing to round.
-#'
-#' @return autospc_chart_xbar object
-#' @noRd
-round_counts.autospc_chart_xbar <- function(chart) {
-  chart$data <- round_subgroup_sizes(chart$data)
-
-  return(chart)
-}
-
-
-#' Aggregate data for analysis
-#'
-#' One row per subgroup, holding its mean `y`, size `n` and sample standard
-#' deviation `s`, combined from the rows that share an `x`.
-#'
-#' @return autospc_chart_xbar object
-#' @noRd
-aggregate_data.autospc_chart_xbar <- function(chart) {
-  return(aggregate_xbars_statistics(chart))
-}
-
-
-#' Calculate control limits for a subset of Xbar-chart data
-#'
-#' The centre line is the mean of the subgroup means weighted by subgroup size,
-#' and the standard deviation estimate at each subgroup is sbar over c4 at its
-#' size, following Provost and Murray.
-#'
-#' @return list of three vectors (cl, sd_estimate, sbar), each the same length
-#'   as period
-#' @noRd
-calculate_limits.autospc_chart_xbar <- function(chart,
-                                                period,
-                                                exclusion_points) {
-  return(get_xbar_statistics(
-    y = period$series,
-    n = period$n,
-    s = period$s,
-    exclusion_points = exclusion_points
-  ))
-}
-
-
-#' Columns the limits table carries beside the series under analysis
-#'
-#' The subgroup mean as supplied, and the subgroup size and standard deviation
-#' the limits are calculated from.
-#'
-#' @return character vector
-#' @noRd
-limits_table_columns.autospc_chart_xbar <- function(chart) {
-  return(c("y", "n", "s"))
-}
-
-
-#' The period statistics the limits table carries
-#'
-#' `sbar` as well as the standard deviation estimate, because the estimate
-#' varies with the subgroup size and is formed from `sbar` at each row.
-#'
-#' @return character vector
-#' @noRd
-period_statistics_columns.autospc_chart_xbar <- function(chart) {
-  return(c("sd_estimate", "sbar"))
-}
-
-
-#' A period's standard deviation estimate at each of a set of rows
-#'
-#' `sbar` over c4 at each row's subgroup size.
-#'
-#' @return numeric, one value per row of `rows`
-#' @noRd
-sd_estimate_at.autospc_chart_xbar <- function(chart, statistics, rows) {
-  return(xbar_sd_estimate(sbar = statistics$sbar, n = rows$n))
-}
-
-
-#' The standard error at each of a set of rows
-#'
-#' The standard error of a subgroup mean: the sd estimate over the square root
-#' of the subgroup size.
-#'
-#' @return numeric, one value per row of `rows`
-#' @noRd
-standard_error_at.autospc_chart_xbar <- function(chart, sd_estimate, rows) {
-  return(rep_len(sd_estimate, nrow(rows)) / sqrt(rows$n))
-}
-
-
-# Presentation methods
-
-#' Chart name
-#'
-#' @return string, name of chart for labels
-#' @noRd
-chart_type_label.autospc_chart_xbar <- function(chart) {
-  return("Xbar")
-}
-
-
-#' Rounding accuracy for centre line labels
-#'
-#' Four significant figures at the scale of the axis, because the values are in
-#' the units of the measure rather than percentages.
-#'
-#' @return number, passed to scales::number(accuracy =)
-#' @noRd
-label_accuracy.autospc_chart_xbar <- function(chart,
-                                              ylimhigh) {
-  accuracy <- 10^(ceiling(log10(ylimhigh)) - 4)
-
-  return(accuracy)
-}
-
-
-#' Lower and upper ends of the y axis
-#'
-#' @return list of two numbers, low and high
-#' @noRd
-y_axis_range.autospc_chart_xbar <- function(chart,
-                                            data) {
-  low <- min(data$lcl,
-    data$series,
-    na.rm = TRUE
-  )
-
-  if (sign(low) != -1) {
-    low <- low * 0.9
-  } else {
-    low <- low * 1.1
-  }
-
-  high <- max(data$ucl,
-    data$series,
-    na.rm = TRUE
-  ) * 1.1
-
-  return(list(
-    low = low,
-    high = high
-  ))
-}
-
-
-#' Retrieve default y axis label
-#'
-#' @return string
-#' @noRd
-y_axis_title.autospc_chart_xbar <- function(chart) {
-  return("Xbar")
-}
-
-
 # Helpers shared with autospc_chart_s
 
 
@@ -370,4 +209,165 @@ round_subgroup_sizes <- function(data) {
       "subgroup size, i.e. whole numbers only."
     )
   ))
+}
+
+
+# Analysis methods
+
+
+#' Round the subgroup sizes to whole numbers
+#'
+#' Where the data has no n column each row is one observation, and there is
+#' nothing to round.
+#'
+#' @return autospc_chart_xbar object
+#' @noRd
+round_counts.autospc_chart_xbar <- function(chart) {
+  chart$data <- round_subgroup_sizes(chart$data)
+
+  return(chart)
+}
+
+
+#' Aggregate data for analysis
+#'
+#' One row per subgroup, holding its mean `y`, size `n` and sample standard
+#' deviation `s`, combined from the rows that share an `x`.
+#'
+#' @return autospc_chart_xbar object
+#' @noRd
+aggregate_data.autospc_chart_xbar <- function(chart) {
+  return(aggregate_xbars_statistics(chart))
+}
+
+
+#' Calculate control limits for a subset of Xbar-chart data
+#'
+#' The centre line is the mean of the subgroup means weighted by subgroup size,
+#' and the standard deviation estimate at each subgroup is sbar over c4 at its
+#' size, following Provost and Murray.
+#'
+#' @return list of three vectors (cl, sd_estimate, sbar), each the same length
+#'   as period
+#' @noRd
+calculate_limits.autospc_chart_xbar <- function(chart,
+                                                period,
+                                                exclusion_points) {
+  return(get_xbar_statistics(
+    y = period$series,
+    n = period$n,
+    s = period$s,
+    exclusion_points = exclusion_points
+  ))
+}
+
+
+#' The standard error at each of a set of rows
+#'
+#' The standard error of a subgroup mean: the sd estimate over the square root
+#' of the subgroup size.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at.autospc_chart_xbar <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)) / sqrt(rows$n))
+}
+
+
+#' The period statistics the limits table carries
+#'
+#' `sbar` as well as the standard deviation estimate, because the estimate
+#' varies with the subgroup size and is formed from `sbar` at each row.
+#'
+#' @return character vector
+#' @noRd
+period_statistics_columns.autospc_chart_xbar <- function(chart) {
+  return(c("sd_estimate", "sbar"))
+}
+
+
+#' Columns the limits table carries beside the series under analysis
+#'
+#' The subgroup mean as supplied, and the subgroup size and standard deviation
+#' the limits are calculated from.
+#'
+#' @return character vector
+#' @noRd
+limits_table_columns.autospc_chart_xbar <- function(chart) {
+  return(c("y", "n", "s"))
+}
+
+
+#' A period's standard deviation estimate at each of a set of rows
+#'
+#' `sbar` over c4 at each row's subgroup size.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+sd_estimate_at.autospc_chart_xbar <- function(chart, statistics, rows) {
+  return(xbar_sd_estimate(sbar = statistics$sbar, n = rows$n))
+}
+
+
+# Presentation methods
+
+#' Chart name
+#'
+#' @return string, name of chart for labels
+#' @noRd
+chart_type_label.autospc_chart_xbar <- function(chart) {
+  return("Xbar")
+}
+
+
+#' Rounding accuracy for centre line labels
+#'
+#' Four significant figures at the scale of the axis, because the values are in
+#' the units of the measure rather than percentages.
+#'
+#' @return number, passed to scales::number(accuracy =)
+#' @noRd
+label_accuracy.autospc_chart_xbar <- function(chart,
+                                              ylimhigh) {
+  accuracy <- 10^(ceiling(log10(ylimhigh)) - 4)
+
+  return(accuracy)
+}
+
+
+#' Lower and upper ends of the y axis
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+y_axis_range.autospc_chart_xbar <- function(chart,
+                                            data) {
+  low <- min(data$lcl,
+    data$series,
+    na.rm = TRUE
+  )
+
+  if (sign(low) != -1) {
+    low <- low * 0.9
+  } else {
+    low <- low * 1.1
+  }
+
+  high <- max(data$ucl,
+    data$series,
+    na.rm = TRUE
+  ) * 1.1
+
+  return(list(
+    low = low,
+    high = high
+  ))
+}
+
+
+#' Retrieve default y axis label
+#'
+#' @return string
+#' @noRd
+y_axis_title.autospc_chart_xbar <- function(chart) {
+  return("Xbar")
 }

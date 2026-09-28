@@ -417,7 +417,7 @@ assemble_chart_list <- function(
 }
 
 
-# Methods
+# Analysis methods
 
 
 #' Round the count columns to whole numbers
@@ -459,6 +459,13 @@ prepare_data.autospc_chart <- function(chart) {
 }
 
 
+#' @noRd
+observed_rows.autospc_chart <- function(chart,
+                                        data) {
+  return(!is.na(data$series))
+}
+
+
 #' Number of points available for analysis
 #'
 #' The non-missing values of `series`.
@@ -475,10 +482,64 @@ n_effective_points.autospc_chart <- function(chart,
 }
 
 
+#' Control limits from a period's statistics
+#'
+#' Three standard errors either side of the centre line. Overridden by the
+#' moving range chart, whose lower limit is defined differently.
+#'
+#' @return list of two numeric vectors named ucl and lcl
 #' @noRd
-observed_rows.autospc_chart <- function(chart,
-                                        data) {
-  return(!is.na(data$series))
+limits_from_statistics.autospc_chart <- function(chart, statistics, rows) {
+  half_width <- 3 * standard_error_at(
+    chart = chart,
+    sd_estimate = statistics$sd_estimate,
+    rows = rows
+  )
+
+  return(list(
+    ucl = statistics$cl + half_width,
+    lcl = statistics$cl - half_width
+  ))
+}
+
+
+#' The standard error at each of a set of rows
+#'
+#' The estimate itself, at every row. Overridden by the classes whose limits
+#' vary with the denominator.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+standard_error_at.autospc_chart <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)))
+}
+
+
+#' The range the plotted statistic can take
+#'
+#' No bound, which is right for an individuals value and is the safe answer for
+#' a class that has not said otherwise. Overridden by the classes whose
+#' statistic is a count, a moving range or a percentage.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart <- function(chart) {
+  return(list(
+    low = -Inf,
+    high = Inf
+  ))
+}
+
+
+#' The period statistics a limits table carries beside the limits
+#'
+#' The standard deviation estimate. Overridden by the classes whose estimate
+#' varies with the subgroup size.
+#'
+#' @return character vector
+#' @noRd
+period_statistics_columns.autospc_chart <- function(chart) {
+  return("sd_estimate")
 }
 
 
@@ -491,6 +552,17 @@ observed_rows.autospc_chart <- function(chart,
 #' @noRd
 limits_table_columns.autospc_chart <- function(chart) {
   return("y")
+}
+
+
+#' A period's standard deviation estimate at each of a set of rows
+#'
+#' The period's one estimate, at every row.
+#'
+#' @return numeric, one value per row of `rows`
+#' @noRd
+sd_estimate_at.autospc_chart <- function(chart, statistics, rows) {
+  return(rep_len(statistics$sd_estimate, nrow(rows)))
 }
 
 
@@ -559,78 +631,6 @@ labels_stay_above.autospc_chart <- function(chart) {
 #' @noRd
 upper_annotation_sf_default.autospc_chart <- function(chart) {
   return(1.1)
-}
-
-
-#' The range the plotted statistic can take
-#'
-#' No bound, which is right for an individuals value and is the safe answer for
-#' a class that has not said otherwise. Overridden by the classes whose
-#' statistic is a count, a moving range or a percentage.
-#'
-#' @return list of two numbers, low and high
-#' @noRd
-limit_bounds.autospc_chart <- function(chart) {
-  return(list(
-    low = -Inf,
-    high = Inf
-  ))
-}
-
-
-#' A period's standard deviation estimate at each of a set of rows
-#'
-#' The period's one estimate, at every row.
-#'
-#' @return numeric, one value per row of `rows`
-#' @noRd
-sd_estimate_at.autospc_chart <- function(chart, statistics, rows) {
-  return(rep_len(statistics$sd_estimate, nrow(rows)))
-}
-
-
-#' The period statistics a limits table carries beside the limits
-#'
-#' The standard deviation estimate. Overridden by the classes whose estimate
-#' varies with the subgroup size.
-#'
-#' @return character vector
-#' @noRd
-period_statistics_columns.autospc_chart <- function(chart) {
-  return("sd_estimate")
-}
-
-
-#' The standard error at each of a set of rows
-#'
-#' The estimate itself, at every row. Overridden by the classes whose limits
-#' vary with the denominator.
-#'
-#' @return numeric, one value per row of `rows`
-#' @noRd
-standard_error_at.autospc_chart <- function(chart, sd_estimate, rows) {
-  return(rep_len(sd_estimate, nrow(rows)))
-}
-
-
-#' Control limits from a period's statistics
-#'
-#' Three standard errors either side of the centre line. Overridden by the
-#' moving range chart, whose lower limit is defined differently.
-#'
-#' @return list of two numeric vectors named ucl and lcl
-#' @noRd
-limits_from_statistics.autospc_chart <- function(chart, statistics, rows) {
-  half_width <- 3 * standard_error_at(
-    chart = chart,
-    sd_estimate = statistics$sd_estimate,
-    rows = rows
-  )
-
-  return(list(
-    ucl = statistics$cl + half_width,
-    lcl = statistics$cl - half_width
-  ))
 }
 
 

@@ -276,15 +276,15 @@ calculate_limits.autospc_chart_p <- function(chart,
 }
 
 
-#' Columns the limits table carries beside the series under analysis
+#' The standard error at each of a set of rows
 #'
-#' The count and the denominator, because the limits of this class are
-#' calculated from both rather than from the percentages it plots.
+#' The estimate is free of the denominator, so each row's standard error is the
+#' estimate over the square root of that row's denominator.
 #'
-#' @return character vector
+#' @return numeric, one value per row of `rows`
 #' @noRd
-limits_table_columns.autospc_chart_p <- function(chart) {
-  return(c("y", "n"))
+standard_error_at.autospc_chart_p <- function(chart, sd_estimate, rows) {
+  return(rep_len(sd_estimate, nrow(rows)) / sqrt(rows$n))
 }
 
 
@@ -303,15 +303,15 @@ limit_bounds.autospc_chart_p <- function(chart) {
 }
 
 
-#' The standard error at each of a set of rows
+#' Columns the limits table carries beside the series under analysis
 #'
-#' The estimate is free of the denominator, so each row's standard error is the
-#' estimate over the square root of that row's denominator.
+#' The count and the denominator, because the limits of this class are
+#' calculated from both rather than from the percentages it plots.
 #'
-#' @return numeric, one value per row of `rows`
+#' @return character vector
 #' @noRd
-standard_error_at.autospc_chart_p <- function(chart, sd_estimate, rows) {
-  return(rep_len(sd_estimate, nrow(rows)) / sqrt(rows$n))
+limits_table_columns.autospc_chart_p <- function(chart) {
+  return(c("y", "n"))
 }
 
 

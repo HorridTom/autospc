@@ -114,23 +114,6 @@ prepare_data.autospc_chart_mr <- function(chart) {
 }
 
 
-#' Number of points available for analysis
-#'
-#' One more than the non-missing moving ranges. `moving_ranges()` prepends `NA`,
-#' so an MR series always has exactly one fewer non-missing value than the
-#' series it was derived from, and the algorithm's data-sufficiency checks are
-#' about that underlying series.
-#'
-#' @return integer
-#' @noRd
-n_effective_points.autospc_chart_mr <- function(chart,
-                                                data) {
-  points <- NextMethod() + 1L
-
-  return(points)
-}
-
-
 #' The rows of a prepared MR series that hold an observation
 #'
 #' The first row of an MR series holds no moving range because there is no
@@ -146,6 +129,23 @@ observed_rows.autospc_chart_mr <- function(chart,
   observed[1L] <- TRUE
 
   return(observed)
+}
+
+
+#' Number of points available for analysis
+#'
+#' One more than the non-missing moving ranges. `moving_ranges()` prepends `NA`,
+#' so an MR series always has exactly one fewer non-missing value than the
+#' series it was derived from, and the algorithm's data-sufficiency checks are
+#' about that underlying series.
+#'
+#' @return integer
+#' @noRd
+n_effective_points.autospc_chart_mr <- function(chart,
+                                                data) {
+  points <- NextMethod() + 1L
+
+  return(points)
 }
 
 
@@ -176,20 +176,6 @@ calculate_limits.autospc_chart_mr <- function(chart,
 }
 
 
-#' The range a moving range can take
-#'
-#' A moving range cannot be negative, and has no upper bound.
-#'
-#' @return list of two numbers, low and high
-#' @noRd
-limit_bounds.autospc_chart_mr <- function(chart) {
-  return(list(
-    low = 0,
-    high = Inf
-  ))
-}
-
-
 #' Control limits from a period's statistics
 #'
 #' The upper limit is three standard errors above the centre line, as for every
@@ -206,6 +192,20 @@ limits_from_statistics.autospc_chart_mr <- function(chart, statistics, rows) {
   limits$lcl <- rep_len(0, length(limits$lcl))
 
   return(limits)
+}
+
+
+#' The range a moving range can take
+#'
+#' A moving range cannot be negative, and has no upper bound.
+#'
+#' @return list of two numbers, low and high
+#' @noRd
+limit_bounds.autospc_chart_mr <- function(chart) {
+  return(list(
+    low = 0,
+    high = Inf
+  ))
 }
 
 

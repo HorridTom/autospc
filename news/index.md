@@ -1,5 +1,16 @@
 # Changelog
 
+## autospc 0.1.0.9027
+
+### `facet_stages()` accepts chart type as a variable for paired chart types
+
+[`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+facets a paired chart (`"XMR"` or `"XbarS"`) as its location chart only.
+Where the chart type was held in a variable or given as an expression,
+e.g. `chart_type = my_type`, rather than written in the call, this
+failed with “No autospc_chart class for chart_type”. It now works
+regardless of how the chart type is given (#302).
+
 ## autospc 0.1.0.9026
 
 ### XbarS charts

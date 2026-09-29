@@ -3,6 +3,7 @@ test_that("Consecutive opposite shifts are considered distinct", {
     x = month_start,
     y = within_4h,
     chart_type = "C'",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 

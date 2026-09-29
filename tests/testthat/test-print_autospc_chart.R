@@ -74,7 +74,7 @@ test_that("print reports exclusions and candidates in the plural", {
   plot <- suppressWarnings(
     autospc(ed_attendances_monthly,
       chart_type = "C'", x = month_start,
-      y = att_all, period_min = 21L
+      y = att_all, period_min = 21L, max_exclusions = 3L
     )
   )
 

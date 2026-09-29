@@ -2,7 +2,8 @@ test_data <- readRDS("testdata/test_data.rds")
 
 test_that("Linetypes are formed correctly", {
   test_plt <- autospc(test_data,
-    chart_type = "C'"
+    chart_type = "C'",
+    max_exclusions = 3L
   )
 
   # layer 1 holds the centre line and control limits
@@ -51,7 +52,8 @@ test_that("the centre line is drawn thicker than the limits and the series", {
   # the widths are keyed by plotted_line, so a mistake there would give one of
   # the four lines another's width with nothing to say so
   test_plt <- autospc(test_data,
-    chart_type = "C'"
+    chart_type = "C'",
+    max_exclusions = 3L
   )
 
   limits <- ggplot2::layer_data(test_plt, 1)

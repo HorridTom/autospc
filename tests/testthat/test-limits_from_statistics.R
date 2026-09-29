@@ -18,7 +18,7 @@ statistics_series <- function() {
 analysed <- function(chart_type, ...) {
   return(suppressWarnings(autospc(statistics_series(),
     chart_type = chart_type, x = x, y = y, period_min = 21L,
-    plot_chart = FALSE, ...
+    max_exclusions = 3L, plot_chart = FALSE, ...
   )))
 }
 
@@ -100,7 +100,7 @@ test_that("extension rows are formed from the estimate the table carries", {
   for (chart_type in c("P", "P'")) {
     table <- suppressWarnings(autospc(data,
       chart_type = chart_type, x = x, y = y, n = n, period_min = 21L,
-      extend_limits_to = 50L, plot_chart = FALSE
+      max_exclusions = 3L, extend_limits_to = 50L, plot_chart = FALSE
     ))
 
     calculated <- table[table$period_type == "calculation", ]

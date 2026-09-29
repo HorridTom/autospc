@@ -1,12 +1,14 @@
 test_that("Annotation is completed regardless of basic_annotations", {
   result_f <- autospc(example_series_1,
     chart_type = "XMR",
+    max_exclusions = 3L,
     basic_annotations = FALSE,
     annotation_arrows = TRUE
   )
 
   result_t <- autospc(example_series_1,
     chart_type = "XMR",
+    max_exclusions = 3L,
     basic_annotations = TRUE
   )
 

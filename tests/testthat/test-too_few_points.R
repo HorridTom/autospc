@@ -242,6 +242,7 @@ test_that("a short series returns the columns a full one does", {
         chart_type = chart_type,
         x = "x", y = "y", n = "n", s = "s",
         period_min = 21L,
+        max_exclusions = 3L,
         plot_chart = FALSE
       )
     ))

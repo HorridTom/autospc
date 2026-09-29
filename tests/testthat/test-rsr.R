@@ -10,6 +10,7 @@ test_that("establish_every_shift works correctly", {
     x = Month_Start,
     y = Total_Att,
     establish_every_shift = TRUE,
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 

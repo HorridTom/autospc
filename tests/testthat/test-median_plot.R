@@ -81,6 +81,7 @@ test_that("the series of medians being plotted are correctly calculated when flo
   # Create and store XmR chart
   auto_median_result <- autospc::autospc(test_data_with_rule2_break,
     chart_type = "X",
+    max_exclusions = 3L,
     floating_median = "auto",
     floating_median_n = test_median_n
   )

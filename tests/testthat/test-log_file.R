@@ -17,7 +17,7 @@ written_log <- function(...) {
 
   suppressWarnings(
     autospc(log_file_data,
-      period_min = 21L, plot_chart = FALSE,
+      period_min = 21L, max_exclusions = 3L, plot_chart = FALSE,
       log_file_path = path, ...
     )
   )
@@ -77,7 +77,7 @@ test_that("a faceted chart writes one entry per stage", {
     facet_stages(log_file_data,
       split_at = c(20L, 40L, 60L),
       chart_type = "C", period_min = 21L, plot_chart = FALSE,
-      log_file_path = path
+      max_exclusions = 3L, log_file_path = path
     )
   )
 
@@ -95,7 +95,7 @@ test_that("named split_at name the stages in the log", {
     facet_stages(log_file_data,
       split_at = c(first = 20L, second = 40L, third = 60L),
       chart_type = "C", period_min = 21L, plot_chart = FALSE,
-      log_file_path = path
+      max_exclusions = 3L, log_file_path = path
     )
   )
 
@@ -111,7 +111,7 @@ test_that("a csv log file is written too", {
 
   suppressWarnings(
     autospc(log_file_data,
-      chart_type = "XMR", period_min = 21L,
+      chart_type = "XMR", period_min = 21L, max_exclusions = 3L,
       plot_chart = FALSE, log_file_path = path
     )
   )
@@ -130,7 +130,7 @@ test_that("an unusable extension warns and writes nothing", {
 
   withCallingHandlers(
     autospc(log_file_data,
-      chart_type = "C", period_min = 21L,
+      chart_type = "C", period_min = 21L, max_exclusions = 3L,
       plot_chart = FALSE, log_file_path = path
     ),
     warning = function(w) {
@@ -150,7 +150,7 @@ test_that("no file is written when no path is given", {
 
   suppressWarnings(
     autospc(log_file_data,
-      chart_type = "C", period_min = 21L,
+      chart_type = "C", period_min = 21L, max_exclusions = 3L,
       plot_chart = FALSE
     )
   )

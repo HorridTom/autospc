@@ -12,7 +12,7 @@ repeated <- function(times = 2L, subgroups = 12L) {
 analyse <- function(d, chart_type) {
   return(autospc(d,
     chart_type = chart_type, x = "x", y = "y",
-    plot_chart = FALSE, period_min = 10L
+    plot_chart = FALSE, period_min = 10L, max_exclusions = 3L
   ))
 }
 

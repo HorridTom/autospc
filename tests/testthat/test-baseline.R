@@ -5,6 +5,7 @@ test_that("baseline_length sets the first period and the limits it gives", {
     x = month_start,
     y = att_all,
     period_min = 21L,
+    max_exclusions = 3L,
     baseline_length = 63L,
     plot_chart = FALSE
   )
@@ -90,6 +91,7 @@ analysed_ed <- function(...) {
     x = month_start,
     y = att_all,
     period_min = 21L,
+    max_exclusions = 3L,
     plot_chart = FALSE,
     ...
   )

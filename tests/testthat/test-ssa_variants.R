@@ -23,6 +23,7 @@ test_that(
   {
     result_ssa <- autospc(example_series_1[1:96, ],
       chart_type = "XMR",
+      max_exclusions = 3L,
       plot_chart = FALSE,
       no_regrets = TRUE,
       overhanging_reversions = TRUE
@@ -30,6 +31,7 @@ test_that(
 
     result_nRF_oRT <- autospc(example_series_1[1:96, ],
       chart_type = "XMR",
+      max_exclusions = 3L,
       plot_chart = FALSE,
       no_regrets = FALSE,
       overhanging_reversions = TRUE
@@ -37,6 +39,7 @@ test_that(
 
     result_nRF_oRF <- autospc(example_series_1[1:96, ],
       chart_type = "XMR",
+      max_exclusions = 3L,
       plot_chart = FALSE,
       no_regrets = FALSE,
       overhanging_reversions = FALSE
@@ -74,6 +77,7 @@ test_that(
   {
     result_ssa <- autospc(example_series_1,
       chart_type = "XMR",
+      max_exclusions = 3L,
       plot_chart = FALSE,
       no_regrets = TRUE,
       overhanging_reversions = TRUE
@@ -81,6 +85,7 @@ test_that(
 
     result_nRF_oRT <- autospc(example_series_1,
       chart_type = "XMR",
+      max_exclusions = 3L,
       plot_chart = FALSE,
       no_regrets = FALSE,
       overhanging_reversions = TRUE
@@ -88,6 +93,7 @@ test_that(
 
     result_nRF_oRF <- autospc(example_series_1,
       chart_type = "XMR",
+      max_exclusions = 3L,
       plot_chart = FALSE,
       no_regrets = FALSE,
       overhanging_reversions = FALSE
@@ -127,6 +133,7 @@ test_that("warning is issued if incompatible variant requested", {
       chart_type = "C'",
       x = month_start,
       y = att_all,
+      max_exclusions = 3L,
       no_regrets = TRUE,
       overhanging_reversions = FALSE
     ),

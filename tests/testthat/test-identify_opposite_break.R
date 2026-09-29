@@ -113,6 +113,7 @@ test_that("Opposite rule break after candidate calc period doesn't prevent re-es
   test_op_break6 <- autospc(test_op_break6_data,
     no_regrets = TRUE,
     chart_type = "C'",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 

@@ -18,7 +18,7 @@ double_counts <- data.frame(
 analysed <- function(data, chart_type) {
   suppressWarnings(
     autospc(data,
-      chart_type = chart_type, period_min = 21L,
+      chart_type = chart_type, period_min = 21L, max_exclusions = 3L,
       plot_chart = FALSE
     )
   )

@@ -7,6 +7,7 @@ test_that("facet_stages produces correct data output", {
     chart_type = "C'",
     x = month_start,
     y = att_all,
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 
@@ -16,6 +17,7 @@ test_that("facet_stages produces correct data output", {
     chart_type = "C'",
     x = month_start,
     y = att_all,
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 
@@ -85,6 +87,7 @@ test_that("", {
     chart_type = "C'",
     x = month_start,
     y = att_all,
+    max_exclusions = 3L,
     plot_chart = TRUE
   )
 
@@ -107,6 +110,7 @@ test_that("facet_stages works when relying on x,y columns in data", {
     ),
     split_at = c(30L, 60L),
     chart_type = "XMR",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 

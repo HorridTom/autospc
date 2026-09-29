@@ -24,7 +24,7 @@ counts <- function(missing_at = integer(0)) {
 analyse <- function(d, chart_type, ...) {
   return(autospc(d,
     chart_type = chart_type, x = "x", y = "y",
-    plot_chart = FALSE, period_min = 21L, ...
+    plot_chart = FALSE, period_min = 21L, max_exclusions = 3L, ...
   ))
 }
 
@@ -101,7 +101,7 @@ test_that("a row is discarded when its denominator has no value", {
   )
 
   discarded <- autospc(d,
-    chart_type = "P\'", x = "x", y = "y", n = "n",
+    chart_type = "P\'", x = "x", y = "y", n = "n", max_exclusions = 3L,
     plot_chart = FALSE, period_min = 21L, aggregation_na_rm = TRUE
   )
 

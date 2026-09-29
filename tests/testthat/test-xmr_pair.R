@@ -14,7 +14,9 @@ pair_titled$subtitle <- "Also from the data"
 
 run_pair <- function(data = pair_data, ...) {
   suppressWarnings(
-    autospc(data, chart_type = "XMR", period_min = 21L, ...)
+    autospc(data,
+      chart_type = "XMR", period_min = 21L, max_exclusions = 3L, ...
+    )
   )
 }
 
@@ -121,7 +123,9 @@ test_that("the MR chart of the pair is the one a standalone MR run gives", {
   pair_mr <- autospc_plot_charts(run_pair())[[2]]
 
   alone <- suppressWarnings(
-    autospc(pair_data, chart_type = "MR", period_min = 21L)
+    autospc(pair_data,
+      chart_type = "MR", period_min = 21L, max_exclusions = 3L
+    )
   )
 
   expect_equal(
@@ -145,7 +149,10 @@ test_that("XMR survives being called from a wrapper that forwards ...", {
 
   expect_no_error(
     suppressWarnings(
-      wrapper(pair_data, chart_type = "XMR", x = x, y = y, period_min = 21L)
+      wrapper(pair_data,
+        chart_type = "XMR", x = x, y = y, period_min = 21L,
+        max_exclusions = 3L
+      )
     )
   )
 })

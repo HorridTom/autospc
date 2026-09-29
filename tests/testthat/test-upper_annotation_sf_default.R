@@ -28,6 +28,7 @@ plot_table <- function(data, chart_type, ...) {
     autospc(data,
       chart_type = chart_type,
       period_min = 21L,
+      max_exclusions = 3L,
       ...
     )
   )

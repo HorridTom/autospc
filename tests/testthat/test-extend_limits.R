@@ -505,6 +505,7 @@ test_that("a P' extension uses the final period's standard deviation estimate", 
     x = "month_start",
     y = "within_4h",
     n = "att_all",
+    max_exclusions = 3L,
     plot_chart = FALSE,
     extend_limits_to = as.Date("2018-06-01")
   )

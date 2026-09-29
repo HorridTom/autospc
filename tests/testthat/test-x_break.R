@@ -1,16 +1,19 @@
 test_that("Integer x breaks are as specified by x_break", {
   plot_10 <- autospc(example_series_1,
     chart_type = "X",
+    max_exclusions = 3L,
     x_break = 10
   )
 
   plot_20 <- autospc(example_series_1,
     chart_type = "X",
+    max_exclusions = 3L,
     x_break = 20
   )
 
   plot_5 <- autospc(example_series_1,
     chart_type = "X",
+    max_exclusions = 3L,
     x_break = 5
   )
 

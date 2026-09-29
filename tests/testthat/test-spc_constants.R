@@ -30,14 +30,16 @@ test_that("a value other than TRUE leaves the exact constants in use", {
 
 test_that("the rounded constants give slightly wider X chart limits", {
   exact <- autospc(example_series_1,
-    chart_type = "X", period_min = 21L, plot_chart = FALSE
+    chart_type = "X", period_min = 21L, plot_chart = FALSE,
+    max_exclusions = 3L
   )
 
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
   rounded <- autospc(example_series_1,
-    chart_type = "X", period_min = 21L, plot_chart = FALSE
+    chart_type = "X", period_min = 21L, plot_chart = FALSE,
+    max_exclusions = 3L
   )
 
   # sigma is the mean moving range over d2, so a smaller d2 widens the limits
@@ -51,14 +53,16 @@ test_that("the rounded constants give slightly wider X chart limits", {
 
 test_that("the rounded constants give a slightly higher MR upper limit", {
   exact <- autospc(example_series_1,
-    chart_type = "MR", period_min = 21L, plot_chart = FALSE
+    chart_type = "MR", period_min = 21L, plot_chart = FALSE,
+    max_exclusions = 3L
   )
 
   previous <- options(autospc.rounded_constants = TRUE)
   on.exit(options(previous))
 
   rounded <- autospc(example_series_1,
-    chart_type = "MR", period_min = 21L, plot_chart = FALSE
+    chart_type = "MR", period_min = 21L, plot_chart = FALSE,
+    max_exclusions = 3L
   )
 
   expect_equal(

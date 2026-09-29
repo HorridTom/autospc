@@ -149,7 +149,10 @@ positive shift rule break arising from missing data; FALSE minimises the risk
 of a false negative.}
 
 \item{max_exclusions}{The maximum number of extreme points to exclude from
-limit calculations.}
+limit calculations. The default will change from 3 to 0 in autospc 0.3.0, so
+that points are excluded only where the caller asks for it. Until then, a
+call that leaves \code{max_exclusions} unset and excludes points warns that its
+results will change.}
 
 \item{highlight_exclusions}{Boolean signifying whether excluded points are
 greyed out.}
@@ -308,7 +311,8 @@ autospc(
   ed_attendances_monthly,
   chart_type = "C'",
   x = month_start,
-  y = att_all
+  y = att_all,
+  max_exclusions = 3L
 )
 
 # Using a P' chart to track changes in the percentage admitted within 4 hours
@@ -317,7 +321,8 @@ autospc(
   chart_type = "P'",
   x = month_start,
   y = within_4h,
-  n = att_all
+  n = att_all,
+  max_exclusions = 3L
 )
 
 # using a shift_rule_threshold of 7 when tracking monthly attendance
@@ -326,6 +331,7 @@ autospc(
   chart_type = "C'",
   x = month_start,
   y = att_all,
+  max_exclusions = 3L,
   shift_rule_threshold = 7
 )
 

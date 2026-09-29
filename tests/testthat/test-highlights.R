@@ -11,6 +11,7 @@ highlights_data2 <- readRDS("testdata/test_highlights_data2.rds")
 test_that("a rule 2 highlight does not run across a period boundary", {
   result <- autospc(highlights_data,
     chart_type = "C'",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 
@@ -40,6 +41,7 @@ test_that("a rule 2 highlight does not appear at the end of a period", {
   # wrongly placed at a period end has more chances to appear
   result <- autospc(highlights_data2,
     chart_type = "C'",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 
@@ -64,7 +66,10 @@ test_that("the exclusion mark is added when a plot is drawn", {
   # highlight_exclusions is a visualisation parameter, so the mark it asks for
   # is put on the table the plot is drawn from rather than on the analysis. The
   # wording of the mark is not the subject here, so it is not asserted
-  drawn <- autospc(highlights_data, chart_type = "C'")$data
+  drawn <- autospc(highlights_data,
+    chart_type = "C'",
+    max_exclusions = 3L
+  )$data
 
   excluded_marks <- unique(drawn$highlight[which(drawn$excluded)])
 
@@ -74,6 +79,7 @@ test_that("the exclusion mark is added when a plot is drawn", {
 
   not_drawn <- autospc(highlights_data,
     chart_type = "C'",
+    max_exclusions = 3L,
     highlight_exclusions = FALSE
   )$data
 

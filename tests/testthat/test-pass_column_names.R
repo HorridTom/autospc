@@ -9,6 +9,7 @@ test_that("Renaming columns doesn't change the result", {
 
   result1 <- autospc(test_data1,
     chart_type = "C'",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 
@@ -16,6 +17,7 @@ test_that("Renaming columns doesn't change the result", {
     x = month,
     y = count,
     chart_type = "C'",
+    max_exclusions = 3L,
     plot_chart = FALSE
   )
 

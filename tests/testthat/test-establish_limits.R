@@ -248,11 +248,13 @@ test_that("the columns come back in one order whatever route is taken", {
   # point in the analysis from one holding a single calculation period, so the
   # two routes are compared against each other.
   re_established <- suppressWarnings(autospc(ed_attendances_monthly,
-    chart_type = "C", x = month_start, y = att_all, plot_chart = FALSE
+    chart_type = "C", x = month_start, y = att_all, plot_chart = FALSE,
+    max_exclusions = 3L
   ))
 
   one_period <- suppressWarnings(autospc(ed_attendances_monthly[1:30, ],
-    chart_type = "C", x = month_start, y = att_all, plot_chart = FALSE
+    chart_type = "C", x = month_start, y = att_all, plot_chart = FALSE,
+    max_exclusions = 3L
   ))
 
   expect_identical(names(one_period), names(re_established))

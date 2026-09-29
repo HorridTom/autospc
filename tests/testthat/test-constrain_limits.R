@@ -33,7 +33,8 @@ proportion_data <- data.frame(
 
 p_chart <- function(...) {
   return(suppressWarnings(autospc(high_p_data(),
-    chart_type = "P", x = x, y = y, n = n, period_min = 21L, ...
+    chart_type = "P", x = x, y = y, n = n, period_min = 21L,
+    max_exclusions = 3L, ...
   )))
 }
 

@@ -85,12 +85,14 @@ test_that("a subgroup with no attendances and no events draws", {
   # a week with no patients at a small clinic: no denominator and no numerator,
   # so no proportion, and the limits carry across it
   result2 <- autospc(test_data2,
-    chart_type = "P'", plot_chart = FALSE, period_min = 21
+    chart_type = "P'", plot_chart = FALSE, period_min = 21,
+    max_exclusions = 3L
   ) %>%
     dplyr::select(x, series, y, n, ucl, lcl, cl)
 
   result3 <- autospc(test_data3,
-    chart_type = "P'", plot_chart = FALSE, period_min = 21
+    chart_type = "P'", plot_chart = FALSE, period_min = 21,
+    max_exclusions = 3L
   ) %>%
     dplyr::select(x, series, y, n, ucl, lcl, cl)
 

@@ -43,6 +43,7 @@ test_that("mR chart created without error", {
   expect_no_error(
     chart <- autospc(mr_data,
       chart_type = "MR",
+      max_exclusions = 3L,
       plot_chart = TRUE
     )
   )
@@ -52,18 +53,21 @@ test_that("mr_screen_max_loops makes no difference to mr chart limits", {
   results_table_0 <- autospc(extreme_mr_data,
     chart_type = "MR",
     plot_chart = FALSE,
+    max_exclusions = 3L,
     mr_screen_max_loops = 0
   )
 
   results_table_1 <- autospc(extreme_mr_data,
     chart_type = "MR",
     plot_chart = FALSE,
+    max_exclusions = 3L,
     mr_screen_max_loops = 1
   )
 
   results_table_inf <- autospc(extreme_mr_data,
     chart_type = "MR",
     plot_chart = FALSE,
+    max_exclusions = 3L,
     mr_screen_max_loops = Inf
   )
 

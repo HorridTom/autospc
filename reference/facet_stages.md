@@ -63,6 +63,7 @@ facet_stages(
   chart_type = "C'",
   x = month_start,
   y = att_all,
+  max_exclusions = 3L,
   x_break = 365
 )
 

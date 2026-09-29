@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9027</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,6 +127,7 @@ on this dataset see <code><a href="../reference/ed_attendances_monthly.html">?ed
 <span>  y <span class="op">=</span> <span class="va">att_all</span>,</span>
 <span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
 <span>  period_min <span class="op">=</span> <span class="fl">24</span>,</span>
+<span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  use_caption <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_break <span class="op">=</span> <span class="fl">91.25</span>,</span>
 <span>  x_date_format <span class="op">=</span> <span class="st">"%Y-%b"</span>,</span>
@@ -271,6 +272,7 @@ Figure 3.2: Example 2
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2a</span>,</span>
 <span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
 <span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -313,6 +315,7 @@ Figure 3.4: Example 4
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2b</span>,</span>
 <span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
 <span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  extend_limits_to <span class="op">=</span> <span class="fl">47L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -331,6 +334,7 @@ overhanging reversion commencing on day 40, against the candidate limits.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">example_series_2c</span>,</span>
 <span>  override_y_title <span class="op">=</span> <span class="st">"Count"</span>,</span>
 <span>  chart_type <span class="op">=</span> <span class="st">"C"</span>,</span>
+<span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  establish_every_shift <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -440,6 +444,7 @@ detail).</p>
 <span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">month_start</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">att_all</span>,</span>
+<span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  verbosity <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  x_break <span class="op">=</span> <span class="fl">365</span>,</span>
 <span>  x_date_format <span class="op">=</span> <span class="st">"%Y-%b"</span>,</span>

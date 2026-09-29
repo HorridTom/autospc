@@ -192,7 +192,10 @@ autospc(
 - max_exclusions:
 
   The maximum number of extreme points to exclude from limit
-  calculations.
+  calculations. The default will change from 3 to 0 in autospc 0.3.0, so
+  that points are excluded only where the caller asks for it. Until
+  then, a call that leaves `max_exclusions` unset and excludes points
+  warns that its results will change.
 
 - highlight_exclusions:
 
@@ -419,7 +422,8 @@ autospc(
   ed_attendances_monthly,
   chart_type = "C'",
   x = month_start,
-  y = att_all
+  y = att_all,
+  max_exclusions = 3L
 )
 #> Registered S3 methods overwritten by 'ggpp':
 #>   method                  from   
@@ -433,7 +437,8 @@ autospc(
   chart_type = "P'",
   x = month_start,
   y = within_4h,
-  n = att_all
+  n = att_all,
+  max_exclusions = 3L
 )
 
 
@@ -443,6 +448,7 @@ autospc(
   chart_type = "C'",
   x = month_start,
   y = att_all,
+  max_exclusions = 3L,
   shift_rule_threshold = 7
 )
 

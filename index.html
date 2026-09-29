@@ -34,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9027</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,7 +103,8 @@
 <pre><code><span><span class="fu"><a href="reference/autospc.html">autospc</a></span><span class="op">(</span><span class="va">ed_attendances_monthly</span>,</span>
 <span>                chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span>
 <span>                x <span class="op">=</span> <span class="va">month_start</span>,</span>
-<span>                y <span class="op">=</span> <span class="va">att_all</span><span class="op">)</span></span></code></pre>
+<span>                y <span class="op">=</span> <span class="va">att_all</span>,</span>
+<span>                max_exclusions <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span></span></code></pre>
 <p>For a <strong>P or P’</strong> chart the data must have the following columns:</p>
 <ul>
 <li><p>Your x-axis variable: date, POSIXct, numeric or integer type. The name of this column can be specified in the <code>x</code> argument of <code><a href="reference/autospc.html">autospc()</a></code>.</p></li>
@@ -115,7 +116,8 @@
 <span>                chart_type <span class="op">=</span> <span class="st">"P'"</span>,</span>
 <span>                x <span class="op">=</span> <span class="va">month_start</span>,</span>
 <span>                y <span class="op">=</span> <span class="va">within_4h</span>,</span>
-<span>                n <span class="op">=</span> <span class="va">att_all</span><span class="op">)</span></span></code></pre>
+<span>                n <span class="op">=</span> <span class="va">att_all</span>,</span>
+<span>                max_exclusions <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span></span></code></pre>
 <p>The parameters of the Stable Shift Algorithm, and the appearance of the chart, can be configured through various arguments. Use <code><a href="reference/autospc.html">?autospc::autospc</a></code> to find out more.</p>
 <div class="section level3">
 <h3 id="analysis-output-as-a-table">Analysis output as a table<a class="anchor" aria-label="anchor" href="#analysis-output-as-a-table"></a>
@@ -126,6 +128,7 @@
 <span>                              x <span class="op">=</span> <span class="va">month_start</span>,</span>
 <span>                              y <span class="op">=</span> <span class="va">within_4h</span>,</span>
 <span>                              n <span class="op">=</span> <span class="va">att_all</span>,</span>
+<span>                              max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>                              plot_chart <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">limits_table</span>,</span>

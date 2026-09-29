@@ -56,6 +56,7 @@ facet_stages(
   y = att_all,
   chart_type = "C'",
   period_min = 24,
+  max_exclusions = 3L,
   use_caption = FALSE,
   x_break = 91.25,
   x_date_format = "%Y-%b",
@@ -210,6 +211,7 @@ Figure 3.2: Example 2
 autospc(example_series_2a,
   override_y_title = "Count",
   chart_type = "C",
+  max_exclusions = 3L,
   extend_limits_to = 47L
 )
 ```
@@ -255,6 +257,7 @@ Figure 3.4: Example 4
 autospc(example_series_2b,
   override_y_title = "Count",
   chart_type = "C",
+  max_exclusions = 3L,
   establish_every_shift = TRUE,
   extend_limits_to = 47L
 )
@@ -276,6 +279,7 @@ candidate limits.
 autospc(example_series_2c,
   override_y_title = "Count",
   chart_type = "C",
+  max_exclusions = 3L,
   establish_every_shift = TRUE
 )
 ```
@@ -393,6 +397,7 @@ autospc(
   chart_type = "C'",
   x = month_start,
   y = att_all,
+  max_exclusions = 3L,
   verbosity = 1,
   x_break = 365,
   x_date_format = "%Y-%b",

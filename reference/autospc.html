@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9027</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -233,7 +233,10 @@ of a false negative.</p></dd>
 
 <dt id="arg-max-exclusions">max_exclusions<a class="anchor" aria-label="anchor" href="#arg-max-exclusions"></a></dt>
 <dd><p>The maximum number of extreme points to exclude from
-limit calculations.</p></dd>
+limit calculations. The default will change from 3 to 0 in autospc 0.3.0, so
+that points are excluded only where the caller asks for it. Until then, a
+call that leaves <code>max_exclusions</code> unset and excludes points warns that its
+results will change.</p></dd>
 
 
 <dt id="arg-highlight-exclusions">highlight_exclusions<a class="anchor" aria-label="anchor" href="#arg-highlight-exclusions"></a></dt>
@@ -462,7 +465,8 @@ and aggregated.</p>
 <span class="r-in"><span>  <span class="va">ed_attendances_monthly</span>,</span></span>
 <span class="r-in"><span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span></span>
 <span class="r-in"><span>  x <span class="op">=</span> <span class="va">month_start</span>,</span></span>
-<span class="r-in"><span>  y <span class="op">=</span> <span class="va">att_all</span></span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="va">att_all</span>,</span></span>
+<span class="r-in"><span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Registered S3 methods overwritten by 'ggpp':</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   method                  from   </span>
@@ -476,7 +480,8 @@ and aggregated.</p>
 <span class="r-in"><span>  chart_type <span class="op">=</span> <span class="st">"P'"</span>,</span></span>
 <span class="r-in"><span>  x <span class="op">=</span> <span class="va">month_start</span>,</span></span>
 <span class="r-in"><span>  y <span class="op">=</span> <span class="va">within_4h</span>,</span></span>
-<span class="r-in"><span>  n <span class="op">=</span> <span class="va">att_all</span></span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="va">att_all</span>,</span></span>
+<span class="r-in"><span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="autospc-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -486,6 +491,7 @@ and aggregated.</p>
 <span class="r-in"><span>  chart_type <span class="op">=</span> <span class="st">"C'"</span>,</span></span>
 <span class="r-in"><span>  x <span class="op">=</span> <span class="va">month_start</span>,</span></span>
 <span class="r-in"><span>  y <span class="op">=</span> <span class="va">att_all</span>,</span></span>
+<span class="r-in"><span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span></span>
 <span class="r-in"><span>  shift_rule_threshold <span class="op">=</span> <span class="fl">7</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="autospc-3.png" alt="" width="700" height="433"></span>

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9027</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9028</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,14 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0.9028" id="autospc-0109028">autospc 0.1.0.9028<a class="anchor" aria-label="anchor" href="#autospc-0109028"></a></h2>
+<div class="section level3">
+<h3 id="the-default-of-max_exclusions-will-change-to-in-0-1-0-9028">The default of <code>max_exclusions</code> will change to 0 in 0.3.0<a class="anchor" aria-label="anchor" href="#the-default-of-max_exclusions-will-change-to-in-0-1-0-9028"></a></h3>
+<p><code>max_exclusions</code> sets how many extreme points can be excluded from the calculation of a period’s limits, and defaults to 3. In autospc 0.3.0 the default will be 0, so that points are excluded only where you ask for it. Wherever points are excluded the change moves the limits, and can change where they are re-established.</p>
+<p>Until then, <code><a href="../reference/autospc.html">autospc()</a></code> and <code><a href="../reference/facet_stages.html">facet_stages()</a></code> warn when <code>max_exclusions</code> is left unset and the analysis excluded at least one point. Set <code>max_exclusions = 3</code> to keep the current results, or <code>max_exclusions = 0</code> to adopt the new default now; either stops the warning. The warning has the class <code>"autospc_max_exclusions_default_warning"</code>. Nothing else changes in this version (#282).</p>
+</div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0.9027" id="autospc-0109027">autospc 0.1.0.9027<a class="anchor" aria-label="anchor" href="#autospc-0109027"></a></h2>
 <div class="section level3">

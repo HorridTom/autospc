@@ -39,7 +39,8 @@ autospc(
   ed_attendances_monthly,
   chart_type = "C'",
   x = month_start,
-  y = att_all
+  y = att_all,
+  max_exclusions = 3L
 )
 ```
 

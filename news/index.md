@@ -1,5 +1,26 @@
 # Changelog
 
+## autospc 0.1.0.9028
+
+### The default of `max_exclusions` will change to 0 in 0.3.0
+
+`max_exclusions` sets how many extreme points can be excluded from the
+calculation of a period’s limits, and defaults to 3. In autospc 0.3.0
+the default will be 0, so that points are excluded only where you ask
+for it. Wherever points are excluded the change moves the limits, and
+can change where they are re-established.
+
+Until then,
+[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+and
+[`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+warn when `max_exclusions` is left unset and the analysis excluded at
+least one point. Set `max_exclusions = 3` to keep the current results,
+or `max_exclusions = 0` to adopt the new default now; either stops the
+warning. The warning has the class
+`"autospc_max_exclusions_default_warning"`. Nothing else changes in this
+version (#282).
+
 ## autospc 0.1.0.9027
 
 ### `facet_stages()` accepts chart type as a variable for paired chart types

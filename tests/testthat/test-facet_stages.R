@@ -144,6 +144,91 @@ test_that("an XMR request is faceted as its X chart", {
 })
 
 
+# chart_type given as a variable or an expression rather than written in the
+# call, #302
+
+chart_type_data <- data.frame(
+  x = rep(1L:40L, each = 3L),
+  y = rep(c(10, 12, 11, 13, 9, 14, 12, 11), 15L)
+)
+
+faceted_table <- function(chart_type) {
+  suppressWarnings(
+    facet_stages(chart_type_data,
+      split_at = c(20L, 40L),
+      chart_type = chart_type,
+      plot_chart = FALSE
+    )
+  )
+}
+
+
+test_that("a pair's chart type held in a variable is faceted", {
+  from_literal <- suppressWarnings(
+    facet_stages(chart_type_data,
+      split_at = c(20L, 40L),
+      chart_type = "XbarS",
+      plot_chart = FALSE
+    )
+  )
+
+  pair <- "XbarS"
+  from_variable <- suppressWarnings(
+    facet_stages(chart_type_data,
+      split_at = c(20L, 40L),
+      chart_type = pair,
+      plot_chart = FALSE
+    )
+  )
+
+  expect_identical(from_variable, from_literal)
+})
+
+
+test_that("a chart type passed through a function argument is evaluated", {
+  expect_identical(
+    faceted_table("XbarS"),
+    faceted_table("Xbar")
+  )
+})
+
+
+test_that("an XMR chart type made by an expression is faceted as X", {
+  one_row_each <- data.frame(x = 1L:40L, y = rep(c(10, 12, 11, 13), 10L))
+
+  from_expression <- suppressWarnings(
+    facet_stages(one_row_each,
+      split_at = c(20L, 40L),
+      chart_type = paste0("X", "MR"),
+      plot_chart = FALSE
+    )
+  )
+
+  from_x <- suppressWarnings(
+    facet_stages(one_row_each,
+      split_at = c(20L, 40L),
+      chart_type = "X",
+      plot_chart = FALSE
+    )
+  )
+
+  expect_identical(from_expression, from_x)
+})
+
+
+test_that("a single chart type in a variable still works", {
+  single <- "C"
+
+  expect_no_error(suppressWarnings(
+    facet_stages(chart_type_data,
+      split_at = c(20L, 40L),
+      chart_type = single,
+      plot_chart = FALSE
+    )
+  ))
+})
+
+
 # the arguments reach every facet
 
 

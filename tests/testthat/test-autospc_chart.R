@@ -595,9 +595,6 @@ test_that("a pair's chart type gives its location chart's type", {
   expect_identical(location_chart_type("XbarS"), "Xbar")
   expect_identical(location_chart_type("C"), "C")
   expect_null(location_chart_type(NULL))
-
-  # facet_stages() passes the chart_type expression as the caller wrote it
-  expect_identical(location_chart_type(quote(my_type)), quote(my_type))
 })
 
 

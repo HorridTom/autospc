@@ -270,7 +270,7 @@ is_chart_pair <- function(charts) {
 #' A pair's chart type gives the chart type of its location half. Any other
 #' chart type, including NULL, is returned unchanged.
 #'
-#' @param chart_type A chart type, as the caller gave it.
+#' @param chart_type A chart type, or NULL.
 #'
 #' @return A chart type.
 #' @noRd

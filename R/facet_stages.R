@@ -86,9 +86,6 @@ facet_stages <- function(data,
     dots_exprs$show_mr <- NULL
   }
 
-  # facet_stages() draws no pairs, so a pair is faceted as its location chart.
-  dots_exprs$chart_type <- location_chart_type(dots_exprs$chart_type)
-
   column_exprs <- dots_exprs[
     which(names(dots_exprs) %in% autospc_column_arguments())
   ]
@@ -120,9 +117,10 @@ facet_stages <- function(data,
   chart_args <- arguments[autospc_chart_parameters()]
   visualisation_params <- arguments[visualisation_param_names()]
 
-  chart_type <- arguments$chart_type
+  validate_chart_type(arguments$chart_type)
 
-  validate_chart_type(chart_type)
+  # facet_stages() draws no pairs, so a pair is faceted as its location chart.
+  chart_type <- location_chart_type(arguments$chart_type)
 
   # Construct one chart from the whole series. It is not analysed: it is
   # constructed for chart$data, which has the columns renamed to x, y, n and s,

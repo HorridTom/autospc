@@ -72,15 +72,12 @@ get_cp_statistics <- function(y,
 
   n_excl <- 1 # Makes explicit the relationship with u-prime charts
   poisson_sd <- sqrt(cl / n_excl)
-  z_i <- (y_excl - cl) / poisson_sd
+  z <- (y_excl - cl) / poisson_sd
 
-  mr <- abs(diff(z_i))
-  mr_lims <- mr_limits(
-    mr = mr,
+  sigma_z <- laney_sigma_z(
+    z = z,
     mr_screen_max_loops = mr_screen_max_loops
   )
-
-  sigma_z <- mr_lims$mean_mr / d2_constant()
 
   sd_estimate <- poisson_sd * sigma_z
 

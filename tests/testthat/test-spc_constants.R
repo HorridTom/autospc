@@ -4,8 +4,7 @@
 
 test_that("the exact constants are used unless the option says otherwise", {
   expect_equal(d2_constant(), 2 / sqrt(pi))
-  expect_equal(mr_upper_limit_factor(), 1 + 3 * sqrt(2 * (1 - 2 / pi)) /
-    (2 / sqrt(pi)))
+  expect_equal(dd4_constant(), 1 + 3 * sqrt(2 * (1 - 2 / pi)) / (2 / sqrt(pi)))
 })
 
 
@@ -16,7 +15,7 @@ test_that("the option selects the published rounded constants", {
   expect_identical(d2_constant(), 1.128)
 
   # the published D4, not one worked out from the rounded d2 and d3
-  expect_identical(mr_upper_limit_factor(), 3.267)
+  expect_identical(dd4_constant(), 3.267)
 })
 
 
@@ -154,7 +153,7 @@ test_that("the option selects the published A3 and B4", {
 test_that("B4 for a subgroup of two is the moving range chart's D4", {
   # the sample standard deviation of two observations is their range over
   # sqrt(2), so the two charts' upper limits are the same multiple of the mean
-  expect_equal(bb4_constant(2), mr_upper_limit_factor())
+  expect_equal(bb4_constant(2), dd4_constant())
 })
 
 

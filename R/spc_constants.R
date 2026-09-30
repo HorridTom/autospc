@@ -38,18 +38,19 @@ d2_constant <- function() {
 }
 
 
-#' The upper limit of a moving range chart, as a multiple of the mean
+#' D4 for a subgroup of two
 #'
-#' D4 for a subgroup of two: the mean moving range plus three standard
-#' deviations of the moving range, over the mean moving range. d3 is the
-#' standard deviation of the range of two observations.
+#' A moving range chart's upper limit as a multiple of the mean moving range:
+#' the mean moving range plus three standard deviations of the moving range,
+#' over the mean moving range. d3 is the standard deviation of the range of two
+#' observations.
 #'
 #' The rounded value is the published D4 rather than one worked out from the
 #' rounded d2 and d3, which would give 3.2673.
 #'
 #' @return number
 #' @noRd
-mr_upper_limit_factor <- function() {
+dd4_constant <- function() {
   if (rounded_constants_enabled()) {
     return(3.267)
   }

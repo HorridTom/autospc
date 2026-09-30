@@ -22,7 +22,7 @@ other analytic output appended as columns.}
 
 \item{split_rows}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{split_at} instead.
 The positions it takes are now counted in the analysed series rather than in
-the data as supplied.}
+the data as supplied. It will be removed in autospc 0.3.0.}
 }
 \value{
 With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: one

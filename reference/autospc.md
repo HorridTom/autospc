@@ -249,7 +249,8 @@ autospc(
 
   **\[deprecated\]** Use `chart_type` instead. `chart_type = "XMR"`
   draws the pair and `chart_type = "X"` draws the X chart on its own,
-  which is what `show_mr = FALSE` did.
+  which is what `show_mr = FALSE` did. It will be removed in autospc
+  0.3.0.
 
 - write_table:
 
@@ -258,7 +259,8 @@ autospc(
   [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on the
   `autospc_plot` object `autospc()` returns does the same, either of
   which can be written to a path of your choosing with e.g.
-  [`write.csv()`](https://rdrr.io/r/utils/write.table.html).
+  [`write.csv()`](https://rdrr.io/r/utils/write.table.html). It will be
+  removed in autospc 0.3.0.
 
 - verbosity:
 

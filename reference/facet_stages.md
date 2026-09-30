@@ -42,7 +42,7 @@ facet_stages(data, split_at, plot_chart = TRUE, ..., split_rows = deprecated())
 
   **\[deprecated\]** Use `split_at` instead. The positions it takes are
   now counted in the analysed series rather than in the data as
-  supplied.
+  supplied. It will be removed in autospc 0.3.0.
 
 ## Value
 

@@ -1,748 +1,315 @@
 # Changelog
 
-## autospc 0.1.0.9028
-
-### The default of `max_exclusions` will change to 0 in 0.3.0
-
-`max_exclusions` sets how many extreme points can be excluded from the
-calculation of a period’s limits, and defaults to 3. In autospc 0.3.0
-the default will be 0, so that points are excluded only where you ask
-for it. Wherever points are excluded the change moves the limits, and
-can change where they are re-established.
-
-Until then,
-[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
-and
-[`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-warn when `max_exclusions` is left unset and the analysis excluded at
-least one point. Set `max_exclusions = 3` to keep the current results,
-or `max_exclusions = 0` to adopt the new default now; either stops the
-warning. The warning has the class
-`"autospc_max_exclusions_default_warning"`. Nothing else changes in this
-version (#282).
-
-## autospc 0.1.0.9027
-
-### `facet_stages()` accepts chart type as a variable for paired chart types
-
-[`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-facets a paired chart (`"XMR"` or `"XbarS"`) as its location chart only.
-Where the chart type was held in a variable or given as an expression,
-e.g. `chart_type = my_type`, rather than written in the call, this
-failed with “No autospc_chart class for chart_type”. It now works
-regardless of how the chart type is given (#302).
-
-## autospc 0.1.0.9026
-
-### XbarS charts
-
-`chart_type = "XbarS"` draws an Xbar chart of subgroup means above an S
-chart of subgroup standard deviations, as specified e.g. in Provost and
-Murray, *The Health Care Data Guide*. `chart_type = "Xbar"` and
-`chart_type = "S"` draw either chart on its own, and
-[`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-facets an XbarS request as its Xbar chart.
-
-- **Two forms of data.** Either one row per measurement, with `y` the
-  measurement, or rows that each summarise some measurements, with `y`
-  their mean, `n` their number and the new argument `s` their sample
-  standard deviation. In either form, rows that share an `x` are
-  combined into one subgroup, so e.g. with `x = month`, data with one
-  row per practice per month gives one subgroup per month. See
-  [`vignette("data-requirements")`](https://horridtom.github.io/autospc/articles/data-requirements.md).
-
-- **Subgroups of different sizes.** As is standard, the Xbar centre line
-  is the mean of the subgroup means weighted by subgroup size, the S
-  centre line is the mean of the subgroup standard deviations weighted
-  in the same way, and the limits of both charts vary with each
-  subgroup’s size. The S chart’s lower limit is zero for subgroups of
-  fewer than six.
-
-- **A subgroup of one** is plotted on the Xbar chart and counts towards
-  its centre line, but has no control limits. It has no standard
-  deviation, so it is not plotted on the S chart.
-
-- **The two charts re-establish their limits independently**, as the X
-  and MR charts of an XMR chart do.
-
-- `plot_chart = FALSE` returns the Xbar chart’s table with the S chart’s
-  columns beside it: `subgroup_s`, `s_cl`, `s_ucl` and `s_lcl`. The Xbar
-  table carries `n`, `s` and `sbar`.
-
-- `options(autospc.rounded_constants = TRUE)` uses the published values
-  of A3, B3 and B4, rounded to three decimal places, as it does d2 and
-  D4 for XMR charts.
-
-## autospc 0.1.0.9025
-
-### Consistent limits for rows outside the calculation period
-
-Limits in display periods, limits extended beyond the data, and limits
-over subgroups with no observation now all derive their limits in the
-same way. For almost every chart this changes nothing. Two small
-differences affect P and P’ charts only.
-
-- **A P’ chart’s extended limits match the period they extend.** Where
-  the final calculation period held a missing subgroup (i.e. with no
-  observation), the extended limits were based on a slightly different
-  standard deviation estimate from the one the period’s own limits used,
-  and from the `sd_estimate` reported on the extension rows. They now
-  use the period’s estimate. Only the extended limits were affected.
-
-- **A mean denominator leaves out excluded points and subgroups with no
-  observation.** Where a row has no denominator of its own, its P or P’
-  limits are placed at a mean denominator: the final calculation
-  period’s for extended limits, and that of the period it sits in for a
-  subgroup whose `n` is missing or zero. That mean now counts only the
-  subgroups whose values are used in the analysis, leaving out excluded
-  points and subgroups with no observation. Extension limits move
-  slightly where the final calculation period holds either, as do the
-  limits of a subgroup with no `n` in a period holding an excluded
-  point.
-
-No centre line, and no control limit at a subgroup with an observation,
-changes. Therefore no rule breaks or re-establishment decisions were
-affected.
-
-## autospc 0.1.0.9024
-
-### A P or P’ chart refuses invalid counts it cannot plot
-
-A P or P’ chart with `n` specified already required `y` and `n` to be
-counts, rounding either of them to a whole number with a warning.
-Nothing checked that the count was valid and could be plotted, so a
-numerator above its denominator or below zero was accepted and drawn at
-an impossible percentage. These values were also included in
-calculations for the centre line and the control limits.
-
-- **`y` must be a count from 0 to `n`.** A numerator outside that range
-  gives an error naming the rows at fault and their values, up to five
-  of them, with the rest counted. The check runs after the counts are
-  rounded, so `y = 10.4` against `n = 10` passes.
-
-- **`n` cannot be negative.** A negative denominator gave the row a
-  negative percentage and a NaN control limit. Where both rules are
-  broken the denominator is reported.
-
-- **A subgroup with no opportunities is still drawn**, as it was before:
-  `n = 0` with `y = 0` has no proportion, so no point is plotted and the
-  limits carry across it - e.g. a week with no patients at a small
-  clinic. `n = 0` with a numerator above zero is refused, some events in
-  no opportunities being a contradiction.
-
-This is a breaking change for data that was never valid. A series
-carrying a numerator outside 0 to `n`, or a negative denominator, will
-now raise an error where before it drew a chart whose centre line and
-limits incorporated the problematic data.
-
-Nothing changes for a series whose counts are valid.
-
-## autospc 0.1.0.9023
-
-### Both ends of the vertical axis can be specified
-
-`override_y_lim` set the upper end of the vertical axis and nothing
-else. The lower end could not be set at all. Specifying a value below
-the centre line made the chart fail to draw.
-
-- **`override_y_lim` takes the lower end as well.** A single number is
-  still the upper end, so every call that worked before works unchanged.
-  A vector of two numbers specifies the lower and upper ends, and `NA`
-  in either position leaves that end as the chart would have set it -
-  `c(-10, NA)` moves the bottom and leaves the top alone.
-
-- **The axis zooms rather than clips.** The ends are now given to
-  `coord_cartesian()` rather than to `scale_y_continuous()`. Before,
-  anything outside the axis was turned into NA and dropped from the
-  drawing without a warning, so a narrowed axis could lose a control
-  limit entirely. Now nothing is dropped: a limit or a centre line
-  annotation outside the axis simply sits outside the panel.
-
-- **A range that would leave a data point outside the axis is an
-  error.** A limit or an annotation may fall outside the axis, because a
-  reader can see a line leave the panel. A data point cannot, so a range
-  that would hide one is refused, naming the range asked for and the
-  range the series needs.
-
-## autospc 0.1.0.9022
-
-### A standard deviation estimate for every chart type
-
-`sd_estimate` is an estimate of the standard deviation of a single
-observation, on the same scale as the centre line. A P or P’ chart
-carried it; the other four chart types calculated the same kind of
-estimate, formed their limits from it and then discarded it.
-
-- **Every chart type now returns `sd_estimate`.** A C, C’, X or MR
-  chart’s analysis table gains the column, so `plot_chart = FALSE`
-  returns one column more than before for those four types. The values
-  already existed inside the calculations - `sqrt(cl)` for a C chart,
-  the mean moving range over d2 for an X chart - and are now returned
-  rather than thrown away.
-
-- **The limits are formed in one place**, three standard errors either
-  side of the centre line, rather than inside each of the six
-  calculations. The standard error is the estimate itself for the chart
-  types whose limits do not vary with a denominator, and the estimate
-  over the square root of the row’s denominator for P and P’. An MR
-  chart’s lower limit remains zero, D3 being zero for a subgroup of two.
-
-This change has no impact on the actual values for any chart’s limits.
-The calculation is the same arithmetic in a different place, and the
-estimate is what the limits were already being formed from. A P’ chart’s
-limits can differ in the last bit or two, the largest difference
-measured being 1.4e-14, because they are now formed from `sd_estimate`
-rather than from a separately computed standard error.
-
-### A P’ chart’s extended limits are standardised correctly
-
-A P’ chart forms z scores to standardise each point’s distance from the
-centre line in light of its own denominator, and the spread of those z
-scores gives Laney’s `sigma_z`. When extending limits beyond the end of
-the data, every z score was being standardised at the period’s mean
-denominator instead of the point’s own, which is what
-`use_nbar_for_stdev` did.
-
-- **The z scores now use each point’s own denominator wherever they are
-  formed.** P’ limits extended beyond data with varying denominators
-  become narrower, more so with greater variation in the denominators.
-  Only rows added by `extend_limits_to` are affected, so no centre line,
-  control limit or rule break within the data changes.
-
-- **A P chart’s extended limits sit at the centre line of the period
-  they extend.** Where a point had been excluded from the final
-  calculation period, the extension rows were drawn at a centre line
-  computed from averaged denominators, so they did not match the period
-  they were carried from.
-
-## autospc 0.1.0.9021
-
-### Control limits constrained to the range the statistic can take
-
-A count and a moving range cannot be negative, and a percentage cannot
-exceed 100. Each limit calculation applied its own version of this and
-the rules did not agree: a P chart’s upper limit was constrained to 100
-on its display rows, but not on its calculation rows and not beyond the
-end of the data.
-
-- **The constraining now happens in one place, after the limits are
-  formed**, so the same rule reaches every row of a chart. A P or P’
-  chart’s upper limit is constrained to 100 wherever it would otherwise
-  pass it, which it was not on calculation rows or on the rows an
-  `extend_limits_to` extension adds.
-
-- **A percentage chart’s vertical axis follows the limits and the
-  points** where they reach outside 0 to 100, rather than stopping at
-  110 whatever they are. Anything outside the axis was dropped from the
-  drawing without a warning, so a chart could be drawn with no upper
-  control limit at all. This only affected uninformative limits, and
-  invalid data points, outside the valid range.
-
-- **`options(autospc.constrain_limits = FALSE)` draws the limits where
-  the arithmetic puts them**, which shows how wide they are at the cost
-  of potentially putting them at values the statistic could not take.
-  Only `FALSE` turns the constraining off, so a mis-typed option leaves
-  it in place. An MR chart has a lower limit of zero either way, as is
-  standard.
-
-## autospc 0.1.0.9020
-
-### Antibiasing constants
-
-X, C’, P’ and MR charts use antibiasing constants d2 and D4 . Both were
-written into the code as the values published to three decimal places,
-1.128 and 3.267. For a subgroup of two both have closed forms.
-
-- **The exact values are now used**: d2 is `2 / sqrt(pi)` and D4 is
-  `1 + 3 * sqrt(2 * (1 - 2 / pi)) / d2`. The limits of an X, C’ or P’
-  chart are 0.034% narrower than before and an MR chart’s upper limit
-  0.014% lower. The centre line is unchanged on every chart type, as are
-  C and P charts, whose limits do not involve a moving range.
-
-- **`options(autospc.rounded_constants = TRUE)` restores the rounded
-  values**, for limits that agree with a hand calculation from a
-  published table of constants, or with software that uses the same
-  rounded values. Only `TRUE` selects them, so a mis-typed option leaves
-  the exact values in use.
-
-## autospc 0.1.0.9019
-
-### A floating median is drawn on a series too short for control limits
-
-`floating_median = "yes"` asks for a median over the last
-`floating_median_n` points that have a value. That does not need control
-limits, but a series too short for limits got no median and no `median`
-column, however many points it held.
-
-- **A series too short for limits now gets its floating median**, in the
-  returned table and on the chart.
-
-- **`show_limits = FALSE` keeps the floating median as well.** It asks
-  for no control limits, not for no median.
-
-- **`floating_median = "auto"` no longer errors where a point in the
-  median window is missing.**
-
-- `floating_median = "auto"` draws no median on a series too short for
-  limits. It draws one only where a point in the window is part of a
-  shift rule break, and a series without centre line and limits has no
-  rule breaks by definition.
-
-- **The `median` column is now always returned**, holding no value where
-  no floating median was drawn. It used to appear only when one was
-  drawn, which depended on the data as well as on `floating_median`:
-  under `"yes"` on whether enough points had a value, and under `"auto"`
-  on whether one of them was part of a shift rule break. A given chart
-  type now returns the same columns whatever the data and whatever the
-  other arguments.
-
-## autospc 0.1.0.9018
-
-### `plot_chart = FALSE` returns the same columns for a given chart type
-
-A series holding too few points to establish limits was returned with
-only the columns the data preparation had added, so a caller reading the
-table had to test for the presence of every analysed column before using
-it. Such a series now returns the same columns, in the same order and of
-the same types, as a series long enough to establish limits. The columns
-that would have recorded the result of the analysis hold NA.
-
-- `limit_extension` is the exception that holds a value rather than NA.
-  It records whether `extend_limits_to` added the row beyond the end of
-  the data, and a series too short to establish limits has no rows
-  added, so FALSE is the answer and not a missing value.
-
-- `median` is outside this contract. The column is there when a floating
-  median is drawn and absent when it is not.
-
-- An XmR chart’s two halves are now joined whether or not limits were
-  established, so `plot_chart = FALSE` returns the moving range columns
-  for a short series as it does for a full one.
-
-### `limit_width` becomes `sd_estimate`
-
-P and P’ charts returned a `limit_width` column holding the distance the
-limits sit from the centre line at a denominator of one. That distance
-is three times an estimate of the standard deviation of a single
-observation. The name did not make this clear. Furthermore, the limits
-of a C or X chart have a width as well, which was not clear.
-
-- **The column is now `sd_estimate`, and holds an estimate of one
-  standard deviation rather than three**: `sqrt(p_bar * (1 - p_bar))`
-  for a P chart, the same times Laney’s sigma_z for a P’ chart, on the
-  same scale as the centre line. The limits themselves are unchanged,
-  and the old column’s values are `3 * sd_estimate`.
-
-- The factor of three now sits where the limits are formed, in
-  `limits_at_denominators()`, rather than where the estimate is
-  calculated. The limits sit `3 * sd_estimate / sqrt(n)` either side of
-  the centre line.
-
-## autospc 0.1.0.9017
-
-### Argument checks
-
-The arguments that are neither Boolean, nor one of a closed set, nor
-numeric were not checked, so a value that was not what the argument
-needed failed wherever it was eventually used, or did not fail at all.
-
-- **`title`, `subtitle`, `override_x_title`, `override_y_title` and
-  `log_file_path` must be a single string**, or NULL. A number, or a
-  vector of two strings, was accepted and drawn.
-
-- **`r1_col` and `r2_col` must be a colour** - a name R knows, a
-  hexadecimal string, or a number indexing the palette.
-  `r1_col = "notacolour"` previously errored only once a rule 1 break
-  was drawn, with “Problem while converting geom to grob”, and
-  `r2_col = "notacolour"` stayed silent until a series happened to break
-  rule 2.
-
-- **`x_date_format` must hold at least one `%` code.** A string holding
-  none formats every date as itself, so `x_date_format = "nonsense"`
-  previously drew a chart reading “nonsense” at every tick on the
-  horizontal axis.
-
-- **A column named by `x`, `y` or `n` that is not in the data is now
-  named in the error**, along with the argument that named it. The error
-  came from
-  [`dplyr::all_of()`](https://tidyselect.r-lib.org/reference/all_of.html)
-  and named neither.
-
-- **A chart with no `x` says so.** Where the caller gave no `x` argument
-  and the data holds no column called `x`, the error was “Must group by
-  variables found in `.data`”, raised from the aggregation. It is now “x
-  not specified. Every chart type needs x: name the column with the x
-  argument, or call it x in the data.”
-
-### Smaller changes
-
-- The error raised when `extend_limits_to` is not beyond the end of the
-  data now names the argument, and is raised before the chart is
-  computed rather than at the end of the analysis.
-
-## autospc 0.1.0.9016
-
-### A short series no longer warns about taking a maximum of nothing
-
-A floating median is taken over the last `floating_median_n` non-missing
-points, and `floating_median_n` defaults to 12. Where a series held
-fewer points than that, the position the median window starts at was
-worked out before ascertaining whether there was a median to draw,
-resulting in [`max()`](https://rdrr.io/r/base/Extremes.html) of no
-values warning and giving `-Inf`. Every chart of fewer than twelve
-points therefore emitted “no non-missing arguments to max; returning
--Inf”, whatever `floating_median` was set to.
-
-- **A series with too few points now draws no floating median.** `-Inf`
-  had meant that `floating_median = "yes"` took the median over the
-  whole series instead, and that `"auto"` looked for a shift rule break
-  across the whole series rather than over the last `floating_median_n`
-  points.
-
-- **`floating_median = "yes"` warns** when it asked for a median and the
-  series is too short for one, naming both counts.
-
-- **`"auto"` and `"no"` are silent.** `"auto"` simply does not draw a
-  median line where there are not sufficient data to do so; `"no"` never
-  draws one.
-
-## autospc 0.1.0.9015
-
-### `facet_stages(split_rows)` is now `facet_stages(split_at)`
-
-`split_rows` counted rows of the data as supplied. Where the data held
-several observations per subgroup, that was not the number of points on
-the chart: thirty-six observations of twelve subgroups, split at row 18,
-gave a first stage of six points rather than eighteen. Where the data
-was not in `x` order the split did not respect that ordering either.
-
-- **`split_at` counts points in the analysed series**, which holds one
-  point per subgroup in `x` order. Where the data already holds one row
-  per subgroup, in `x` order, nothing changes.
-
-- **`split_rows` is deprecated.** Supplying it warns, and its value is
-  taken as `split_at` — so it takes the new meaning rather than keeping
-  the old one for a release. Where both are given, `split_at` is used.
-
-- The warning about split points beyond the end of the series now refers
-  to the analysed series.
-
-## autospc 0.1.0.9014
-
-### Deprecations
-
-- `autospc(override_annotation_dist)` and
-  `autospc(override_annotation_dist_P)` are gone. They were deprecated
-  in 0.0.0.9010 and became defunct in 0.1.0, and stayed in the signature
-  only so that supplying one gave an error naming its replacement.
-  Supplying one is now R’s own “unused argument” error. Use
-  `upper_annotation_sf` and `lower_annotation_sf` instead — the
-  equivalent scale factor is `1 + 1/x`, so
-  `override_annotation_dist = 10` becomes `upper_annotation_sf = 1.1`.
-
-## autospc 0.1.0.9013
-
-### Deprecations
-
-- Setting `no_regrets = TRUE` with `overhanging_reversions = FALSE` is
-  now deprecated, and will be an error in a future version. `no_regrets`
-  requires consideration of overhanging reversions, so the combination
-  does not make sense. It has always warned and changed
-  `overhanging_reversions` to TRUE, and still does; the warning now says
-  that the change is going away. Set `overhanging_reversions = TRUE`, or
-  leave it at its default, or set `no_regrets = FALSE`.
-
-## autospc 0.1.0.9012
-
-### Where an extension of the limits begins
-
-`extend_limits_to` adds rows past the end of the data and draws the
-final period’s limits across them. The first of those rows sat one unit
-along the horizontal axis from the last subgroup. One unit is a step in
-whatever units `x` is expressed in rather than a subgroup, so on finely
-spaced data it was far too long: with readings ten milliseconds apart
-and `x` in seconds, one unit is a hundred subgroups, and a short
-extension put the first row past the second.
-
-- **The step is now the median gap between consecutive subgroups**, so
-  the extension starts where the next subgroup would have been.
-
-- **It is capped at half the extension**, so that both rows fall inside
-  an extension shorter than one subgroup. The limits then slope over the
-  first half of that extension rather than holding level, although this
-  is by definition over only a small fraction of the x-axis.
-
-- **It is rounded up on an axis of whole units** — an integer column, or
-  a `Date` — because a fractional step there lands on a value the column
-  cannot tell from the one before it.
-
-- **On an axis of whole units the step is also held to the length of the
-  extension**, because rounding up can otherwise take it back past the
-  cap. Where that leaves the step landing on `extend_limits_to` itself —
-  an extension of one whole unit or less — the extension is a single row
-  rather than two, and the limits slope across it.
-
-On a chart whose `x` is spaced about one unit apart nothing moves. On
-other spacings the first row of the extension moves: on monthly `Date`
-data, from one day past the last subgroup to one month past it.
-
-## autospc 0.1.0.9011
-
-### The analysed values have a column of their own
-
-**This changes what `y` means in the table
-[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
-returns**, for the chart types whose analysed series is derived from
-column(s) the caller passed. C, C’ and X charts are unaffected: what
-they analyse is `y` as supplied.
-
-- **`series` is new**, and holds the values the algorithm analyses and
-  the chart plots: the `y` values as supplied on a C, C’ or X chart, the
-  moving ranges on an MR chart, and percentages on a P or P’ chart.
-
-- **`y` now holds what the caller supplied**, aggregated where the chart
-  type aggregates. It held the analysed series before, so on an MR chart
-  it held the moving ranges and now holds the values they were measured
-  between, and on a P or P’ chart it held percentages and now holds the
-  count.
-
-- **`y_numerator` is gone.** It existed only because `y` held
-  percentages on a P or P’ chart and the count had nowhere else to go.
-
-- The columns are ordered `x`, `series`, `y`, and then the denominator
-  `n` where the chart type has one.
-
-The plot itself is unchanged. Note that for MR, P and P’ charts this is
-a breaking change for code taking the output of
-[`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
-with `plot_chart = FALSE` and using the analysed values or
-`y_numerator`. The fix is straightforward however, simply replace the
-`y` with `series` and `y_numerator` with `y` in the legacy code.
-
-## autospc 0.1.0.9010
-
-### The table the package returns
-
-`autospc(plot_chart = FALSE)` and
-[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on a plot
-returned different tables. They are now the same table, providing the
-results of the analysis.
-
-- **The columns that place the centre line labels on a plot have left
-  the returned table.** `cl_label`, `annotation_level` and
-  `annotation_curvature` say where a label and its arrow are drawn,
-  which is a property of the drawing rather than of the analysis. They
-  were in the table `plot_chart = FALSE` returned and were never in the
-  table [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
-  gave.
-
-- **`highlight` now marks only the rules a point breaks.** The rule
-  highlight of an excluded point was overwritten by the exclusion mark,
-  masking the rule it broke. The exclusion mark that
-  `highlight_exclusions` asks for is now added when the plot is drawn,
-  so the plot is unchanged.
-
-- **The floating median and the rows `extend_limits_to` adds are now
-  part of the analysis**, so
+## autospc 0.2.0
+
+This release adds the XbarS chart, improves handling of missing values,
+and returns the same table columns for a given chart type whatever the
+(valid) data. It also announces that the default of `max_exclusions`
+changes to 0 in 0.3.0. It brings together development versions
+0.1.0.9001 to 0.1.0.9028.
+
+### Lifecycle changes
+
+#### Breaking changes
+
+##### The table `plot_chart = FALSE` returns
+
+- **The analysed values have a column of their own.** `series` holds the
+  values the algorithm analyses and the chart plots: the `y` values as
+  supplied on a C, C’ or X chart, the moving ranges on an MR chart, and
+  percentages on a P or P’ chart. **`y` now holds what the caller
+  supplied**, aggregated where the chart type aggregates; on an MR chart
+  it held the moving ranges, and on a P or P’ chart the percentages.
+  **`y_numerator` is gone**: on a P or P’ chart the count is now `y`.
+  Code using the analysed values or `y_numerator` from an MR, P or P’
+  chart needs `series` in place of `y`, and `y` in place of
+  `y_numerator`. The columns are ordered `x`, `series`, `y`, and then
+  the denominator `n` where the chart type has one.
+
+- **`autospc(plot_chart = FALSE)` and
   [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on a
-  plot carries them. Both were produced when a plot was drawn, so
-  `plot_chart = FALSE` had them and
-  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) did
-  not.
+  plot return the same table.**
 
-- **`show_limits` no longer changes the table.** It says whether the
-  limits are drawn, and the table now holds the analysis whether or not
-  they are.
+  - `cl_label`, `annotation_level` and `annotation_curvature` are no
+    longer included. They are properties of the drawing rather than of
+    the analysis.
+  - `highlight` now marks only the rules a point breaks. The rule
+    highlight of an excluded point was overwritten by the exclusion
+    mark, masking the rule it broke. The plot is unchanged.
+  - The floating median and the rows `extend_limits_to` adds are part of
+    the analysis, so
+    [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on a
+    plot carries them.
+  - `show_limits` no longer changes the table.
+  - A new column, `limit_extension`, is TRUE on the rows
+    `extend_limits_to` adds beyond the end of the data and FALSE on
+    every other row. Those rows no longer copy the last subgroup’s
+    denominator and numerator; they hold the limits, the period they
+    continue, and nothing else.
 
-- **New column `limit_extension`**, TRUE on the rows `extend_limits_to`
-  adds beyond the end of the data and FALSE on every row that holds a
-  subgroup.
+- **A given chart type returns the same columns, in the same order and
+  of the same types, whatever the data and the other arguments.** A
+  series too short to establish limits used to be returned with only the
+  columns the data preparation had added; it now has every column, with
+  NA where the analysis would have recorded a result. `limit_extension`
+  is FALSE there rather than NA. An XmR chart’s two halves are joined
+  whether or not limits were established. The `median` column is always
+  returned, holding no value where no floating median was drawn.
 
-- **The rows `extend_limits_to` adds no longer copy the last subgroup’s
-  values.** They carried its denominator and numerator, at a point on
-  the axis where there is no subgroup at all; they now hold the limits,
-  the period they continue, and nothing else.
+- **Every chart type returns a new column, `sd_estimate`**, an estimate
+  of the standard deviation of a single observation on the same scale as
+  the centre line - for example `sqrt(cl)` for a C chart, and the mean
+  moving range over d2 for an X chart.
 
-### Bug fixes
+- **P and P’ charts no longer return `constant`, `pbar`, `ucl_display`
+  and `lcl_display`.** They held working values from extending limits
+  over a display period. `pbar` is `cl`, and the limits at any
+  denominator `n` sit `3 * sd_estimate / sqrt(n)` either side of the
+  centre line.
 
-- **The rows `extend_limits_to` adds no longer change the type of the
-  `x` and `y` columns.** A column of whole numbers became a column of
-  numbers, and the `x_max` the plot records followed it. A point on the
-  axis that falls between two whole numbers is still taken as given, and
-  the column gives way to it.
+##### Results that change
 
-- **`plot_period` is now missing on the rows before the first point and
-  after the last**, which have no limits and so belong to no period. It
-  read `NANA` there.
+- **Missing values.** The analysis now proceeds as though a point with
+  no `y` were not there, rather than walking over it as a row. This
+  changes results for any series that has one.
 
-- **The rows `extend_limits_to` adds now name the period they continue**
-  where the series ends with a subgroup that holds no observation. They
-  took the period of the last row of the table, which in that case
-  belongs to no period, so they were labelled `displayNA`.
-
-## autospc 0.1.0.9009
-
-### Bug fixes
+  - A calculation period now holds `period_min` points, not `period_min`
+    rows. Where a series had missing values inside the first period,
+    limits were previously calculated from fewer points than asked for.
+  - Control limits now carry across a gap, as the centre line already
+    did.
+  - No limits are drawn before the first point or after the last.
+  - A missing point no longer silently splits a run, which had made a
+    shift rule break disappear. The new argument `na_ends_run` controls
+    this, and defaults to `TRUE`, the previous behaviour. A missing
+    point may have continued the run before it or been on the other side
+    of the centre line, and the data cannot say which: `TRUE` minimises
+    the risk of a false positive shift rule break arising from missing
+    data, `FALSE` minimises the risk of a false negative.
+  - An MR chart now shows its control limits at the first point as well
+    as its centre line. The limits themselves are unchanged.
+  - On a P or P’ chart, the limits at a point with missing `y` are
+    calculated from that point’s own denominator where the data supplied
+    one, and the denominator is reported in the table. Where the
+    denominator is missing or zero the limits are drawn at the mean
+    denominator of the point’s period, leaving out excluded points and
+    subgroups with no observation.
+  - The period columns are now filled in at a point with missing `y`,
+    and the centre line and limits at such a point inside a display
+    period match the rest of that period.
 
 - **A point on the centre line no longer ends the run it sits in.** A
-  point within `centre_line_tolerance` of the centre line was treated as
-  a side of its own, so it split the run it fell in. It now neither
+  point within `centre_line_tolerance` of the centre line neither
   commences a run, ends one, nor counts towards the length of the one it
   sits in, which is the conventional treatment of a point that is
-  neither above the line nor below it. A run still commences only at a
-  point that is above or below the line, so points on the line before
-  any run belong to none.
+  neither above the line nor below it.
 
-## autospc 0.1.0.9008
+- **The exact values of d2 and D4 are used.** They were written into the
+  code as the published values to three decimal places, 1.128 and 3.267.
+  The limits of an X, C’ or P’ chart sit 0.034% closer to the centre
+  line than before, and an MR chart’s upper limit is 0.014% lower. These
+  are the ratios of the exact to the rounded constants. Where a moving
+  range or a point lies within that margin of a limit, the screening of
+  moving ranges or a rule 1 break can differ as well. Centre lines, and
+  C and P charts, are unchanged.
+  `options(autospc.rounded_constants = TRUE)` restores the rounded
+  values.
 
-### Data that cannot be charted
+- **Control limits are constrained to the range the statistic can
+  take**. A P or P’ chart’s upper limit is constrained to at most 100%,
+  previously this applied only in display periods. A percentage chart’s
+  vertical axis follows the limits and the points where they reach
+  outside 0 to 100. This only affected uninformative limits, and data
+  points outside the valid range.
+  `options(autospc.constrain_limits = FALSE)` draws unconstrained
+  limits, where the calculation puts them.
 
-- **X, MR and XMR charts now reject a repeated `x`.** Each point on
-  these charts is one row, so a repeated `x` has no place to be plotted.
-  It was previously accepted, and multiplied in the output table. The
-  error names the values that are repeated. C, C’, P and P’ charts are
-  unchanged, summing the rows that share an `x` into one subgroup as
-  before.
+- **Limits extended beyond the data.**
 
-### Missing values
+  - The extension starts where the next subgroup would have been: one
+    median gap between consecutive subgroups past the last, capped at
+    half the extension, rather than one unit of `x`. On a chart whose
+    `x` is spaced about one unit apart nothing changes; on monthly
+    `Date` data the first row of the extension moves from one day past
+    the last subgroup to one month past it.
+  - A P’ chart’s extended limits use the standard deviation estimate of
+    the period they extend. Previously, they were recalculated for the
+    extension from that period’s data, with the z score of each point in
+    the period standardised at the period’s mean denominator rather than
+    at the point’s own, and with the moving ranges formed differently
+    around a subgroup with no observation. Where the period’s
+    denominators vary, the extended limits were previously too wide, and
+    are now narrower.
+  - On a P chart, the centre line of extension rows, and the limits
+    around it, are those of the period being extended. Previously, Where
+    a point had been excluded from that period, the extension
+    recalculated the centre line from averaged denominators, which gave
+    a different value.
+  - The extension of a P or P’ chart uses the final calculation period’s
+    mean denominator, leaving out excluded points and subgroups with no
+    observation.
 
-The analysis now proceeds as though a point with no `y` were not there,
-rather than walking over it as a row. This changes results for any
-series that has one.
+  Only rows added by `extend_limits_to` are affected by these changes,
+  so they do not affect centre lines, control limits or rule breaks
+  within the data.
 
-- **A calculation period now holds `period_min` points, not `period_min`
-  rows.** Where a series had missing values inside the first period,
-  limits were previously calculated from fewer points than asked for.
+##### Data that is refused
 
-- **An MR chart now shows its control limits at the first point** as
-  well as its centre line, which it already showed. The first row of an
-  MR chart holds no moving range, because there is no earlier point to
-  measure one against; that is not a missing value, and the limits there
-  are defined. The limits themselves are unchanged.
+- **X, MR and XMR charts reject a repeated `x`.** Each point on these
+  charts is one row, so a repeated `x` has no place to be plotted. It
+  was previously accepted, and multiplied in the output table. The error
+  names the values that are repeated. The other chart types combine the
+  rows that share an `x` into one subgroup, as before.
 
-- **Control limits now carry across a gap.** They were drawn only where
-  a point was, so they broke at every missing value; the centre line
-  carried across but the control limits did not.
+- **A P or P’ chart refuses counts it cannot plot.** `y` must be a count
+  from 0 to `n`, and `n` cannot be negative. The error names the rows at
+  fault and their values, up to five of them. A subgroup with `n = 0`
+  and `y = 0` is still drawn as a gap. A series whose counts are valid
+  is unaffected.
 
-- **No limits are drawn before the first point or after the last.** The
-  centre line previously ran to both edges of the chart whether or not
-  there was anything there.
+##### Removed
 
-- **A missing point no longer silently splits a run**, which had made a
-  shift rule break disappear. `na_ends_run` now controls this, and
-  defaults to `TRUE`, which is the previous behaviour. A missing point
-  may have continued the run before it or been on the other side of the
-  centre line, and the data cannot say which: `TRUE` minimises the risk
-  of a false positive shift rule break arising from missing data,
-  `FALSE` minimises the risk of a false negative.
+- `autospc(override_annotation_dist)` and
+  `autospc(override_annotation_dist_P)`, defunct since 0.1.0, are gone
+  from the signature. Supplying one is now R’s own “unused argument”
+  error. Use `upper_annotation_sf` and `lower_annotation_sf` instead:
+  `override_annotation_dist = 10` becomes `upper_annotation_sf = 1.1`.
 
-- Rows with no `x` are excluded before the analysis rather than after
-  it. One such row could previously add a subgroup of its own, which
-  counted towards the minimum needed for limits: 20 subgroups plus one
-  row with no `x` drew limits that 20 subgroups alone correctly refused.
-  `options(autospc.warn_missing_x = FALSE)` turns off the warning.
+#### Deprecations
 
-- The warning given when a series is too short now says how many points
-  it has.
-
-- **`aggregation_na_rm` controls what an observation with no value does
-  to the subgroup it is aggregated into.** `FALSE`, the default, makes
-  the whole subgroup missing, as the package has always done. `TRUE`
-  discards the observation and forms the subgroup from the rest. A row
-  is discarded when either its `y` or its `n` has no value, so a
-  subgroup’s numerator and denominator always count the same
-  observations. A subgroup that loses every observation stays on the
-  chart as a missing point rather than disappearing. `aggregation_na_rm`
-  has no effect on data that is already one row per subgroup, or on X
-  and MR charts, which do not aggregate.
-
-- **The limits at a point with missing `y` on a P or P’ chart are now
-  calculated from that point’s own denominator**, where the data
-  supplied one. The denominator of such a point is also now reported in
-  the returned table. Limits at a point whose denominator is missing or
-  zero are drawn at the mean denominator of its period.
-
-- **P and P’ charts now return a `limit_width` column.** It holds the
-  distance the limits sit from the centre line at a denominator of 1, so
-  that the limits at any denominator are the centre line plus and minus
-  `limit_width` over the square root of that denominator. It takes one
-  value for a calculation period and the display period that follows it.
-
-- **P and P’ charts no longer return the `constant`, `pbar`,
-  `ucl_display` and `lcl_display` columns.** They held working values
-  from the extension of limits over a display period. `constant` and
-  `pbar` are now `limit_width` and `cl`, which hold the same values on
-  every row rather than on the display rows alone, and the other two
-  held the display limits before they were held within 0 and 100, which
-  were not used.
-
-- **Period columns are now correctly populated for a point with missing
-  `y`.** `period_type`, `period_start`, `plot_period`, `limit_change`,
-  `cl_change` and, on a P or P’ chart, `limit_width` were all missing at
-  such a point, though its centre line and limits were filled in from
-  the period it sits in.
-
-- **The centre line and limits at a point with missing `y` inside a
-  display period now match the rest of that period.** Previously they
-  were calculated afresh from the display period’s own values instead of
-  being carried forward with the rest of the period’s. No data point is
-  plotted at such a point, so it is only the lines that were affected.
-
-## autospc 0.1.0.9003
-
-### Bug fixes
-
-- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-  no longer fails when `split_rows` asks for a single stage. Passing the
-  last row of the data, as in
-  `facet_stages(data, split_rows = nrow(data))`, failed on drawing with
-  `At least one layer must contain all faceting variables`. It now draws
-  one facet.
-
-- A `split_rows` value beyond the end of the data is now taken as the
-  last row, and warns. It previously produced a repeated stage: on 43
-  rows of data, `split_rows = 44` gave two facets of the same series and
-  `split_rows = c(44, 45)` gave three.
-
-- `facet_stages(plot_chart = FALSE)` now always returns a `stage`
-  column. Where there was a single stage it returned a table with no
-  `stage` column at all.
-
-## autospc 0.1.0.9002
-
-### Bug fixes
-
-- The `month_start` column of `ed_attendances_monthly` is now the first
-  day of each month, for 109 consecutive months from June 2015. It
-  previously wrote each month either as its first day or as the last day
-  of the month before, so the dates looked as though they drifted
-  through the calendar. The counts are unchanged and no row has moved to
-  a different month. Charts drawn from this dataset shift by up to a day
-  on the x axis.
-- The help page for `ed_attendances_monthly` said the data had 9 columns
-  where it has 7, and listed `e_adm_via_ed` before `e_adm_over_4h` while
-  the data has them the other way round. Both are corrected.
-
-## autospc 0.1.0.9001
-
-### Bug fixes
-
-- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-  no longer fails when no stage has enough points for control limits. It
-  draws each stage as a plain time series, which is what
+- **The default of `max_exclusions` will change from 3 to 0 in 0.3.0**,
+  so that points are excluded from a period’s limits only where you ask
+  for it. Wherever points are excluded the change moves the limits, and
+  can change where they are re-established. Until then,
   [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
-  draws for a series with no limits. The same fault stopped
-  `facet_stages(show_limits = FALSE)` drawing at all; that works now
-  too.
+  and
+  [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+  warn when `max_exclusions` is left unset and the analysis excluded at
+  least one point. Set `max_exclusions = 3` to keep the current results,
+  or `max_exclusions = 0` to adopt the new default now; either stops the
+  warning. The warning has the class
+  `"autospc_max_exclusions_default_warning"` (#282).
+
+- **`facet_stages(split_rows)` is deprecated in favour of `split_at`**,
+  which counts points in the analysed series - one point per subgroup,
+  in `x` order - rather than rows of the data as supplied. Where the
+  data already holds one row per subgroup, in `x` order, nothing
+  changes. Supplying `split_rows` warns, and its value is taken as
+  `split_at`. It will be removed in 0.3.0.
+
+- **Setting `no_regrets = TRUE` with `overhanging_reversions = FALSE` is
+  deprecated**, and will be an error in 0.3.0. `no_regrets` requires
+  consideration of overhanging reversions, so the combination does not
+  make sense. It still warns and changes `overhanging_reversions` to
+  TRUE.
+
+- **`autospc(show_mr)`, `facet_stages(show_mr)` and
+  `autospc(write_table)`**, deprecated since 0.1.0, still warn, and will
+  be removed in 0.3.0.
+
+### New features
+
+- **XbarS charts.** `chart_type = "XbarS"` draws an Xbar chart of
+  subgroup means above an S chart of subgroup standard deviations, as
+  specified e.g. in Provost and Murray, *The Health Care Data Guide*.
+  `chart_type = "Xbar"` and `chart_type = "S"` draw either chart on its
+  own, and
+  [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+  facets an XbarS request as its Xbar chart.
+
+  - Data may have one row per measurement, with `y` the measurement, or
+    rows that each summarise some measurements, with `y` their mean, `n`
+    their number and the new argument `s` their sample standard
+    deviation. In either form, rows that share an `x` are combined into
+    one subgroup, so e.g. with `x = month`, data with one row per
+    practice per month gives one subgroup per month. See
+    [`vignette("data-requirements")`](https://horridtom.github.io/autospc/articles/data-requirements.md).
+  - As is standard, the Xbar centre line is the mean of the subgroup
+    means weighted by subgroup size, the S centre line is the mean of
+    the subgroup standard deviations weighted in the same way, and the
+    limits of both charts vary with each subgroup’s size. The S chart’s
+    lower limit is zero for subgroups of fewer than six.
+  - A subgroup of one is plotted on the Xbar chart and counts towards
+    its centre line, but has no control limits. It has no standard
+    deviation, so it is not plotted on the S chart.
+  - The two charts re-establish their limits independently, as the X and
+    MR charts of an XMR chart do.
+  - `plot_chart = FALSE` returns the Xbar chart’s table with the S
+    chart’s columns beside it: `subgroup_s`, `s_cl`, `s_ucl` and
+    `s_lcl`. The Xbar table carries `n`, `s` and `sbar`.
+
+- **`override_y_lim` takes the lower end of the vertical axis as well.**
+  A single number still specifies the upper end. A vector of two numbers
+  gives the lower and upper ends, and `NA` in either position leaves
+  that end as the chart would have set it. The axis now zooms rather
+  than clips, so nothing is dropped from the drawing: a limit or a
+  centre line annotation outside the axis sits outside the panel. A
+  range that would leave a data point outside the axis is an error.
+
+- **`aggregation_na_rm`** controls what a missing (`NA`) observation
+  does to the subgroup it is aggregated into. `FALSE`, the default,
+  makes the whole subgroup missing, as before. `TRUE` discards the
+  observation and forms the subgroup from the rest.
+
+- **Three package options**, documented in `?autospc-package`:
+  `autospc.rounded_constants`, `autospc.constrain_limits` and
+  `autospc.warn_missing_x`.
+
+- **Arguments are checked.** `title`, `subtitle`, `override_x_title`,
+  `override_y_title` and `log_file_path` must be a single string or
+  NULL; `r1_col` and `r2_col` must be a colour; `x_date_format` must
+  hold at least one `%` code. A column named by `x`, `y` or `n` that is
+  not in the data is named in the error along with the argument that
+  named it, and a chart with no `x` says so.
+
+### Bug fixes
+
+- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+  accepts a paired chart type (`"XMR"` or `"XbarS"`) held in a variable
+  or given as an expression, e.g. `chart_type = my_type`. It previously
+  failed with “No autospc_chart class for chart_type” (#302).
+
+- A floating median is drawn on a series too short for control limits,
+  and with `show_limits = FALSE`. `floating_median = "auto"` no longer
+  errors where a point in the median window is missing.
+
+- A series shorter than `floating_median_n` no longer warns “no
+  non-missing arguments to max”, and draws no floating median.
+  `floating_median = "yes"` warns when the series is too short for the
+  median it asked for.
+
+- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+  no longer fails when no stage has enough points for control limits, or
+  with `show_limits = FALSE`, or when asked for a single stage. A split
+  point beyond the end of the series is taken as the last point, with a
+  warning, rather than repeating a stage.
+  `facet_stages(plot_chart = FALSE)` always returns a `stage` column.
 
 - In a faceted chart where some stages have limits and some do not, the
-  points of a stage without limits were drawn grey, which is the colour
-  of a point excluded from the limits calculation. They are now drawn
-  black, like the points of any series shown without limits.
+  points of a stage without limits are drawn black rather than the grey
+  of an excluded point.
 
-- A chart drawn without control limits now honours `x_break`,
-  `x_date_format` and `x_pad_end`. They were ignored, because the plain
-  time series was drawn without formatting its x axis.
+- A chart drawn without control limits honours `x_break`,
+  `x_date_format` and `x_pad_end`.
+
+- The rows `extend_limits_to` adds no longer change the type of the `x`
+  and `y` columns, and name the period they continue where the series
+  ends with a subgroup that has no observation.
+
+- `plot_period` is missing on the rows before the first point and after
+  the last, where it read `NANA`.
+
+- Rows with no `x` are excluded before the analysis rather than after,
+  with a warning that `options(autospc.warn_missing_x = FALSE)` turns
+  off. One such row could previously add a subgroup of its own.
+
+- The error raised when `extend_limits_to` is not beyond the end of the
+  data names the argument, and is raised before the chart is computed.
+
+- The `month_start` column of `ed_attendances_monthly` is the first day
+  of each month; it was sometimes the last day of the month before.
+  Charts drawn from this dataset shift by up to a day on the x axis. Its
+  help page now lists its 7 columns correctly.
 
 ## autospc 0.1.0
 

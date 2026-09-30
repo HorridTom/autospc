@@ -13,7 +13,7 @@
 #' @param ... Arguments passed to [autospc::autospc()]
 #' @param split_rows `r lifecycle::badge("deprecated")` Use `split_at` instead.
 #' The positions it takes are now counted in the analysed series rather than in
-#' the data as supplied.
+#' the data as supplied. It will be removed in autospc 0.3.0.
 #'
 #' @returns With `plot_chart = TRUE` (the default), an `autospc_plot`: one
 #' ggplot, faceted by stage, which also carries the analysed chart behind each
@@ -44,14 +44,15 @@ facet_stages <- function(data,
 
   if (lifecycle::is_present(split_rows)) {
     lifecycle::deprecate_warn(
-      when = "0.1.0.9015",
+      when = "0.2.0",
       what = "facet_stages(split_rows)",
       with = "facet_stages(split_at)",
       details = paste(
         "The positions are now counted in the analysed series, which",
         "holds one point per subgroup in x order, rather than in the",
         "data as supplied. Where the data already holds one row per",
-        "subgroup, in x order, nothing changes."
+        "subgroup, in x order, nothing changes. split_rows will be removed",
+        "in autospc 0.3.0."
       )
     )
 
@@ -80,7 +81,7 @@ facet_stages <- function(data,
       details = paste(
         'chart_type = "X" facets the X chart on its own, which',
         "is what facet_stages() has always drawn for",
-        'chart_type = "XMR".'
+        'chart_type = "XMR". show_mr will be removed in autospc 0.3.0.'
       )
     )
 

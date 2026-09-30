@@ -111,12 +111,13 @@
 #' and control limits
 #' @param show_mr `r lifecycle::badge("deprecated")` Use `chart_type` instead.
 #' `chart_type = "XMR"` draws the pair and `chart_type = "X"` draws the X
-#' chart on its own, which is what `show_mr = FALSE` did.
+#' chart on its own, which is what `show_mr = FALSE` did. It will be removed in
+#' autospc 0.3.0.
 #' @param write_table `r lifecycle::badge("deprecated")` Save the results
 #' yourself instead. `autospc(plot_chart = FALSE)` returns them as a data frame,
 #' and `as.data.frame()` on the `autospc_plot` object `autospc()` returns does
 #' the same, either of which can be written to a path of your choosing with
-#' e.g. `write.csv()`.
+#' e.g. `write.csv()`. It will be removed in autospc 0.3.0.
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
 #' none if 0. A value outside the range is taken as the nearest end of it, and a
@@ -286,7 +287,8 @@ autospc <- function(data,
         "frame, and as.data.frame() on the autospc_plot object",
         "autospc() returns does the same. Either can be written",
         "to a path of your choosing with e.g. write.csv().",
-        "No file has been written."
+        "No file has been written. write_table will be removed in",
+        "autospc 0.3.0."
       )
     )
   }
@@ -299,7 +301,7 @@ autospc <- function(data,
       details = paste(
         'chart_type = "X" draws the X chart on its own, which',
         'is what show_mr = FALSE did, and chart_type = "XMR"',
-        "draws the pair."
+        "draws the pair. show_mr will be removed in autospc 0.3.0."
       )
     )
 

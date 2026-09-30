@@ -119,7 +119,7 @@ validate_algorithm_parameters <- function(arguments,
                                           user_env = rlang::caller_env()) {
   if (arguments$no_regrets & !arguments$overhanging_reversions) {
     lifecycle::deprecate_warn(
-      when = "0.1.0.9013",
+      when = "0.2.0",
       what = I(paste(
         "Setting `no_regrets = TRUE` with",
         "`overhanging_reversions = FALSE`"
@@ -128,8 +128,8 @@ validate_algorithm_parameters <- function(arguments,
         "no_regrets requires consideration of overhanging reversions,",
         "so the combination does not make sense. overhanging_reversions",
         "has been changed to TRUE for this call. It will be an error in",
-        "a future version: set overhanging_reversions = TRUE, or leave",
-        "it at its default, or set no_regrets = FALSE."
+        "autospc 0.3.0: set overhanging_reversions = TRUE, or leave it at",
+        "its default, or set no_regrets = FALSE."
       ),
       user_env = user_env
     )

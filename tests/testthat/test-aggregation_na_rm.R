@@ -131,6 +131,20 @@ test_that("aggregation_na_rm reaches every chart type that sums observations", {
     )
   }
 
+  # the count data with an area of opportunity of 2 on every row
+  rates <- counts(7L)
+  rates$n <- 2
+
+  expect_true(is.na(analyse(rates, "U", n = "n")$y[3]))
+  expect_identical(
+    analyse(rates, "U", n = "n", aggregation_na_rm = TRUE)$y[3],
+    8
+  )
+  expect_identical(
+    analyse(rates, "U", n = "n", aggregation_na_rm = TRUE)$n[3],
+    4
+  )
+
   for (chart_type in c("P", "P\'")) {
     expect_true(
       is.na(analyse(binary_observations(13L), chart_type)$y[3]),

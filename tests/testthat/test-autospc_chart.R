@@ -6,6 +6,7 @@ factory_classes <- c(
   "C'" = "autospc_chart_cp",
   "P" = "autospc_chart_p",
   "P'" = "autospc_chart_pp",
+  "U" = "autospc_chart_u",
   "X" = "autospc_chart_x",
   "MR" = "autospc_chart_mr",
   "Xbar" = "autospc_chart_xbar",
@@ -19,7 +20,7 @@ test_that("the class mapping covers every chart type that is not a pair", {
   )
 })
 
-# n is the denominator for P and P', and n and s the subgroup size and
+# n is the denominator for P, P' and U, and n and s the subgroup size and
 # standard deviation for Xbar and S. The other types select only x and y.
 factory_data <- data.frame(
   x = 1:5,
@@ -131,9 +132,9 @@ test_that("autospc_chart returns the right class for every type it handles", {
 
 
 test_that("n and s are not required by the types that do not use them", {
-  # only the P, P', Xbar and S branches use n, and only the Xbar and S branches
-  # use s. R does not evaluate an argument that nothing looks at, so the other
-  # four must build with neither supplied
+  # only the P, P', U, Xbar and S branches use n, and only the Xbar and S
+  # branches use s. R does not evaluate an argument that nothing looks at, so
+  # the other four must build with neither supplied
   for (chart_type in c("C", "C'", "X", "MR")) {
     expect_no_error(autospc_chart(
       chart_type = chart_type,
@@ -145,8 +146,8 @@ test_that("n and s are not required by the types that do not use them", {
 })
 
 
-test_that("n is required by the proportion charts", {
-  for (chart_type in c("P", "P'")) {
+test_that("n is required by the charts with a denominator", {
+  for (chart_type in c("P", "P'", "U")) {
     expect_error(
       autospc_chart(
         chart_type = chart_type,
@@ -537,7 +538,7 @@ test_that("every pair's halves are chart types, named location and dispersion", 
 test_that("each pair is followed by its halves, then the other chart types", {
   expect_identical(
     autospc_chart_types(),
-    c("XMR", "X", "MR", "XbarS", "Xbar", "S", "C", "C'", "P", "P'")
+    c("XMR", "X", "MR", "XbarS", "Xbar", "S", "C", "C'", "P", "P'", "U")
   )
 })
 

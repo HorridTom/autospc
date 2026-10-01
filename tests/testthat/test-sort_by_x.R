@@ -66,6 +66,23 @@ test_that("an MR chart gives the same result whatever order the rows arrive in",
 })
 
 
+test_that("a U chart gives the same result whatever order the rows arrive in", {
+  with_n <- function(d) {
+    d$n <- d$mth %% 3 + 1
+
+    return(autospc(d,
+      chart_type = "U", x = mth, y = val, n = n,
+      plot_chart = FALSE, max_exclusions = 3L
+    ))
+  }
+
+  expect_equal(
+    with_n(shuffled_data),
+    with_n(sorted_data)
+  )
+})
+
+
 test_that("the series comes back in x order", {
   for (chart_type in c("C", "C'", "X", "MR", "Xbar", "S")) {
     result <- run_sorted(shuffled_data, chart_type)

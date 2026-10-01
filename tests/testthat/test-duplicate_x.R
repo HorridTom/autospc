@@ -50,7 +50,7 @@ test_that("facet_stages refuses a repeated x on an X chart", {
 
 
 test_that("the subgroup charts still sum the rows that share an x", {
-  for (chart_type in c("C", "C\'", "P", "P\'", "U")) {
+  for (chart_type in c("C", "C\'", "P", "P\'", "U", "U\'")) {
     result <- autospc(
       data.frame(
         x = rep(1:12, each = 2),

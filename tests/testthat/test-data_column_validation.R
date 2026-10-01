@@ -172,7 +172,7 @@ p_expectations <- matrix(
   )
 )
 
-# U requires both columns, and rounds y but not n, which is an area of
+# U and U' require both columns, and rounds y but not n, which is an area of
 # opportunity rather than a count.
 u_expectations <- matrix(
   c(
@@ -342,20 +342,23 @@ for (chart_type in c("P", "P'")) {
 }
 
 
-for (i in seq_along(data_column_validation_data_yn)) {
-  case <- data_column_validation_data_yn[[i]]
-  y_type <- column_type(case, "y")
-  n_type <- column_type(case, "n")
+for (chart_type in c("U", "U'")) {
+  for (i in seq_along(data_column_validation_data_yn)) {
+    case <- data_column_validation_data_yn[[i]]
+    y_type <- column_type(case, "y")
+    n_type <- column_type(case, "n")
 
-  test_that(paste0(
-    "column requirements: chart_type = U | y ", y_type, ", n ", n_type
-  ), {
-    expect_conditions_of_case(
-      df         = case,
-      chart_type = "U",
-      expected   = u_expectations[y_type, n_type]
-    )
-  })
+    test_that(paste0(
+      "column requirements: chart_type = ", chart_type,
+      " | y ", y_type, ", n ", n_type
+    ), {
+      expect_conditions_of_case(
+        df         = case,
+        chart_type = chart_type,
+        expected   = u_expectations[y_type, n_type]
+      )
+    })
+  }
 }
 
 

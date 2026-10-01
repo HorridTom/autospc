@@ -135,15 +135,22 @@ test_that("aggregation_na_rm reaches every chart type that sums observations", {
   rates <- counts(7L)
   rates$n <- 2
 
-  expect_true(is.na(analyse(rates, "U", n = "n")$y[3]))
-  expect_identical(
-    analyse(rates, "U", n = "n", aggregation_na_rm = TRUE)$y[3],
-    8
-  )
-  expect_identical(
-    analyse(rates, "U", n = "n", aggregation_na_rm = TRUE)$n[3],
-    4
-  )
+  for (chart_type in c("U", "U\'")) {
+    expect_true(
+      is.na(analyse(rates, chart_type, n = "n")$y[3]),
+      info = chart_type
+    )
+    expect_identical(
+      analyse(rates, chart_type, n = "n", aggregation_na_rm = TRUE)$y[3],
+      8,
+      info = chart_type
+    )
+    expect_identical(
+      analyse(rates, chart_type, n = "n", aggregation_na_rm = TRUE)$n[3],
+      4,
+      info = chart_type
+    )
+  }
 
   for (chart_type in c("P", "P\'")) {
     expect_true(

@@ -39,8 +39,9 @@ new_autospc_chart <- function(x = list(),
 #' columns meet the class's requirements on presence and type, and any counts
 #' among them are whole numbers. `prepare_data()` then adds `series`, *the
 #' values under analysis*, which are not always the values the user passed: for
-#' MR they are the moving ranges, and for P and P' the percentages. `y` keeps
-#' what the user supplied, aggregated where the class aggregates.
+#' MR they are the moving ranges, for P and P' the percentages, and for U and U'
+#' the rates. `y` keeps what the user supplied, aggregated where the class
+#' aggregates.
 #'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd
@@ -134,7 +135,7 @@ autospc_chart_types <- function() {
     c(pair, unname(pair_types[[pair]]))
   }))
 
-  chart_types <- c(paired, "C", "C'", "P", "P'")
+  chart_types <- c(paired, "C", "C'", "P", "P'", "U", "U'")
 
   return(chart_types)
 }
@@ -311,7 +312,7 @@ location_component <- function(items) {
 
 #' Create an autospc_chart object of the class given by chart_type
 #'
-#' Only the P, P', Xbar and S branches use `n`, and only the Xbar and S
+#' Only the P, P', U, U', Xbar and S branches use `n`, and only the Xbar and S
 #' branches use `s`. R does not evaluate an argument that nothing looks at, so
 #' either may be left out for the other chart types.
 #'
@@ -332,6 +333,8 @@ autospc_chart <- function(chart_type,
     "C'" = autospc_chart_cp(data = data, x = x, y = y, ...),
     "P" = autospc_chart_p(data = data, x = x, y = y, n = n, ...),
     "P'" = autospc_chart_pp(data = data, x = x, y = y, n = n, ...),
+    "U" = autospc_chart_u(data = data, x = x, y = y, n = n, ...),
+    "U'" = autospc_chart_up(data = data, x = x, y = y, n = n, ...),
     "X" = autospc_chart_x(data = data, x = x, y = y, ...),
     "MR" = autospc_chart_mr(data = data, x = x, y = y, ...),
     "Xbar" = autospc_chart_xbar(data = data, x = x, y = y, n = n, s = s, ...),

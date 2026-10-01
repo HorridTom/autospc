@@ -17,13 +17,17 @@
 #'  mean of the measurements each row summarises,
 #'  \item count (plotted on the vertical axis) for C and C' charts,
 #'  \item numerator of the proportion (plotted on the vertical axis) for P and
-#'  P' charts.
+#'  P' charts,
+#'  \item count of events for U and U' charts, which plot the rate `y / n`.
 #'  }
 #'  See \code{vignette("data-requirements", package = "autospc")} for more
 #'  details.
 #' @param n Name of column (passed using tidyselect semantics) to use as
-#' denominator for P and P' charts, and for XbarS charts as the number of
-#' measurements each row summarises.
+#' denominator for P and P' charts, as the area of opportunity each count was
+#' made over for U and U' charts, and for XbarS charts as the number of
+#' measurements each row summarises. For U and U' charts `n` need not be a whole
+#' number, and its unit sets the unit of the rate: for infections per 1,000
+#' central line days, `n` is the number of central line days divided by 1,000.
 #' \cr
 #' See \code{vignette("data-requirements", package = "autospc")} for more
 #' details.
@@ -43,7 +47,7 @@
 #' that is already one row per subgroup, or on X and MR charts.
 #' @param chart_type The type of chart you wish to plot. Must must have length
 #' one. Available options are: "XMR", "X", "MR", "XbarS", "Xbar", "S", "C",
-#' "C'", "P", "P'".
+#' "C'", "P", "P'", "U", "U'".
 #'
 #' ## Algorithm Parameters
 #' Parameters that control behaviour of the algorithm used to re-establish
@@ -84,9 +88,11 @@
 #' @param highlight_exclusions Boolean signifying whether excluded points are
 #' greyed out.
 #' @param mr_screen_max_loops Integer or Inf specifying maximum number of times
-#' to recursively ignore mr values above the upper range limit when calculating
-#' xmr limits. Note this does not affect the calculation of the upper range
-#' limit on the mr chart.
+#' to recursively ignore moving ranges above the upper range limit when
+#' estimating a standard deviation from them: the moving ranges of the data for
+#' X charts, and of the points' z-scores for C', P' and U' charts. 0 turns the
+#' screening off, as Laney (2002) describes the P' and U' charts. Note this does
+#' not affect the calculation of the upper range limit on the mr chart.
 #' @param centre_line_tolerance Minimum difference between a point's vertical
 #' position and the centre line to count as "on the centre line" for the
 #' purposes of shift rule breaks
@@ -188,8 +194,8 @@
 #' the centre line, the control limits and the rest of the analytic output
 #' appended as columns. `series` holds the values analysed and plotted, which
 #' are the moving ranges on an MR chart, the subgroup standard deviations on an
-#' S chart and percentages on a P or P' chart; `y` holds the values as supplied
-#' and aggregated.
+#' S chart, percentages on a P or P' chart and rates on a U or U' chart; `y`
+#' holds the values as supplied and aggregated.
 #'
 #' @examples
 #' # Using a C' chart to track changes in the count of monthly attendance

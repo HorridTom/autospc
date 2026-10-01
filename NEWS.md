@@ -1,3 +1,24 @@
+# autospc 0.2.0.9001
+
+## U and U' charts
+
+`chart_type = "U"` draws a U chart of rates: a count of events `y` over the
+area of opportunity `n` in which they could occur, such as infections per 1,000
+central line days. Its control limits vary with `n`. `chart_type = "U'"` draws
+Laney's U' chart (Laney, 2002), whose limits are also widened where the rates
+vary from subgroup to subgroup by more than a Poisson count would. The chart
+plots `y / n`, so the unit of `n` sets the unit of the rate, and `n` need not be
+a whole number. Rows that share an `x` are summed into one subgroup. See
+`vignette("data-requirements")` for the data each needs.
+
+## Documentation
+
+* `mr_screen_max_loops` applies to the screening of moving ranges in C' and P'
+  charts as well as X charts, and now to U' charts too. Its documentation said
+  only X charts; it now says which, and that 0 turns the screening off.
+* The `autospc.rounded_constants` option documentation now names C' and P'
+  charts, which use d2, and D4 in their screening of moving ranges.
+
 # autospc 0.2.0
 
 This release adds the XbarS chart, improves handling of missing values, and

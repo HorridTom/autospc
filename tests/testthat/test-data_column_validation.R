@@ -97,6 +97,33 @@ expected_conditions <- list(
     kind = "error",
     text = "For Xbar, S and XbarS charts, y must be of type integer or double."
   ),
+  y_missing_u = list(
+    kind = "error",
+    text = "y not specified. For U and U' charts, y must be specified."
+  ),
+  n_missing_u = list(
+    kind = "error",
+    text = paste0(
+      "n not specified. For U and U' charts, n must be specified: it is ",
+      "the area of opportunity each count in y was made over."
+    )
+  ),
+  y_type_u = list(
+    kind = "error",
+    text = "For U and U' charts, y must be of type integer or double."
+  ),
+  n_type_u = list(
+    kind = "error",
+    text = "For U and U' charts, n must be of type integer or double."
+  ),
+  y_rounded_u = list(
+    kind = "warning",
+    text = paste0(
+      "At least one element of y has non-zero fractional part. ",
+      "Rounding to the nearest whole number.\n",
+      "U and U' charts require y to be a count, i.e. whole numbers only."
+    )
+  ),
   y_rounded_c = list(
     kind = "warning",
     text = paste0(
@@ -136,6 +163,29 @@ p_expectations <- matrix(
     "y_not_logical_p", "n_type_p", NA, NA, "n_rounded_p",
     # y double fractional
     "y_not_logical_p", "n_type_p", "y_rounded_p", "y_rounded_p", "y_rounded_p"
+  ),
+  nrow = length(column_types),
+  byrow = TRUE,
+  dimnames = list(
+    y = column_types,
+    n = column_types
+  )
+)
+
+# U and U' require both columns, and rounds y but not n, which is an area of
+# opportunity rather than a count.
+u_expectations <- matrix(
+  c(
+    # y absent
+    "y_missing_u", "y_missing_u", "y_missing_u", "y_missing_u", "y_missing_u",
+    # y logical
+    "n_missing_u", "y_type_u", "y_type_u", "y_type_u", "y_type_u",
+    # y integer
+    "n_missing_u", "n_type_u", NA, NA, NA,
+    # y double whole
+    "n_missing_u", "n_type_u", NA, NA, NA,
+    # y double fractional
+    "n_missing_u", "n_type_u", "y_rounded_u", "y_rounded_u", "y_rounded_u"
   ),
   nrow = length(column_types),
   byrow = TRUE,
@@ -286,6 +336,26 @@ for (chart_type in c("P", "P'")) {
         df         = case,
         chart_type = chart_type,
         expected   = p_expectations[y_type, n_type]
+      )
+    })
+  }
+}
+
+
+for (chart_type in c("U", "U'")) {
+  for (i in seq_along(data_column_validation_data_yn)) {
+    case <- data_column_validation_data_yn[[i]]
+    y_type <- column_type(case, "y")
+    n_type <- column_type(case, "n")
+
+    test_that(paste0(
+      "column requirements: chart_type = ", chart_type,
+      " | y ", y_type, ", n ", n_type
+    ), {
+      expect_conditions_of_case(
+        df         = case,
+        chart_type = chart_type,
+        expected   = u_expectations[y_type, n_type]
       )
     })
   }

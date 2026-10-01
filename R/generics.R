@@ -26,8 +26,8 @@ aggregate_data <- function(chart) {
 
 #' Turn the aggregated data into the series the algorithm analyses
 #'
-#' Runs after `aggregate_data()`, because the P and P' transform is computed
-#' from the aggregated numerator and denominator.
+#' Runs after `aggregate_data()`, because the P, P', U and U' transforms are
+#' computed from the aggregated numerator and denominator.
 #'
 #' @return autospc_chart object of the same class as chart, with `chart$data`
 #'   replaced
@@ -104,9 +104,9 @@ limits_from_statistics <- function(chart, statistics, rows) {
 #'
 #' Limits sit three standard errors either side of the centre line. For most
 #' classes the standard deviation estimate is that standard error already,
-#' because the statistic is a single observation. A P or P' chart's estimate is
-#' free of the denominator, so each row's standard error is the estimate over
-#' the square root of that row's denominator.
+#' because the statistic is a single observation. A P, P', U or U' chart's
+#' estimate is free of the denominator, so each row's standard error is the
+#' estimate over the square root of that row's denominator.
 #'
 #' @param sd_estimate The period's standard deviation estimate, as one value or
 #'   as one per row.

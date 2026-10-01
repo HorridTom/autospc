@@ -8,13 +8,14 @@
 #'   on its own with `withCallingHandlers()`.}
 #'   \item{`autospc.rounded_constants`}{Whether to use the published rounded
 #'   values of the constants the control limits are calculated with - d2 and D4
-#'   for X and MR charts, A3, B3 and B4 for Xbar and S charts - rather than
-#'   their exact values. `FALSE` unless set to `TRUE`, so the exact values are
+#'   for X and MR charts, d2 for C', P' and U' charts and D4 in their screening
+#'   of moving ranges, A3, B3 and B4 for Xbar and S charts - rather than their
+#'   exact values. `FALSE` unless set to `TRUE`, so the exact values are
 #'   used by default. Set `options(autospc.rounded_constants = TRUE)` for limits
 #'   that agree with a hand calculation from a published table of constants.}
 #'   \item{`autospc.constrain_limits`}{Whether to constrain control limits to
-#'   the range the plotted statistic can take: a count, a moving range and a
-#'   standard deviation at or above zero, a percentage between 0 and 100.
+#'   the range the plotted statistic can take: a count, a rate, a moving range
+#'   and a standard deviation at or above zero, a percentage between 0 and 100.
 #'   `TRUE` unless set to `FALSE`. Set `options(autospc.constrain_limits =
 #'   FALSE)` to draw the limits where the arithmetic puts them, which shows how
 #'   wide they are but potentially puts them at values the statistic could not

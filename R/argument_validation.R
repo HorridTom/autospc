@@ -314,6 +314,56 @@ require_denominator_not_negative <- function(data,
 }
 
 
+#' Stop unless every count is zero or more
+#'
+#' @return invisible TRUE, or an error with `message` as its text
+#' @noRd
+require_count_not_negative <- function(data,
+                                       message) {
+  negative <- which(!is.na(data$y) & data$y < 0)
+
+  if (length(negative) == 0L) {
+    return(invisible(TRUE))
+  }
+
+  stop(
+    paste0(
+      message, " Negative: ",
+      offending_rows(data = data, rows = negative, columns = "y")
+    ),
+    call. = FALSE
+  )
+}
+
+
+#' Stop unless every count over a denominator of zero is zero
+#'
+#' A row with a denominator of zero has no opportunity for an event, so its
+#' only possible count is zero, which gives it no value of its own. A positive
+#' count there has no finite rate, so it is refused.
+#'
+#' @return invisible TRUE, or an error with `message` as its text
+#' @noRd
+require_no_count_without_denominator <- function(data,
+                                                 message) {
+  without <- which(
+    !is.na(data$y) & !is.na(data$n) & data$n == 0 & data$y > 0
+  )
+
+  if (length(without) == 0L) {
+    return(invisible(TRUE))
+  }
+
+  stop(
+    paste0(
+      message, " Not 0: ",
+      offending_rows(data = data, rows = without, columns = c("y", "n"))
+    ),
+    call. = FALSE
+  )
+}
+
+
 is_whole_number <- function(x,
                             tol = .Machine$double.eps^0.5) {
   return(abs(x - round(x)) < tol)

@@ -235,9 +235,93 @@ an error:
 > For a P or P’ chart with n specified, n must be of type integer or
 > double.
 
-## 6 Summary
+## 6 U and U’ charts
 
-Table [6.1](#tab:summary-table) summarises the column requirements for
+U and U’ charts are for rates: a count of events over the area of
+opportunity in which they could occur, such as infections per 1,000
+central line days. For example, [Gauntt et
+al. (2022)](https://doi.org/10.1097/pq9.0000000000000575) used U charts
+to follow central line-associated bloodstream infections (CLABSIs) in
+the paediatric cardiothoracic intensive care unit at Nationwide
+Children’s Hospital, Columbus, Ohio, from 2018 to 2021. Each subgroup
+was a month, the count was the CLABSIs in that month, and the area of
+opportunity was its central line days in thousands, so the chart showed
+CLABSIs per 1,000 central line days. The rate fell from 1.52 per 1,000
+central line days in 2018 to 0.37 in 2020 and 0.32 in 2021. Because the
+area of opportunity varies from one subgroup to the next, so do the
+control limits.
+
+The U’ chart (Laney, 2002, *Quality Engineering* 14(4), 531-537) widens
+the U chart’s limits where the rates vary from subgroup to subgroup by
+more than a count of events following the Poisson distribution would,
+which is common where the areas of opportunity are large.
+
+The data columns required for U and U’ charts are as follows:
+
+- The subgrouping variable, to be plotted on the horizontal axis, `x`
+- The count of events, `y`. This must be of type `integer` or `double`.
+- The area of opportunity each count was made over, `n`. This must be of
+  type `integer` or `double`.
+
+The chart plots the rate `y / n`, so the unit of `n` sets the unit of
+the rate. For infections per 1,000 central line days, `n` is the number
+of central line days divided by 1,000. `n` need not be a whole number,
+and is used as given.
+
+Rows that share a value of `x` form one subgroup, whose `y` and `n` are
+summed, so that its rate is its total count over its total area of
+opportunity: for instance one row per ward per month, for a chart of the
+whole unit by month.
+
+### 6.1 Requirements on `y` and `n`
+
+If `y` or `n` is not specified, an error is raised:
+
+> y not specified. For U and U’ charts, y must be specified.
+
+> n not specified. For U and U’ charts, n must be specified: it is the
+> area of opportunity each count in y was made over.
+
+Any type other than `integer` or `double` causes an error:
+
+> For U and U’ charts, y must be of type integer or double.
+
+> For U and U’ charts, n must be of type integer or double.
+
+`y` is a count, so it must consist of whole numbers. Where it is of type
+`double` with at least one non-whole-number value, the values are
+rounded to the nearest whole number and a warning is issued:
+
+> At least one element of y has non-zero fractional part. Rounding to
+> the nearest whole number. U and U’ charts require y to be a count,
+> i.e. whole numbers only.
+
+Neither `y` nor `n` may be negative, and a subgroup with an area of
+opportunity of zero can have no events. The error names the rows at
+fault:
+
+> For U and U’ charts, y cannot be negative.
+
+> For U and U’ charts, n cannot be negative.
+
+> For U and U’ charts, y must be 0 where n is 0.
+
+A subgroup with a count of zero over an area of zero has no rate, and is
+left as a gap in the chart.
+
+### 6.2 The U’ chart’s standard deviation
+
+The U’ chart estimates how much the rates vary from the moving ranges of
+each point’s distance from the centre line, in standard errors. By
+default these moving ranges are screened once for outliers, as for C’
+and P’ charts. `mr_screen_max_loops = 0` turns the screening off, which
+is the calculation as Laney describes it, and
+`options(autospc.rounded_constants = TRUE)` uses the published value of
+d2, 1.128, in place of the exact one.
+
+## 7 Summary
+
+Table [7.1](#tab:summary-table) summarises the column requirements for
 each chart type.
 
 | Chart type | y type(s) accepted | n type(s) accepted | s type(s) accepted |
@@ -248,5 +332,6 @@ each chart type.
 | C / C’ | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | not used | not used |
 | P / P’ (observation level) | `logical` | not used | not used |
 | P / P’ (aggregated) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | `integer`, `double` (whole numbers only; non-integer doubles are rounded with a warning) | not used |
+| U / U’ | `integer`, `double` (the count; whole numbers only; non-integer doubles are rounded with a warning) | `integer`, `double` (the area of opportunity; need not be whole) | not used |
 
-Table 6.1: Summary of data column requirements by chart type. {.table}
+Table 7.1: Summary of data column requirements by chart type. {.table}

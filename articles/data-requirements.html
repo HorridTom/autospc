@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -311,19 +311,105 @@ error:</p>
 </div>
 </div>
 <div class="section level2" number="6">
-<h2 id="summary">
-<span class="header-section-number">6</span> Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+<h2 id="u-and-u-charts">
+<span class="header-section-number">6</span> U and U’ charts<a class="anchor" aria-label="anchor" href="#u-and-u-charts"></a>
 </h2>
-<p>Table <a href="#tab:summary-table">6.1</a> summarises the column requirements for each chart
+<p>U and U’ charts are for rates: a count of events over the area of opportunity
+in which they could occur, such as infections per 1,000 central line days. For
+example, <a href="https://doi.org/10.1097/pq9.0000000000000575" class="external-link">Gauntt et al. (2022)</a>
+used U charts to follow central line-associated bloodstream infections
+(CLABSIs) in the paediatric cardiothoracic intensive care unit at Nationwide
+Children’s Hospital, Columbus, Ohio, from 2018 to 2021. Each subgroup was a
+month, the count was the CLABSIs in that month, and the area of opportunity was
+its central line days in thousands, so the chart showed CLABSIs per 1,000
+central line days. The rate fell from 1.52 per 1,000 central line days in 2018
+to 0.37 in 2020 and 0.32 in 2021. Because the area of opportunity varies from
+one subgroup to the next, so do the control limits.</p>
+<p>The U’ chart (Laney, 2002, <em>Quality Engineering</em> 14(4), 531-537) widens the U
+chart’s limits where the rates vary from subgroup to subgroup by more than a
+count of events following the Poisson distribution would, which is common where
+the areas of opportunity are large.</p>
+<p>The data columns required for U and U’ charts are as follows:</p>
+<ul>
+<li>The subgrouping variable, to be plotted on the horizontal axis, <code>x</code>
+</li>
+<li>The count of events, <code>y</code>. This must be of type <code>integer</code> or <code>double</code>.</li>
+<li>The area of opportunity each count was made over, <code>n</code>. This must be of type
+<code>integer</code> or <code>double</code>.</li>
+</ul>
+<p>The chart plots the rate <code>y / n</code>, so the unit of <code>n</code> sets the unit of the rate.
+For infections per 1,000 central line days, <code>n</code> is the number of central line
+days divided by 1,000. <code>n</code> need not be a whole number, and is used as given.</p>
+<p>Rows that share a value of <code>x</code> form one subgroup, whose <code>y</code> and <code>n</code> are summed,
+so that its rate is its total count over its total area of opportunity: for
+instance one row per ward per month, for a chart of the whole unit by month.</p>
+<div class="section level3" number="6.1">
+<h3 id="requirements-on-y-and-n">
+<span class="header-section-number">6.1</span> Requirements on <code>y</code> and <code>n</code><a class="anchor" aria-label="anchor" href="#requirements-on-y-and-n"></a>
+</h3>
+<p>If <code>y</code> or <code>n</code> is not specified, an error is raised:</p>
+<blockquote>
+<p>y not specified. For U and U’ charts, y must be specified.</p>
+</blockquote>
+<blockquote>
+<p>n not specified. For U and U’ charts, n must be specified: it is the area of
+opportunity each count in y was made over.</p>
+</blockquote>
+<p>Any type other than <code>integer</code> or <code>double</code> causes an error:</p>
+<blockquote>
+<p>For U and U’ charts, y must be of type integer or double.</p>
+</blockquote>
+<blockquote>
+<p>For U and U’ charts, n must be of type integer or double.</p>
+</blockquote>
+<p><code>y</code> is a count, so it must consist of whole numbers. Where it is of type
+<code>double</code> with at least one non-whole-number value, the values are rounded to the
+nearest whole number and a warning is issued:</p>
+<blockquote>
+<p>At least one element of y has non-zero fractional part. Rounding to the
+nearest whole number. U and U’ charts require y to be a count, i.e. whole
+numbers only.</p>
+</blockquote>
+<p>Neither <code>y</code> nor <code>n</code> may be negative, and a subgroup with an area of opportunity
+of zero can have no events. The error names the rows at fault:</p>
+<blockquote>
+<p>For U and U’ charts, y cannot be negative.</p>
+</blockquote>
+<blockquote>
+<p>For U and U’ charts, n cannot be negative.</p>
+</blockquote>
+<blockquote>
+<p>For U and U’ charts, y must be 0 where n is 0.</p>
+</blockquote>
+<p>A subgroup with a count of zero over an area of zero has no rate, and is left as
+a gap in the chart.</p>
+</div>
+<div class="section level3" number="6.2">
+<h3 id="the-u-charts-standard-deviation">
+<span class="header-section-number">6.2</span> The U’ chart’s standard deviation<a class="anchor" aria-label="anchor" href="#the-u-charts-standard-deviation"></a>
+</h3>
+<p>The U’ chart estimates how much the rates vary from the moving ranges of each
+point’s distance from the centre line, in standard errors. By default these
+moving ranges are screened once for outliers, as for C’ and P’ charts.
+<code>mr_screen_max_loops = 0</code> turns the screening off, which is the calculation as
+Laney describes it, and <code>options(autospc.rounded_constants = TRUE)</code> uses the
+published value of d2, 1.128, in place of the exact one.</p>
+</div>
+</div>
+<div class="section level2" number="7">
+<h2 id="summary">
+<span class="header-section-number">7</span> Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h2>
+<p>Table <a href="#tab:summary-table">7.1</a> summarises the column requirements for each chart
 type.</p>
 <table class="table">
 <caption>
-<span id="tab:summary-table">Table 6.1: </span>Summary of data column requirements by chart type.</caption>
+<span id="tab:summary-table">Table 7.1: </span>Summary of data column requirements by chart type.</caption>
 <colgroup>
 <col width="12%">
-<col width="29%">
-<col width="36%">
-<col width="21%">
+<col width="32%">
+<col width="35%">
+<col width="20%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Chart type</th>
@@ -376,6 +462,14 @@ type.</p>
 <code>integer</code>, <code>double</code> (whole numbers only; non-integer doubles are rounded with a warning)</td>
 <td align="left">
 <code>integer</code>, <code>double</code> (whole numbers only; non-integer doubles are rounded with a warning)</td>
+<td align="left">not used</td>
+</tr>
+<tr class="odd">
+<td align="left">U / U’</td>
+<td align="left">
+<code>integer</code>, <code>double</code> (the count; whole numbers only; non-integer doubles are rounded with a warning)</td>
+<td align="left">
+<code>integer</code>, <code>double</code> (the area of opportunity; need not be whole)</td>
 <td align="left">not used</td>
 </tr>
 </tbody>

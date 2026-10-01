@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,19 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9001" id="autospc-0209001">autospc 0.2.0.9001<a class="anchor" aria-label="anchor" href="#autospc-0209001"></a></h2>
+<div class="section level3">
+<h3 id="u-and-u-charts-0-2-0-9001">U and U’ charts<a class="anchor" aria-label="anchor" href="#u-and-u-charts-0-2-0-9001"></a></h3>
+<p><code>chart_type = "U"</code> draws a U chart of rates: a count of events <code>y</code> over the area of opportunity <code>n</code> in which they could occur, such as infections per 1,000 central line days. Its control limits vary with <code>n</code>. <code>chart_type = "U'"</code> draws Laney’s U’ chart (Laney, 2002), whose limits are also widened where the rates vary from subgroup to subgroup by more than a Poisson count would. The chart plots <code>y / n</code>, so the unit of <code>n</code> sets the unit of the rate, and <code>n</code> need not be a whole number. Rows that share an <code>x</code> are summed into one subgroup. See <code><a href="../articles/data-requirements.html">vignette("data-requirements")</a></code> for the data each needs.</p>
+</div>
+<div class="section level3">
+<h3 id="documentation-0-2-0-9001">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0-9001"></a></h3>
+<ul><li>
+<code>mr_screen_max_loops</code> applies to the screening of moving ranges in C’ and P’ charts as well as X charts, and now to U’ charts too. Its documentation said only X charts; it now says which, and that 0 turns the screening off.</li>
+<li>The <code>autospc.rounded_constants</code> option documentation now names C’ and P’ charts, which use d2, and D4 in their screening of moving ranges.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="autospc-020">autospc 0.2.0<a class="anchor" aria-label="anchor" href="#autospc-020"></a></h2>
 <p>This release adds the XbarS chart, improves handling of missing values, and returns the same table columns for a given chart type whatever the (valid) data. It also announces that the default of <code>max_exclusions</code> changes to 0 in 0.3.0. It brings together development versions 0.1.0.9001 to 0.1.0.9028.</p>

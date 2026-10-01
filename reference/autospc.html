@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,15 +131,19 @@ are excluded, with a warning; see the Options section of
 mean of the measurements each row summarises,</p></li>
 <li><p>count (plotted on the vertical axis) for C and C' charts,</p></li>
 <li><p>numerator of the proportion (plotted on the vertical axis) for P and
-P' charts.</p></li>
+P' charts,</p></li>
+<li><p>count of events for U and U' charts, which plot the rate <code>y / n</code>.</p></li>
 </ul><p>See <code><a href="../articles/data-requirements.html">vignette("data-requirements", package = "autospc")</a></code> for more
 details.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>Name of column (passed using tidyselect semantics) to use as
-denominator for P and P' charts, and for XbarS charts as the number of
-measurements each row summarises.
+denominator for P and P' charts, as the area of opportunity each count was
+made over for U and U' charts, and for XbarS charts as the number of
+measurements each row summarises. For U and U' charts <code>n</code> need not be a whole
+number, and its unit sets the unit of the rate: for infections per 1,000
+central line days, <code>n</code> is the number of central line days divided by 1,000.
 <br>
 See <code><a href="../articles/data-requirements.html">vignette("data-requirements", package = "autospc")</a></code> for more
 details.</p></dd>
@@ -168,7 +172,7 @@ that is already one row per subgroup, or on X and MR charts.</p></dd>
 <dt id="arg-chart-type">chart_type<a class="anchor" aria-label="anchor" href="#arg-chart-type"></a></dt>
 <dd><p>The type of chart you wish to plot. Must must have length
 one. Available options are: "XMR", "X", "MR", "XbarS", "Xbar", "S", "C",
-"C'", "P", "P'".</p><div class="section">
+"C'", "P", "P'", "U", "U'".</p><div class="section">
 <h3 id="algorithm-parameters">Algorithm Parameters<a class="anchor" aria-label="anchor" href="#algorithm-parameters"></a></h3>
 
 
@@ -246,9 +250,11 @@ greyed out.</p></dd>
 
 <dt id="arg-mr-screen-max-loops">mr_screen_max_loops<a class="anchor" aria-label="anchor" href="#arg-mr-screen-max-loops"></a></dt>
 <dd><p>Integer or Inf specifying maximum number of times
-to recursively ignore mr values above the upper range limit when calculating
-xmr limits. Note this does not affect the calculation of the upper range
-limit on the mr chart.</p></dd>
+to recursively ignore moving ranges above the upper range limit when
+estimating a standard deviation from them: the moving ranges of the data for
+X charts, and of the points' z-scores for C', P' and U' charts. 0 turns the
+screening off, as Laney (2002) describes the P' and U' charts. Note this does
+not affect the calculation of the upper range limit on the mr chart.</p></dd>
 
 
 <dt id="arg-centre-line-tolerance">centre_line_tolerance<a class="anchor" aria-label="anchor" href="#arg-centre-line-tolerance"></a></dt>
@@ -455,8 +461,8 @@ analysis behind it.</p>
 the centre line, the control limits and the rest of the analytic output
 appended as columns. <code>series</code> holds the values analysed and plotted, which
 are the moving ranges on an MR chart, the subgroup standard deviations on an
-S chart and percentages on a P or P' chart; <code>y</code> holds the values as supplied
-and aggregated.</p>
+S chart, percentages on a P or P' chart and rates on a U or U' chart; <code>y</code>
+holds the values as supplied and aggregated.</p>
     </div>
 
     <div class="section level2">

@@ -39,8 +39,9 @@ new_autospc_chart <- function(x = list(),
 #' columns meet the class's requirements on presence and type, and any counts
 #' among them are whole numbers. `prepare_data()` then adds `series`, *the
 #' values under analysis*, which are not always the values the user passed: for
-#' MR they are the moving ranges, and for P and P' the percentages. `y` keeps
-#' what the user supplied, aggregated where the class aggregates.
+#' MR they are the moving ranges, for P and P' the percentages, and for U and U'
+#' the rates. `y` keeps what the user supplied, aggregated where the class
+#' aggregates.
 #'
 #' @return `x`, unchanged, if valid; otherwise an error.
 #' @noRd

@@ -2,8 +2,8 @@
 
 #' Aggregate ratio-chart data over subgroups
 #'
-#' Shared by the P/P' methods, and by u/u' when those exist: all four plot a
-#' ratio, so all four sum a numerator and a denominator over x. Named for ratios
+#' Shared by the P, P', U and U' methods: all four plot a ratio, so all four sum
+#' a numerator and a denominator over x. Named for ratios
 #' rather than proportions because a rate's denominator is an area of
 #' opportunity rather than a count of trials, so rates are not always
 #' proportions.

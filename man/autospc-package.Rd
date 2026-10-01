@@ -20,13 +20,14 @@ carries the class \code{"autospc_missing_x_warning"}, so it can also be handled
 on its own with \code{withCallingHandlers()}.}
 \item{\code{autospc.rounded_constants}}{Whether to use the published rounded
 values of the constants the control limits are calculated with - d2 and D4
-for X and MR charts, A3, B3 and B4 for Xbar and S charts - rather than
-their exact values. \code{FALSE} unless set to \code{TRUE}, so the exact values are
+for X and MR charts, d2 for C', P' and U' charts and D4 in their screening
+of moving ranges, A3, B3 and B4 for Xbar and S charts - rather than their
+exact values. \code{FALSE} unless set to \code{TRUE}, so the exact values are
 used by default. Set \code{options(autospc.rounded_constants = TRUE)} for limits
 that agree with a hand calculation from a published table of constants.}
 \item{\code{autospc.constrain_limits}}{Whether to constrain control limits to
-the range the plotted statistic can take: a count, a moving range and a
-standard deviation at or above zero, a percentage between 0 and 100.
+the range the plotted statistic can take: a count, a rate, a moving range
+and a standard deviation at or above zero, a percentage between 0 and 100.
 \code{TRUE} unless set to \code{FALSE}. Set \code{options(autospc.constrain_limits = FALSE)} to draw the limits where the arithmetic puts them, which shows how
 wide they are but potentially puts them at values the statistic could not
 take. The vertical axis follows the limits either way. An MR chart has a

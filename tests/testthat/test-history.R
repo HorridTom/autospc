@@ -86,11 +86,11 @@ test_that("a break with no position records nothing to be against", {
 # keep_candidate_tables
 
 
-# example_series_2a produces two candidates, one rejected and one accepted
+# example_series_2c produces three candidates, all rejected
 candidates_of <- function(...) {
   chart <- autospc_chart(
     chart_type = "C'",
-    data = example_series_2a,
+    data = example_series_2c,
     x = "x",
     y = "y",
     ...
@@ -103,7 +103,7 @@ candidates_of <- function(...) {
 test_that("a chart does not keep the candidate tables unless asked", {
   candidates <- candidates_of()
 
-  expect_length(candidates, 2L)
+  expect_length(candidates, 3L)
 
   expect_true(all(vapply(
     candidates,
@@ -119,7 +119,7 @@ test_that("keep_candidate_tables = TRUE keeps a full table per candidate", {
   expect_true(all(vapply(
     candidates,
     function(candidate) {
-      nrow(candidate$table) == nrow(example_series_2a)
+      nrow(candidate$table) == nrow(example_series_2c)
     },
     logical(1)
   )))

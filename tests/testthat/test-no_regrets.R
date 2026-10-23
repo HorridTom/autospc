@@ -84,6 +84,24 @@ test_that("No regrets = FALSE", {
 })
 
 
+test_that("a break does not move when a point is added (#308)", {
+  # with 43 points, the final run of the candidate calculation period starting
+  # at row 22 is unfinished, so limits are not yet re-established
+  output_43 <- autospc(example_series_2a,
+    x = x, y = y, chart_type = "C'", plot_chart = FALSE
+  )
+
+  # a 44th point ends that run, and limits are re-established at row 22
+  output_44 <- autospc(
+    dplyr::bind_rows(example_series_2a, data.frame(x = 44L, y = 43L)),
+    x = x, y = y, chart_type = "C'", plot_chart = FALSE
+  )
+
+  expect_identical(which(output_43$break_point), integer(0))
+  expect_identical(which(output_44$break_point), 22L)
+})
+
+
 # no_regrets and overhanging_reversions are resolved once per call
 
 

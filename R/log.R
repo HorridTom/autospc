@@ -195,6 +195,12 @@ interpret_log_entry <- function(entry,
           "Candidate limits rejected, prevailing",
           "limits retained."
         )
+      } else if (branch == "20") {
+        interpretation <- paste(
+          "Candidate limits rejected: insufficient data to establish a",
+          "stable new process. The final run of the candidate calculation",
+          "period is not complete."
+        )
       } else {
         interpretation <- "Undefined branch at step 07."
       }
@@ -536,7 +542,7 @@ render_log <- function(chart) {
           as.integer(candidate$final_run_prevents)
         )
       )
-      add(candidate$counter, if (candidate$accepted) "0700" else "0710")
+      add(candidate$counter, candidate_decision_code(candidate))
     }
   }
 
@@ -551,6 +557,28 @@ render_log <- function(chart) {
   }
 
   return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
+}
+
+
+#' Log code for the decision on one candidate
+#'
+#' 0700 accepted; 0710 rejected because of an opposing rule break; 0720
+#' rejected because the final run of the candidate calculation period is not
+#' complete and may still become an opposing rule break, which ends the
+#' algorithm.
+#'
+#' @return character, one log code
+#' @noRd
+candidate_decision_code <- function(candidate) {
+  if (candidate$accepted) {
+    return("0700")
+  }
+
+  if (!candidate$opposite_break && candidate$final_run_prevents) {
+    return("0720")
+  }
+
+  return("0710")
 }
 
 

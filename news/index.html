@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,14 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9002" id="autospc-0209002">autospc 0.2.0.9002<a class="anchor" aria-label="anchor" href="#autospc-0209002"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-0-9002">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0-9002"></a></h3>
+<ul><li>With <code>no_regrets = TRUE</code>, the default, adding a point to the end of a series could move a re-establishment of limits to an earlier point (#308). This happened when the final run of a candidate calculation period was on the opposite side of the candidate centre line and continued to the end of the data. The candidate limits were rejected, the algorithm went on to consider later points, and a later candidate could be accepted; once more data ended that run, the earlier candidate was accepted instead. The algorithm now stops at such a candidate. Only the end of a series is affected. Some re-establishments are now made only once a few more points have been added to the series.</li>
+<li>The algorithm log records this outcome with a new code, <code>0720</code>: “Candidate limits rejected: insufficient data to establish a stable new process. The final run of the candidate calculation period is not complete.” The description of the algorithm in <code><a href="../articles/stable-shift-algorithm.html">vignette("stable-shift-algorithm")</a></code>, its flow chart, and the explanation of the log codes are updated to match.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9001" id="autospc-0209001">autospc 0.2.0.9001<a class="anchor" aria-label="anchor" href="#autospc-0209001"></a></h2>
 <div class="section level3">

@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -402,11 +402,12 @@ candidate calculation period, then the candidate limits are rejected, the
 counter is set to the next rule-breaking run (after the triggering rule
 break) against the prevailing limits, and the algorithm continues from
 (3).</p></li>
-<li><p>If the final run of the candidate calculation period could become an
-opposing rule break with the addition of more data to the time series, then
-the candidate limits are rejected, the counter is set to the next
-rule-breaking run (after the triggering rule break) against the prevailing
-limits, and the algorithm continues from (3).</p></li>
+<li><p>If there is no opposing rule break, but the final run of the candidate
+calculation period could become one with the addition of more data to the
+time series, then there are insufficient data to establish a stable new
+process, and the candidate limits are rejected. Unlike a rejection at an
+opposing rule break, the algorithm then terminates. When more data are
+added, that run may end, in which case the candidate limits are accepted.</p></li>
 <li><p>If neither of the conditions of (i) and (ii) are met, then the
 candidate limits are accepted, established from the start of the triggering
 rule break, and extended over the rest of the data. The counter is set to
@@ -538,9 +539,9 @@ described in the following table. This shorthand forms the content of the
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="12%">
-<col width="8%">
-<col width="78%">
+<col width="6%">
+<col width="4%">
+<col width="89%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">algorithm_step</th>
@@ -666,7 +667,7 @@ described in the following table. This shorthand forms the content of the
 <tr class="even">
 <td align="left">7</td>
 <td align="left">07xx</td>
-<td align="left">Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No.</td>
+<td align="left">Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No, xx = 20: No - insufficient data to establish a stable new process, as the final run of the candidate calculation period is not complete.</td>
 </tr>
 </tbody>
 </table>

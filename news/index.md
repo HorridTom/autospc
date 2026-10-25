@@ -1,5 +1,28 @@
 # Changelog
 
+## autospc 0.2.0.9002
+
+### Bug fixes
+
+- With `no_regrets = TRUE`, the default, adding a point to the end of a
+  series could move a re-establishment of limits to an earlier point
+  (#308). This happened when the final run of a candidate calculation
+  period was on the opposite side of the candidate centre line and
+  continued to the end of the data. The candidate limits were rejected,
+  the algorithm went on to consider later points, and a later candidate
+  could be accepted; once more data ended that run, the earlier
+  candidate was accepted instead. The algorithm now stops at such a
+  candidate. Only the end of a series is affected. Some
+  re-establishments are now made only once a few more points have been
+  added to the series.
+- The algorithm log records this outcome with a new code, `0720`:
+  “Candidate limits rejected: insufficient data to establish a stable
+  new process. The final run of the candidate calculation period is not
+  complete.” The description of the algorithm in
+  [`vignette("stable-shift-algorithm")`](https://horridtom.github.io/autospc/articles/stable-shift-algorithm.md),
+  its flow chart, and the explanation of the log codes are updated to
+  match.
+
 ## autospc 0.2.0.9001
 
 ### U and U’ charts

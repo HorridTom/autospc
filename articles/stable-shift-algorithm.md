@@ -353,12 +353,13 @@ the end of this first calculation period.
         (after the triggering rule break) against the prevailing limits,
         and the algorithm continues from (3).
 
-    2.  If the final run of the candidate calculation period could
-        become an opposing rule break with the addition of more data to
-        the time series, then the candidate limits are rejected, the
-        counter is set to the next rule-breaking run (after the
-        triggering rule break) against the prevailing limits, and the
-        algorithm continues from (3).
+    2.  If there is no opposing rule break, but the final run of the
+        candidate calculation period could become one with the addition
+        of more data to the time series, then there are insufficient
+        data to establish a stable new process, and the candidate limits
+        are rejected. Unlike a rejection at an opposing rule break, the
+        algorithm then terminates. When more data are added, that run
+        may end, in which case the candidate limits are accepted.
 
     3.  If neither of the conditions of (i) and (ii) are met, then the
         candidate limits are accepted, established from the start of the
@@ -519,4 +520,4 @@ log_exp_tab %>%
 |  |  | y = 1: At least one opposing rule break. |
 |  |  | z = 0: Final run does not prevent re-establishment of limits |
 |  |  | z = 1: Final run prevents re-establishment of limits. |
-| 7 | 07xx | Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No. |
+| 7 | 07xx | Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No, xx = 20: No - insufficient data to establish a stable new process, as the final run of the candidate calculation period is not complete. |

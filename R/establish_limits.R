@@ -250,10 +250,22 @@ establish_limits <- function(chart) {
                   reason = "limits re-established"
                 )
                 counter <- counter + chart$period_min
+              } else if (!opposite_rule_break &
+                chart$no_regrets == TRUE &
+                final_run_prevents) {
+                # [7c] The final run of the candidate calculation period may
+                # still become an opposing rule break, so there are
+                # insufficient data to establish a stable new process: the
+                # candidate limits are rejected, and the algorithm stops.
+                chart <- record_stop(chart,
+                  counter = counter,
+                  reason = "final run of the candidate period not yet complete"
+                )
+
+                break
               } else {
-                # [7b] If not (i.e. there is an opposing rule break, or the
-                # final run prevents re-establishment of limits), limits are not
-                # re-established, the candidate limits are rejected, and the
+                # [7b] If not (i.e. there is an opposing rule break), limits are
+                # not re-established, the candidate limits are rejected, and the
                 # algorithm proceeds to the next point that could potentially
                 # be the start of a new period.
 

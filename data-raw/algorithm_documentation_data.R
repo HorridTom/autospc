@@ -28,7 +28,9 @@ get_algorithm_flow_chart_string <- function() {
   K [shape = diamond, label = '@@11', width = 3, group = c];
   L [label = '@@12', width = 3];
   M [label = '@@13', width = 3];
-  N [label = '@@14', width = 3]
+  N [label = '@@14', width = 3];
+  O [shape = diamond, label = '@@15', width = 3];
+  P [label = '@@3', width = 1]
 
   # edge statements
   A -> B;
@@ -40,7 +42,8 @@ get_algorithm_flow_chart_string <- function() {
   H -> I;
   I -> C [label = 'N (6b)']; I -> J [label = 'Y (6a)'];
   J -> K;
-  K -> L [label = 'N (7a)']; K -> M [label = 'Y (7b)'];
+  K -> O [label = 'N']; K -> M [label = 'Y (7b)'];
+  O -> L [label = 'N (7a)']; O -> P [label = 'Y (7c)'];
   L -> N;
   M -> N;
   N -> D
@@ -59,10 +62,11 @@ get_algorithm_flow_chart_string <- function() {
    [8]: paste0('Set counter to next rule break\\n','and record its direction')
    [9]: paste0('(6) Sufficient data remaining\\n', 'to form a new period?')
   [10]: paste0('Establish candidate limits')
-  [11]: paste0('(7) Is there an opposing rule break\\n','or does the final run prevent\\n','establishment of new limits?')
+  [11]: paste0('(7) Is there an opposing rule break\\n','in the candidate calculation period?')
   [12]: paste0('Accept candidate limits:\\n','re-establish limits at the counter')
   [13]: paste0('Reject candidate limits')
   [14]: paste0('Set counter to next\\n','rule-breaking run')
+  [15]: paste0('Could the final run still become\\n','an opposing rule break?')
   "
 
   return(diagram_string)
@@ -123,7 +127,11 @@ get_log_explanation_table <- function() {
     ),
     "7", "07xx", paste0(
       "Decide whether to re-establish",
-      " limits. xx = 00: Yes, xx = 10: No."
+      " limits. xx = 00: Yes, xx = 10: No,",
+      " xx = 20: No - insufficient data to",
+      " establish a stable new process, as the",
+      " final run of the candidate calculation",
+      " period is not complete."
     )
   )
 }

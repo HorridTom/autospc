@@ -361,26 +361,25 @@ autospc_chart <- function(chart_type,
 #'   `autospc_chart_elements()`.
 #' @noRd
 assemble_chart_list <- function(
-  data,
-  x,
-  y,
-  aggregation_na_rm = autospc_default("aggregation_na_rm"),
-  period_min = autospc_default("period_min"),
-  baseline_length = autospc_default("baseline_length"),
-  shift_rule_threshold = autospc_default("shift_rule_threshold"),
-  baseline_only = autospc_default("baseline_only"),
-  establish_every_shift = autospc_default("establish_every_shift"),
-  no_regrets = autospc_default("no_regrets"),
-  overhanging_reversions = autospc_default("overhanging_reversions"),
-  na_ends_run = autospc_default("na_ends_run"),
-  max_exclusions = autospc_default("max_exclusions"),
-  mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
-  centre_line_tolerance = autospc_default("centre_line_tolerance"),
-  floating_median = autospc_default("floating_median"),
-  floating_median_n = autospc_default("floating_median_n"),
-  extend_limits_to = autospc_default("extend_limits_to"),
-  keep_candidate_tables = autospc_default("keep_candidate_tables")
-) {
+    data,
+    x,
+    y,
+    aggregation_na_rm = autospc_default("aggregation_na_rm"),
+    period_min = autospc_default("period_min"),
+    baseline_length = autospc_default("baseline_length"),
+    shift_rule_threshold = autospc_default("shift_rule_threshold"),
+    baseline_only = autospc_default("baseline_only"),
+    establish_every_shift = autospc_default("establish_every_shift"),
+    no_regrets = autospc_default("no_regrets"),
+    overhanging_reversions = autospc_default("overhanging_reversions"),
+    na_ends_run = autospc_default("na_ends_run"),
+    max_exclusions = autospc_default("max_exclusions"),
+    mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
+    centre_line_tolerance = autospc_default("centre_line_tolerance"),
+    floating_median = autospc_default("floating_median"),
+    floating_median_n = autospc_default("floating_median_n"),
+    extend_limits_to = autospc_default("extend_limits_to"),
+    keep_candidate_tables = autospc_default("keep_candidate_tables")) {
   # baseline_length is period_min unless the caller sets it, so that every
   # chart has a first calculation period length and the field is never NULL.
   if (is.null(baseline_length)) {

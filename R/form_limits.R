@@ -168,10 +168,9 @@ form_display_limits <- function(limits_table, counter, chart) {
 # Function to create limits for new calculation and display period with rule
 # breaks
 form_calculation_and_display_limits <- function(
-  data,
-  counter_at_period_start,
-  chart
-) {
+    data,
+    counter_at_period_start,
+    chart) {
   # form calculation limits for first period
   limits_table <- form_calculation_limits(
     data = data,

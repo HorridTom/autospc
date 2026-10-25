@@ -238,8 +238,19 @@ test_that("the log records the algorithm's decisions", {
     entries(analyse(example_series_2a)),
     c(
       "1" = "0100;0200",
-      "22" = "0300;040122;050010;060001;0710",
-      "23" = "040023;050010;060000;0700"
+      "22" = "0300;040122;050010;060001;0720"
+    )
+  )
+
+  expect_identical(
+    entries(analyse(dplyr::bind_rows(
+      example_series_2a,
+      data.frame(x = 44L, y = 43L)
+    ))),
+    c(
+      "1" = "0100;0200",
+      "22" = "0300;040122;050010;060000;0700",
+      "43" = "0410"
     )
   )
 

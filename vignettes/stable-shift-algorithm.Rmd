@@ -304,11 +304,12 @@ points beginning at the counter.
     break) against the prevailing limits, and the algorithm continues from
     (3).
 
-    ii. If the final run of the candidate calculation period could become an
-    opposing rule break with the addition of more data to the time series, then 
-    the candidate limits are rejected, the counter is set to the next
-    rule-breaking run (after the triggering rule break) against the prevailing
-    limits, and the algorithm continues from (3).
+    ii. If there is no opposing rule break, but the final run of the candidate
+    calculation period could become one with the addition of more data to the
+    time series, then there are insufficient data to establish a stable new
+    process, and the candidate limits are rejected. Unlike a rejection at an
+    opposing rule break, the algorithm then terminates. When more data are
+    added, that run may end, in which case the candidate limits are accepted.
     
     iii. If neither of the conditions of (i) and (ii) are met, then the
     candidate limits are accepted, established from the start of the triggering

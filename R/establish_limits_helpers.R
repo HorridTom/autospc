@@ -246,9 +246,8 @@ identify_opposite_break <- function(limits_table,
 # Function to establish whether the final run in the candidate calculation
 # period prevents limits being re-established (for no regrets)
 final_run_prevents_re_establishment <- function(
-  candidate_limits_table,
-  triggering_rule_break_direction
-) {
+    candidate_limits_table,
+    triggering_rule_break_direction) {
   # Filter data to exclude everything prior to the last calculation period
   data <- candidate_limits_table
   data <- data %>%

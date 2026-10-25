@@ -13,11 +13,10 @@ contract_data <- data.frame(
 )
 
 contract_plot <- function(
-  plot = ggplot2::ggplot(contract_data, ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_point(),
-  charts = list(autospc_chart_c(data = contract_data, x = "x", y = "y")),
-  visualisation_params = list(point_size = 4)
-) {
+    plot = ggplot2::ggplot(contract_data, ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_point(),
+    charts = list(autospc_chart_c(data = contract_data, x = "x", y = "y")),
+    visualisation_params = list(point_size = 4)) {
   validate_autospc_plot(
     new_autospc_plot(
       plot = plot,

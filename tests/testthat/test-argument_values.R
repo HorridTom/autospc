@@ -579,6 +579,92 @@ test_that("a bad colour is refused whether or not the chart would use it", {
 })
 
 
+# floating_median_style
+
+
+test_that("floating_median_style takes a list of colour, linetype and linewidth", {
+  styles <- list(
+    list(colour = "navy", linetype = "dashed", linewidth = 1),
+    list(colour = "#ff0000"),
+    list(linetype = "13"),
+    list(linetype = 2L),
+    list(linewidth = 0.2),
+    list()
+  )
+
+  for (style in styles) {
+    expect_s3_class(
+      analyse(floating_median_style = style),
+      "data.frame"
+    )
+  }
+})
+
+
+test_that("floating_median_style must be a list with named elements", {
+  expect_error(
+    analyse(floating_median_style = "red"),
+    "`floating_median_style` must be a list"
+  )
+
+  expect_error(
+    analyse(floating_median_style = list("red")),
+    "`floating_median_style` must be a list"
+  )
+})
+
+
+test_that("an element floating_median_style does not use is an error", {
+  expect_error(
+    analyse(floating_median_style = list(color = "navy")),
+    "`color`"
+  )
+})
+
+
+test_that("the colour in floating_median_style is checked as a colour", {
+  for (value in list("notacolour", c("red", "blue"), NA)) {
+    expect_error(
+      analyse(floating_median_style = list(colour = value)),
+      "`floating_median_style$colour` must be a colour",
+      fixed = TRUE
+    )
+  }
+})
+
+
+test_that("the linetype in floating_median_style is checked as a line type", {
+  for (value in list("banana", "123", "1G", "10", c("13", "42"), NA, -1L)) {
+    expect_error(
+      analyse(floating_median_style = list(linetype = value)),
+      "`floating_median_style$linetype` must be a line type",
+      fixed = TRUE
+    )
+  }
+})
+
+
+test_that("the linewidth in floating_median_style is a positive number", {
+  for (value in list(0, -1, "thick", c(1, 2), NA)) {
+    expect_error(
+      analyse(floating_median_style = list(linewidth = value)),
+      "`floating_median_style$linewidth` must be",
+      fixed = TRUE
+    )
+  }
+})
+
+
+test_that("a bad floating_median_style is refused whether or not a median is drawn", {
+  # analyse() leaves floating_median at "no". The style is still checked,
+  # because a later call with a median would use it
+  expect_error(
+    analyse(floating_median_style = list(colour = "notacolour")),
+    "must be a colour"
+  )
+})
+
+
 # x_date_format
 
 

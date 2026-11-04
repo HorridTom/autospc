@@ -121,6 +121,16 @@ test_that("every visualisation parameter reaches the plot object", {
       given[[parameter]] <- !autospc_default(parameter)
     }
 
+    if (is.list(autospc_default(parameter))) {
+      # a list parameter takes a list; every element is given, so the value
+      # recorded is the value given
+      given[[parameter]] <- list(
+        colour = "navy",
+        linetype = "dashed",
+        linewidth = 1.5
+      )
+    }
+
     if (identical(parameter, "override_y_lim")) {
       # a numeric parameter that is checked against the series needs a value
       # that passes that check too

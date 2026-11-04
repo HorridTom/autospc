@@ -45,6 +45,8 @@ autospc(
   extend_limits_to = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
+  floating_median_style = list(colour = "firebrick3", linetype = "longdash", linewidth =
+    0.75),
   point_size = 2,
   line_width_sf = 1,
   include_annotations = TRUE,
@@ -258,6 +260,12 @@ to extend the final limits out to}
 control limits)}
 
 \item{r2_col}{Highlight colour for breaks of rule 2 (shifts)}
+
+\item{floating_median_style}{A list setting how the floating median is
+drawn, with any of the elements \code{colour}, \code{linetype} and \code{linewidth}.
+Elements not given take their defaults: \code{"firebrick3"}, \code{"longdash"} and
+0.75. The width is multiplied by \code{line_width_sf}, as the other lines are. The
+median's label is drawn in \code{colour}.}
 
 \item{point_size}{Size of plot points, defaults to 2. See
 \link[ggplot2]{aes_linetype_size_shape} for more details.}

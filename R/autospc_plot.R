@@ -241,6 +241,7 @@ visualisation_param_names <- function() {
     "x_pad_end",
     "r1_col",
     "r2_col",
+    "floating_median_style",
     "point_size",
     "line_width_sf",
     "highlight_exclusions",
@@ -400,7 +401,7 @@ autospc_plot <- function(charts,
       table = main$table,
       visualisation_params = visualisation_params,
       axis_extents = main$axis_extents,
-      floating_median_n = main$chart$floating_median_n,
+      chart = main$chart,
       faceted = faceted
     )
   } else {

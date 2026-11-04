@@ -203,23 +203,29 @@ test_that("a non-default floating_median_n reaches the analysis", {
 
 
 test_that("a non-default floating_median_n reaches the label", {
-  label_x <- function(n) {
-    plot <- autospc(test_median_data,
-      chart_type = "X",
+  # the last eight points are four of 10 then four of 30, so the median of the
+  # last four is 30 and of the last eight is 20
+  window_data <- data.frame(
+    x = 1:30,
+    y = as.integer(c(
+      rep(c(10, 12, 11, 13, 9, 14), 3), 11, 12, 13, 12,
+      10, 10, 10, 10, 30, 30, 30, 30
+    ))
+  )
+
+  label_of <- function(n) {
+    plot <- suppressWarnings(autospc(window_data,
+      chart_type = "C",
+      period_min = 21L,
       floating_median = "yes",
       floating_median_n = n
-    )
-    built <- ggplot2::ggplot_build(plot)$data
-    labelled <- Filter(function(layer) "label" %in% names(layer), built)
-    median_label <- Filter(
-      function(layer) all(layer$label == "Median"),
-      labelled
-    )
-    median_label[[1]]$x
+    ))
+
+    return(median_drawing(plot)$label$label)
   }
 
-  # the label sits at the start of the window, so a wider window moves it left
-  expect_lt(label_x(20L), label_x(8L))
+  expect_identical(label_of(4L), "Median\n30")
+  expect_identical(label_of(8L), "Median\n20")
 })
 
 
@@ -320,6 +326,11 @@ no_limits_chart <- function(floating_median, ...) {
 }
 
 
+has_median_label <- function(labels) {
+  return(any(startsWith(as.character(stats::na.omit(labels)), "Median\n")))
+}
+
+
 median_value_of <- function(table) {
   return(as.numeric(unique(stats::na.omit(table$median))))
 }
@@ -358,12 +369,12 @@ test_that("the floating median is drawn on a series too short for limits", {
   )))
 
   # and one holds its label
-  expect_true("Median" %in% drawn$labels)
+  expect_true(has_median_label(drawn$labels))
 })
 
 
 test_that("no floating median is drawn where none was asked for", {
-  expect_false("Median" %in% drawn_medians(no_limits_chart("no"))$labels)
+  expect_false(has_median_label(drawn_medians(no_limits_chart("no"))$labels))
 })
 
 
@@ -380,7 +391,7 @@ test_that("show_limits = FALSE keeps the floating median", {
     show_limits = FALSE
   )))
 
-  expect_true("Median" %in% drawn$labels)
+  expect_true(has_median_label(drawn$labels))
 })
 
 
@@ -408,26 +419,21 @@ test_that("auto is not confused by a point with no value in the window", {
 })
 
 
-test_that("the floating median label sits at the start of the median window", {
+test_that("the floating median label sits just after the end of the median window", {
   table <- suppressWarnings(autospc(example_series_1,
     chart_type = "C", floating_median = "yes", plot_chart = FALSE
   ))
 
-  window_starts_at <- min(table$x[!is.na(table$median)])
+  window_ends_at <- max(table$x[!is.na(table$median)])
 
-  drawn <- ggplot2::ggplot_build(suppressWarnings(autospc(example_series_1,
+  label <- median_drawing(suppressWarnings(autospc(example_series_1,
     chart_type = "C", floating_median = "yes"
-  )))$data
+  )))$label
 
-  label <- do.call(rbind, lapply(drawn, function(layer) {
-    if (is.null(layer$label)) {
-      return(NULL)
-    }
-
-    return(layer[layer$label == "Median", c("x", "y")])
-  }))
-
-  expect_equal(label$x, window_starts_at)
+  expect_identical(nrow(label), 1L)
+  expect_gt(label$x, window_ends_at)
+  expect_identical(label$hjust, 0)
+  expect_equal(label$y, median_value_of(table))
 })
 
 
@@ -460,7 +466,7 @@ test_that("an XmR pair too short for limits draws its floating median", {
     chart_type = "XMR", period_min = 21L, floating_median = "yes"
   )))
 
-  expect_true("Median" %in% drawn$labels)
+  expect_true(has_median_label(drawn$labels))
 })
 
 
@@ -484,5 +490,202 @@ test_that("a moving range panel without limits draws its floating median", {
   )
 
   # one median label on each panel
-  expect_identical(sum(panel_texts(plot) == "Median"), 2L)
+  expect_identical(sum(startsWith(panel_texts(plot), "Median\n")), 2L)
+})
+
+
+# The floating median's style and its label
+
+
+# a P chart long enough for limits, whose last twelve points are 40, 45, 50,
+# 55, 60 and 65 per cent twice, so its floating median is 52.5%
+with_limits_data <- data.frame(
+  x = 1:36,
+  y = as.integer(c(rep(c(48, 52), 12), rep(c(40, 45, 50, 55, 60, 65), 2))),
+  n = 100L
+)
+
+
+with_limits_plot <- function(...) {
+  return(suppressWarnings(autospc(with_limits_data,
+    chart_type = "P",
+    floating_median = "yes",
+    ...
+  )))
+}
+
+
+# no_limits_data, above, is too short for limits, so it is drawn by
+# create_timeseries_plot(); its last twelve points have a median of 18
+no_limits_plot <- function(...) {
+  return(no_limits_chart("yes", ...))
+}
+
+
+median_plots <- list(
+  with_limits = with_limits_plot,
+  no_limits = no_limits_plot
+)
+
+
+test_that("the floating median is drawn in firebrick3, longdash, at width 0.75 by default", {
+  for (name in names(median_plots)) {
+    drawing <- median_drawing(median_plots[[name]]())
+
+    expect_length(drawing$line, 1L)
+
+    line <- drawing$line[[1]]
+
+    expect_identical(unique(line$colour), "firebrick3", info = name)
+    expect_identical(unique(line$linetype), "longdash", info = name)
+    expect_identical(unique(line$linewidth), 0.75, info = name)
+    expect_identical(drawing$label$colour, "firebrick3", info = name)
+  }
+})
+
+
+test_that("floating_median_style sets the median's colour, line type and width", {
+  style <- list(colour = "navy", linetype = "dashed", linewidth = 1.2)
+
+  for (name in names(median_plots)) {
+    drawing <- median_drawing(
+      median_plots[[name]](floating_median_style = style)
+    )
+
+    line <- drawing$line[[1]]
+
+    expect_identical(unique(line$colour), "navy", info = name)
+    expect_identical(unique(line$linetype), "dashed", info = name)
+    expect_identical(unique(line$linewidth), 1.2, info = name)
+    expect_identical(drawing$label$colour, "navy", info = name)
+  }
+})
+
+
+test_that("elements not given in floating_median_style take their defaults", {
+  line <- median_drawing(
+    with_limits_plot(floating_median_style = list(colour = "navy"))
+  )$line[[1]]
+
+  expect_identical(unique(line$colour), "navy")
+  expect_identical(unique(line$linetype), "longdash")
+  expect_identical(unique(line$linewidth), 0.75)
+})
+
+
+test_that("the floating median's width follows line_width_sf", {
+  for (name in names(median_plots)) {
+    line <- median_drawing(median_plots[[name]](line_width_sf = 2))$line[[1]]
+
+    expect_identical(unique(line$linewidth), 1.5, info = name)
+  }
+})
+
+
+test_that("the floating median has no legend entry", {
+  for (name in names(median_plots)) {
+    layer <- median_drawing(median_plots[[name]]())$layer[[1]]
+
+    expect_false(layer$show.legend, info = name)
+  }
+})
+
+
+test_that("the floating median label gives the median's value", {
+  expect_identical(
+    median_drawing(with_limits_plot())$label$label,
+    "Median\n52.5%"
+  )
+
+  expect_identical(
+    median_drawing(no_limits_plot())$label$label,
+    "Median\n18"
+  )
+})
+
+
+test_that("a count median halfway between two whole numbers keeps its half", {
+  # C and C' labels are whole numbers, but the median of an even number of
+  # counts can end in .5. Its last twelve points sort to 15, 16, 17, 17, 18,
+  # 18, 19, 19, 20, 20, 21 and 22, so the median is 18.5
+  halfway_data <- data.frame(
+    x = 1:14,
+    y = as.integer(c(10, 11, 17, 18, 16, 19, 20, 18, 21, 19, 22, 17, 20, 15))
+  )
+
+  label <- median_drawing(suppressWarnings(autospc(halfway_data,
+    chart_type = "C",
+    period_min = 21L,
+    floating_median = "yes"
+  )))$label
+
+  expect_identical(label$label, "Median\n18.5")
+})
+
+
+test_that("the floating median label sits just after its line, level with it", {
+  last_x <- c(with_limits = 36L, no_limits = 14L)
+  value <- c(with_limits = 52.5, no_limits = 18)
+
+  for (name in names(median_plots)) {
+    label <- median_drawing(median_plots[[name]]())$label
+
+    # one label, so it was not dropped for lying outside the axis
+    expect_identical(nrow(label), 1L, info = name)
+    expect_gt(label$x, last_x[[name]])
+    expect_identical(label$hjust, 0, info = name)
+    expect_equal(label$y, value[[name]], info = name)
+  }
+})
+
+
+test_that("the floating median label is drawn at annotation_size", {
+  for (name in names(median_plots)) {
+    label <- median_drawing(median_plots[[name]](annotation_size = 5))$label
+
+    expect_identical(label$size, 5, info = name)
+  }
+})
+
+
+test_that("the floating median label sits at the end of the median, not of the extension", {
+  set.seed(5)
+  extended <- data.frame(x = 1:40, y = as.integer(stats::rpois(40, 50)))
+
+  label <- median_drawing(suppressWarnings(autospc(extended,
+    chart_type = "C", period_min = 21L, floating_median = "yes",
+    extend_limits_to = 48
+  )))$label
+
+  expect_identical(nrow(label), 1L)
+  expect_gt(label$x, 40)
+  expect_lt(label$x, 48)
+})
+
+
+test_that("the plot records floating_median_style with every element filled in", {
+  plot <- with_limits_plot(floating_median_style = list(colour = "navy"))
+
+  expect_identical(
+    autospc_plot_visualisation_params(plot,
+      parameter = "floating_median_style"
+    ),
+    list(colour = "navy", linetype = "longdash", linewidth = 0.75)
+  )
+})
+
+
+test_that("a faceted plot draws the median label only in the facet with the median", {
+  # facet_stages() takes the floating median over the last points of the whole
+  # series, which are in the last facet
+  plot <- suppressWarnings(facet_stages(example_series_1,
+    split_at = c(60L, 100L),
+    chart_type = "C",
+    floating_median = "yes"
+  ))
+
+  label <- median_drawing(plot)$label
+
+  expect_identical(nrow(label), 1L)
+  expect_identical(as.integer(label$PANEL), 3L)
 })

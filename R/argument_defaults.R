@@ -66,6 +66,8 @@ autospc_flag_arguments <- function() {
 #'   \item `number` — any single finite number
 #'   \item `axis_value` — a single value of whatever type the horizontal axis
 #'     holds, which is not restricted to numbers
+#'   \item `axis_window` — two values on the horizontal axis, either of which
+#'     may be NA
 #' }
 #'
 #' Unlike the Boolean arguments these cannot be read off the signature, because
@@ -92,7 +94,8 @@ autospc_numeric_arguments <- function() {
     override_y_lim = "axis_range",
     x_break = "axis_value",
     x_pad_end = "axis_value",
-    extend_limits_to = "axis_value"
+    extend_limits_to = "axis_value",
+    display_window = "axis_window"
   ))
 }
 

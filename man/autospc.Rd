@@ -43,6 +43,7 @@ autospc(
   x_date_format = "\%Y-\%m-\%d",
   x_pad_end = NULL,
   extend_limits_to = NULL,
+  display_window = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
   floating_median_style = list(colour = "firebrick3", linetype = "longdash", linewidth =
@@ -255,6 +256,14 @@ axis.}
 
 \item{extend_limits_to}{Optional, specifies a point on the horizontal axis
 to extend the final limits out to}
+
+\item{display_window}{Optional, two values on the horizontal axis giving the
+start and end of the range to show, with NA for an end to leave where the
+chart would put it. The analysis uses the whole series; the plot is zoomed to
+this range, and the centre line labels are placed for it. The vertical axis
+is still set from the whole series, and \code{override_y_lim} is checked against
+the points in the range. The floating median is drawn only when the range
+reaches the end of the data.}
 
 \item{r1_col}{Highlight colour for breaks of rule 1 (points outside the
 control limits)}

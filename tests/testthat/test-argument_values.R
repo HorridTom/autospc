@@ -595,6 +595,7 @@ test_that("display_window takes dates for a horizontal axis of dates", {
     autospc(ed_attendances_monthly,
       x = month_start, y = att_all, chart_type = "C",
       display_window = as.Date(c("2021-01-01", "2024-07-01")),
+      max_exclusions = 3L,
       plot_chart = FALSE
     ),
     "data.frame"
@@ -625,7 +626,8 @@ test_that("display_window must be of the same type as x", {
       display_window = c(5, 20),
       plot_chart = FALSE
     ),
-    "`display_window`"
+    "`display_window` must be of the same type as `x`",
+    fixed = TRUE
   )
 })
 

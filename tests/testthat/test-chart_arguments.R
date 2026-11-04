@@ -131,6 +131,11 @@ test_that("every visualisation parameter reaches the plot object", {
       )
     }
 
+    if (identical(parameter, "display_window")) {
+      # two points on the horizontal axis, which runs from 1 to 30
+      given[[parameter]] <- c(5, 20)
+    }
+
     if (identical(parameter, "override_y_lim")) {
       # a numeric parameter that is checked against the series needs a value
       # that passes that check too

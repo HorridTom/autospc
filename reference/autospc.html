@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,6 +95,8 @@ by default the Stable Shift Algorithm.</p>
 <span>  extend_limits_to <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  r1_col <span class="op">=</span> <span class="st">"orange"</span>,</span>
 <span>  r2_col <span class="op">=</span> <span class="st">"steelblue3"</span>,</span>
+<span>  floating_median_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"firebrick3"</span>, linetype <span class="op">=</span> <span class="st">"longdash"</span>, linewidth <span class="op">=</span></span>
+<span>    <span class="fl">0.75</span><span class="op">)</span>,</span>
 <span>  point_size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  line_width_sf <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  include_annotations <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -392,6 +394,14 @@ control limits)</p></dd>
 
 <dt id="arg-r-col">r2_col<a class="anchor" aria-label="anchor" href="#arg-r-col"></a></dt>
 <dd><p>Highlight colour for breaks of rule 2 (shifts)</p></dd>
+
+
+<dt id="arg-floating-median-style">floating_median_style<a class="anchor" aria-label="anchor" href="#arg-floating-median-style"></a></dt>
+<dd><p>A list setting how the floating median is
+drawn, with any of the elements <code>colour</code>, <code>linetype</code> and <code>linewidth</code>.
+Elements not given take their defaults: <code>"firebrick3"</code>, <code>"longdash"</code> and
+0.75. The width is multiplied by <code>line_width_sf</code>, as the other lines are. The
+median's label is drawn in <code>colour</code>.</p></dd>
 
 
 <dt id="arg-point-size">point_size<a class="anchor" aria-label="anchor" href="#arg-point-size"></a></dt>

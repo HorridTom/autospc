@@ -58,6 +58,7 @@ utils::globalVariables(c(
   "excluded.y",
   "highlight",
   "interpretation",
+  "label",
   "lagged_above_or_below_cl",
   "lagged_period_type",
   "lcl",

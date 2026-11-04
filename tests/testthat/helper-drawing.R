@@ -44,7 +44,7 @@ panel_texts <- function(plot) {
 # built data, and the built data of its label.
 #
 # The line is the layer whose y is mapped to `median`. The label is the text
-# whose label starts "Median ", from whichever layer draws it.
+# whose label starts "Median" and a new line, from whichever layer draws it.
 median_drawing <- function(plot) {
   built <- ggplot2::ggplot_build(plot)$data
 
@@ -64,9 +64,9 @@ median_drawing <- function(plot) {
 
     return(layer %>%
       dplyr::mutate(label = as.character(label)) %>%
-      dplyr::filter(!is.na(label), startsWith(label, "Median ")) %>%
+      dplyr::filter(!is.na(label), startsWith(label, "Median\n")) %>%
       dplyr::select(dplyr::any_of(
-        c("x", "y", "label", "hjust", "colour", "size")
+        c("PANEL", "x", "y", "label", "hjust", "colour", "size")
       )) %>%
       as.data.frame())
   }))

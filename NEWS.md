@@ -1,3 +1,17 @@
+# autospc 0.2.0.9003
+
+## Floating median
+
+* New argument `floating_median_style`, a list of `colour`, `linetype` and
+  `linewidth`, sets how the floating median is drawn (#315). The default is
+  now `firebrick3` with long dashes, in place of grey, which was often hard
+  to see. The median's width follows `line_width_sf`, as the other lines do.
+* The floating median's label now sits just after the end of the median line, at
+  `annotation_size` (#316). The horizontal axis is extended to make room for it.
+* The floating median is no longer drawn behind the keys of the "Rule
+  triggered" legend, and `facet_stages()` draws its label only in the facet
+  that holds the median.
+
 # autospc 0.2.0.9002
 
 ## Bug fixes

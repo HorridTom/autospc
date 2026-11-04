@@ -117,7 +117,9 @@ create_spc_plot <- function(plot_data,
       spc_plot = spc_plot,
       table = long_table %>%
         dplyr::filter(plotted_line == "cl"),
-      floating_median_n = chart$floating_median_n
+      chart = chart,
+      visualisation_params = visualisation_params,
+      ylimhigh = axis_extents$ylimhigh
     )
   }
 
@@ -215,7 +217,7 @@ draw_dispersion_panel <- function(plot_data,
       table = plot_data$table,
       visualisation_params = visualisation_params,
       axis_extents = plot_data$axis_extents,
-      floating_median_n = plot_data$chart$floating_median_n
+      chart = plot_data$chart
     ))
   }
 
@@ -236,7 +238,7 @@ draw_dispersion_panel <- function(plot_data,
 create_timeseries_plot <- function(table,
                                    visualisation_params,
                                    axis_extents,
-                                   floating_median_n,
+                                   chart,
                                    faceted = FALSE) {
   time_series_plot <- ggplot2::ggplot(
     table,
@@ -277,7 +279,9 @@ create_timeseries_plot <- function(table,
     time_series_plot <- add_floating_median(
       table = table,
       spc_plot = time_series_plot,
-      floating_median_n = floating_median_n
+      chart = chart,
+      visualisation_params = visualisation_params,
+      ylimhigh = axis_extents$ylimhigh
     )
   }
 

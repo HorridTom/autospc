@@ -162,7 +162,7 @@
 #' @param r2_col Highlight colour for breaks of rule 2 (shifts)
 #' @param floating_median_style A list setting how the floating median is
 #' drawn, with any of the elements `colour`, `linetype` and `linewidth`.
-#' Elements not given take their defaults: `"firebrick3"`, `"13"` (dotted) and
+#' Elements not given take their defaults: `"firebrick3"`, `"longdash"` and
 #' 0.75. The width is multiplied by `line_width_sf`, as the other lines are. The
 #' median's label is drawn in `colour`.
 #' @param point_size Size of plot points, defaults to 2. See
@@ -279,7 +279,7 @@ autospc <- function(data,
                     r2_col = "steelblue3",
                     floating_median_style = list(
                       colour = "firebrick3",
-                      linetype = "13",
+                      linetype = "longdash",
                       linewidth = 0.75
                     ),
                     point_size = 2,

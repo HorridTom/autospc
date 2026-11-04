@@ -224,6 +224,10 @@ axis_specifications <- function(table,
   x_max <- max(subgroup_x_values(table), na.rm = TRUE)
   end_x <- max(x_max, x_pad_end)
 
+  if (has_floating_median(table)) {
+    end_x <- max(end_x, floating_median_label_end(table))
+  }
+
   if (!enough_data_for_limits(chart)) {
     ylimlow <- min(table$series, na.rm = TRUE)
     ylimhigh <- max(table$series, na.rm = TRUE)

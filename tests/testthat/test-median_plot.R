@@ -224,8 +224,8 @@ test_that("a non-default floating_median_n reaches the label", {
     return(median_drawing(plot)$label$label)
   }
 
-  expect_identical(label_of(4L), "Median 30")
-  expect_identical(label_of(8L), "Median 20")
+  expect_identical(label_of(4L), "Median\n30")
+  expect_identical(label_of(8L), "Median\n20")
 })
 
 
@@ -327,7 +327,7 @@ no_limits_chart <- function(floating_median, ...) {
 
 
 has_median_label <- function(labels) {
-  return(any(startsWith(as.character(stats::na.omit(labels)), "Median ")))
+  return(any(startsWith(as.character(stats::na.omit(labels)), "Median\n")))
 }
 
 
@@ -490,7 +490,7 @@ test_that("a moving range panel without limits draws its floating median", {
   )
 
   # one median label on each panel
-  expect_identical(sum(startsWith(panel_texts(plot), "Median ")), 2L)
+  expect_identical(sum(startsWith(panel_texts(plot), "Median\n")), 2L)
 })
 
 
@@ -528,7 +528,7 @@ median_plots <- list(
 )
 
 
-test_that("the floating median is drawn in firebrick3, dotted, at width 0.75 by default", {
+test_that("the floating median is drawn in firebrick3, longdash, at width 0.75 by default", {
   for (name in names(median_plots)) {
     drawing <- median_drawing(median_plots[[name]]())
 
@@ -537,7 +537,7 @@ test_that("the floating median is drawn in firebrick3, dotted, at width 0.75 by 
     line <- drawing$line[[1]]
 
     expect_identical(unique(line$colour), "firebrick3", info = name)
-    expect_identical(unique(line$linetype), "13", info = name)
+    expect_identical(unique(line$linetype), "longdash", info = name)
     expect_identical(unique(line$linewidth), 0.75, info = name)
     expect_identical(drawing$label$colour, "firebrick3", info = name)
   }
@@ -568,7 +568,7 @@ test_that("elements not given in floating_median_style take their defaults", {
   )$line[[1]]
 
   expect_identical(unique(line$colour), "navy")
-  expect_identical(unique(line$linetype), "13")
+  expect_identical(unique(line$linetype), "longdash")
   expect_identical(unique(line$linewidth), 0.75)
 })
 
@@ -594,12 +594,12 @@ test_that("the floating median has no legend entry", {
 test_that("the floating median label gives the median's value", {
   expect_identical(
     median_drawing(with_limits_plot())$label$label,
-    "Median 52.5%"
+    "Median\n52.5%"
   )
 
   expect_identical(
     median_drawing(no_limits_plot())$label$label,
-    "Median 18"
+    "Median\n18"
   )
 })
 
@@ -619,7 +619,7 @@ test_that("a count median halfway between two whole numbers keeps its half", {
     floating_median = "yes"
   )))$label
 
-  expect_identical(label$label, "Median 18.5")
+  expect_identical(label$label, "Median\n18.5")
 })
 
 
@@ -670,6 +670,22 @@ test_that("the plot records floating_median_style with every element filled in",
     autospc_plot_visualisation_params(plot,
       parameter = "floating_median_style"
     ),
-    list(colour = "navy", linetype = "13", linewidth = 0.75)
+    list(colour = "navy", linetype = "longdash", linewidth = 0.75)
   )
+})
+
+
+test_that("a faceted plot draws the median label only in the facet with the median", {
+  # facet_stages() takes the floating median over the last points of the whole
+  # series, which are in the last facet
+  plot <- suppressWarnings(facet_stages(example_series_1,
+    split_at = c(60L, 100L),
+    chart_type = "C",
+    floating_median = "yes"
+  ))
+
+  label <- median_drawing(plot)$label
+
+  expect_identical(nrow(label), 1L)
+  expect_identical(as.integer(label$PANEL), 3L)
 })

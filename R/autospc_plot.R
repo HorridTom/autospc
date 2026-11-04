@@ -401,7 +401,7 @@ autospc_plot <- function(charts,
       table = main$table,
       visualisation_params = visualisation_params,
       axis_extents = main$axis_extents,
-      floating_median_n = main$chart$floating_median_n,
+      chart = main$chart,
       faceted = faceted
     )
   } else {

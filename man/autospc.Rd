@@ -45,7 +45,8 @@ autospc(
   extend_limits_to = NULL,
   r1_col = "orange",
   r2_col = "steelblue3",
-  floating_median_style = list(colour = "firebrick3", linetype = "13", linewidth = 0.75),
+  floating_median_style = list(colour = "firebrick3", linetype = "longdash", linewidth =
+    0.75),
   point_size = 2,
   line_width_sf = 1,
   include_annotations = TRUE,
@@ -262,7 +263,7 @@ control limits)}
 
 \item{floating_median_style}{A list setting how the floating median is
 drawn, with any of the elements \code{colour}, \code{linetype} and \code{linewidth}.
-Elements not given take their defaults: \code{"firebrick3"}, \code{"13"} (dotted) and
+Elements not given take their defaults: \code{"firebrick3"}, \code{"longdash"} and
 0.75. The width is multiplied by \code{line_width_sf}, as the other lines are. The
 median's label is drawn in \code{colour}.}
 

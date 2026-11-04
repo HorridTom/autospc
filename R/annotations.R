@@ -1,4 +1,6 @@
-# Add annotation data to main dataframe
+# Add annotation data to main dataframe. With a window, only the periods that
+# overlap it are labelled, a period starting before it at its first row, and
+# align_labels takes the limits in it.
 add_annotation_data <- function(table,
                                 chart,
                                 ylimhigh,
@@ -6,8 +8,22 @@ add_annotation_data <- function(table,
                                 flip_labels,
                                 upper_annotation_sf,
                                 lower_annotation_sf,
-                                annotation_arrow_curve) {
-  first_row <- first_label_row(chart)
+                                annotation_arrow_curve,
+                                window = NULL) {
+  in_window <- rep(TRUE, nrow(table))
+
+  if (!is.null(window)) {
+    in_window <- !is.na(table$x) &
+      table$x >= window[[1L]] &
+      table$x <= window[[2L]]
+  }
+
+  # a facet wholly outside the window has no labels
+  first_row <- 0L
+
+  if (any(in_window)) {
+    first_row <- max(first_label_row(chart), match(TRUE, in_window))
+  }
 
   labels <- centre_line_label(
     chart = chart,
@@ -17,8 +33,10 @@ add_annotation_data <- function(table,
 
   table <- table %>%
     dplyr::mutate(
+      in_window = !!in_window,
+      labelled_break = break_point & in_window,
       cl_label = dplyr::if_else(
-        break_point |
+        labelled_break |
           dplyr::row_number() == first_row,
         labels,
         ""
@@ -27,14 +45,14 @@ add_annotation_data <- function(table,
       flip_labels = flip_labels,
       upper_annotation_level = dplyr::if_else(
         align_labels,
-        max(ucl,
+        max(c(-Inf, ucl[in_window]),
           na.rm = TRUE
         ) * upper_annotation_sf,
         ucl * upper_annotation_sf
       ),
       lower_level = dplyr::if_else(
         align_labels,
-        min(lcl, na.rm = TRUE) * lower_annotation_sf,
+        min(c(Inf, lcl[in_window]), na.rm = TRUE) * lower_annotation_sf,
         lcl * lower_annotation_sf
       ),
       lower_annotation_level = dplyr::if_else(
@@ -45,7 +63,7 @@ add_annotation_data <- function(table,
       annotation_level = dplyr::case_when(
         dplyr::row_number() == first_row ~
           upper_annotation_level,
-        break_point == FALSE ~ 0,
+        labelled_break == FALSE ~ 0,
         cl_change == 1 ~ upper_annotation_level,
         cl_change == 0 ~ upper_annotation_level,
         cl_change == -1 ~ lower_annotation_level
@@ -53,13 +71,15 @@ add_annotation_data <- function(table,
       annotation_curvature = dplyr::case_when(
         dplyr::row_number() == first_row ~
           annotation_arrow_curve,
-        break_point == FALSE ~ 0,
+        labelled_break == FALSE ~ 0,
         cl_change == 1 ~ annotation_arrow_curve,
         cl_change == -1 & flip_labels ~ -annotation_arrow_curve,
         cl_change == -1 & !flip_labels ~ annotation_arrow_curve
       )
     ) %>%
     dplyr::select(
+      -in_window,
+      -labelled_break,
       -align_labels,
       -flip_labels,
       -upper_annotation_level,
@@ -76,7 +96,8 @@ add_annotations_to_plot <- function(spc_plot,
                                     basic_annotations,
                                     annotation_size,
                                     annotation_arrows,
-                                    annotation_arrow_curve) {
+                                    annotation_arrow_curve,
+                                    window = NULL) {
   use_basic_annotations <- basic_annotations
 
   if (!basic_annotations &
@@ -105,7 +126,8 @@ add_annotations_to_plot <- function(spc_plot,
       table = table,
       annotation_size = annotation_size,
       annotation_arrows = annotation_arrows,
-      annotation_arrow_curve = annotation_arrow_curve
+      annotation_arrow_curve = annotation_arrow_curve,
+      window = window
     )
   }
 
@@ -199,8 +221,14 @@ add_annotations_to_plot_basic <- function(spc_plot,
                                           table,
                                           annotation_size,
                                           annotation_arrows,
-                                          annotation_arrow_curve) {
+                                          annotation_arrow_curve,
+                                          window = NULL) {
   x_range <- max(table$x, na.rm = TRUE) - min(table$x, na.rm = TRUE)
+
+  if (!is.null(window)) {
+    x_range <- window[[2L]] - window[[1L]]
+  }
+
   x_nudge <- x_range / 25
 
   annotated_plot <- spc_plot +

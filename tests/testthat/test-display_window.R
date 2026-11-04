@@ -145,6 +145,20 @@ test_that("the floating median is drawn when the window reaches the end of the d
 })
 
 
+test_that("a window ending at the last point makes room for the median label", {
+  # 2024-06-01 is the last point; the label sits after it
+  plot <- p_chart(
+    display_window = as.Date(c("2021-01-01", "2024-06-01")),
+    floating_median = "yes"
+  )
+
+  label <- median_drawing(plot)$label
+
+  expect_identical(nrow(label), 1L)
+  expect_gt(as.numeric(coordinate_limits(plot)$x[2]), as.numeric(label$x))
+})
+
+
 test_that("no floating median is drawn when the window ends before the end of the data", {
   # the median is taken over 2023-07 to 2024-06; one window ends before it,
   # the other part-way through it
@@ -155,7 +169,7 @@ test_that("no floating median is drawn when the window ends before the end of th
     ))
 
     expect_length(drawing$line, 0L)
-    expect_null(drawing$label)
+    expect_identical(NROW(drawing$label), 0L)
   }
 })
 

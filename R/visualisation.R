@@ -105,6 +105,7 @@ create_spc_plot <- function(plot_data,
       labels = scales::label_number(big.mark = ",")
     ) +
     ggplot2::coord_cartesian(
+      xlim = axis_extents$window,
       ylim = c(
         axis_extents$ylimlow,
         axis_extents$ylimhigh
@@ -112,7 +113,7 @@ create_spc_plot <- function(plot_data,
     )
 
   # Add floating median to chart if needed
-  if (has_floating_median(table)) {
+  if (floating_median_shown(table, axis_extents$window)) {
     spc_plot <- add_floating_median(
       spc_plot = spc_plot,
       table = long_table %>%
@@ -131,7 +132,8 @@ create_spc_plot <- function(plot_data,
       basic_annotations = visualisation_params$basic_annotations,
       annotation_size = visualisation_params$annotation_size,
       annotation_arrows = visualisation_params$annotation_arrows,
-      annotation_arrow_curve = visualisation_params$annotation_arrow_curve
+      annotation_arrow_curve = visualisation_params$annotation_arrow_curve,
+      window = axis_extents$window
     )
   }
 
@@ -268,6 +270,7 @@ create_timeseries_plot <- function(table,
       )
     ) +
     ggplot2::coord_cartesian(
+      xlim = axis_extents$window,
       ylim = c(
         axis_extents$ylimlow,
         axis_extents$ylimhigh
@@ -275,7 +278,7 @@ create_timeseries_plot <- function(table,
     )
 
   # a floating median does not need limits, so is added here if present
-  if (has_floating_median(table)) {
+  if (floating_median_shown(table, axis_extents$window)) {
     time_series_plot <- add_floating_median(
       table = table,
       spc_plot = time_series_plot,

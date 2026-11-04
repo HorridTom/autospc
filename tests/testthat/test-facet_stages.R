@@ -432,7 +432,7 @@ test_that("it records the axis extents it was drawn with", {
 
   expect_setequal(
     names(autospc_plot_axis_extents(plot)),
-    c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh")
+    c("start_x", "x_max", "end_x", "window", "ylimlow", "ylimhigh")
   )
 
   # what is recorded is what the coord was given, before ggplot expands it

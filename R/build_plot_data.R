@@ -228,6 +228,17 @@ axis_specifications <- function(table,
     end_x <- max(end_x, floating_median_label_end(table))
   }
 
+  window <- displayed_window(
+    display_window = visualisation_params$display_window,
+    table = table,
+    start_x = start_x,
+    end_x = end_x
+  )
+
+  if (!is.null(window) && floating_median_shown(table, window)) {
+    window[[2L]] <- max(window[[2L]], floating_median_label_end(table))
+  }
+
   if (!enough_data_for_limits(chart)) {
     ylimlow <- min(table$series, na.rm = TRUE)
     ylimhigh <- max(table$series, na.rm = TRUE)
@@ -251,8 +262,15 @@ axis_specifications <- function(table,
       ylimhigh <- requested[[2L]]
     }
 
+    shown <- table
+
+    if (!is.null(window)) {
+      shown <- table %>%
+        dplyr::filter(x >= window[[1L]], x <= window[[2L]])
+    }
+
     require_series_within_axis(
-      series = table$series,
+      series = shown$series,
       low = ylimlow,
       high = ylimhigh,
       name = "override_y_lim"
@@ -273,6 +291,7 @@ axis_specifications <- function(table,
       start_x = start_x,
       x_max = x_max,
       end_x = end_x,
+      window = window,
       ylimlow = ylimlow,
       ylimhigh = ylimhigh
     ),
@@ -281,6 +300,38 @@ axis_specifications <- function(table,
       y = y_title
     )
   ))
+}
+
+
+#' The range of the horizontal axis to show, from `display_window`
+#'
+#' An end given as NA is the end the chart would have, `start_x` or `end_x`.
+#'
+#' @param display_window The value of the `display_window` argument, or NULL.
+#' @param table The table being drawn.
+#' @param start_x,end_x The ends of the horizontal axis without a window.
+#'
+#' @return The start and end of the range, or NULL where no range was given.
+#' @noRd
+displayed_window <- function(display_window,
+                             table,
+                             start_x,
+                             end_x) {
+  if (is.null(display_window) || all(is.na(display_window))) {
+    return(NULL)
+  }
+
+  window <- c(start_x, end_x)
+
+  if (!is.na(display_window[[1L]])) {
+    window[[1L]] <- display_window[[1L]]
+  }
+
+  if (!is.na(display_window[[2L]])) {
+    window[[2L]] <- display_window[[2L]]
+  }
+
+  return(window)
 }
 
 
@@ -336,7 +387,8 @@ add_plot_columns <- function(table,
     flip_labels = visualisation_params$flip_labels,
     upper_annotation_sf = visualisation_params$upper_annotation_sf,
     lower_annotation_sf = visualisation_params$lower_annotation_sf,
-    annotation_arrow_curve = visualisation_params$annotation_arrow_curve
+    annotation_arrow_curve = visualisation_params$annotation_arrow_curve,
+    window = axis_extents$window
   )
 
   return(table)

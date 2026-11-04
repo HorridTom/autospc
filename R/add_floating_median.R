@@ -128,11 +128,42 @@ floating_median_label <- function(chart,
 #' @return A value on the horizontal axis.
 #' @noRd
 floating_median_label_end <- function(table) {
-  median_x <- table %>%
-    dplyr::filter(!is.na(median)) %>%
-    dplyr::pull(x)
+  return(max(median_x_values(table)) +
+    floating_median_spacing(table$x, fraction = 0.12))
+}
 
-  return(max(median_x) + floating_median_spacing(table$x, fraction = 0.12))
+
+#' Whether the floating median is drawn
+#'
+#' Where the table has one, and the range shown, if any, reaches the last point
+#' it is taken over.
+#'
+#' @param table One row per point, holding `x` and `median`.
+#' @param window The range of the horizontal axis shown, or NULL for all of it.
+#'
+#' @return `TRUE` or `FALSE`.
+#' @noRd
+floating_median_shown <- function(table,
+                                  window) {
+  if (!has_floating_median(table)) {
+    return(FALSE)
+  }
+
+  return(is.null(window) || window[[2L]] >= max(median_x_values(table)))
+}
+
+
+#' The horizontal axis values the floating median is taken over
+#'
+#' @param table One row per point, holding `x` and `median`, with a median in
+#'   at least one row.
+#'
+#' @return The values of `x` in the rows with a median.
+#' @noRd
+median_x_values <- function(table) {
+  return(table %>%
+    dplyr::filter(!is.na(median)) %>%
+    dplyr::pull(x))
 }
 
 

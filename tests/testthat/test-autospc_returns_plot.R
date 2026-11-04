@@ -171,7 +171,7 @@ test_that("the returned plot carries the values it was drawn with", {
 
   expect_setequal(
     names(autospc_plot_axis_extents(plot)),
-    c("start_x", "x_max", "end_x", "ylimlow", "ylimhigh")
+    c("start_x", "x_max", "end_x", "window", "ylimlow", "ylimhigh")
   )
 
   expect_identical(autospc_plot_axis_extents(plot, value = "start_x"), 1L)

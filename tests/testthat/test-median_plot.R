@@ -604,6 +604,25 @@ test_that("the floating median label gives the median's value", {
 })
 
 
+test_that("a count median halfway between two whole numbers keeps its half", {
+  # C and C' labels are whole numbers, but the median of an even number of
+  # counts can end in .5. Its last twelve points sort to 15, 16, 17, 17, 18,
+  # 18, 19, 19, 20, 20, 21 and 22, so the median is 18.5
+  halfway_data <- data.frame(
+    x = 1:14,
+    y = as.integer(c(10, 11, 17, 18, 16, 19, 20, 18, 21, 19, 22, 17, 20, 15))
+  )
+
+  label <- median_drawing(suppressWarnings(autospc(halfway_data,
+    chart_type = "C",
+    period_min = 21L,
+    floating_median = "yes"
+  )))$label
+
+  expect_identical(label$label, "Median 18.5")
+})
+
+
 test_that("the floating median label sits just after its line, level with it", {
   last_x <- c(with_limits = 36L, no_limits = 14L)
   value <- c(with_limits = 52.5, no_limits = 18)

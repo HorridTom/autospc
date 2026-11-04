@@ -722,6 +722,122 @@ match_colour <- function(value,
 }
 
 
+#' Check the floating median's style, and fill in the elements not given
+#'
+#' A list with any of the elements of the default in `autospc()`: `colour`,
+#' `linetype` and `linewidth`. Each element given is checked, and those not
+#' given take their default values.
+#'
+#' @return The style with every element, in the order of the default, or an
+#'   error naming the argument or the element.
+#' @noRd
+match_floating_median_style <- function(value,
+                                        name,
+                                        call = rlang::caller_env()) {
+  default <- autospc_default(name)
+
+  element_names <- names(value)
+
+  is_named_list <- is.list(value) &&
+    (length(value) == 0L ||
+      (!is.null(element_names) &&
+        all(nzchar(element_names)) &&
+        !anyDuplicated(element_names)))
+
+  if (!is_named_list) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a list with named elements, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  unknown <- setdiff(element_names, names(default))
+
+  if (length(unknown) > 0L) {
+    rlang::abort(
+      sprintf(
+        "`%s` has %s autospc does not use: %s. Its elements are %s.",
+        name,
+        if (length(unknown) == 1L) "an element" else "elements",
+        paste0("`", unknown, "`", collapse = ", "),
+        paste0("`", names(default), "`", collapse = ", ")
+      ),
+      call = call
+    )
+  }
+
+  style <- c(value, default[setdiff(names(default), element_names)])
+  style <- style[names(default)]
+
+  style$colour <- match_colour(
+    style$colour,
+    paste0(name, "$colour"),
+    call = call
+  )
+
+  style$linetype <- match_linetype(
+    style$linetype,
+    paste0(name, "$linetype"),
+    call = call
+  )
+
+  style$linewidth <- match_number(
+    style$linewidth,
+    paste0(name, "$linewidth"),
+    kind = "positive",
+    call = call
+  )
+
+  return(style)
+}
+
+
+#' Check that a value is a single line type
+#'
+#' A whole number from zero, one of the names grid gives line types, or a
+#' string of two, four, six or eight hexadecimal digits from 1 to F, giving
+#' the lengths of the dashes and gaps in turn.
+#'
+#' @return `value`, unchanged, or an error naming the argument.
+#' @noRd
+match_linetype <- function(value,
+                           name,
+                           call = rlang::caller_env()) {
+  line_type_names <- c(
+    "blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash"
+  )
+
+  is_linetype <- length(value) == 1L &&
+    !is.na(value) &&
+    (
+      (is.numeric(value) &&
+        is.finite(value) &&
+        is_whole_number(value) &&
+        value >= 0) ||
+        (is.character(value) &&
+          (value %in% line_type_names ||
+            grepl("^([1-9A-Fa-f]{2}){1,4}$", value)))
+    )
+
+  if (!is_linetype) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be a line type, not %s.",
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
 #' Check that a value is a date format
 #'
 #' A single string holding at least one `%` code. A string with none formats
@@ -844,6 +960,12 @@ validate_argument_values <- function(arguments,
   for (name in autospc_colour_arguments()) {
     arguments[[name]] <- match_colour(arguments[[name]], name, call = call)
   }
+
+  arguments$floating_median_style <- match_floating_median_style(
+    arguments$floating_median_style,
+    "floating_median_style",
+    call = call
+  )
 
   arguments$x_date_format <- match_date_format(
     arguments$x_date_format,

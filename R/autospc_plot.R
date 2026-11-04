@@ -241,6 +241,7 @@ visualisation_param_names <- function() {
     "x_pad_end",
     "r1_col",
     "r2_col",
+    "floating_median_style",
     "point_size",
     "line_width_sf",
     "highlight_exclusions",

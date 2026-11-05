@@ -222,21 +222,27 @@ axis_specifications <- function(table,
 
   start_x <- min(table$x, na.rm = TRUE)
   x_max <- max(subgroup_x_values(table), na.rm = TRUE)
-  end_x <- max(x_max, x_pad_end)
+  data_end_x <- max(x_max, x_pad_end)
+  end_x <- data_end_x
 
   if (has_floating_median(table)) {
     end_x <- max(end_x, floating_median_label_end(table))
   }
 
+  # an end of the window given as NA is the end of the data; the space for the
+  # median label is then a share of the window
   window <- displayed_window(
     display_window = visualisation_params$display_window,
     table = table,
     start_x = start_x,
-    end_x = end_x
+    end_x = data_end_x
   )
 
   if (!is.null(window) && floating_median_shown(table, window)) {
-    window[[2L]] <- max(window[[2L]], floating_median_label_end(table))
+    window[[2L]] <- max(
+      window[[2L]],
+      floating_median_label_end(table, extent_x = window)
+    )
   }
 
   if (!enough_data_for_limits(chart)) {
@@ -305,11 +311,12 @@ axis_specifications <- function(table,
 
 #' The range of the horizontal axis to show, from `display_window`
 #'
-#' An end given as NA is the end the chart would have, `start_x` or `end_x`.
+#' An end given as NA is that end of the data, `start_x` or `end_x`.
 #'
 #' @param display_window The value of the `display_window` argument, or NULL.
 #' @param table The table being drawn.
-#' @param start_x,end_x The ends of the horizontal axis without a window.
+#' @param start_x,end_x The start and end of the data on the horizontal axis,
+#'   with `x_pad_end` or `extend_limits_to` if given.
 #'
 #' @return The start and end of the range, or NULL where no range was given.
 #' @noRd

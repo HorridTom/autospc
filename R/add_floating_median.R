@@ -26,6 +26,8 @@ has_floating_median <- function(table) {
 #'   `floating_median_style`, `line_width_sf` and `annotation_size` are read.
 #' @param ylimhigh The upper end of the vertical axis, which the label's format
 #'   can depend on.
+#' @param window The range of the horizontal axis shown, or NULL for all of it.
+#'   The gap before the label is a share of its extent.
 #'
 #' @return The plot, with the median line and its label added.
 #' @noRd
@@ -33,7 +35,8 @@ add_floating_median <- function(table,
                                 spc_plot,
                                 chart,
                                 visualisation_params,
-                                ylimhigh) {
+                                ylimhigh,
+                                window = NULL) {
   style <- visualisation_params$floating_median_style
 
   median_rows <- table %>%
@@ -47,7 +50,13 @@ add_floating_median <- function(table,
     ylimhigh = ylimhigh
   )
 
-  label_gap <- floating_median_spacing(table$x, fraction = 0.01)
+  extent_x <- table$x
+
+  if (!is.null(window)) {
+    extent_x <- window
+  }
+
+  label_gap <- floating_median_spacing(extent_x, fraction = 0.01)
 
   # one row, kept with its facet where the plot is faceted. The values are
   # injected with !! so that a column of the same name cannot stand in for them
@@ -120,16 +129,20 @@ floating_median_label <- function(chart,
 
 #' Where the horizontal axis must reach to show the floating median's label
 #'
-#' The last point the median is taken over, plus space for the label.
+#' The last point the median is taken over, plus space for the label: 12% of
+#' the extent of `extent_x`.
 #'
 #' @param table One row per point, holding `x` and `median`, with a median in
 #'   at least one row.
+#' @param extent_x The horizontal axis values whose extent the space is a share
+#'   of: the data's, or the range shown.
 #'
 #' @return A value on the horizontal axis.
 #' @noRd
-floating_median_label_end <- function(table) {
+floating_median_label_end <- function(table,
+                                      extent_x = table$x) {
   return(max(median_x_values(table)) +
-    floating_median_spacing(table$x, fraction = 0.12))
+    floating_median_spacing(extent_x, fraction = 0.12))
 }
 
 

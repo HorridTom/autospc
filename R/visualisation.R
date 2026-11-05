@@ -120,7 +120,8 @@ create_spc_plot <- function(plot_data,
         dplyr::filter(plotted_line == "cl"),
       chart = chart,
       visualisation_params = visualisation_params,
-      ylimhigh = axis_extents$ylimhigh
+      ylimhigh = axis_extents$ylimhigh,
+      window = axis_extents$window
     )
   }
 
@@ -284,7 +285,8 @@ create_timeseries_plot <- function(table,
       spc_plot = time_series_plot,
       chart = chart,
       visualisation_params = visualisation_params,
-      ylimhigh = axis_extents$ylimhigh
+      ylimhigh = axis_extents$ylimhigh,
+      window = axis_extents$window
     )
   }
 

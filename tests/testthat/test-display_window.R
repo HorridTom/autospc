@@ -159,6 +159,24 @@ test_that("a window ending at the last point makes room for the median label", {
 })
 
 
+test_that("the space for the median label is a share of the window, not of the series", {
+  # the window runs from 2021-01-01 to the last point, 2024-06-01, and the
+  # label space is 12% of that after the last point
+  plot <- p_chart(
+    display_window = as.Date(c("2021-01-01", NA)),
+    floating_median = "yes"
+  )
+
+  last_point <- as.numeric(as.Date("2024-06-01"))
+  window_extent <- last_point - as.numeric(as.Date("2021-01-01"))
+
+  expect_equal(
+    as.numeric(coordinate_limits(plot)$x[2]),
+    last_point + 0.12 * window_extent
+  )
+})
+
+
 test_that("no floating median is drawn when the window ends before the end of the data", {
   # the median is taken over 2023-07 to 2024-06; one window ends before it,
   # the other part-way through it

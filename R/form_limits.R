@@ -36,22 +36,29 @@ form_calculation_limits <- function(data,
 
   statistic_columns <- period_statistics_columns(chart)
 
-  calculation_period <- calculation_period %>%
-    dplyr::mutate(
-      cl = statistics$cl,
-      ucl = limits$ucl,
-      lcl = limits$lcl,
-      !!!statistics[statistic_columns]
+  # add the period's centre line, limits and statistics to its rows, mark it as
+  # a calculation period, and mark the excluded points
+  new_values <- c(
+    list(cl = statistics$cl, ucl = limits$ucl, lcl = limits$lcl),
+    statistics[statistic_columns],
+    list(
+      period_type = "calculation",
+      excluded = seq_len(nrow(calculation_period)) %in% exclusion_points
     )
+  )
+  for (column in names(new_values)) {
+    calculation_period[[column]] <- rep_len(
+      new_values[[column]], nrow(calculation_period)
+    )
+  }
+
+  # keep only these columns, in this order
+  calculation_period <- calculation_period[unique(c(
+    "x", "series", "ucl", "lcl", "cl", statistic_columns,
+    "period_type", "excluded"
+  ))]
 
   extra_columns <- limits_table_columns(chart)
-
-  calculation_period <- calculation_period %>%
-    dplyr::select(x, series, ucl, lcl, cl, dplyr::all_of(statistic_columns)) %>%
-    dplyr::mutate(period_type = "calculation") %>%
-    dplyr::mutate(
-      excluded = ifelse(dplyr::row_number() %in% exclusion_points, T, F)
-    )
 
 
   # First period does not already have the additional columns
@@ -59,73 +66,57 @@ form_calculation_limits <- function(data,
     # Joins limits to the existing data
     limits_table <- data %>%
       dplyr::left_join(calculation_period, by = "x") %>%
-      dplyr::mutate(series = dplyr::if_else(
-        is.na(series.y), series.x, series.y
-      ))
+      dplyr::mutate(
+        series = dplyr::if_else(is.na(series.y), series.x, series.y),
+        # the first point is not classed as a break point, for compatibility
+        # with (at least) add_rule_breaks_respecting_periods
+        break_point = dplyr::if_else(dplyr::row_number() == counter,
+          NA,
+          FALSE
+        )
+      )
 
+    # keep only these columns, in this order. break_point keeps track of break
+    # points as they are added
     limits_table <- limits_table %>%
       dplyr::select(
         x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
         dplyr::all_of(statistic_columns),
         period_type, excluded,
         dplyr::any_of("run_break"),
-        dplyr::any_of("log")
+        dplyr::any_of("log"),
+        break_point
       )
-    # Add the break_point column to keep track of break points as they are
-    # added. For compatibility with (at least)
-    # add_rule_breaks_respecting_periods, the first point is not classed as a
-    # break point.
-    limits_table <- limits_table %>%
-      dplyr::mutate(break_point = dplyr::if_else(dplyr::row_number() == counter,
-        NA,
-        FALSE
-      ))
   } else {
-    # joins limits to the existing data, overwriting display limits
-    limits_table <- data %>%
-      dplyr::left_join(calculation_period, by = "x") %>%
-      dplyr::mutate(series = dplyr::if_else(
-        is.na(series.y), series.x, series.y
-      )) %>%
-      dplyr::mutate(ucl = dplyr::if_else(is.na(ucl.y), ucl.x, ucl.y)) %>%
-      dplyr::mutate(lcl = dplyr::if_else(is.na(lcl.y), lcl.x, lcl.y)) %>%
-      dplyr::mutate(cl = dplyr::if_else(is.na(cl.y), cl.x, cl.y)) %>%
-      dplyr::mutate(period_type = dplyr::if_else(
-        is.na(period_type.y), period_type.x, period_type.y
-      )) %>%
-      dplyr::mutate(excluded = dplyr::if_else(
-        is.na(excluded.y), excluded.x, excluded.y
-      ))
+    # copy the new period's values into its rows of data, replacing the display
+    # limits there. calculation_period was taken from data starting at row
+    # counter, so its rows are rows counter onwards of data. A missing value
+    # leaves the value already there, and rows beyond the end of data are
+    # skipped
+    limits_table <- data
+    rows <- counter:(counter + nrow(calculation_period) - 1L)
+    for (column in setdiff(names(calculation_period), "x")) {
+      new <- calculation_period[[column]]
+      has_value <- !is.na(new) & rows <= nrow(limits_table)
+      limits_table[[column]][rows[has_value]] <- new[has_value]
+    }
 
-    # the new period's value where it has one, the value carried before where
-    # it has not, for each period statistic
-    merged_statistics <- lapply(statistic_columns, function(column) {
-      dplyr::coalesce(
-        limits_table[[paste0(column, ".y")]],
-        limits_table[[paste0(column, ".x")]]
-      )
-    })
-    names(merged_statistics) <- statistic_columns
+    # the first row of the new period is a break point
+    limits_table[["break_point"]] <- limits_table$break_point |
+      seq_len(nrow(limits_table)) == counter
 
-    limits_table <- limits_table %>%
-      dplyr::mutate(!!!merged_statistics)
-
-    limits_table <- limits_table %>%
-      dplyr::mutate(break_point = (break_point |
-        dplyr::row_number() == counter))
-
-    limits_table <- limits_table %>%
-      dplyr::select(
-        x, series, dplyr::all_of(extra_columns), ucl, lcl, cl,
-        dplyr::all_of(statistic_columns),
-        period_type, excluded,
-        dplyr::contains("break_point"),
-        dplyr::contains("rule"),
-        dplyr::contains("above_or_below"),
-        dplyr::contains("highlight"),
-        dplyr::contains("run"),
-        dplyr::any_of("log")
-      )
+    # keep only these columns, in this order. Names are matched ignoring case
+    columns <- names(limits_table)
+    containing <- function(text) {
+      return(columns[grepl(text, tolower(columns), fixed = TRUE)])
+    }
+    limits_table <- limits_table[unique(c(
+      "x", "series", extra_columns, "ucl", "lcl", "cl", statistic_columns,
+      "period_type", "excluded",
+      containing("break_point"), containing("rule"),
+      containing("above_or_below"), containing("highlight"),
+      containing("run"), intersect("log", columns)
+    ))]
   }
 
   return(limits_table)
@@ -149,19 +140,25 @@ form_display_limits <- function(limits_table, counter, chart) {
     return(limits_table)
   }
 
-  calculated <- dplyr::slice_head(limits_table, n = counter - 1L)
-  display <- dplyr::slice(limits_table, counter:nrow(limits_table))
+  # the limits for each display row, from the statistics of the last row of the
+  # calculation period
+  display_rows <- counter:nrow(limits_table)
 
   limits <- limits_at_rows(
     chart = chart,
-    statistics = period_statistics(dplyr::slice_tail(calculated, n = 1L)),
-    rows = display
+    statistics = period_statistics(limits_table[counter - 1L, ]),
+    rows = limits_table[display_rows, ]
   )
 
-  display <- display %>%
-    dplyr::mutate(!!!limits, period_type = "display")
+  # write the limits into the display rows and mark them as display rows
+  new_values <- c(limits, list(period_type = "display"))
+  for (column in names(new_values)) {
+    limits_table[[column]][display_rows] <- rep_len(
+      new_values[[column]], length(display_rows)
+    )
+  }
 
-  return(dplyr::bind_rows(calculated, display))
+  return(limits_table)
 }
 
 

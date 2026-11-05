@@ -1,3 +1,13 @@
+# autospc 0.2.0.9005
+
+## Speed
+
+* The analysis runs about ten times faster, and a drawn chart about two and a
+  half to three times faster. The helpers the algorithm calls repeatedly while
+  it looks for new periods now use base R in place of dplyr, and
+  `find_extremes()` no longer works out rule 2 and highlighting, which it did
+  not use. Results are unchanged.
+
 # autospc 0.2.0.9004
 
 ## Showing part of a chart

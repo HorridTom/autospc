@@ -8,25 +8,38 @@
 add_rule_breaks <- function(x,
                             centre_line_tolerance,
                             shift_rule_threshold) {
-  x <- x %>%
-    dplyr::mutate(rule1 = (series > ucl) | (series < lcl)) %>%
-    dplyr::mutate(
-      above_or_below_cl = dplyr::case_when(
-        abs(series - cl) %<=%
-          centre_line_tolerance ~ 0L,
-        (series - cl) %>>%
-          centre_line_tolerance ~ 1L,
-        (series - cl) %<<%
-          -centre_line_tolerance ~ -1L
-      )
-    ) %>%
-    add_rule_two(shift_rule_threshold = shift_rule_threshold) %>%
-    dplyr::mutate(rule2 = dplyr::if_else(rule2 & above_or_below_cl == 0L,
-      FALSE,
-      rule2
-    )) %>%
-    add_highlight() %>%
-    dplyr::relocate(above_or_below_cl, .after = rule2)
+  # rule 1: the point is outside the limits
+  rule1 <- (x$series > x$ucl) | (x$series < x$lcl)
+
+  # which side of the centre line each point is: 1 above, -1 below, 0 on it
+  # (within centre_line_tolerance), NA where it cannot be compared
+  difference <- x$series - x$cl
+  side <- rep(NA_integer_, length(difference))
+  side[which(difference %<<% -centre_line_tolerance)] <- -1L
+  side[which(difference %>>% centre_line_tolerance)] <- 1L
+  side[which(abs(difference) %<=% centre_line_tolerance)] <- 0L
+  x[["rule1"]] <- rule1
+  x[["above_or_below_cl"]] <- side
+
+  x <- add_rule_two(x, shift_rule_threshold = shift_rule_threshold)
+
+  # a point on the centre line is not marked as a rule 2 break
+  rule2 <- x$rule2
+  on_cl <- rule2 & side == 0L
+  rule2[which(on_cl)] <- FALSE
+  rule2[is.na(on_cl)] <- NA
+  x[["rule2"]] <- rule2
+
+  # rule 2 takes precedence over rule 1 in the highlight
+  highlight <- rep("None", length(rule1))
+  highlight[which(rule1)] <- "Rule 1"
+  highlight[which(rule2)] <- "Rule 2"
+  x[["highlight"]] <- highlight
+
+  # put above_or_below_cl immediately after rule2
+  others <- setdiff(names(x), "above_or_below_cl")
+  before <- seq_len(match("rule2", others))
+  x <- x[c(others[before], "above_or_below_cl", others[-before])]
 }
 
 add_rule_two <- function(table, shift_rule_threshold) {
@@ -112,13 +125,4 @@ commences_a_run <- function(side,
   commences[counting] <- !(!blocked & side[counting] == side[previous])
 
   return(commences)
-}
-
-add_highlight <- function(table) {
-  table <- table %>%
-    dplyr::mutate(highlight = dplyr::case_when(
-      rule2 ~ "Rule 2",
-      rule1 ~ "Rule 1",
-      TRUE ~ "None"
-    ))
 }

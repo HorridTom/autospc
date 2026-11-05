@@ -838,6 +838,43 @@ match_linetype <- function(value,
 }
 
 
+#' Check that one argument is a range of the horizontal axis
+#'
+#' Two values of whatever type the horizontal axis holds, either of which may
+#' be NA, the first before the second where both are given. Whether they are of
+#' the type the data's axis holds is checked against the data, by
+#' `check_display_window_against_data()`.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_axis_window <- function(value,
+                              name,
+                              call = rlang::caller_env()) {
+  is_window <- length(value) == 2L &&
+    !is.list(value) &&
+    !is.character(value) &&
+    !is.factor(value) &&
+    (anyNA(value) || isTRUE(value[[1L]] < value[[2L]]))
+
+  if (!is_window) {
+    rlang::abort(
+      sprintf(
+        paste(
+          "`%s` must be two values on the horizontal axis, the start and end",
+          "of the range to show, the start first, with NA for an end to",
+          "leave where the chart puts it, not %s."
+        ),
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
 #' Check that a value is a date format
 #'
 #' A single string holding at least one `%` code. A string with none formats
@@ -889,18 +926,78 @@ validate_arguments_against_data <- function(arguments,
 
   observed_x <- x_values[!is.na(x_values)]
 
-  if (is.null(extend_limits_to) || length(observed_x) == 0L) {
+  if (length(observed_x) == 0L) {
     return(arguments)
   }
 
-  if (extend_limits_to <= max(observed_x)) {
+  if (!is.null(extend_limits_to) && extend_limits_to <= max(observed_x)) {
     rlang::abort(
       "`extend_limits_to` must be a point beyond the end of the data.",
       call = call
     )
   }
 
+  check_display_window_against_data(
+    window = arguments$display_window,
+    observed_x = observed_x,
+    call = call
+  )
+
   return(arguments)
+}
+
+
+#' Stop unless `display_window` suits the horizontal axis the data has
+#'
+#' The window must hold the same type as `x` - dates for dates, date-times for
+#' date-times, numbers for numbers - and must overlap the data, taking an end
+#' given as NA to be that end of the data.
+#'
+#' @param window The `display_window` given, or NULL.
+#' @param observed_x The values of `x` that are not NA.
+#'
+#' @return `NULL`, or an error naming the argument.
+#' @noRd
+check_display_window_against_data <- function(window,
+                                              observed_x,
+                                              call = rlang::caller_env()) {
+  if (is.null(window) || all(is.na(window))) {
+    return(invisible(NULL))
+  }
+
+  same_type <- inherits(window, "Date") == inherits(observed_x, "Date") &&
+    inherits(window, "POSIXct") == inherits(observed_x, "POSIXct") &&
+    (is.numeric(window) || inherits(window, c("Date", "POSIXct")))
+
+  if (!same_type) {
+    rlang::abort(
+      sprintf(
+        paste(
+          "`display_window` must be of the same type as `x`, which is %s,",
+          "not %s."
+        ),
+        class(observed_x)[[1L]],
+        class(window)[[1L]]
+      ),
+      call = call
+    )
+  }
+
+  start <- if (is.na(window[[1L]])) min(observed_x) else window[[1L]]
+  end <- if (is.na(window[[2L]])) max(observed_x) else window[[2L]]
+
+  if (start > max(observed_x) || end < min(observed_x)) {
+    rlang::abort(
+      sprintf(
+        "`display_window` must overlap the data, which runs from %s to %s.",
+        format(min(observed_x)),
+        format(max(observed_x))
+      ),
+      call = call
+    )
+  }
+
+  return(invisible(NULL))
 }
 
 
@@ -945,6 +1042,7 @@ validate_argument_values <- function(arguments,
     arguments[[name]] <- switch(kinds[[name]],
       axis_value = match_axis_value(value, name, call = call),
       axis_range = match_axis_range(value, name, call = call),
+      axis_window = match_axis_window(value, name, call = call),
       match_number(value, name, kinds[[name]], call = call)
     )
   }

@@ -239,6 +239,7 @@ visualisation_param_names <- function() {
     "x_break",
     "x_date_format",
     "x_pad_end",
+    "display_window",
     "r1_col",
     "r2_col",
     "floating_median_style",

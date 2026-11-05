@@ -302,7 +302,8 @@ test_that("every numeric argument is checked", {
       "override_y_lim",
       "x_break",
       "x_pad_end",
-      "extend_limits_to"
+      "extend_limits_to",
+      "display_window"
     )
   )
 })
@@ -576,6 +577,64 @@ test_that("a bad colour is refused whether or not the chart would use it", {
   # values_data breaks no rule, so neither highlight colour is drawn. The
   # colour is still checked, because a later series would use it
   expect_error(analyse(r2_col = "notacolour"), "must be a colour")
+})
+
+
+# display_window
+
+
+test_that("display_window takes two points on the horizontal axis, NA at either end", {
+  for (window in list(c(5, 20), c(NA, 20), c(5, NA), c(5L, 40L))) {
+    expect_s3_class(analyse(display_window = window), "data.frame")
+  }
+})
+
+
+test_that("display_window takes dates for a horizontal axis of dates", {
+  expect_s3_class(
+    autospc(ed_attendances_monthly,
+      x = month_start, y = att_all, chart_type = "C",
+      display_window = as.Date(c("2021-01-01", "2024-07-01")),
+      max_exclusions = 3L,
+      plot_chart = FALSE
+    ),
+    "data.frame"
+  )
+})
+
+
+test_that("display_window must be two values", {
+  for (window in list(5, c(1, 2, 3), "banana")) {
+    expect_error(
+      analyse(display_window = window),
+      "`display_window` must be",
+      info = deparse(window)
+    )
+  }
+})
+
+
+test_that("display_window must start before it ends", {
+  expect_error(analyse(display_window = c(20, 5)), "`display_window`")
+})
+
+
+test_that("display_window must be of the same type as x", {
+  expect_error(
+    autospc(ed_attendances_monthly,
+      x = month_start, y = att_all, chart_type = "C",
+      display_window = c(5, 20),
+      plot_chart = FALSE
+    ),
+    "`display_window` must be of the same type as `x`",
+    fixed = TRUE
+  )
+})
+
+
+test_that("display_window must overlap the data", {
+  # values_data runs from 1 to 30
+  expect_error(analyse(display_window = c(40, 50)), "overlap")
 })
 
 

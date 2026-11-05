@@ -1,3 +1,19 @@
+# autospc 0.2.0.9004
+
+## Showing part of a chart
+
+* New argument `display_window = c(start, end)` shows part of the horizontal
+  axis without changing the analysis (#317). The plot is zoomed to the range,
+  so lines run on to its edges. Every calculation period that overlaps the
+  range has its centre line labelled, a period that starts before the range at
+  its first point, and `align_labels` uses the limits within the range. `NA`
+  at either end leaves that end where the chart would put it. The vertical
+  axis is still set from the whole series, and `override_y_lim` is checked
+  against the points within the range only. The floating median is still
+  taken over the end of the whole series, and is drawn only when the range
+  reaches the end of the data. `facet_stages()` applies the range to every
+  facet.
+
 # autospc 0.2.0.9003
 
 ## Floating median

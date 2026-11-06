@@ -37,6 +37,12 @@ create_spc_plot <- function(plot_data,
     table$highlight[is.na(table$highlight)] <- "None"
   }
 
+  # number the stretches of the series between missing values, so that the
+  # series line is drawn in pieces and breaks where a value is missing. The
+  # rows are in order of x within each facet
+  table <- table %>%
+    dplyr::mutate(series_segment = cumsum(is.na(series)))
+
   long_table <- table %>%
     tidyr::pivot_longer(
       cols = c(series, cl, ucl, lcl),
@@ -386,7 +392,8 @@ format_spc_plot <- function(plot_unformatted,
       data = . %>% dplyr::filter(plotted_line %in% c("series")),
       ggplot2::aes(
         linetype = plotted_line,
-        linewidth = plotted_line
+        linewidth = plotted_line,
+        group = series_segment
       ),
       show.legend = FALSE,
       na.rm = TRUE

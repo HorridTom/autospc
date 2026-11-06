@@ -97,6 +97,7 @@ utils::globalVariables(c(
   "series",
   "series.x",
   "series.y",
+  "series_segment",
   "spread",
   "stage",
   "subgroup_mean",

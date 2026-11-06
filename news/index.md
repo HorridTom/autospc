@@ -1,5 +1,16 @@
 # Changelog
 
+## autospc 0.2.0.9006
+
+### Missing values
+
+- The line joining the series points now breaks at each row whose value
+  is missing, rather than running straight across it (#321). The points,
+  centre line and limits are drawn as before, and the analysis is
+  unchanged. This behaviour is independent of `na_ends_run`. Time points
+  absent from the data are not treated as missing: to break the line
+  there, add a row for each missing time point with the value `NA`.
+
 ## autospc 0.2.0.9005
 
 ### Speed

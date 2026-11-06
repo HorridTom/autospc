@@ -432,6 +432,28 @@ test_that("na_ends_run FALSE lets a run continue across a gap", {
 })
 
 
+test_that("limits are re-established after a gap that ended a run", {
+  # A run that starts in the first period and continues up to a gap, then a
+  # run on the same side after the gap. The gap ends the first run, so the
+  # limits are re-established from the run after the gap, not from the first
+  # run.
+  d <- data.frame(
+    x = 1:50,
+    y = as.numeric(c(rep(c(10, 12), length.out = 13), rep(20, 10), NA, rep(30, 26)))
+  )
+
+  result <- analyse(d,
+    shift_rule_threshold = 8L,
+    na_ends_run = TRUE,
+    max_exclusions = 3L
+  )
+
+  first_new_cl <- which(result$cl != result$cl[1])[1]
+  expect_identical(first_new_cl, 25L)
+  expect_equal(result$cl[50], 30)
+})
+
+
 test_that("na_ends_run makes no difference to a series with no gaps", {
   d <- data.frame(x = 1:37, y = as.numeric(c(rep(10, 25), rep(20, 12))))
 

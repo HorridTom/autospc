@@ -111,14 +111,13 @@ find_extremes <- function(data,
 # Function to scan to see where start of each rule 2 break is -
 # returns list of these points
 rule2_break_start_positions <- function(limits_table, counter) {
-  # Add a column for start of rule 2 breaks - i.e. if there is a rule 2
-  # highlight and that is not preceded by a rule 2 highlight
+  # A rule 2 break starts where a run that is long enough to break rule 2
+  # commences. Using run_start, rather than comparing each point with the one
+  # before, means a run that a gap ended (na_ends_run) is not taken to continue
+  # into the run after the gap, even when both are on the same side of the
+  # centre line.
   limits_table <- limits_table %>%
-    dplyr::mutate(start_of_rule2_break = rule2 &
-      (rule2 != dplyr::lag(rule2) |
-        different_cl_side(above_or_below_cl,
-          y = dplyr::lag(above_or_below_cl)
-        )))
+    dplyr::mutate(start_of_rule2_break = rule2 & run_start)
 
   next_rule_break_positions <-
     (which(limits_table$start_of_rule2_break[

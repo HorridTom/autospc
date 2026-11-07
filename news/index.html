@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,13 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9007" id="autospc-0209007">autospc 0.2.0.9007<a class="anchor" aria-label="anchor" href="#autospc-0209007"></a></h2>
+<div class="section level3">
+<h3 id="bugfix-missing-values-0-2-0-9007">Bugfix: Missing values<a class="anchor" aria-label="anchor" href="#bugfix-missing-values-0-2-0-9007"></a></h3>
+<ul><li>Fixed a bug introduced in 0.2.0.9006. With <code>na_ends_run = TRUE</code>, limits are now re-established after a gap in the data (#323). When a gap ended a run and the run after the gap was on the same side of the centre line, the algorithm took the second run to be a continuation of the first. If the first run started before the point the algorithm had reached, no rule 2 break was found, so the limits were never re-established after the gap. A rule 2 break now starts correctly where a run that breaks rule 2 commences, so a run after a gap is treated as a new run. Results are unchanged for data with no gaps, and with <code>na_ends_run = FALSE</code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9006" id="autospc-0209006">autospc 0.2.0.9006<a class="anchor" aria-label="anchor" href="#autospc-0209006"></a></h2>
 <div class="section level3">

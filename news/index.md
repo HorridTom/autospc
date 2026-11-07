@@ -1,5 +1,20 @@
 # Changelog
 
+## autospc 0.2.0.9007
+
+### Bugfix: Missing values
+
+- Fixed a bug introduced in 0.2.0.9006. With `na_ends_run = TRUE`,
+  limits are now re-established after a gap in the data (#323). When a
+  gap ended a run and the run after the gap was on the same side of the
+  centre line, the algorithm took the second run to be a continuation of
+  the first. If the first run started before the point the algorithm had
+  reached, no rule 2 break was found, so the limits were never
+  re-established after the gap. A rule 2 break now starts correctly
+  where a run that breaks rule 2 commences, so a run after a gap is
+  treated as a new run. Results are unchanged for data with no gaps, and
+  with `na_ends_run = FALSE`.
+
 ## autospc 0.2.0.9006
 
 ### Missing values

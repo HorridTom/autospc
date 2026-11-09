@@ -20,6 +20,10 @@ chart_argument_alternatives <- list(
   establish_every_shift = TRUE,
   no_regrets = FALSE,
   overhanging_reversions = FALSE,
+  force_restart_at = 15,
+  # given as a list of ranges, because one range given on its own is held on
+  # the chart as a list containing it
+  prevent_establishment_in = list(c(5, 10)),
   na_ends_run = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,

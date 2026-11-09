@@ -303,7 +303,9 @@ test_that("every numeric argument is checked", {
       "x_break",
       "x_pad_end",
       "extend_limits_to",
-      "display_window"
+      "display_window",
+      "force_restart_at",
+      "prevent_establishment_in"
     )
   )
 })
@@ -635,6 +637,168 @@ test_that("display_window must be of the same type as x", {
 test_that("display_window must overlap the data", {
   # values_data runs from 1 to 30
   expect_error(analyse(display_window = c(40, 50)), "overlap")
+})
+
+
+# force_restart_at and prevent_establishment_in
+
+
+test_that("force_restart_at takes one or more points on the horizontal axis", {
+  for (restarts in list(15, c(10, 20), 15L)) {
+    expect_s3_class(
+      analyse(force_restart_at = restarts),
+      "data.frame"
+    )
+  }
+})
+
+
+test_that("force_restart_at takes dates for a horizontal axis of dates", {
+  expect_s3_class(
+    autospc(ed_attendances_monthly,
+      x = month_start, y = att_all, chart_type = "C",
+      force_restart_at = as.Date(c("2015-01-01", "2020-04-01")),
+      max_exclusions = 3L,
+      plot_chart = FALSE
+    ),
+    "data.frame"
+  )
+})
+
+
+test_that("force_restart_at rejects NA, text and a list", {
+  for (restarts in list(NA, c(10, NA), "banana", list(10, 20))) {
+    expect_error(
+      analyse(force_restart_at = restarts),
+      "`force_restart_at` must be one or more values",
+      info = deparse(restarts)
+    )
+  }
+})
+
+
+test_that("force_restart_at must be of the same type as x", {
+  expect_error(
+    autospc(ed_attendances_monthly,
+      x = month_start, y = att_all, chart_type = "C",
+      force_restart_at = 20,
+      plot_chart = FALSE
+    ),
+    "`force_restart_at` must be of the same type as `x`",
+    fixed = TRUE
+  )
+})
+
+
+test_that("force_restart_at accepts points outside the data", {
+  # values_data runs from 1 to 30
+  expect_s3_class(analyse(force_restart_at = c(-5, 40)), "data.frame")
+})
+
+
+test_that("prevent_establishment_in takes a range or a list of ranges", {
+  for (ranges in list(
+    c(5, 10),
+    c(NA, 10),
+    c(5, NA),
+    c(NA, NA),
+    c(5, 5),
+    list(c(5, 10)),
+    list(c(5, 10), c(20, NA))
+  )) {
+    expect_s3_class(
+      analyse(prevent_establishment_in = ranges),
+      "data.frame"
+    )
+  }
+})
+
+
+test_that("prevent_establishment_in takes dates for a horizontal axis of dates", {
+  expect_s3_class(
+    autospc(ed_attendances_monthly,
+      x = month_start, y = att_all, chart_type = "C",
+      prevent_establishment_in = list(
+        as.Date(c("2015-01-01", "2016-01-01")),
+        as.Date(c("2020-04-01", NA))
+      ),
+      max_exclusions = 3L,
+      plot_chart = FALSE
+    ),
+    "data.frame"
+  )
+})
+
+
+test_that("one range given to prevent_establishment_in is held on the chart as a list containing it", {
+  from_pair <- autospc_plot_charts(
+    analyse_plotting(prevent_establishment_in = c(5, 10))
+  )[[1]]
+  from_list <- autospc_plot_charts(
+    analyse_plotting(prevent_establishment_in = list(c(5, 10)))
+  )[[1]]
+
+  expect_identical(from_pair$prevent_establishment_in, list(c(5, 10)))
+  expect_identical(from_list$prevent_establishment_in, list(c(5, 10)))
+})
+
+
+test_that("prevent_establishment_in rejects anything that is not ranges", {
+  for (ranges in list(
+    5,
+    c(1, 2, 3),
+    "banana",
+    c(10, 5),
+    list(),
+    list(c(5, 10), c(20, 15)),
+    list(c(5, 10), 20)
+  )) {
+    expect_error(
+      analyse(prevent_establishment_in = ranges),
+      "`prevent_establishment_in` must be a range",
+      info = deparse(ranges)
+    )
+  }
+})
+
+
+test_that("prevent_establishment_in must be of the same type as x", {
+  expect_error(
+    autospc(ed_attendances_monthly,
+      x = month_start, y = att_all, chart_type = "C",
+      prevent_establishment_in = list(c(5, 20)),
+      plot_chart = FALSE
+    ),
+    "`prevent_establishment_in` must be of the same type as `x`",
+    fixed = TRUE
+  )
+})
+
+
+test_that("prevent_establishment_in accepts ranges outside the data", {
+  # values_data runs from 1 to 30
+  expect_s3_class(
+    analyse(prevent_establishment_in = list(c(-10, -5), c(40, 50))),
+    "data.frame"
+  )
+})
+
+
+test_that("facet_stages checks force_restart_at and prevent_establishment_in", {
+  expect_error(
+    facet_stages(values_data,
+      split_at = 20L, chart_type = "C'", x = x, y = y,
+      force_restart_at = "banana"
+    ),
+    "`force_restart_at` must be one or more values"
+  )
+  expect_error(
+    facet_stages(values_data,
+      split_at = 20L, chart_type = "C'", x = x, y = y,
+      prevent_establishment_in = c(10, 5)
+    ),
+    "`prevent_establishment_in` must be a range"
+  )
 })
 
 

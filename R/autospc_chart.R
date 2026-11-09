@@ -102,6 +102,8 @@ autospc_chart_elements <- function() {
     "establish_every_shift",
     "no_regrets",
     "overhanging_reversions",
+    "force_restart_at",
+    "prevent_establishment_in",
     "na_ends_run",
     "max_exclusions",
     "mr_screen_max_loops",
@@ -372,6 +374,8 @@ assemble_chart_list <- function(
     establish_every_shift = autospc_default("establish_every_shift"),
     no_regrets = autospc_default("no_regrets"),
     overhanging_reversions = autospc_default("overhanging_reversions"),
+    force_restart_at = autospc_default("force_restart_at"),
+    prevent_establishment_in = autospc_default("prevent_establishment_in"),
     na_ends_run = autospc_default("na_ends_run"),
     max_exclusions = autospc_default("max_exclusions"),
     mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
@@ -388,6 +392,15 @@ assemble_chart_list <- function(
 
   floating_median <- match_choice(floating_median, "floating_median")
 
+  # prevent_establishment_in may be given as one range of x values in which
+  # limits may not be established, or as a list of such ranges. One range is
+  # held as a list containing it, so that the chart always holds a list of
+  # ranges
+  if (!is.null(prevent_establishment_in) &&
+    !is.list(prevent_establishment_in)) {
+    prevent_establishment_in <- list(prevent_establishment_in)
+  }
+
   autospc_chart_l <- list(
     data = data,
     x = x,
@@ -400,6 +413,8 @@ assemble_chart_list <- function(
     establish_every_shift = establish_every_shift,
     no_regrets = no_regrets,
     overhanging_reversions = overhanging_reversions,
+    force_restart_at = force_restart_at,
+    prevent_establishment_in = prevent_establishment_in,
     na_ends_run = na_ends_run,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,

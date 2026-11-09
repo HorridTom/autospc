@@ -850,10 +850,7 @@ match_linetype <- function(value,
 match_axis_window <- function(value,
                               name,
                               call = rlang::caller_env()) {
-  is_window <- length(value) == 2L &&
-    !is.list(value) &&
-    !is.character(value) &&
-    !is.factor(value) &&
+  is_window <- is_axis_pair(value) &&
     (anyNA(value) || isTRUE(value[[1L]] < value[[2L]]))
 
   if (!is_window) {
@@ -872,6 +869,98 @@ match_axis_window <- function(value,
   }
 
   return(value)
+}
+
+
+#' Check that one argument is one or more values on the horizontal axis
+#'
+#' Values of whatever type the horizontal axis holds, none of them NA. Whether
+#' they are of the type the data's axis holds is checked against the data, by
+#' `validate_arguments_against_data()`.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_axis_values <- function(value,
+                              name,
+                              call = rlang::caller_env()) {
+  is_values <- length(value) >= 1L &&
+    !is.list(value) &&
+    !is.character(value) &&
+    !is.factor(value) &&
+    !anyNA(value)
+
+  if (!is_values) {
+    rlang::abort(
+      sprintf(
+        paste(
+          "`%s` must be one or more values on the horizontal axis, with",
+          "none missing, not %s."
+        ),
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Check that one argument is one or more ranges of the horizontal axis
+#'
+#' A range is two values of whatever type the horizontal axis holds, either of
+#' which may be NA, the first no later than the second where both are given.
+#' The argument is one range, or a list of them. Whether they are of the type
+#' the data's axis holds is checked against the data, by
+#' `validate_arguments_against_data()`.
+#'
+#' @return `value`, or an error naming the argument.
+#' @noRd
+match_axis_ranges <- function(value,
+                              name,
+                              call = rlang::caller_env()) {
+  ranges <- if (is.list(value)) value else list(value)
+
+  is_range <- function(range) {
+    return(is_axis_pair(range) &&
+      (anyNA(range) || isTRUE(range[[1L]] <= range[[2L]])))
+  }
+
+  is_ranges <- length(ranges) >= 1L &&
+    all(vapply(ranges, is_range, logical(1L)))
+
+  if (!is_ranges) {
+    rlang::abort(
+      sprintf(
+        paste(
+          "`%s` must be a range of the horizontal axis, two values with the",
+          "start first and NA for an open end, or a list of such ranges,",
+          "not %s."
+        ),
+        name,
+        describe_value(value)
+      ),
+      call = call
+    )
+  }
+
+  return(value)
+}
+
+
+#' Whether a value has the shape of two values on the horizontal axis
+#'
+#' Two values that are not text, a factor or a list. Their order is for the
+#' caller to check.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+is_axis_pair <- function(value) {
+  return(length(value) == 2L &&
+    !is.list(value) &&
+    !is.character(value) &&
+    !is.factor(value))
 }
 
 
@@ -943,6 +1032,33 @@ validate_arguments_against_data <- function(arguments,
     call = call
   )
 
+  if (!is.null(arguments$force_restart_at)) {
+    check_axis_type(
+      value = arguments$force_restart_at,
+      name = "force_restart_at",
+      observed_x = observed_x,
+      call = call
+    )
+  }
+
+  ranges <- arguments$prevent_establishment_in
+
+  if (!is.null(ranges) && !is.list(ranges)) {
+    ranges <- list(ranges)
+  }
+
+  # a range with both ends open covers the whole axis whatever its type
+  for (range in ranges) {
+    if (!all(is.na(range))) {
+      check_axis_type(
+        value = range,
+        name = "prevent_establishment_in",
+        observed_x = observed_x,
+        call = call
+      )
+    }
+  }
+
   return(arguments)
 }
 
@@ -965,23 +1081,12 @@ check_display_window_against_data <- function(window,
     return(invisible(NULL))
   }
 
-  same_type <- inherits(window, "Date") == inherits(observed_x, "Date") &&
-    inherits(window, "POSIXct") == inherits(observed_x, "POSIXct") &&
-    (is.numeric(window) || inherits(window, c("Date", "POSIXct")))
-
-  if (!same_type) {
-    rlang::abort(
-      sprintf(
-        paste(
-          "`display_window` must be of the same type as `x`, which is %s,",
-          "not %s."
-        ),
-        class(observed_x)[[1L]],
-        class(window)[[1L]]
-      ),
-      call = call
-    )
-  }
+  check_axis_type(
+    value = window,
+    name = "display_window",
+    observed_x = observed_x,
+    call = call
+  )
 
   start <- if (is.na(window[[1L]])) min(observed_x) else window[[1L]]
   end <- if (is.na(window[[2L]])) max(observed_x) else window[[2L]]
@@ -992,6 +1097,40 @@ check_display_window_against_data <- function(window,
         "`display_window` must overlap the data, which runs from %s to %s.",
         format(min(observed_x)),
         format(max(observed_x))
+      ),
+      call = call
+    )
+  }
+
+  return(invisible(NULL))
+}
+
+
+#' Stop unless an argument holds the same type as the horizontal axis
+#'
+#' Dates for dates, date-times for date-times, numbers for numbers.
+#'
+#' @param value The argument's value.
+#' @param name The argument's name.
+#' @param observed_x The values of `x` that are not NA.
+#'
+#' @return `NULL`, or an error naming the argument.
+#' @noRd
+check_axis_type <- function(value,
+                            name,
+                            observed_x,
+                            call = rlang::caller_env()) {
+  same_type <- inherits(value, "Date") == inherits(observed_x, "Date") &&
+    inherits(value, "POSIXct") == inherits(observed_x, "POSIXct") &&
+    (is.numeric(value) || inherits(value, c("Date", "POSIXct")))
+
+  if (!same_type) {
+    rlang::abort(
+      sprintf(
+        "`%s` must be of the same type as `x`, which is %s, not %s.",
+        name,
+        class(observed_x)[[1L]],
+        class(value)[[1L]]
       ),
       call = call
     )
@@ -1043,6 +1182,8 @@ validate_argument_values <- function(arguments,
       axis_value = match_axis_value(value, name, call = call),
       axis_range = match_axis_range(value, name, call = call),
       axis_window = match_axis_window(value, name, call = call),
+      axis_values = match_axis_values(value, name, call = call),
+      axis_ranges = match_axis_ranges(value, name, call = call),
       match_number(value, name, kinds[[name]], call = call)
     )
   }

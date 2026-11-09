@@ -19,6 +19,8 @@ autospc(
   establish_every_shift = FALSE,
   no_regrets = TRUE,
   overhanging_reversions = TRUE,
+  force_restart_at = NULL,
+  prevent_establishment_in = NULL,
   na_ends_run = TRUE,
   max_exclusions = 3L,
   highlight_exclusions = TRUE,
@@ -143,7 +145,23 @@ used. Defines whether limits can change as more data is added or not.}
 \item{overhanging_reversions}{Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate re-establishment
 prevent limits being re-established, even where they overhang the end of the
-candidate calculation period. Set to FALSE only with no_regrets = FALSE.
+candidate calculation period. Set to FALSE only with no_regrets = FALSE.}
+
+\item{force_restart_at}{Optional, one or more values on the horizontal axis
+at which the algorithm restarts. The series is analysed in pieces, each
+starting at the first point at or after one of these values, and each piece
+is analysed as if it were a series of its own: its first calculation period
+is \code{baseline_length} points, and a piece with fewer than \code{period_min} points
+is given no limits. Values outside the data are ignored.}
+
+\item{prevent_establishment_in}{Optional, a range of the horizontal axis in
+which the algorithm may not establish new limits, given as two values with NA
+for an open end, or a list of such ranges. A range includes both its end
+points. A shift that starts inside a range and continues at least
+\code{shift_rule_threshold} points past the end of that range can still
+re-establish limits after the end of the range. The first calculation period
+of the series, and the first after each restart, are not affected. Ranges
+outside the data are ignored.
 \subsection{SPC Parameters}{
 
 Parameters that control how centre line and control limits are established

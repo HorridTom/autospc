@@ -476,6 +476,20 @@ prepare_data.autospc_chart <- function(chart) {
 }
 
 
+#' Prepare one segment of a series that starts at a forced restart
+#'
+#' Each row's `series` value is worked out from that row alone, so the
+#' segment's rows already hold what `prepare_data()` would give for a series
+#' starting at the segment's first row.
+#'
+#' @return `data`, unchanged.
+#' @noRd
+prepare_segment_data.autospc_chart <- function(chart,
+                                               data) {
+  return(data)
+}
+
+
 #' @noRd
 observed_rows.autospc_chart <- function(chart,
                                         data) {
@@ -717,6 +731,14 @@ print.autospc_chart <- function(x, ...) {
     cat(sprintf(
       "\nLimits re-established at %s\n",
       paste(x$result$re_establish_rows, collapse = ", ")
+    ))
+  }
+
+  restarts <- which(x$result$table$restart)
+  if (length(restarts) > 0L) {
+    cat(sprintf(
+      "Forced restarts at %s\n",
+      paste(restarts, collapse = ", ")
     ))
   }
 

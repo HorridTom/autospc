@@ -35,6 +35,9 @@ interpret_log_entry <- function(entry,
 
   # Form log entry interpretation string based on log entry components
   switch(step,
+    "00" = {
+      interpretation <- "Restart forced by force_restart_at."
+    },
     "01" = {
       interpretation <- "Counter initialised to 1."
     },
@@ -345,6 +348,12 @@ series_short_message <- function(labels,
                                  charts) {
   chart <- location_component(charts)
 
+  if (length(restart_rows(chart)) > 0L) {
+    return(too_few_points_message(
+      "Each segment of the series between forced restarts has"
+    ))
+  }
+
   points <- n_effective_points(chart, data = chart$data)
 
   return(too_few_points_message(
@@ -488,8 +497,49 @@ write_log_file <- function(logs,
 #'   algorithm recorded nothing
 #' @noRd
 render_log <- function(chart) {
-  spc_table <- chart$result$table
-  n_rows <- nrow(spc_table)
+  n_rows <- nrow(chart$result$table)
+  segments <- segment_rows(chart)
+
+  rows <- integer(0)
+  codes <- character(0)
+
+  for (segment in seq_along(segments)) {
+    entries <- segment_log_entries(chart,
+      segment = segment,
+      segments = segments
+    )
+    rows <- c(rows, entries$rows)
+    codes <- c(codes, entries$codes)
+  }
+
+  return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
+}
+
+
+#' Log entries for one segment of the series
+#'
+#' The first segment starts with `0100`, and each segment after a forced restart
+#' with `0000` at its first row. Each segment's entries are those its own
+#' history records: its first period, the rule breaks and candidates whose
+#' counter lies in it, and why the algorithm stopped looking in it - `stopped`
+#' for the last segment, and the restart record that follows it for any other.
+#' An entry past the end of a segment other than the last is held at its last
+#' row, marked as `collect_log_entries()` marks one past the end of the series.
+#'
+#' @param chart The chart, with its history and table set.
+#' @param segment Which segment, counting from 1.
+#' @param segments The rows of each segment, as `segment_rows()` returns them.
+#'
+#' @return A list of `rows` and `codes`, in the order they were recorded.
+#' @noRd
+segment_log_entries <- function(chart,
+                                segment,
+                                segments) {
+  this_segment <- segments[[segment]]
+  first_row <- if (length(this_segment) > 0L) this_segment[[1L]] else 1L
+  last_segment <- segment == length(segments)
+  last_row <- if (last_segment) Inf else this_segment[[length(this_segment)]]
+  history <- chart$history
 
   rows <- integer(0)
   codes <- character(0)
@@ -498,24 +548,59 @@ render_log <- function(chart) {
     codes <<- c(codes, code)
   }
 
-  add(1L, "0100")
+  held <- function() {
+    beyond <- rows > last_row
+    codes[beyond] <- paste0("co@", rows[beyond], "|", codes[beyond])
+    rows[beyond] <- last_row
 
-  if (!enough_data_for_limits(chart)) {
-    add(1L, "0210")
-    return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
+    return(list(rows = rows, codes = codes))
   }
 
-  add(1L, "0200")
+  add(first_row, if (segment == 1L) "0100" else "0000")
 
-  stopped <- chart$history$stopped
+  if (!enough_data_for_new_period(
+    data = segment_data(chart,
+      rows = this_segment,
+      first_segment = segment == 1L
+    ),
+    counter = 1L,
+    chart = chart
+  )) {
+    add(first_row, "0210")
+    return(held())
+  }
+
+  add(first_row, "0200")
+
+  stopped <- if (last_segment) {
+    history$stopped
+  } else {
+    list(
+      counter = history$restarts$counter[[segment]],
+      reason = history$restarts$previous_segment_ended[[segment]]
+    )
+  }
+
   if (identical(stopped$reason, "baseline only")) {
-    return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
+    return(held())
   }
 
-  add(chart$history$counter_path$to[1], "0300")
+  in_segment <- function(row) {
+    return(!is.na(row) & row >= first_row & row <= last_row)
+  }
 
-  breaks <- chart$history$breaks
-  candidates <- chart$history$candidates
+  path <- history$counter_path
+  first_period <- path$to[
+    path$reason == "first period established" & in_segment(path$from)
+  ]
+  add(first_period[[1L]], "0300")
+
+  breaks <- history$breaks
+  breaks <- breaks[in_segment(breaks$counter), , drop = FALSE]
+  candidates <- Filter(
+    function(candidate) in_segment(candidate$counter),
+    history$candidates
+  )
 
   for (i in seq_len(NROW(breaks))) {
     add(
@@ -556,7 +641,7 @@ render_log <- function(chart) {
     add(stopped$counter, stop_code)
   }
 
-  return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
+  return(held())
 }
 
 

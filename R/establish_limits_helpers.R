@@ -20,16 +20,30 @@ enough_data_for_new_period <- function(data,
 #' Can this chart have limits?
 #'
 #' Whether the prepared series is long enough for the algorithm to form one
-#' calculation period. Read from `chart$data` and the chart's parameters.
+#' calculation period, at the first point of the series or at any forced
+#' restart. Read from `chart$data` and the chart's parameters.
 #'
 #' @return TRUE or FALSE
 #' @noRd
 enough_data_for_limits <- function(chart) {
-  return(enough_data_for_new_period(
-    data = chart$data,
-    counter = 1L,
-    chart = chart
-  ))
+  segments <- segment_rows(chart)
+
+  enough <- vapply(
+    seq_along(segments),
+    function(segment) {
+      enough_data_for_new_period(
+        data = segment_data(chart,
+          rows = segments[[segment]],
+          first_segment = segment == 1L
+        ),
+        counter = 1L,
+        chart = chart
+      )
+    },
+    logical(1L)
+  )
+
+  return(any(enough))
 }
 
 

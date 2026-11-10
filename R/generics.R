@@ -37,6 +37,29 @@ prepare_data <- function(chart) {
 }
 
 
+#' Prepare one segment of a series that starts at a forced restart
+#'
+#' `prepare_data()` prepares the whole series at once, before it is split at
+#' the forced restarts. Where a row's `series` value is worked out from earlier
+#' rows as well as its own, the value at the first row of a segment depends on
+#' rows before the restart. This recalculates any such value from the
+#' segment's own rows, so that the segment's `series` is what `prepare_data()`
+#' would give if the series began at the segment's first row.
+#'
+#' @param chart The chart being analysed.
+#' @param data The rows of `chart$data` from one forced restart to the row
+#'   before the next, or to the end of the series, already prepared by
+#'   `prepare_data()`.
+#'
+#' @return `data`, with `series` as `prepare_data()` would give it for a series
+#'   starting at the segment's first row.
+#' @noRd
+prepare_segment_data <- function(chart,
+                                 data) {
+  UseMethod("prepare_segment_data")
+}
+
+
 #' The rows of a prepared series that hold an observation
 #'
 #' A row whose `series` value is missing because there was never a value to

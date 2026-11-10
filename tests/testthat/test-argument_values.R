@@ -644,9 +644,11 @@ test_that("display_window must overlap the data", {
 
 
 test_that("force_restart_at takes one or more points on the horizontal axis", {
+  # a period_min short enough for every segment to have limits, since a segment
+  # without them is warned about
   for (restarts in list(15, c(10, 20), 15L)) {
     expect_s3_class(
-      analyse(force_restart_at = restarts),
+      analyse(force_restart_at = restarts, period_min = 5L),
       "data.frame"
     )
   }

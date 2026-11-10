@@ -1,14 +1,102 @@
 #' Set control limits over a prepared series
 #'
-#' Reads `chart$data`. The algorithm iterates over the rows that hold an
-#' observation, so it is given those rows rather than `chart$data` itself, and
-#' the rest are put back into the result at the end. Where there are too few
-#' points to form a period the analysed columns hold no value.
+#' Reads `chart$data`. The series is split at each forced restart, each segment
+#' is analysed as if it were a series of its own, and the segments are joined.
+#' Where no segment has enough points to form a period the analysed columns hold
+#' no value.
 #'
 #' @return autospc_chart object, with `chart$result$table` set
 #' @noRd
 establish_limits <- function(chart) {
-  prepared_data <- chart$data
+  segments <- segment_rows(chart)
+
+  analysed <- lapply(seq_along(segments), function(segment) {
+    analyse_segment(
+      chart = chart,
+      rows = segments[[segment]],
+      first_segment = segment == 1L,
+      last_segment = segment == length(segments)
+    )
+  })
+
+  has_limits <- vapply(
+    analysed,
+    function(segment) segment$has_limits,
+    logical(1L)
+  )
+
+  chart$history <- join_segment_histories(analysed, segments = segments)
+  chart$result$table <- join_segment_tables(analysed, segments = segments)
+
+  if (!any(has_limits)) {
+    chart$result$table$log <- render_log(chart)
+
+    chart$result$table <- fill_analysis_columns(
+      table = chart$result$table,
+      chart = chart
+    )
+
+    chart$result$re_establish_rows <- integer(0)
+    chart$result$exclusions <- integer(0)
+  } else {
+    chart$result$table$run_break <- NULL
+    chart$result$re_establish_rows <- which(chart$result$table$break_point)
+    chart$result$exclusions <- which(chart$result$table$excluded)
+
+    chart$result$table$log <- render_log(chart)
+
+    # extend_limits_to produces limit values. They go on last
+    # so that every column they copy from the last row of the data is present.
+    # Only the last segment's limits are extended, so a last segment with no
+    # limits has no extension
+    if (has_limits[length(has_limits)]) {
+      chart$result$table <- extend_limits_beyond_data(
+        table = chart$result$table,
+        chart = chart
+      )
+    } else {
+      chart$result$table$limit_extension <- FALSE
+    }
+  }
+
+  return(finish_analysis_table(chart))
+}
+
+
+#' Run the algorithm over one segment of a series
+#'
+#' The segment is the whole series where there is no forced restart, or the rows
+#' from one restart to the next. It is analysed as if it were a series of its
+#' own. The algorithm iterates over the rows that hold an observation, so it is
+#' given those rows rather than the segment itself, and the rest are put back
+#' into the result at the end.
+#'
+#' @param chart The chart being analysed.
+#' @param rows The rows of `chart$data` that make up the segment.
+#' @param first_segment Whether the segment starts at the first row of the
+#'   series.
+#' @param last_segment Whether the segment ends at the last row of the series.
+#'   Any other segment ends at a forced restart, so no more points can join its
+#'   final run.
+#'
+#' @return A list: `chart`, holding the segment's analysis in `chart$history`
+#'   and `chart$result$table`, with the history's row numbers counted in the
+#'   whole series; `has_limits`, whether the segment had enough points for a
+#'   period; and `observed`, the number of its rows that hold an observation.
+#' @noRd
+analyse_segment <- function(chart,
+                            rows,
+                            first_segment,
+                            last_segment) {
+  prepared_data <- segment_data(chart,
+    rows = rows,
+    first_segment = first_segment
+  )
+  rows_before <- if (length(rows) > 0L) rows[[1L]] - 1L else 0L
+
+  chart$data <- prepared_data
+  chart$history <- list()
+  chart$result <- list()
 
   # Remove missing values from series for analysis
   observed_data <- compact_series(chart,
@@ -27,15 +115,12 @@ establish_limits <- function(chart) {
     chart = chart
   )) {
     chart$result$table <- prepared_data
-    chart$result$table$log <- render_log(chart)
 
-    chart$result$table <- fill_analysis_columns(
-      table = chart$result$table,
-      chart = chart
-    )
-
-    chart$result$re_establish_rows <- integer(0)
-    chart$result$exclusions <- integer(0)
+    return(list(
+      chart = chart,
+      has_limits = FALSE,
+      observed = nrow(observed_data)
+    ))
   } else {
     # [2] There are enough data points to form one period
     limits_table <- form_calculation_and_display_limits(
@@ -182,11 +267,15 @@ establish_limits <- function(chart) {
 
               # Establish whether (for no regrets) the final run in the
               # candidate calculation period prevents re-establishment of limits
-              final_run_prevents <- final_run_prevents_re_establishment(
-                candidate_limits_table,
-                triggering_rule_break_direction =
-                  triggering_rule_break_direction
-              )
+              # Only the last segment can receive more points. Any other segment
+              # ends at a forced restart, so its final run is complete and
+              # cannot become an opposing rule break
+              final_run_prevents <- last_segment &&
+                final_run_prevents_re_establishment(
+                  candidate_limits_table,
+                  triggering_rule_break_direction =
+                    triggering_rule_break_direction
+                )
 
               # Check whether either we re-establish at every shift OR:
               # 1) There is no opposing rule break AND
@@ -316,11 +405,13 @@ establish_limits <- function(chart) {
 
     limits_table <- add_period_columns(limits_table)
 
-    # Restore missing values in their original positions
+    # Restore missing values in their original positions, and count the
+    # history's rows in the whole series
     chart$history <- restate_history_rows(
       history = chart$history,
-      positions = which(observed_rows(chart, data = prepared_data)),
-      n_rows = nrow(prepared_data)
+      positions = rows_before +
+        which(observed_rows(chart, data = prepared_data)),
+      n_rows = rows_before + nrow(prepared_data)
     )
 
     chart$result$table <- restore_missing_rows(
@@ -328,20 +419,11 @@ establish_limits <- function(chart) {
       data = prepared_data,
       chart = chart
     )
-
-    chart$result$table$run_break <- NULL
-    chart$result$re_establish_rows <- which(chart$result$table$break_point)
-    chart$result$exclusions <- which(chart$result$table$excluded)
-
-    chart$result$table$log <- render_log(chart)
-
-    # extend_limits_to produces limit values. They go on last
-    # so that every column they copy from the last row of the data is present
-    chart$result$table <- extend_limits_beyond_data(
-      table = chart$result$table,
-      chart = chart
-    )
   } # end of: [2] enough data points to form one period
 
-  return(finish_analysis_table(chart))
+  return(list(
+    chart = chart,
+    has_limits = TRUE,
+    observed = nrow(observed_data)
+  ))
 }

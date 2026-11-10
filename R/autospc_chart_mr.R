@@ -114,6 +114,25 @@ prepare_data.autospc_chart_mr <- function(chart) {
 }
 
 
+#' Prepare one segment of a series that starts at a forced restart
+#'
+#' Each moving range is the difference between a value and the one before it,
+#' so the moving range at the segment's first row was taken from the last value
+#' before the restart. The moving ranges are recalculated from the segment's
+#' own values, so that its first row holds none, as the first row of the series
+#' does, and the moving range across the restart belongs to neither segment.
+#'
+#' @return `data`, with `series` holding the moving ranges within the segment.
+#' @noRd
+prepare_segment_data.autospc_chart_mr <- function(chart,
+                                                  data) {
+  data <- data %>%
+    dplyr::mutate(series = moving_ranges(y = y))
+
+  return(data)
+}
+
+
 #' The rows of a prepared MR series that hold an observation
 #'
 #' The first row of an MR series holds no moving range because there is no

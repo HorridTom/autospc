@@ -50,6 +50,7 @@ analysis_table_columns <- function(chart) {
     "period_type",
     "excluded",
     "break_point",
+    "restart",
     "rule1",
     "run_start",
     "rule2",
@@ -88,6 +89,7 @@ analysis_column_types <- function() {
     period_type = character(0),
     excluded = logical(0),
     break_point = logical(0),
+    restart = logical(0),
     rule1 = logical(0),
     run_start = logical(0),
     rule2 = logical(0),
@@ -134,7 +136,8 @@ fill_analysis_columns <- function(table,
 #' Finish a chart's analysis table
 #'
 #' What both paths through `establish_limits()` end with: the floating median,
-#' and the columns in the order `analysis_table_columns()` declares.
+#' `restart`, TRUE at the first row of each segment after a forced restart, and
+#' the columns in the order `analysis_table_columns()` declares.
 #'
 #' @param chart The chart being analysed, with `chart$result$table` set.
 #'
@@ -147,6 +150,13 @@ finish_analysis_table <- function(chart) {
     floating_median = chart$floating_median,
     floating_median_n = chart$floating_median_n
   )
+
+  # restart_rows() counts rows of the data, which come before any rows the
+  # extension added
+  restart_at <- restart_rows(chart)
+
+  chart$result$table <- chart$result$table %>%
+    dplyr::mutate(restart = dplyr::row_number() %in% restart_at)
 
   chart$result$table <- chart$result$table %>%
     dplyr::select(

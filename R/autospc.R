@@ -73,11 +73,11 @@
 #' prevent limits being re-established, even where they overhang the end of the
 #' candidate calculation period. Set to FALSE only with no_regrets = FALSE.
 #' @param force_restart_at Optional, one or more values on the horizontal axis
-#' at which the algorithm restarts. The series is analysed in pieces, each
-#' starting at the first point at or after one of these values, and each piece
-#' is analysed as if it were a series of its own: its first calculation period
-#' is `baseline_length` points, and a piece with fewer than `period_min` points
-#' is given no limits. Values outside the data are ignored.
+#' at which the algorithm restarts. The series is analysed in segments, each
+#' starting at the first point at or after one of these values, and each
+#' segment is analysed as if it were a series of its own: its first calculation
+#' period is `baseline_length` points, and a segment with fewer than
+#' `period_min` points is given no limits. Values outside the data are ignored.
 #' @param prevent_establishment_in Optional, a range of the horizontal axis in
 #' which the algorithm may not establish new limits, given as two values with NA
 #' for an open end, or a list of such ranges. A range includes both its end

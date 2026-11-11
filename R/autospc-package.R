@@ -58,6 +58,8 @@ utils::globalVariables(c(
   "excluded",
   "excluded.x",
   "excluded.y",
+  "first_x",
+  "half_step",
   "highlight",
   "in_window",
   "interpretation",
@@ -65,6 +67,7 @@ utils::globalVariables(c(
   "labelled_break",
   "lagged_above_or_below_cl",
   "lagged_period_type",
+  "last_x",
   "lcl",
   "lcl.x",
   "lcl.y",
@@ -113,5 +116,7 @@ utils::globalVariables(c(
   "upper_annotation_level",
   "value",
   "x",
+  "xmax",
+  "xmin",
   "y"
 ))

@@ -675,9 +675,9 @@ test_that("the plot records floating_median_style with every element filled in",
 })
 
 
-test_that("a faceted plot draws the median label only in the facet with the median", {
-  # facet_stages() takes the floating median over the last points of the whole
-  # series, which are in the last facet
+test_that("a faceted plot labels the floating median in every facet", {
+  # each stage is analysed as a series of its own, and takes its own floating
+  # median over its last points
   plot <- suppressWarnings(facet_stages(example_series_1,
     split_at = c(60L, 100L),
     chart_type = "C",
@@ -686,6 +686,157 @@ test_that("a faceted plot draws the median label only in the facet with the medi
 
   label <- median_drawing(plot)$label
 
+  expect_identical(as.integer(label$PANEL), 1:3)
+})
+
+
+# A floating median for each segment of a series with forced restarts
+
+segment_series <- data.frame(
+  x = example_series_1$x,
+  y = round(example_series_1$y)
+)
+
+segment_table <- function(...) {
+  autospc(segment_series,
+    chart_type = "C", plot_chart = FALSE, max_exclusions = 0L, ...
+  )
+}
+
+segment_plot <- function(...) {
+  autospc(segment_series, chart_type = "C", max_exclusions = 0L, ...)
+}
+
+
+test_that("each segment takes its own floating median over its last points", {
+  table <- segment_table(force_restart_at = 60, floating_median = "yes")
+
+  expect_identical(which(!is.na(table$median)), c(48:59, 114:125))
+  expect_identical(
+    unique(table$median[48:59]),
+    stats::median(table$series[48:59])
+  )
+  expect_identical(
+    unique(table$median[114:125]),
+    stats::median(table$series[114:125])
+  )
+})
+
+
+test_that("a segment shorter than floating_median_n has no median, and no warning unless it is the last", {
+  # rows 60 to 64 are a segment of five points
+  expect_no_warning(
+    table <- segment_table(
+      force_restart_at = c(60, 65),
+      floating_median = "yes"
+    )
+  )
+
+  expect_false(any(!is.na(table$median[60:64])))
+  expect_identical(which(!is.na(table$median)), c(48:59, 114:125))
+})
+
+
+test_that("a last segment shorter than floating_median_n is warned about", {
+  # rows 115 to 125 are a segment of eleven points
+  expect_warning(
+    table <- segment_table(force_restart_at = 115, floating_median = "yes"),
+    "the segment of this series after its last forced restart has 11"
+  )
+
+  expect_identical(which(!is.na(table$median)), 103:114)
+})
+
+
+test_that("auto decides each segment's median from that segment's own rule 2 breaks", {
+  # with a restart at row 50, the last twelve points of the first segment
+  # (rows 38 to 49) break no shift rule, and those of the second do
+  table <- segment_table(force_restart_at = 50, floating_median = "auto")
+
+  expect_false(any(table$rule2[38:49], na.rm = TRUE))
+  expect_true(any(table$rule2[114:125], na.rm = TRUE))
+
+  expect_identical(which(!is.na(table$median)), 114:125)
+})
+
+
+test_that("a segment too short for limits still gets a floating median", {
+  # rows 110 to 125 are sixteen points, fewer than period_min
+  table <- segment_table(force_restart_at = 110, floating_median = "yes")
+
+  expect_true(all(is.na(table$cl[110:125])))
+  expect_identical(which(!is.na(table$median)), c(98:109, 114:125))
+})
+
+
+test_that("each segment's floating median is drawn as a line of its own", {
+  plot <- segment_plot(force_restart_at = 60, floating_median = "yes")
+  line <- median_drawing(plot)$line[[1]]
+  drawn <- line[!is.na(line$y), ]
+
+  expect_identical(
+    tapply(drawn$x, drawn$group, range),
+    list(`1` = c(48, 59), `2` = c(114, 125)),
+    ignore_attr = TRUE
+  )
+})
+
+
+test_that("only the last segment's floating median is labelled", {
+  plot <- segment_plot(force_restart_at = 60, floating_median = "yes")
+  label <- median_drawing(plot)$label
+
   expect_identical(nrow(label), 1L)
-  expect_identical(as.integer(label$PANEL), 3L)
+  expect_identical(label$y, 9.5)
+  expect_gt(label$x, 125)
+})
+
+
+test_that("a window that ends before the last segment draws the earlier median without a label", {
+  plot <- segment_plot(
+    force_restart_at = 60,
+    floating_median = "yes",
+    display_window = c(1, 80)
+  )
+  drawing <- median_drawing(plot)
+  line <- drawing$line[[1]]
+
+  expect_identical(range(line$x[!is.na(line$y)]), c(48, 59))
+  expect_identical(NROW(drawing$label), 0L)
+})
+
+
+test_that("an unlabelled floating median leaves no space for a label", {
+  # rows 120 to 125 are too few for a median, so the only median, at the end
+  # of the first segment, is not labelled
+  with_median <- suppressWarnings(
+    segment_plot(force_restart_at = 120, floating_median = "yes")
+  )
+  without_median <- segment_plot(force_restart_at = 120, floating_median = "no")
+
+  expect_identical(
+    ggplot2::ggplot_build(with_median)$layout$panel_params[[1]]$x.range,
+    ggplot2::ggplot_build(without_median)$layout$panel_params[[1]]$x.range
+  )
+})
+
+
+test_that("a window showing only an unlabelled floating median leaves no space for a label", {
+  # the window ends three points after the first segment's median, which is
+  # drawn and not labelled
+  with_median <- segment_plot(
+    force_restart_at = 60,
+    floating_median = "yes",
+    display_window = c(1, 62)
+  )
+  without_median <- segment_plot(
+    force_restart_at = 60,
+    floating_median = "no",
+    display_window = c(1, 62)
+  )
+
+  expect_identical(
+    ggplot2::ggplot_build(with_median)$layout$panel_params[[1]]$x.range,
+    ggplot2::ggplot_build(without_median)$layout$panel_params[[1]]$x.range
+  )
 })

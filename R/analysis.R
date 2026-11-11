@@ -148,7 +148,8 @@ finish_analysis_table <- function(chart) {
   chart$result$table <- floating_median_column(
     table = chart$result$table,
     floating_median = chart$floating_median,
-    floating_median_n = chart$floating_median_n
+    floating_median_n = chart$floating_median_n,
+    segments = segment_rows(chart)
   )
 
   # restart_rows() counts rows of the data, which come before any rows the

@@ -80,3 +80,65 @@ record_break <- function(chart,
 
   return(chart)
 }
+
+
+#' The limits in force before a candidate period
+#'
+#' The last row before the candidate's counter, and the centre line and limits
+#' it holds. NA where the candidate starts at the first row.
+#'
+#' @return A list of `last_row`, `cl`, `ucl` and `lcl`.
+#' @noRd
+prevailing_limits <- function(limits_table,
+                              counter) {
+  last_row <- if (counter > 1L) {
+    as.integer(counter) - 1L
+  } else {
+    NA_integer_
+  }
+
+  return(list(
+    last_row = last_row,
+    cl = limits_table$cl[last_row],
+    ucl = limits_table$ucl[last_row],
+    lcl = limits_table$lcl[last_row]
+  ))
+}
+
+
+#' Record a candidate that was not formed because it starts in a prevented
+#' range
+#'
+#' Recorded among the candidates, so that each shift rule break the algorithm
+#' moved to is followed by a candidate. Nothing about the candidate was
+#' evaluated, so `period_rows` is empty, `table` is NULL, and
+#' `opposite_break` and `final_run_prevents` are NA. `prevented` is TRUE, and
+#' is present only on such a candidate.
+#'
+#' @param counter Where the candidate would have started.
+#' @param trigger_direction The direction of the shift rule break there.
+#' @param limits_table The limits table at the time.
+#'
+#' @return autospc_chart object
+#' @noRd
+record_prevented_candidate <- function(chart,
+                                       counter,
+                                       trigger_direction,
+                                       limits_table) {
+  chart$history$candidates <- c(
+    chart$history$candidates,
+    list(list(
+      counter = as.integer(counter),
+      period_rows = integer(0),
+      trigger_direction = trigger_direction,
+      table = NULL,
+      prevailing = prevailing_limits(limits_table, counter = counter),
+      opposite_break = NA,
+      final_run_prevents = NA,
+      accepted = FALSE,
+      prevented = TRUE
+    ))
+  )
+
+  return(chart)
+}

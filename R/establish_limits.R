@@ -224,6 +224,33 @@ analyse_segment <- function(chart,
             triggering_rule_break_direction <-
               limits_table$above_or_below_cl[counter]
 
+            # A candidate starting in a range given by
+            # prevent_establishment_in is not formed. The counter moves to the
+            # first row after the range, and the loop looks for the next
+            # candidate from there
+            row_after_range <- row_after_prevented_range(
+              chart,
+              table = limits_table,
+              counter = counter
+            )
+
+            if (!is.null(row_after_range)) {
+              chart <- record_prevented_candidate(chart,
+                counter = counter,
+                trigger_direction = triggering_rule_break_direction,
+                limits_table = limits_table
+              )
+
+              chart <- record_counter_move(chart,
+                from = counter,
+                to = row_after_range,
+                reason = "in a range where establishment is prevented"
+              )
+              counter <- row_after_range
+
+              next
+            }
+
 
             # [6] Check whether there are enough points after the counter to
             # form a new period
@@ -296,12 +323,6 @@ analyse_segment <- function(chart,
                 counter + chart$period_min - 1L,
                 nrow(limits_table)
               )
-              prevailing_row <- if (counter > 1L) {
-                as.integer(counter) - 1L
-              } else {
-                NA_integer_
-              }
-
               chart$history$candidates <- c(
                 chart$history$candidates,
                 list(list(
@@ -313,11 +334,9 @@ analyse_segment <- function(chart,
                   } else {
                     NULL
                   },
-                  prevailing = list(
-                    last_row = prevailing_row,
-                    cl       = limits_table$cl[prevailing_row],
-                    ucl      = limits_table$ucl[prevailing_row],
-                    lcl      = limits_table$lcl[prevailing_row]
+                  prevailing = prevailing_limits(
+                    limits_table,
+                    counter = counter
                   ),
                   opposite_break = opposite_rule_break,
                   final_run_prevents = final_run_prevents,

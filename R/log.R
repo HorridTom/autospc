@@ -204,6 +204,11 @@ interpret_log_entry <- function(entry,
           "stable new process. The final run of the candidate calculation",
           "period is not complete."
         )
+      } else if (branch == "30") {
+        interpretation <- paste(
+          "Not considered: in a range given by",
+          "prevent_establishment_in."
+        )
       } else {
         interpretation <- "Undefined branch at step 07."
       }
@@ -619,14 +624,19 @@ segment_log_entries <- function(chart,
 
     if (i <= length(candidates)) {
       candidate <- candidates[[i]]
-      add(
-        candidate$counter,
-        paste0(
-          "0600",
-          as.integer(candidate$opposite_break),
-          as.integer(candidate$final_run_prevents)
+
+      # a candidate in a prevented range is not formed, so has no checks
+      if (!isTRUE(candidate$prevented)) {
+        add(
+          candidate$counter,
+          paste0(
+            "0600",
+            as.integer(candidate$opposite_break),
+            as.integer(candidate$final_run_prevents)
+          )
         )
-      )
+      }
+
       add(candidate$counter, candidate_decision_code(candidate))
     }
   }
@@ -650,11 +660,16 @@ segment_log_entries <- function(chart,
 #' 0700 accepted; 0710 rejected because of an opposing rule break; 0720
 #' rejected because the final run of the candidate calculation period is not
 #' complete and may still become an opposing rule break, which ends the
-#' algorithm.
+#' algorithm; 0730 not formed, because it starts in a range given by
+#' `prevent_establishment_in`.
 #'
 #' @return character, one log code
 #' @noRd
 candidate_decision_code <- function(candidate) {
+  if (isTRUE(candidate$prevented)) {
+    return("0730")
+  }
+
   if (candidate$accepted) {
     return("0700")
   }

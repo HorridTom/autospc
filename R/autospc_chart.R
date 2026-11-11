@@ -750,7 +750,13 @@ print.autospc_chart <- function(x, ...) {
     ))
   }
 
-  candidates <- x$history$candidates
+  is_prevented <- vapply(
+    x$history$candidates,
+    function(candidate) isTRUE(candidate$prevented),
+    logical(1)
+  )
+  candidates <- x$history$candidates[!is_prevented]
+
   if (length(candidates) > 0L) {
     accepted <- sum(vapply(
       candidates,
@@ -762,6 +768,15 @@ print.autospc_chart <- function(x, ...) {
       length(candidates),
       if (length(candidates) == 1L) "" else "s",
       accepted
+    ))
+  }
+
+  if (any(is_prevented)) {
+    cat(sprintf(
+      "%d candidate period%s not formed, in ranges given by %s\n",
+      sum(is_prevented),
+      if (sum(is_prevented) == 1L) "" else "s",
+      "prevent_establishment_in"
     ))
   }
 

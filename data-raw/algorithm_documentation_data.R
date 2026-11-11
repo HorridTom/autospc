@@ -76,14 +76,19 @@ get_algorithm_flow_chart_string <- function() {
 get_log_explanation_table <- function() {
   log_exp_tab <- tibble::tribble(
     ~algorithm_step, ~shorthand, ~explanation,
+    "0", "0000", paste0(
+      "Restart forced by force_restart_at. The counter",
+      " is set to the first point of the new segment,",
+      " and the algorithm continues from step 2."
+    ),
     "1", "0100", "Initialise algorithm. Counter = 1.",
     "2", "02xx", paste0(
       "Check whether there are sufficient",
       " data to form at least one set of",
       " limits."
     ),
-    "", "", "x = 00: Yes",
-    "", "", "x = 10: No",
+    "", "", "xx = 00: Yes",
+    "", "", "xx = 10: No",
     "3", "0300", "Main algorithm loop begins.",
     "4", "04xxyy", paste0(
       "Check whether there are sufficient",
@@ -99,7 +104,10 @@ get_log_explanation_table <- function() {
       " beyond current run"
     ),
     "", "", "xx = 10: No",
-    "", "", "yy = position of next rule break.",
+    "", "", paste0(
+      "yy = position of next rule break, or NA if",
+      " there is none."
+    ),
     "5", "05xxyy", paste0(
       "Check whether there are any",
       " subsequent rule breaks."
@@ -125,13 +133,27 @@ get_log_explanation_table <- function() {
       "z = 1: Final run prevents",
       " re-establishment of limits."
     ),
-    "7", "07xx", paste0(
-      "Decide whether to re-establish",
-      " limits. xx = 00: Yes, xx = 10: No,",
-      " xx = 20: No - insufficient data to",
+    "7", "07xx", "Decide whether to re-establish limits.",
+    "", "", "xx = 00: Yes",
+    "", "", "xx = 10: No",
+    "", "", paste0(
+      "xx = 20: No - insufficient data to",
       " establish a stable new process, as the",
       " final run of the candidate calculation",
       " period is not complete."
+    ),
+    "", "", paste0(
+      "xx = 30: Not considered - the candidate is",
+      " in a range given by prevent_establishment_in,",
+      " so no candidate limits are formed. The",
+      " counter moves to the first point after the",
+      " range."
+    ),
+    "", "co@n|", paste0(
+      "Prefix to an entry that belongs at point n,",
+      " past the last point of the data or of a",
+      " segment. The entry is recorded at that last",
+      " point."
     )
   )
 }

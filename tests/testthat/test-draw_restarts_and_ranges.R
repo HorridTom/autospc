@@ -131,7 +131,7 @@ test_that("the legend entries come after the chart's own legends", {
   expect_length(texts, 4L)
   expect_match(texts[[1]], "Rule triggered")
   expect_match(texts[[2]], "Period Type")
-  expect_match(texts[[3]], "Establishment prevented")
+  expect_match(texts[[3]], "Re-establishment\nprevented")
   expect_match(texts[[4]], "Forced restart")
 })
 
@@ -152,7 +152,7 @@ test_that("there is no legend entry for what is not drawn", {
   ))
 
   expect_false(any(grepl("Forced restart", texts)))
-  expect_true(any(grepl("Establishment prevented", texts)))
+  expect_true(any(grepl("Re-establishment\nprevented", texts)))
 })
 
 

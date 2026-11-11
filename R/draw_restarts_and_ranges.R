@@ -32,7 +32,7 @@ restart_line_positions <- function(table,
 }
 
 
-#' The areas shaded for the ranges where establishment is prevented
+#' The areas shaded for the ranges where re-establishment is prevented
 #'
 #' Each range given by `prevent_establishment_in`, within the data of each
 #' facet: an open end is taken as that end of the data, and a range outside the
@@ -122,7 +122,7 @@ half_spacing <- function(x) {
 }
 
 
-#' Shade the ranges where establishment is prevented
+#' Shade the ranges where re-establishment is prevented
 #'
 #' Added before anything else is drawn, so that the shading lies behind the
 #' points and lines. Its legend entry comes after the chart's own legends.
@@ -147,14 +147,15 @@ add_prevented_ranges <- function(spc_plot,
         xmax = xmax,
         ymin = -Inf,
         ymax = Inf,
-        fill = "Establishment prevented"
+        fill = "Re-establishment prevented"
       ),
       alpha = 0.2,
       inherit.aes = FALSE
     ) +
     ggplot2::scale_fill_manual(
       name = NULL,
-      values = c("Establishment prevented" = "grey80"),
+      values = c("Re-establishment prevented" = "grey80"),
+      labels = c("Re-establishment prevented" = "Re-establishment\nprevented"),
       guide = ggplot2::guide_legend(order = 3L)
     )
 

@@ -389,7 +389,10 @@ format_spc_plot <- function(plot_unformatted,
     "display",
     plot_periods
   )[1]]
-  first_calc_period <- plot_periods[1]
+  first_calc_period <- plot_periods[grep(
+    "calculation",
+    plot_periods
+  )[1]]
 
   list_of_plot_periods <- unique(plot_periods)
 

@@ -319,7 +319,12 @@ points beginning at the counter.
 
 The algorithm is visualised in the flow chart below.
 
-```{r 5.1, fig.width=5, fig.height=7, out.width="75%"}
+```{r flowchart, fig.width=5, fig.height=7, out.width="75%"}
+#| fig.cap: >
+#|   The Stable Shift Algorithm. In this package the algorithm can also be made
+#|   to restart at given points, with `force_restart_at`, and prevented from
+#|   establishing new limits in given ranges, with `prevent_establishment_in`.
+#|   Neither is shown in this flowchart.
 # grViz(autospc:::algorithm_flow_chart_string) %>%
 #   DiagrammeRsvg::export_svg() %>%
 #   charToRaw() %>%
@@ -390,6 +395,7 @@ log_exp_tab <- autospc:::log_explanation_table
 
 ```{r 6.3}
 log_exp_tab %>%
+  dplyr::mutate(shorthand = gsub("@", "\\\\@", shorthand)) %>%
   knitr::kable()
 ```
  

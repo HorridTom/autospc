@@ -27,7 +27,7 @@ geom_data <- function(plot, geom) {
 legend_texts <- function(plot) {
   grob <- ggplot2::ggplotGrob(plot)
   box <- grob$grobs[[which(grob$layout$name == "guide-box-right")]]
-  is_legend <- vapply(box$grobs, gtable::is.gtable, logical(1L))
+  is_legend <- vapply(box$grobs, inherits, logical(1L), what = "gtable")
 
   texts <- vapply(
     box$grobs[is_legend],

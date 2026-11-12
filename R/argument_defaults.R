@@ -68,6 +68,9 @@ autospc_flag_arguments <- function() {
 #'     holds, which is not restricted to numbers
 #'   \item `axis_window` — two values on the horizontal axis, either of which
 #'     may be NA
+#'   \item `axis_values` — one or more values on the horizontal axis, none NA
+#'   \item `axis_ranges` — two values on the horizontal axis, either of which
+#'     may be NA, or a list of such pairs
 #' }
 #'
 #' Unlike the Boolean arguments these cannot be read off the signature, because
@@ -95,7 +98,9 @@ autospc_numeric_arguments <- function() {
     x_break = "axis_value",
     x_pad_end = "axis_value",
     extend_limits_to = "axis_value",
-    display_window = "axis_window"
+    display_window = "axis_window",
+    force_restart_at = "axis_values",
+    prevent_establishment_in = "axis_ranges"
   ))
 }
 

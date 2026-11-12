@@ -38,10 +38,10 @@ create_spc_plot <- function(plot_data,
   }
 
   # number the stretches of the series between missing values, so that the
-  # series line is drawn in pieces and breaks where a value is missing. The
-  # rows are in order of x within each facet
+  # series line is drawn as one polyline per stretch and breaks where a value
+  # is missing. The rows are in order of x within each facet
   table <- table %>%
-    dplyr::mutate(series_segment = cumsum(is.na(series)))
+    dplyr::mutate(series_polyline = cumsum(is.na(series)))
 
   long_table <- table %>%
     tidyr::pivot_longer(
@@ -67,6 +67,14 @@ create_spc_plot <- function(plot_data,
     ggplot2::aes(
       x = x,
       y = value
+    )
+  )
+
+  plot_unformatted <- add_prevented_ranges(
+    plot_unformatted,
+    areas = prevented_range_areas(chart,
+      table = table,
+      axis_extents = axis_extents
     )
   )
 
@@ -117,6 +125,11 @@ create_spc_plot <- function(plot_data,
         axis_extents$ylimhigh
       )
     )
+
+  spc_plot <- add_restart_lines(spc_plot,
+    lines = restart_line_positions(table, window = axis_extents$window),
+    line_width_sf = visualisation_params$line_width_sf
+  )
 
   # Add floating median to chart if needed
   if (floating_median_shown(table, axis_extents$window)) {
@@ -252,7 +265,17 @@ create_timeseries_plot <- function(table,
   time_series_plot <- ggplot2::ggplot(
     table,
     ggplot2::aes(x = x, y = series)
-  ) +
+  )
+
+  time_series_plot <- add_prevented_ranges(
+    time_series_plot,
+    areas = prevented_range_areas(chart,
+      table = table,
+      axis_extents = axis_extents
+    )
+  )
+
+  time_series_plot <- time_series_plot +
     ggplot2::geom_line(
       colour = "black",
       linewidth = 0.5 * visualisation_params$line_width_sf
@@ -283,6 +306,11 @@ create_timeseries_plot <- function(table,
         axis_extents$ylimhigh
       )
     )
+
+  time_series_plot <- add_restart_lines(time_series_plot,
+    lines = restart_line_positions(table, window = axis_extents$window),
+    line_width_sf = visualisation_params$line_width_sf
+  )
 
   # a floating median does not need limits, so is added here if present
   if (floating_median_shown(table, axis_extents$window)) {
@@ -361,7 +389,10 @@ format_spc_plot <- function(plot_unformatted,
     "display",
     plot_periods
   )[1]]
-  first_calc_period <- plot_periods[1]
+  first_calc_period <- plot_periods[grep(
+    "calculation",
+    plot_periods
+  )[1]]
 
   list_of_plot_periods <- unique(plot_periods)
 
@@ -393,7 +424,7 @@ format_spc_plot <- function(plot_unformatted,
       ggplot2::aes(
         linetype = plotted_line,
         linewidth = plotted_line,
-        group = series_segment
+        group = series_polyline
       ),
       show.legend = FALSE,
       na.rm = TRUE
@@ -413,7 +444,8 @@ format_spc_plot <- function(plot_unformatted,
         c("Calculation", "Display")
       } else {
         c("Calculation")
-      }
+      },
+      guide = ggplot2::guide_legend(order = 2L)
     ) +
     ggplot2::scale_linetype_manual(
       values = line_types,
@@ -431,7 +463,8 @@ format_spc_plot <- function(plot_unformatted,
       na.rm = TRUE
     ) +
     ggplot2::scale_color_manual(rule_title,
-      values = point_colours
+      values = point_colours,
+      guide = ggplot2::guide_legend(order = 1L)
     ) +
     theme_autospc()
 

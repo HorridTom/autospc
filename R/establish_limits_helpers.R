@@ -20,16 +20,30 @@ enough_data_for_new_period <- function(data,
 #' Can this chart have limits?
 #'
 #' Whether the prepared series is long enough for the algorithm to form one
-#' calculation period. Read from `chart$data` and the chart's parameters.
+#' calculation period, at the first point of the series or at any forced
+#' restart. Read from `chart$data` and the chart's parameters.
 #'
 #' @return TRUE or FALSE
 #' @noRd
 enough_data_for_limits <- function(chart) {
-  return(enough_data_for_new_period(
-    data = chart$data,
-    counter = 1L,
-    chart = chart
-  ))
+  segments <- segment_rows(chart)
+
+  enough <- vapply(
+    seq_along(segments),
+    function(segment) {
+      enough_data_for_new_period(
+        data = segment_data(chart,
+          rows = segments[[segment]],
+          first_segment = segment == 1L
+        ),
+        counter = 1L,
+        chart = chart
+      )
+    },
+    logical(1L)
+  )
+
+  return(any(enough))
 }
 
 
@@ -409,47 +423,91 @@ points_with_a_value <- function(table) {
 #' Check whether a floating median is required, and if so add a column to the
 #' table holding its values
 #'
-#' The median is taken over the last `floating_median_n` points that have a
-#' value. A series holding fewer than that has none to take it over, so no
-#' median is drawn; `floating_median = "yes"` asked for one and is warned,
-#' where `"auto"` only asked the package to decide and is not.
+#' A median is taken at the end of each segment of the series: the whole series
+#' where there is no forced restart, or the rows from one restart to the next.
+#' Each is taken over the segment's last `floating_median_n` points that have a
+#' value. A segment holding fewer than that has none to take it over, so no
+#' median is drawn there. `floating_median = "yes"` asked for one, so where the
+#' last segment is too short it is warned; `"auto"` only asked the package to
+#' decide, and is not.
 #'
 #' @param table The analysed table.
 #' @param floating_median One of "no", "yes" and "auto".
 #' @param floating_median_n The number of points the median is taken over.
+#' @param segments The rows of each segment, as `segment_rows()` gives them.
+#'   The rows the extension added beyond the end of the data are in none, so
+#'   no median is taken over them.
 #'
 #' @return `table`, with a `median` column where a floating median is drawn.
 #' @noRd
 floating_median_column <- function(table,
                                    floating_median,
-                                   floating_median_n) {
-  # the column is always returned, and holds a value only on the rows the
+                                   floating_median_n,
+                                   segments) {
+  # the column is always returned, and holds a value only on the rows a
   # median is drawn over
-  table <- table %>%
-    dplyr::mutate(median = NA_real_)
+  medians <- rep(NA_real_, nrow(table))
 
-  if (identical(floating_median, "no")) {
-    return(table)
+  if (!identical(floating_median, "no")) {
+    for (segment in seq_along(segments)) {
+      rows <- segments[[segment]]
+
+      medians[rows] <- segment_floating_median(
+        segment_table = dplyr::slice(table, rows),
+        floating_median = floating_median,
+        floating_median_n = floating_median_n,
+        warn = identical(floating_median, "yes") &&
+          segment == length(segments),
+        restarted = length(segments) > 1L
+      )
+    }
   }
 
-  # the rows the extension added beyond the end of the data hold no
-  # observation, so the median is taken over the rows the data supplied
-  observed <- table %>%
-    dplyr::filter(!limit_extension)
+  table <- table %>%
+    dplyr::mutate(median = medians)
 
-  if (points_with_a_value(observed) < floating_median_n) {
-    if (identical(floating_median, "yes")) {
+  return(table)
+}
+
+
+#' The floating median over one segment of the series
+#'
+#' @param segment_table The rows of the analysed table in the segment.
+#' @param floating_median One of "yes" and "auto".
+#' @param floating_median_n The number of points the median is taken over.
+#' @param warn Whether to warn when the segment is too short for a median.
+#' @param restarted Whether the series has a forced restart, which decides how
+#'   the warning describes the segment.
+#'
+#' @return One value per row of `segment_table`: the median on the rows it is
+#'   taken over, and NA elsewhere.
+#' @noRd
+segment_floating_median <- function(segment_table,
+                                    floating_median,
+                                    floating_median_n,
+                                    warn,
+                                    restarted) {
+  no_median <- rep(NA_real_, nrow(segment_table))
+  points <- points_with_a_value(segment_table)
+
+  if (points < floating_median_n) {
+    if (warn) {
       warning(paste0(
         "A floating median is taken over the last ", floating_median_n,
-        " points that have a value, and this series has ",
-        points_with_a_value(observed), ". No floating median is drawn."
+        " points that have a value, and ",
+        if (restarted) {
+          "the segment of this series after its last forced restart has "
+        } else {
+          "this series has "
+        },
+        points, ". No floating median is drawn."
       ))
     }
 
-    return(table)
+    return(no_median)
   }
 
-  median_from_x <- observed %>%
+  median_from_x <- segment_table %>%
     dplyr::mutate(non_missing = !is.na(series)) %>%
     dplyr::arrange(dplyr::desc(x)) %>%
     dplyr::mutate(cumulative_num_non_missing = cumsum(non_missing)) %>%
@@ -457,7 +515,7 @@ floating_median_column <- function(table,
     dplyr::pull(x) %>%
     max()
 
-  window <- observed %>%
+  window <- segment_table %>%
     dplyr::filter(x >= median_from_x)
 
   addfloating_median <- switch(
@@ -469,16 +527,15 @@ floating_median_column <- function(table,
     FALSE
   )
 
-  if (addfloating_median) {
-    table <- table %>%
-      dplyr::mutate(median = dplyr::if_else(
-        !limit_extension & x >= median_from_x,
-        stats::median(window$series, na.rm = TRUE),
-        NA_real_
-      ))
+  if (!addfloating_median) {
+    return(no_median)
   }
 
-  return(table)
+  return(dplyr::if_else(
+    segment_table$x >= median_from_x,
+    stats::median(window$series, na.rm = TRUE),
+    NA_real_
+  ))
 }
 
 

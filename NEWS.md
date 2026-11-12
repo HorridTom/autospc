@@ -1,3 +1,47 @@
+# autospc 0.2.0.9008
+
+## Forced restarts and preventing re-establishment
+
+* New argument `force_restart_at` makes the algorithm restart at one or more
+  values on the horizontal axis (#119). The series is analysed in segments,
+  each starting at the first point of the series or the first point at or after
+  a forced restart. Each segment is analysed as if it were a series of its own:
+  its first calculation period is `baseline_length` points, a segment with fewer
+  than `period_min` points has no limits, and no run counts towards the shift
+  rule across a restart. Each restart is drawn as a solid vertical line, with
+  the legend entry "Forced restart". Values outside the data are ignored.
+* New argument `prevent_establishment_in` gives a range of the horizontal axis
+  in which the algorithm may not establish new limits (#119): two values, with
+  `NA` for an open end, or a list of such ranges. A range includes both its end
+  points. A shift that starts inside a range and continues past its end can
+  still re-establish limits after the range. The first calculation period of
+  the series, and the first after each restart, are not affected. Each range is
+  shaded light grey, with the legend entry "Re-establishment prevented".
+  Ranges outside the data are ignored.
+* The table returned with `plot_chart = FALSE` has a new column, `restart`,
+  which is `TRUE` at the first row of each segment after a forced restart.
+* The algorithm log records a forced restart with the new code `0000`, and a
+  candidate in a range given by `prevent_establishment_in` with the new code
+  `0730`, "Not considered". The table of log codes in the "Stable Shift
+  Algorithm" vignette now lists every code the log can record, including these
+  two and the prefix `co@n|`.
+* With forced restarts, a floating median can be drawn at the end of each
+  segment that holds at least `floating_median_n` points, not only at the end
+  of the series. Only the last is labelled.
+
+## Chart legends
+
+* The legends now always appear in the same order: "Rule triggered", then
+  "Period Type", then "Re-establishment prevented" and "Forced restart".
+  Before, ggplot2 chose the order, and it differed between charts and between
+  versions of ggplot2.
+* The "Period Type" legend now shows "Calculation" when the first rows of the
+  chart have no limits: a series that begins with missing values, a faceted
+  chart whose first stage is too short for limits, or a series whose first
+  segment is too short for limits. Before, it showed only "Display".
+* `facet_stages()` now labels the floating median in every facet that has one,
+  not only in the last.
+
 # autospc 0.2.0.9007
 
 ## Bugfix: Missing values

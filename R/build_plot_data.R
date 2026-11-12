@@ -225,8 +225,10 @@ axis_specifications <- function(table,
   data_end_x <- max(x_max, x_pad_end)
   end_x <- data_end_x
 
-  if (has_floating_median(table)) {
-    end_x <- max(end_x, floating_median_label_end(table))
+  labelled <- labelled_floating_medians(table, window = NULL)
+
+  if (has_floating_median(labelled)) {
+    end_x <- max(end_x, floating_median_label_end(labelled))
   }
 
   # an end of the window given as NA is the end of the data; the space for the
@@ -238,11 +240,15 @@ axis_specifications <- function(table,
     end_x = data_end_x
   )
 
-  if (!is.null(window) && floating_median_shown(table, window)) {
-    window[[2L]] <- max(
-      window[[2L]],
-      floating_median_label_end(table, extent_x = window)
-    )
+  if (!is.null(window)) {
+    labelled <- labelled_floating_medians(table, window = window)
+
+    if (has_floating_median(labelled)) {
+      window[[2L]] <- max(
+        window[[2L]],
+        floating_median_label_end(labelled, extent_x = window)
+      )
+    }
   }
 
   if (!enough_data_for_limits(chart)) {

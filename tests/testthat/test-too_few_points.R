@@ -34,8 +34,8 @@ test_that("Charts with fewer points than min period error handle", {
   # the same columns a series long enough for limits returns, the analysed
   # ones holding no value. aggregate_data() summarises to the columns the class
   # analyses, so a C chart drops n and a P chart keeps it
-  testthat::expect_equal(ncol(result_C), 22)
-  testthat::expect_equal(ncol(result_P), 23)
+  testthat::expect_equal(ncol(result_C), 23)
+  testthat::expect_equal(ncol(result_P), 24)
   testthat::expect_warning(
     autospc(test_data, plot_chart = TRUE, chart_type = "C")
   )
@@ -54,8 +54,8 @@ test_that("Charts with show_limits = FALSE behave as expected", {
 
   # expect full limits table to be returned regardless of show_limits status,
   # including the four columns describing the periods
-  testthat::expect_equal(ncol(result_C), 22)
-  testthat::expect_equal(ncol(result_P), 23)
+  testthat::expect_equal(ncol(result_C), 23)
+  testthat::expect_equal(ncol(result_P), 24)
 
   testthat::expect_true(all(c(
     "limit_change", "period_start", "plot_period",
@@ -291,11 +291,12 @@ test_that("the analysed columns a short series gets hold no value", {
     autospc(short, chart_type = "C", period_min = 21L, plot_chart = FALSE)
   )
 
-  # limit_extension is not one of them: it says whether the extension put the
-  # row there, and none did
+  # limit_extension and restart are not among them: they say whether the
+  # extension put the row there and whether the series restarts there, and
+  # neither happened
   filled <- setdiff(
     names(analysis_column_types()),
-    c("sd_estimate", "limit_extension")
+    c("sd_estimate", "limit_extension", "restart")
   )
 
   for (column in filled) {
@@ -303,6 +304,7 @@ test_that("the analysed columns a short series gets hold no value", {
   }
 
   expect_false(any(result$limit_extension))
+  expect_false(any(result$restart))
 
   # and the data is there as it was
   expect_identical(result$x, short$x)

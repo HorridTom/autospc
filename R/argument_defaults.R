@@ -61,6 +61,7 @@ autospc_flag_arguments <- function() {
 #'   \item `count` — a whole number of one or more
 #'   \item `count_from_zero` — a whole number of zero or more
 #'   \item `loops` — a whole number of zero or more, or Inf
+#'   \item `count_or_inf` — a whole number of one or more, or Inf
 #'   \item `non_negative` — a number of zero or more
 #'   \item `positive` — a number above zero
 #'   \item `number` — any single finite number
@@ -100,7 +101,8 @@ autospc_numeric_arguments <- function() {
     extend_limits_to = "axis_value",
     display_window = "axis_window",
     force_restart_at = "axis_values",
-    prevent_establishment_in = "axis_ranges"
+    prevent_establishment_in = "axis_ranges",
+    restart_after_gap = "count_or_inf"
   ))
 }
 

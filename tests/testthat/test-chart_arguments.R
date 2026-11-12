@@ -24,6 +24,7 @@ chart_argument_alternatives <- list(
   # given as a list of ranges, because one range given on its own is held on
   # the chart as a list containing it
   prevent_establishment_in = list(c(5, 10)),
+  restart_after_gap = 3L,
   na_ends_run = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,

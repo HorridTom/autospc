@@ -104,6 +104,7 @@ autospc_chart_elements <- function() {
     "overhanging_reversions",
     "force_restart_at",
     "prevent_establishment_in",
+    "restart_after_gap",
     "na_ends_run",
     "max_exclusions",
     "mr_screen_max_loops",
@@ -376,6 +377,7 @@ assemble_chart_list <- function(
     overhanging_reversions = autospc_default("overhanging_reversions"),
     force_restart_at = autospc_default("force_restart_at"),
     prevent_establishment_in = autospc_default("prevent_establishment_in"),
+    restart_after_gap = autospc_default("restart_after_gap"),
     na_ends_run = autospc_default("na_ends_run"),
     max_exclusions = autospc_default("max_exclusions"),
     mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
@@ -388,6 +390,11 @@ assemble_chart_list <- function(
   # chart has a first calculation period length and the field is never NULL.
   if (is.null(baseline_length)) {
     baseline_length <- period_min
+  }
+
+  # restart_after_gap is period_min unless the caller sets it
+  if (is.null(restart_after_gap)) {
+    restart_after_gap <- period_min
   }
 
   floating_median <- match_choice(floating_median, "floating_median")
@@ -415,6 +422,7 @@ assemble_chart_list <- function(
     overhanging_reversions = overhanging_reversions,
     force_restart_at = force_restart_at,
     prevent_establishment_in = prevent_establishment_in,
+    restart_after_gap = restart_after_gap,
     na_ends_run = na_ends_run,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,

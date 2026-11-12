@@ -305,7 +305,8 @@ test_that("every numeric argument is checked", {
       "extend_limits_to",
       "display_window",
       "force_restart_at",
-      "prevent_establishment_in"
+      "prevent_establishment_in",
+      "restart_after_gap"
     )
   )
 })
@@ -782,6 +783,58 @@ test_that("prevent_establishment_in accepts ranges outside the data", {
   expect_s3_class(
     analyse(prevent_establishment_in = list(c(-10, -5), c(40, 50))),
     "data.frame"
+  )
+})
+
+
+# restart_after_gap
+
+
+test_that("restart_after_gap takes a whole number of one or more, or Inf", {
+  for (gap in list(1L, 5, Inf)) {
+    expect_s3_class(
+      analyse(restart_after_gap = gap),
+      "data.frame"
+    )
+  }
+})
+
+
+test_that("restart_after_gap rejects anything but a whole number or Inf", {
+  for (gap in list(0L, -1, 2.5, NA, -Inf, c(3, 4), "banana")) {
+    expect_error(
+      analyse(restart_after_gap = gap),
+      "`restart_after_gap` must be a whole number of one or more, or Inf",
+      info = deparse(gap)
+    )
+  }
+})
+
+
+test_that("restart_after_gap is period_min unless the caller sets it", {
+  chart_with <- function(...) {
+    plot <- autospc(values_data, chart_type = "C'", x = x, y = y, ...)
+
+    return(autospc_plot_charts(plot)[[1]])
+  }
+
+  expect_identical(chart_with()$restart_after_gap, 21L)
+  expect_identical(chart_with(period_min = 25L)$restart_after_gap, 25L)
+  expect_identical(chart_with(baseline_length = 10L)$restart_after_gap, 21L)
+  expect_identical(
+    chart_with(period_min = 25L, restart_after_gap = 4L)$restart_after_gap,
+    4L
+  )
+})
+
+
+test_that("facet_stages checks restart_after_gap", {
+  expect_error(
+    facet_stages(values_data,
+      split_at = 20L, chart_type = "C'", x = x, y = y,
+      restart_after_gap = 0L
+    ),
+    "`restart_after_gap` must be a whole number of one or more, or Inf"
   )
 })
 

@@ -253,3 +253,23 @@ test_that("the moving range chart names the columns it adds to its pair", {
     c(mr = "series", amr = "cl", url = "ucl", lrl = "lcl")
   )
 })
+
+
+test_that("observed_rows reads the moving ranges, or y for the location chart", {
+  # a missing value at row 2 leaves the moving ranges at rows 2 and 3 missing,
+  # and row 1 has no earlier point to take a moving range against
+  prepared <- data.frame(
+    x = 1:5,
+    y = c(1, NA, 3, 4, 5),
+    series = c(NA, NA, NA, 1, 1)
+  )
+
+  expect_identical(
+    observed_rows(test_chart_mr(), data = prepared),
+    c(TRUE, FALSE, FALSE, TRUE, TRUE)
+  )
+  expect_identical(
+    observed_rows(test_chart_mr(), data = prepared, location = TRUE),
+    c(TRUE, FALSE, TRUE, TRUE, TRUE)
+  )
+})

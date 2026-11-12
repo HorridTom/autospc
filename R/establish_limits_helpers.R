@@ -424,12 +424,13 @@ points_with_a_value <- function(table) {
 #' table holding its values
 #'
 #' A median is taken at the end of each segment of the series: the whole series
-#' where there is no forced restart, or the rows from one restart to the next.
+#' where there is no restart, or the rows from one restart to the next.
 #' Each is taken over the segment's last `floating_median_n` points that have a
-#' value. A segment holding fewer than that has none to take it over, so no
-#' median is drawn there. `floating_median = "yes"` asked for one, so where the
-#' last segment is too short it is warned; `"auto"` only asked the package to
-#' decide, and is not.
+#' value, and drawn from the first of those points to the last, so not over any
+#' points with no value that follow them. A segment with fewer such points has
+#' no median. Where the last segment is too short, `floating_median = "yes"`
+#' gives a warning, because the caller asked for a median; `"auto"` does not,
+#' because the caller left the decision to the package.
 #'
 #' @param table The analysed table.
 #' @param floating_median One of "no", "yes" and "auto".
@@ -476,7 +477,7 @@ floating_median_column <- function(table,
 #' @param floating_median One of "yes" and "auto".
 #' @param floating_median_n The number of points the median is taken over.
 #' @param warn Whether to warn when the segment is too short for a median.
-#' @param restarted Whether the series has a forced restart, which decides how
+#' @param restarted Whether the series has a restart, which decides how
 #'   the warning describes the segment.
 #'
 #' @return One value per row of `segment_table`: the median on the rows it is
@@ -496,7 +497,7 @@ segment_floating_median <- function(segment_table,
         "A floating median is taken over the last ", floating_median_n,
         " points that have a value, and ",
         if (restarted) {
-          "the segment of this series after its last forced restart has "
+          "the segment of this series after its last restart has "
         } else {
           "this series has "
         },
@@ -531,8 +532,11 @@ segment_floating_median <- function(segment_table,
     return(no_median)
   }
 
+  # drawn from the first of those points to the last
+  median_to_x <- max(segment_table$x[!is.na(segment_table$series)])
+
   return(dplyr::if_else(
-    segment_table$x >= median_from_x,
+    segment_table$x >= median_from_x & segment_table$x <= median_to_x,
     stats::median(window$series, na.rm = TRUE),
     NA_real_
   ))

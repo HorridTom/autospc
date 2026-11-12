@@ -1,7 +1,24 @@
-# Splitting a series at forced restarts, and joining what the segments give
+# Splitting a series at restarts, and joining what the segments give
 
 
 #' The rows at which the series restarts
+#'
+#' At each forced restart, and after each long gap. `chart$data` has one row
+#' per point of the series.
+#'
+#' @param chart The chart being analysed.
+#'
+#' @return The rows of `chart$data`, in order, with no row repeated.
+#' @noRd
+restart_rows <- function(chart) {
+  return(sort(unique(c(
+    forced_restart_rows(chart),
+    gap_restarts(chart)$restarts
+  ))))
+}
+
+
+#' The rows at which the series is forced to restart
 #'
 #' Each value of `force_restart_at` restarts the series at the first row whose
 #' `x` is at or after it. A value after the last row has no such row, and a
@@ -12,7 +29,7 @@
 #'
 #' @return The rows of `chart$data`, in order, with no row repeated.
 #' @noRd
-restart_rows <- function(chart) {
+forced_restart_rows <- function(chart) {
   restarts <- chart$force_restart_at
   x <- chart$data$x
 
@@ -34,7 +51,7 @@ restart_rows <- function(chart) {
 
 #' The rows of each segment of the series
 #'
-#' The series is one segment where there is no forced restart. Each restart
+#' The series is one segment where there is no restart. Each restart
 #' starts a new segment, which runs to the row before the next restart or to the
 #' end of the series.
 #'
@@ -60,10 +77,12 @@ segment_rows <- function(chart) {
 
 #' The prepared series of one segment
 #'
-#' The segment's rows of `chart$data`. A segment after a forced restart is
-#' analysed as if the series began at its first row, so its rows are passed
-#' through `prepare_segment_data()`, which recalculates any `series` value that
-#' `prepare_data()` worked out from rows before the restart.
+#' The segment's rows of `chart$data`. A segment after a restart is analysed as
+#' if the series began at its first row, so its rows are passed through
+#' `prepare_segment_data()`, which recalculates any `series` value that
+#' `prepare_data()` worked out from rows before the restart. The stranded
+#' points after a gap have their `series` value removed, so that the analysis
+#' skips them, as it skips the points in the gap, which have no value.
 #'
 #' @param chart The chart being analysed.
 #' @param rows The rows of `chart$data` that make up the segment.
@@ -76,14 +95,16 @@ segment_data <- function(chart,
                          rows,
                          first_segment) {
   if (first_segment && length(rows) == nrow(chart$data)) {
-    return(chart$data)
+    data <- chart$data
+  } else {
+    data <- dplyr::slice(chart$data, rows)
+
+    if (!first_segment) {
+      data <- prepare_segment_data(chart, data = data)
+    }
   }
 
-  data <- dplyr::slice(chart$data, rows)
-
-  if (!first_segment) {
-    data <- prepare_segment_data(chart, data = data)
-  }
+  data$series[rows %in% gap_restarts(chart)$stranded_points] <- NA
 
   return(data)
 }
@@ -182,7 +203,7 @@ join_segment_histories <- function(analysed,
 
 #' Join the segments' analysed tables into one
 #'
-#' Each segment after a forced restart has its periods numbered after the
+#' Each segment after a restart has its periods numbered after the
 #' observations of the segments before it, so that no two segments share a
 #' `plot_period`. Its first observation is a break point where the segment has
 #' limits, and its `cl_change` is the direction from the last centre line

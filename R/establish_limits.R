@@ -1,6 +1,6 @@
 #' Set control limits over a prepared series
 #'
-#' Reads `chart$data`. The series is split at each forced restart, each segment
+#' Reads `chart$data`. The series is split at each restart, each segment
 #' is analysed as if it were a series of its own, and the segments are joined.
 #' Where no segment has enough points to form a period the analysed columns hold
 #' no value.
@@ -65,7 +65,7 @@ establish_limits <- function(chart) {
 
 #' Run the algorithm over one segment of a series
 #'
-#' The segment is the whole series where there is no forced restart, or the rows
+#' The segment is the whole series where there is no restart, or the rows
 #' from one restart to the next. It is analysed as if it were a series of its
 #' own. The algorithm iterates over the rows that hold an observation, so it is
 #' given those rows rather than the segment itself, and the rest are put back
@@ -76,13 +76,14 @@ establish_limits <- function(chart) {
 #' @param first_segment Whether the segment starts at the first row of the
 #'   series.
 #' @param last_segment Whether the segment ends at the last row of the series.
-#'   Any other segment ends at a forced restart, so no more points can join its
+#'   Any other segment ends at a restart, so no more points can join its
 #'   final run.
 #'
 #' @return A list: `chart`, holding the segment's analysis in `chart$history`
 #'   and `chart$result$table`, with the history's row numbers counted in the
 #'   whole series; `has_limits`, whether the segment had enough points for a
-#'   period; and `observed`, the number of its rows that hold an observation.
+#'   period; and `observed`, the number of its rows that hold an observation,
+#'   including any stranded points after a gap.
 #' @noRd
 analyse_segment <- function(chart,
                             rows,
@@ -93,6 +94,7 @@ analyse_segment <- function(chart,
     first_segment = first_segment
   )
   rows_before <- if (length(rows) > 0L) rows[[1L]] - 1L else 0L
+  stranded_points <- sum(rows %in% gap_restarts(chart)$stranded_points)
 
   chart$data <- prepared_data
   chart$history <- list()
@@ -119,7 +121,7 @@ analyse_segment <- function(chart,
     return(list(
       chart = chart,
       has_limits = FALSE,
-      observed = nrow(observed_data)
+      observed = nrow(observed_data) + stranded_points
     ))
   } else {
     # [2] There are enough data points to form one period
@@ -295,7 +297,7 @@ analyse_segment <- function(chart,
               # Establish whether (for no regrets) the final run in the
               # candidate calculation period prevents re-establishment of limits
               # Only the last segment can receive more points. Any other segment
-              # ends at a forced restart, so its final run is complete and
+              # ends at a restart, so its final run is complete and
               # cannot become an opposing rule break
               final_run_prevents <- last_segment &&
                 final_run_prevents_re_establishment(
@@ -443,6 +445,6 @@ analyse_segment <- function(chart,
   return(list(
     chart = chart,
     has_limits = TRUE,
-    observed = nrow(observed_data)
+    observed = nrow(observed_data) + stranded_points
   ))
 }

@@ -355,7 +355,7 @@ series_short_message <- function(labels,
 
   if (length(restart_rows(chart)) > 0L) {
     return(too_few_points_message(
-      "Each segment of the series between forced restarts has"
+      "Each segment of the series between restarts has"
     ))
   }
 

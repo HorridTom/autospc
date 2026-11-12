@@ -172,3 +172,24 @@ test_that("the S chart names and titles itself", {
   expect_identical(y_axis_title(chart), "S")
   expect_true(labels_stay_above(chart))
 })
+
+
+test_that("observed_rows reads the standard deviations, or y for the location chart", {
+  # the subgroup at row 2 is a subgroup of one: a mean, but no standard
+  # deviation
+  prepared <- data.frame(
+    x = 1:3,
+    y = c(50, 52, 49),
+    series = c(4.1, NA, 5.2)
+  )
+  chart <- autospc_chart_s(data = s_data(), x = "x", y = "y")
+
+  expect_identical(
+    observed_rows(chart, data = prepared),
+    c(TRUE, FALSE, TRUE)
+  )
+  expect_identical(
+    observed_rows(chart, data = prepared, location = TRUE),
+    c(TRUE, TRUE, TRUE)
+  )
+})

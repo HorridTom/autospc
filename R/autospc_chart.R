@@ -484,7 +484,7 @@ prepare_data.autospc_chart <- function(chart) {
 }
 
 
-#' Prepare one segment of a series that starts at a forced restart
+#' Prepare one segment of a series that starts at a restart
 #'
 #' Each row's `series` value is worked out from that row alone, so the
 #' segment's rows already hold what `prepare_data()` would give for a series
@@ -500,7 +500,8 @@ prepare_segment_data.autospc_chart <- function(chart,
 
 #' @noRd
 observed_rows.autospc_chart <- function(chart,
-                                        data) {
+                                        data,
+                                        location = FALSE) {
   return(!is.na(data$series))
 }
 

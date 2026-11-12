@@ -500,8 +500,9 @@ test_that("a point on the centre line does not end the run it sits in", {
 
 
 test_that("the too few points warning counts observations, not rows", {
+  # a gap this long would otherwise restart the series
   expect_warning(
-    analyse(gapped(10:35)),
+    analyse(gapped(10:35), restart_after_gap = Inf),
     "The input data has 20 points"
   )
 })

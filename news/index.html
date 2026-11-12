@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,24 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9008" id="autospc-0209008">autospc 0.2.0.9008<a class="anchor" aria-label="anchor" href="#autospc-0209008"></a></h2>
+<div class="section level3">
+<h3 id="forced-restarts-and-preventing-re-establishment-0-2-0-9008">Forced restarts and preventing re-establishment<a class="anchor" aria-label="anchor" href="#forced-restarts-and-preventing-re-establishment-0-2-0-9008"></a></h3>
+<ul><li>New argument <code>force_restart_at</code> makes the algorithm restart at one or more values on the horizontal axis (#119). The series is analysed in segments, each starting at the first point of the series or the first point at or after a forced restart. Each segment is analysed as if it were a series of its own: its first calculation period is <code>baseline_length</code> points, a segment with fewer than <code>period_min</code> points has no limits, and no run counts towards the shift rule across a restart. Each restart is drawn as a solid vertical line, with the legend entry “Forced restart”. Values outside the data are ignored.</li>
+<li>New argument <code>prevent_establishment_in</code> gives a range of the horizontal axis in which the algorithm may not establish new limits (#119): two values, with <code>NA</code> for an open end, or a list of such ranges. A range includes both its end points. A shift that starts inside a range and continues past its end can still re-establish limits after the range. The first calculation period of the series, and the first after each restart, are not affected. Each range is shaded light grey, with the legend entry “Re-establishment prevented”. Ranges outside the data are ignored.</li>
+<li>The table returned with <code>plot_chart = FALSE</code> has a new column, <code>restart</code>, which is <code>TRUE</code> at the first row of each segment after a forced restart.</li>
+<li>The algorithm log records a forced restart with the new code <code>0000</code>, and a candidate in a range given by <code>prevent_establishment_in</code> with the new code <code>0730</code>, “Not considered”. The table of log codes in the “Stable Shift Algorithm” vignette now lists every code the log can record, including these two and the prefix <code>co@n|</code>.</li>
+<li>With forced restarts, a floating median can be drawn at the end of each segment that holds at least <code>floating_median_n</code> points, not only at the end of the series. Only the last is labelled.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="chart-legends-0-2-0-9008">Chart legends<a class="anchor" aria-label="anchor" href="#chart-legends-0-2-0-9008"></a></h3>
+<ul><li>The legends now always appear in the same order: “Rule triggered”, then “Period Type”, then “Re-establishment prevented” and “Forced restart”. Before, ggplot2 chose the order, and it differed between charts and between versions of ggplot2.</li>
+<li>The “Period Type” legend now shows “Calculation” when the first rows of the chart have no limits: a series that begins with missing values, a faceted chart whose first stage is too short for limits, or a series whose first segment is too short for limits. Before, it showed only “Display”.</li>
+<li>
+<code><a href="../reference/facet_stages.html">facet_stages()</a></code> now labels the floating median in every facet that has one, not only in the last.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9007" id="autospc-0209007">autospc 0.2.0.9007<a class="anchor" aria-label="anchor" href="#autospc-0209007"></a></h2>
 <div class="section level3">

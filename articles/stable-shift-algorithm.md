@@ -378,7 +378,18 @@ The algorithm is visualised in the flow chart below.
 knitr::include_graphics("SSA_flowchart.png")
 ```
 
-![](SSA_flowchart.png)  
+![The Stable Shift Algorithm. In this package the algorithm can also be
+made to restart at given points, with \`force_restart_at\`, and
+prevented from establishing new limits in given ranges, with
+\`prevent_establishment_in\`. Neither is shown in this
+flowchart.](SSA_flowchart.png)
+
+Figure 3.7: The Stable Shift Algorithm. In this package the algorithm
+can also be made to restart at given points, with `force_restart_at`,
+and prevented from establishing new limits in given ranges, with
+`prevent_establishment_in`. Neither is shown in this flowchart.
+
+  
 
 ## 4 Using the algorithm log
 
@@ -492,21 +503,23 @@ log_exp_tab <- autospc:::log_explanation_table
 ``` r
 
 log_exp_tab %>%
+  dplyr::mutate(shorthand = gsub("@", "\\\\@", shorthand)) %>%
   knitr::kable()
 ```
 
 | algorithm_step | shorthand | explanation |
 |:---|:---|:---|
+| 0 | 0000 | Restart forced by force_restart_at. The counter is set to the first point of the new segment, and the algorithm continues from step 2. |
 | 1 | 0100 | Initialise algorithm. Counter = 1. |
 | 2 | 02xx | Check whether there are sufficient data to form at least one set of limits. |
-|  |  | x = 00: Yes |
-|  |  | x = 10: No |
+|  |  | xx = 00: Yes |
+|  |  | xx = 10: No |
 | 3 | 0300 | Main algorithm loop begins. |
 | 4 | 04xxyy | Check whether there are sufficient data to proceed (Yes/No), and find subsequent rule breaks. |
 |  |  | xx = 00: Yes - next rule break within current run |
 |  |  | xx = 01: Yes - next rule break beyond current run |
 |  |  | xx = 10: No |
-|  |  | yy = position of next rule break. |
+|  |  | yy = position of next rule break, or NA if there is none. |
 | 5 | 05xxyy | Check whether there are any subsequent rule breaks. |
 |  |  | xx = 00: Yes |
 |  |  | xx = 10: No |
@@ -520,4 +533,9 @@ log_exp_tab %>%
 |  |  | y = 1: At least one opposing rule break. |
 |  |  | z = 0: Final run does not prevent re-establishment of limits |
 |  |  | z = 1: Final run prevents re-establishment of limits. |
-| 7 | 07xx | Decide whether to re-establish limits. xx = 00: Yes, xx = 10: No, xx = 20: No - insufficient data to establish a stable new process, as the final run of the candidate calculation period is not complete. |
+| 7 | 07xx | Decide whether to re-establish limits. |
+|  |  | xx = 00: Yes |
+|  |  | xx = 10: No |
+|  |  | xx = 20: No - insufficient data to establish a stable new process, as the final run of the candidate calculation period is not complete. |
+|  |  | xx = 30: Not considered - the candidate is in a range given by prevent_establishment_in, so no candidate limits are formed. The counter moves to the first point after the range. |
+|  | co@n\| | Prefix to an entry that belongs at point n, past the last point of the data or of a segment. The entry is recorded at that last point. |

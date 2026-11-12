@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,6 +69,8 @@ by default the Stable Shift Algorithm.</p>
 <span>  establish_every_shift <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  no_regrets <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overhanging_reversions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  force_restart_at <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prevent_establishment_in <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_ends_run <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  highlight_exclusions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -222,7 +224,27 @@ used. Defines whether limits can change as more data is added or not.</p></dd>
 <dd><p>Boolean determining whether rule breaks in the
 opposite direction to a rule break triggering a candidate re-establishment
 prevent limits being re-established, even where they overhang the end of the
-candidate calculation period. Set to FALSE only with no_regrets = FALSE.</p><div class="section">
+candidate calculation period. Set to FALSE only with no_regrets = FALSE.</p></dd>
+
+
+<dt id="arg-force-restart-at">force_restart_at<a class="anchor" aria-label="anchor" href="#arg-force-restart-at"></a></dt>
+<dd><p>Optional, one or more values on the horizontal axis
+at which the algorithm restarts. The series is analysed in segments, each
+starting at the first point at or after one of these values, and each
+segment is analysed as if it were a series of its own: its first calculation
+period is <code>baseline_length</code> points, and a segment with fewer than
+<code>period_min</code> points is given no limits. Values outside the data are ignored.</p></dd>
+
+
+<dt id="arg-prevent-establishment-in">prevent_establishment_in<a class="anchor" aria-label="anchor" href="#arg-prevent-establishment-in"></a></dt>
+<dd><p>Optional, a range of the horizontal axis in
+which the algorithm may not establish new limits, given as two values with NA
+for an open end, or a list of such ranges. A range includes both its end
+points. A shift that starts inside a range and continues at least
+<code>shift_rule_threshold</code> points past the end of that range can still
+re-establish limits after the end of the range. The first calculation period
+of the series, and the first after each restart, are not affected. Ranges
+outside the data are ignored.</p><div class="section">
 <h3 id="spc-parameters">SPC Parameters<a class="anchor" aria-label="anchor" href="#spc-parameters"></a></h3>
 
 

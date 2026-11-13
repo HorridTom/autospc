@@ -76,10 +76,15 @@ get_algorithm_flow_chart_string <- function() {
 get_log_explanation_table <- function() {
   log_exp_tab <- tibble::tribble(
     ~algorithm_step, ~shorthand, ~explanation,
-    "0", "0000", paste0(
-      "Restart forced by force_restart_at. The counter",
-      " is set to the first point of the new segment,",
-      " and the algorithm continues from step 2."
+    "0", "00xx", paste0(
+      "Restart. The counter is set to the first point",
+      " of the new segment, and the algorithm continues",
+      " from step 2."
+    ),
+    "", "", "xx = 00: Forced by force_restart_at",
+    "", "", paste0(
+      "xx = 10: After a gap of at least",
+      " restart_after_gap points with no value"
     ),
     "1", "0100", "Initialise algorithm. Counter = 1.",
     "2", "02xx", paste0(

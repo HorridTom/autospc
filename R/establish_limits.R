@@ -25,7 +25,10 @@ establish_limits <- function(chart) {
     logical(1L)
   )
 
-  chart$history <- join_segment_histories(analysed, segments = segments)
+  chart$history <- join_segment_histories(analysed,
+    segments = segments,
+    forced = forced_restart_rows(chart)
+  )
   chart$result$table <- join_segment_tables(analysed, segments = segments)
 
   if (!any(has_limits)) {

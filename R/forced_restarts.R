@@ -112,23 +112,28 @@ segment_data <- function(chart,
 
 #' Join the segments' histories into one
 #'
-#' The records of each kind are joined in order, with their row numbers already
-#' counted in the whole series. `baseline` is the first segment's and `stopped`
-#' the last segment's. Each forced restart is recorded in `restarts`: the row
-#' the new segment starts at, where the previous segment's counter was when it
-#' ended, why the algorithm stopped looking in the previous segment, and the
-#' length of the new segment's first calculation period. NA where the previous
-#' segment, or the new one, had too few points for a period. The counter's move
-#' to each restart row is recorded in `counter_path`.
+#' The segments' `counter_path`, `breaks` and `candidates` are each joined in
+#' order, with their row numbers already counted in the whole series.
+#' `baseline` is the first segment's and `stopped` the last segment's. Each
+#' restart is recorded in `restarts`: the row the new segment starts at, its
+#' `type` ("forced", or "after gap"), where the previous segment's counter was
+#' when it ended, why the algorithm stopped looking in the previous segment,
+#' and the length of the new segment's first calculation period. NA where the
+#' previous segment, or the new one, had too few points for a period. The
+#' counter's move to each restart row is recorded in `counter_path`. A forced
+#' restart at the end of a gap is recorded as forced.
 #'
 #' @param analysed The segments, as `analyse_segment()` returns them.
 #' @param segments The rows of each segment, as `segment_rows()` returns them.
+#' @param forced The rows of the forced restarts, as `forced_restart_rows()`
+#'   returns them.
 #'
 #' @return The history of the whole series. With one segment, that segment's
 #'   history.
 #' @noRd
 join_segment_histories <- function(analysed,
-                                   segments) {
+                                   segments,
+                                   forced) {
   histories <- lapply(analysed, function(segment) segment$chart$history)
 
   if (length(histories) == 1L) {
@@ -146,6 +151,7 @@ join_segment_histories <- function(analysed,
     if (segment > 1L) {
       previous <- histories[[segment - 1L]]$stopped
       restart_row <- as.integer(segments[[segment]][[1L]])
+      restart_type <- if (restart_row %in% forced) "forced" else "after gap"
       from <- if (is.null(previous)) NA_integer_ else previous$counter
 
       # a move to where the counter already is is not recorded, as in
@@ -156,7 +162,11 @@ join_segment_histories <- function(analysed,
           data.frame(
             from = as.integer(from),
             to = restart_row,
-            reason = "forced restart"
+            reason = if (restart_type == "forced") {
+              "forced restart"
+            } else {
+              "restart after gap"
+            }
           )
         )
       }
@@ -165,6 +175,7 @@ join_segment_histories <- function(analysed,
         restarts,
         data.frame(
           row = restart_row,
+          type = restart_type,
           counter = as.integer(from),
           previous_segment_ended = if (is.null(previous)) {
             NA_character_

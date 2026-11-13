@@ -304,6 +304,7 @@ test_that("the history records each restart", {
     chart$history$restarts,
     data.frame(
       row = 60L,
+      type = "forced",
       counter = 47L,
       previous_segment_ended = "not enough data for a further period",
       baseline_length = 21L

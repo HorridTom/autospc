@@ -263,3 +263,56 @@ test_that("facet_stages restarts each stage whose data reaches past the gap", {
   expect_identical(table$stage[table$restart], c("2", "3"))
   expect_identical(table$x[table$restart], c(62L, 62L))
 })
+
+
+# The record of a restart after a gap
+
+
+test_that("the history records a restart after a gap", {
+  chart <- charts_with_gaps(gap_series())[[1]]
+
+  expect_identical(
+    chart$history$restarts,
+    data.frame(
+      row = 62L,
+      type = "after gap",
+      counter = 22L,
+      previous_segment_ended = "not enough data for a further period",
+      baseline_length = 21L
+    )
+  )
+
+  path <- chart$history$counter_path
+  expect_identical(
+    path[path$reason == "restart after gap", c("from", "to")],
+    data.frame(from = 22L, to = 62L),
+    ignore_attr = TRUE
+  )
+})
+
+
+test_that("the log marks a restart after a gap with 0010", {
+  table <- analyse_gaps(gap_series())
+
+  expect_identical(table$log[table$x == 62], "0010;0200")
+  expect_identical(
+    interpret_log_entry("0010", verbosity = 1L),
+    "Restart after a gap of at least restart_after_gap points with no value."
+  )
+})
+
+
+test_that("a forced restart at the end of a gap is recorded as forced", {
+  chart <- charts_with_gaps(gap_series(), force_restart_at = 62)[[1]]
+
+  expect_identical(chart$history$restarts$type, "forced")
+  expect_match(chart$result$table$log[62], "^0000;")
+})
+
+
+test_that("print lists forced restarts and restarts after gaps apart", {
+  chart <- charts_with_gaps(gap_series(), force_restart_at = 85)[[1]]
+
+  expect_output(print(chart), "Forced restarts at 85")
+  expect_output(print(chart), "Restarts after gaps at 62")
+})

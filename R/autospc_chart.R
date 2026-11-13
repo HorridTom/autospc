@@ -744,10 +744,20 @@ print.autospc_chart <- function(x, ...) {
   }
 
   restarts <- which(x$result$table$restart)
-  if (length(restarts) > 0L) {
+  forced <- intersect(restarts, forced_restart_rows(x))
+  after_gaps <- setdiff(restarts, forced)
+
+  if (length(forced) > 0L) {
     cat(sprintf(
       "Forced restarts at %s\n",
-      paste(restarts, collapse = ", ")
+      paste(forced, collapse = ", ")
+    ))
+  }
+
+  if (length(after_gaps) > 0L) {
+    cat(sprintf(
+      "Restarts after gaps at %s\n",
+      paste(after_gaps, collapse = ", ")
     ))
   }
 
@@ -810,7 +820,9 @@ print.autospc_chart <- function(x, ...) {
 #' @noRd
 format_calculation_periods <- function(table,
                                        max_shown = 10L) {
-  periods <- unique(table$plot_period[table$period_type == "calculation"])
+  # a row with no period, such as one with no value after the last
+  # observation, has no period type
+  periods <- unique(table$plot_period[table$period_type %in% "calculation"])
 
   lines <- vapply(periods, function(period) {
     rows <- which(table$plot_period == period)

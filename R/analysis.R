@@ -136,7 +136,7 @@ fill_analysis_columns <- function(table,
 #' Finish a chart's analysis table
 #'
 #' What both paths through `establish_limits()` end with: the floating median,
-#' `restart`, TRUE at the first row of each segment after a forced restart, and
+#' `restart`, TRUE at the first row of each segment after a restart, and
 #' the columns in the order `analysis_table_columns()` declares.
 #'
 #' @param chart The chart being analysed, with `chart$result$table` set.
@@ -151,6 +151,11 @@ finish_analysis_table <- function(chart) {
     floating_median_n = chart$floating_median_n,
     segments = segment_rows(chart)
   )
+
+  # put back the values of the stranded points after a gap, so that they are
+  # drawn, with no limits
+  stranded <- gap_restarts(chart)$stranded_points
+  chart$result$table$series[stranded] <- chart$data$series[stranded]
 
   # restart_rows() counts rows of the data, which come before any rows the
   # extension added

@@ -30,6 +30,13 @@ test_that("baseline_length defaults to period_min", {
 })
 
 
+test_that("restart_after_gap defaults to period_min", {
+  chart <- test_chart_c()
+
+  expect_identical(chart$restart_after_gap, chart$period_min)
+})
+
+
 test_that("baseline_length is coerced to an integer", {
   chart <- test_chart_c(baseline_length = 30.7)
 
@@ -55,9 +62,13 @@ test_that("defaults populated as expected", {
 test_that("a chart built without chart parameters takes autospc()'s defaults", {
   chart <- test_chart_c()
 
-  # baseline_length is the exception: autospc() declares it NULL, and the chart
-  # takes period_min in its place. The test above covers it.
-  parameters <- setdiff(autospc_chart_parameters(), "baseline_length")
+  # baseline_length and restart_after_gap are the exceptions: autospc()
+  # declares them NULL, and the chart takes period_min in their place. The tests
+  # above cover them.
+  parameters <- setdiff(
+    autospc_chart_parameters(),
+    c("baseline_length", "restart_after_gap")
+  )
 
   for (parameter in parameters) {
     # where the default declares a set of accepted values, the first is the

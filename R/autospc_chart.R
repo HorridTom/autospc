@@ -104,6 +104,7 @@ autospc_chart_elements <- function() {
     "overhanging_reversions",
     "force_restart_at",
     "prevent_establishment_in",
+    "restart_after_gap",
     "na_ends_run",
     "max_exclusions",
     "mr_screen_max_loops",
@@ -376,6 +377,7 @@ assemble_chart_list <- function(
     overhanging_reversions = autospc_default("overhanging_reversions"),
     force_restart_at = autospc_default("force_restart_at"),
     prevent_establishment_in = autospc_default("prevent_establishment_in"),
+    restart_after_gap = autospc_default("restart_after_gap"),
     na_ends_run = autospc_default("na_ends_run"),
     max_exclusions = autospc_default("max_exclusions"),
     mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
@@ -388,6 +390,11 @@ assemble_chart_list <- function(
   # chart has a first calculation period length and the field is never NULL.
   if (is.null(baseline_length)) {
     baseline_length <- period_min
+  }
+
+  # restart_after_gap is period_min unless the caller sets it
+  if (is.null(restart_after_gap)) {
+    restart_after_gap <- period_min
   }
 
   floating_median <- match_choice(floating_median, "floating_median")
@@ -415,6 +422,7 @@ assemble_chart_list <- function(
     overhanging_reversions = overhanging_reversions,
     force_restart_at = force_restart_at,
     prevent_establishment_in = prevent_establishment_in,
+    restart_after_gap = restart_after_gap,
     na_ends_run = na_ends_run,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,
@@ -476,7 +484,7 @@ prepare_data.autospc_chart <- function(chart) {
 }
 
 
-#' Prepare one segment of a series that starts at a forced restart
+#' Prepare one segment of a series that starts at a restart
 #'
 #' Each row's `series` value is worked out from that row alone, so the
 #' segment's rows already hold what `prepare_data()` would give for a series
@@ -492,7 +500,8 @@ prepare_segment_data.autospc_chart <- function(chart,
 
 #' @noRd
 observed_rows.autospc_chart <- function(chart,
-                                        data) {
+                                        data,
+                                        location = FALSE) {
   return(!is.na(data$series))
 }
 
@@ -735,10 +744,20 @@ print.autospc_chart <- function(x, ...) {
   }
 
   restarts <- which(x$result$table$restart)
-  if (length(restarts) > 0L) {
+  forced <- intersect(restarts, forced_restart_rows(x))
+  after_gaps <- setdiff(restarts, forced)
+
+  if (length(forced) > 0L) {
     cat(sprintf(
       "Forced restarts at %s\n",
-      paste(restarts, collapse = ", ")
+      paste(forced, collapse = ", ")
+    ))
+  }
+
+  if (length(after_gaps) > 0L) {
+    cat(sprintf(
+      "Restarts after gaps at %s\n",
+      paste(after_gaps, collapse = ", ")
     ))
   }
 
@@ -801,7 +820,9 @@ print.autospc_chart <- function(x, ...) {
 #' @noRd
 format_calculation_periods <- function(table,
                                        max_shown = 10L) {
-  periods <- unique(table$plot_period[table$period_type == "calculation"])
+  # a row with no period, such as one with no value after the last
+  # observation, has no period type
+  periods <- unique(table$plot_period[table$period_type %in% "calculation"])
 
   lines <- vapply(periods, function(period) {
     rows <- which(table$plot_period == period)

@@ -66,13 +66,23 @@ prepare_segment_data <- function(chart,
 #' have is not a gap in the series. `observed_rows.autospc_chart_mr()` is where
 #' that applies.
 #'
+#' With `location = TRUE`, the rows that hold an observation on the location
+#' chart instead. The algorithm finds the gaps after which it restarts from
+#' these, so that both charts of a pair find the same gaps. For a location
+#' chart the answer is the same either way; the dispersion charts' methods read
+#' the location chart's value from `y`.
+#'
 #' @param chart The chart being analysed.
-#' @param data A prepared series, with a `series` column.
+#' @param data A prepared series, with one row per point and a `series`
+#'   column.
+#' @param location Whether to give the location chart's observations rather
+#'   than this chart's.
 #'
 #' @return A logical vector, one element per row of `data`.
 #' @noRd
 observed_rows <- function(chart,
-                          data) {
+                          data,
+                          location = FALSE) {
   UseMethod("observed_rows")
 }
 

@@ -497,6 +497,7 @@ match_number <- function(value,
     count = "a whole number of one or more",
     count_from_zero = "a whole number of zero or more",
     loops = "a whole number of zero or more, or Inf",
+    count_or_inf = "a whole number of one or more, or Inf",
     non_negative = "a number of zero or more",
     positive = "a number above zero",
     number = "a number"
@@ -512,6 +513,8 @@ match_number <- function(value,
         value >= 0,
       loops = identical(value, Inf) ||
         (is.finite(value) && is_whole_number(value) && value >= 0),
+      count_or_inf = identical(value, Inf) ||
+        (is.finite(value) && is_whole_number(value) && value >= 1),
       non_negative = is.finite(value) && value >= 0,
       positive = is.finite(value) && value > 0,
       number = is.finite(value)

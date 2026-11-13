@@ -129,6 +129,19 @@ test_that("print says so when there were too few points for limits", {
 })
 
 
+test_that("print lists the calculation periods when the series ends with no values", {
+  trailing <- print_data
+  trailing$y[51:60] <- NA
+
+  plot <- suppressWarnings(
+    autospc(trailing, chart_type = "C", period_min = 21L)
+  )
+  chart <- autospc_plot_charts(plot)[[1]]
+
+  expect_output(print(chart), "rows +1- +21 +cl = ")
+})
+
+
 test_that("print returns the chart invisibly", {
   chart <- analysed_print_chart()
 

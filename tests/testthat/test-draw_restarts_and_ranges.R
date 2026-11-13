@@ -227,3 +227,179 @@ test_that("ranges of dates are shaded on a chart of dates", {
   expect_true(areas$xmin < as.numeric(as.Date("2016-01-01")))
   expect_true(areas$xmax > as.numeric(as.Date("2017-12-01")))
 })
+
+
+# A series for restarts after gaps: a shift upwards at x = 31, cut short by a
+# gap of 21 points at 41 to 61, so that the series restarts at 62
+gap_draw_series <- function() {
+  data <- data.frame(
+    x = 1:100,
+    y = c(rep(c(9L, 11L), 15L), rep(c(14L, 16L), 15L), rep(c(9L, 11L), 20L))
+  )
+  data$y[41:61] <- NA
+
+  return(data)
+}
+
+gap_draw_plot <- function(data = gap_draw_series(), ...) {
+  autospc(data, chart_type = "C", max_exclusions = 0L, ...)
+}
+
+
+test_that("a restart after a gap is drawn as a dotted line", {
+  lines <- geom_data(gap_draw_plot(), "GeomVline")[[1]]
+
+  expect_identical(lines$xintercept, 62)
+  expect_identical(lines$linetype, "13")
+  expect_identical(lines$colour, "grey30")
+})
+
+
+test_that("forced restarts and restarts after gaps are drawn apart", {
+  plot <- gap_draw_plot(force_restart_at = 85)
+  lines <- geom_data(plot, "GeomVline")[[1]]
+  lines <- lines[order(lines$xintercept), ]
+
+  expect_identical(lines$xintercept, c(62, 85))
+  expect_identical(lines$linetype, c("13", "solid"))
+
+  texts <- legend_texts(plot)
+  expect_match(texts[[length(texts)]], "Forced restart Restart after gap")
+})
+
+
+test_that("a restart after a gap that follows a forced restart is dotted", {
+  lines <- geom_data(gap_draw_plot(force_restart_at = 20), "GeomVline")[[1]]
+  lines <- lines[order(lines$xintercept), ]
+
+  expect_identical(lines$xintercept, c(20, 62))
+  expect_identical(lines$linetype, c("solid", "13"))
+})
+
+
+test_that("a forced restart at the last point of a gap is drawn apart", {
+  # the forced restart is at 61, which has no value, and the restart after the
+  # gap is at 62
+  lines <- geom_data(gap_draw_plot(force_restart_at = 61), "GeomVline")[[1]]
+  lines <- lines[order(lines$xintercept), ]
+
+  expect_identical(lines$xintercept, c(61, 62))
+  expect_identical(lines$linetype, c("solid", "13"))
+})
+
+
+test_that("a forced restart at the end of a gap is drawn as forced", {
+  lines <- geom_data(gap_draw_plot(force_restart_at = 62), "GeomVline")[[1]]
+
+  expect_identical(lines$xintercept, 62)
+  expect_identical(lines$linetype, "solid")
+  expect_false(any(grepl("Restart after gap", legend_texts(
+    gap_draw_plot(force_restart_at = 62)
+  ))))
+})
+
+
+test_that("a restart moved past a prevented range is drawn as after a gap", {
+  # the gap ends at 62, inside the range, so the restart moves to 71
+  plot <- gap_draw_plot(prevent_establishment_in = c(55, 70))
+  lines <- geom_data(plot, "GeomVline")[[1]]
+
+  expect_identical(lines$xintercept, 71)
+  expect_identical(lines$linetype, "13")
+})
+
+
+test_that("a forced restart among the stranded points is drawn as forced", {
+  plot <- gap_draw_plot(
+    prevent_establishment_in = c(55, 70),
+    force_restart_at = 66
+  )
+  lines <- geom_data(plot, "GeomVline")[[1]]
+
+  expect_identical(lines$xintercept, 66)
+  expect_identical(lines$linetype, "solid")
+})
+
+
+test_that("a restart after a gap outside the window is not drawn", {
+  plot <- gap_draw_plot(display_window = c(1, 50))
+
+  expect_length(geom_data(plot, "GeomVline"), 0L)
+  expect_false(any(grepl("Restart after gap", legend_texts(plot))))
+})
+
+
+test_that("both panels of a pair draw a restart after a gap", {
+  plot <- autospc(gap_draw_series(), chart_type = "XMR", max_exclusions = 0L)
+  params <- autospc_plot_visualisation_params(plot)
+  plot_data <- build_plot_data(autospc_plot_charts(plot), params)
+
+  location <- create_spc_plot(list(plot_data$location), params)
+  dispersion <- draw_dispersion_panel(plot_data$dispersion, params)
+
+  for (panel in list(location, dispersion)) {
+    lines <- geom_data(panel, "GeomVline")[[1]]
+
+    expect_identical(lines$xintercept, 62)
+    expect_identical(lines$linetype, "13")
+  }
+})
+
+
+test_that("each facet draws the restarts after gaps in its own data", {
+  plot <- facet_stages(gap_draw_series(),
+    split_at = c(50L, 79L), chart_type = "C", max_exclusions = 0L,
+    force_restart_at = 90
+  )
+  lines <- geom_data(plot, "GeomVline")[[1]]
+  lines <- lines[order(lines$PANEL, lines$xintercept), ]
+
+  # stage 1 ends at 50, before the gap ends, and stage 2 ends at 79, before the
+  # forced restart at 90
+  expect_identical(as.integer(lines$PANEL), c(2L, 3L, 3L))
+  expect_identical(lines$xintercept, c(62, 62, 90))
+  expect_identical(lines$linetype, c("13", "13", "solid"))
+})
+
+
+test_that("a forced restart in two facets is drawn as forced in each", {
+  plot <- facet_stages(gap_draw_series(),
+    split_at = c(50L, 79L), chart_type = "C", max_exclusions = 0L,
+    force_restart_at = 62
+  )
+  lines <- geom_data(plot, "GeomVline")[[1]]
+
+  expect_identical(as.integer(sort(lines$PANEL)), c(2L, 3L))
+  expect_identical(lines$linetype, c("solid", "solid"))
+})
+
+
+test_that("a chart without limits draws a restart after a gap", {
+  short <- data.frame(x = 1:30, y = rep(c(10L, 12L), 15L))
+  short$y[10:13] <- NA
+
+  plot <- suppressWarnings(autospc(short,
+    chart_type = "C",
+    restart_after_gap = 4L
+  ))
+  lines <- geom_data(plot, "GeomVline")[[1]]
+
+  expect_identical(lines$xintercept, 14)
+  expect_identical(lines$linetype, "13")
+})
+
+
+test_that("restarts on a chart of dates are drawn as the right type", {
+  monthly <- gap_draw_series()
+  monthly$x <- seq(as.Date("2010-01-01"), by = "month", length.out = 100L)
+
+  plot <- gap_draw_plot(monthly, force_restart_at = as.Date("2016-12-15"))
+  lines <- geom_data(plot, "GeomVline")[[1]]
+  lines <- lines[order(lines$xintercept), ]
+
+  expect_identical(
+    as.numeric(lines$xintercept),
+    as.numeric(as.Date(c("2015-02-01", "2017-01-01")))
+  )
+  expect_identical(lines$linetype, c("13", "solid"))
+})

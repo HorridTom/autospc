@@ -133,6 +133,26 @@ prepare_data.autospc_chart_s <- function(chart) {
 }
 
 
+#' The rows of a prepared S series that hold an observation
+#'
+#' With `location = TRUE`, the rows where the Xbar chart has a value. An S
+#' series keeps the subgroup means in `y`, so these are the rows where `y` is
+#' not missing. A subgroup of one has a mean but no standard deviation, so it
+#' has a value on the Xbar chart but not on the S chart.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+observed_rows.autospc_chart_s <- function(chart,
+                                          data,
+                                          location = FALSE) {
+  if (location) {
+    return(!is.na(data$y))
+  }
+
+  return(NextMethod())
+}
+
+
 #' Calculate control limits for a subset of S-chart data
 #'
 #' The centre line is sbar, and the standard deviation estimate at each

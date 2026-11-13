@@ -36,7 +36,16 @@ interpret_log_entry <- function(entry,
   # Form log entry interpretation string based on log entry components
   switch(step,
     "00" = {
-      interpretation <- "Restart forced by force_restart_at."
+      if (branch == "00") {
+        interpretation <- "Restart forced by force_restart_at."
+      } else if (branch == "10") {
+        interpretation <- paste(
+          "Restart after a gap of at least restart_after_gap points with no",
+          "value."
+        )
+      } else {
+        interpretation <- "Undefined branch at step 00."
+      }
     },
     "01" = {
       interpretation <- "Counter initialised to 1."
@@ -355,7 +364,7 @@ series_short_message <- function(labels,
 
   if (length(restart_rows(chart)) > 0L) {
     return(too_few_points_message(
-      "Each segment of the series between forced restarts has"
+      "Each segment of the series between restarts has"
     ))
   }
 
@@ -521,15 +530,40 @@ render_log <- function(chart) {
 }
 
 
+#' The log code at the first row of a segment
+#'
+#' @param chart The chart, with its series prepared.
+#' @param segment Which segment, counting from 1.
+#' @param row The segment's first row.
+#'
+#' @return `0100` for the first segment, `0000` for a segment after a forced
+#'   restart, and `0010` for one after a gap.
+#' @noRd
+restart_log_code <- function(chart,
+                             segment,
+                             row) {
+  if (segment == 1L) {
+    return("0100")
+  }
+
+  if (row %in% forced_restart_rows(chart)) {
+    return("0000")
+  }
+
+  return("0010")
+}
+
+
 #' Log entries for one segment of the series
 #'
-#' The first segment starts with `0100`, and each segment after a forced restart
-#' with `0000` at its first row. Each segment's entries are those its own
-#' history records: its first period, the rule breaks and candidates whose
-#' counter lies in it, and why the algorithm stopped looking in it - `stopped`
-#' for the last segment, and the restart record that follows it for any other.
-#' An entry past the end of a segment other than the last is held at its last
-#' row, marked as `collect_log_entries()` marks one past the end of the series.
+#' The first segment starts with `0100`, each segment after a forced restart
+#' with `0000` at its first row, and each segment after a gap with `0010`. Each
+#' segment's entries are those its own history records: its first period, the
+#' rule breaks and candidates whose counter lies in it, and why the algorithm
+#' stopped looking in it - `stopped` for the last segment, and the restart
+#' record that follows it for any other. An entry past the end of a segment
+#' other than the last is held at its last row, marked as
+#' `collect_log_entries()` marks one past the end of the series.
 #'
 #' @param chart The chart, with its history and table set.
 #' @param segment Which segment, counting from 1.
@@ -561,7 +595,7 @@ segment_log_entries <- function(chart,
     return(list(rows = rows, codes = codes))
   }
 
-  add(first_row, if (segment == 1L) "0100" else "0000")
+  add(first_row, restart_log_code(chart, segment = segment, row = first_row))
 
   if (!enough_data_for_new_period(
     data = segment_data(chart,

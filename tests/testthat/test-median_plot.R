@@ -307,6 +307,19 @@ test_that("points with no value do not count towards floating_median_n", {
 })
 
 
+test_that("the floating median is not drawn over points with no value after it", {
+  # twelve points with a value, then three with none
+  trailing <- data.frame(
+    x = 1:15,
+    y = as.integer(c(10, 11, 10, 12, 11, 18, 19, 20, 19, 17, 18, 19, NA, NA, NA))
+  )
+
+  result <- short_median_chart("yes", data = trailing)
+
+  expect_identical(result$x[!is.na(result$median)], 1:12)
+})
+
+
 # A series too short to establish control limits
 
 
@@ -741,7 +754,7 @@ test_that("a last segment shorter than floating_median_n is warned about", {
   # rows 115 to 125 are a segment of eleven points
   expect_warning(
     table <- segment_table(force_restart_at = 115, floating_median = "yes"),
-    "the segment of this series after its last forced restart has 11"
+    "the segment of this series after its last restart has 11"
   )
 
   expect_identical(which(!is.na(table$median)), 103:114)

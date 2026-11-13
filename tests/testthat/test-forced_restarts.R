@@ -304,6 +304,7 @@ test_that("the history records each restart", {
     chart$history$restarts,
     data.frame(
       row = 60L,
+      type = "forced",
       counter = 47L,
       previous_segment_ended = "not enough data for a further period",
       baseline_length = 21L
@@ -365,7 +366,7 @@ test_that("a chart has limits where any segment has enough points", {
   short <- data.frame(x = 1:30, y = rep(c(10L, 12L), 15L))
   expect_warning(
     autospc(short, chart_type = "C", x = x, y = y, force_restart_at = 15),
-    "Each segment of the series between forced restarts has fewer than"
+    "Each segment of the series between restarts has fewer than"
   )
 })
 

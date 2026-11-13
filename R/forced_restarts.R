@@ -1,7 +1,24 @@
-# Splitting a series at forced restarts, and joining what the segments give
+# Splitting a series at restarts, and joining what the segments give
 
 
 #' The rows at which the series restarts
+#'
+#' At each forced restart, and after each long gap. `chart$data` has one row
+#' per point of the series.
+#'
+#' @param chart The chart being analysed.
+#'
+#' @return The rows of `chart$data`, in order, with no row repeated.
+#' @noRd
+restart_rows <- function(chart) {
+  return(sort(unique(c(
+    forced_restart_rows(chart),
+    gap_restarts(chart)$restarts
+  ))))
+}
+
+
+#' The rows at which the series is forced to restart
 #'
 #' Each value of `force_restart_at` restarts the series at the first row whose
 #' `x` is at or after it. A value after the last row has no such row, and a
@@ -12,7 +29,7 @@
 #'
 #' @return The rows of `chart$data`, in order, with no row repeated.
 #' @noRd
-restart_rows <- function(chart) {
+forced_restart_rows <- function(chart) {
   restarts <- chart$force_restart_at
   x <- chart$data$x
 
@@ -34,7 +51,7 @@ restart_rows <- function(chart) {
 
 #' The rows of each segment of the series
 #'
-#' The series is one segment where there is no forced restart. Each restart
+#' The series is one segment where there is no restart. Each restart
 #' starts a new segment, which runs to the row before the next restart or to the
 #' end of the series.
 #'
@@ -60,10 +77,12 @@ segment_rows <- function(chart) {
 
 #' The prepared series of one segment
 #'
-#' The segment's rows of `chart$data`. A segment after a forced restart is
-#' analysed as if the series began at its first row, so its rows are passed
-#' through `prepare_segment_data()`, which recalculates any `series` value that
-#' `prepare_data()` worked out from rows before the restart.
+#' The segment's rows of `chart$data`. A segment after a restart is analysed as
+#' if the series began at its first row, so its rows are passed through
+#' `prepare_segment_data()`, which recalculates any `series` value that
+#' `prepare_data()` worked out from rows before the restart. The stranded
+#' points after a gap have their `series` value removed, so that the analysis
+#' skips them, as it skips the points in the gap, which have no value.
 #'
 #' @param chart The chart being analysed.
 #' @param rows The rows of `chart$data` that make up the segment.
@@ -76,14 +95,16 @@ segment_data <- function(chart,
                          rows,
                          first_segment) {
   if (first_segment && length(rows) == nrow(chart$data)) {
-    return(chart$data)
+    data <- chart$data
+  } else {
+    data <- dplyr::slice(chart$data, rows)
+
+    if (!first_segment) {
+      data <- prepare_segment_data(chart, data = data)
+    }
   }
 
-  data <- dplyr::slice(chart$data, rows)
-
-  if (!first_segment) {
-    data <- prepare_segment_data(chart, data = data)
-  }
+  data$series[rows %in% gap_restarts(chart)$stranded_points] <- NA
 
   return(data)
 }
@@ -91,23 +112,28 @@ segment_data <- function(chart,
 
 #' Join the segments' histories into one
 #'
-#' The records of each kind are joined in order, with their row numbers already
-#' counted in the whole series. `baseline` is the first segment's and `stopped`
-#' the last segment's. Each forced restart is recorded in `restarts`: the row
-#' the new segment starts at, where the previous segment's counter was when it
-#' ended, why the algorithm stopped looking in the previous segment, and the
-#' length of the new segment's first calculation period. NA where the previous
-#' segment, or the new one, had too few points for a period. The counter's move
-#' to each restart row is recorded in `counter_path`.
+#' The segments' `counter_path`, `breaks` and `candidates` are each joined in
+#' order, with their row numbers already counted in the whole series.
+#' `baseline` is the first segment's and `stopped` the last segment's. Each
+#' restart is recorded in `restarts`: the row the new segment starts at, its
+#' `type` ("forced", or "after gap"), where the previous segment's counter was
+#' when it ended, why the algorithm stopped looking in the previous segment,
+#' and the length of the new segment's first calculation period. NA where the
+#' previous segment, or the new one, had too few points for a period. The
+#' counter's move to each restart row is recorded in `counter_path`. A forced
+#' restart at the end of a gap is recorded as forced.
 #'
 #' @param analysed The segments, as `analyse_segment()` returns them.
 #' @param segments The rows of each segment, as `segment_rows()` returns them.
+#' @param forced The rows of the forced restarts, as `forced_restart_rows()`
+#'   returns them.
 #'
 #' @return The history of the whole series. With one segment, that segment's
 #'   history.
 #' @noRd
 join_segment_histories <- function(analysed,
-                                   segments) {
+                                   segments,
+                                   forced) {
   histories <- lapply(analysed, function(segment) segment$chart$history)
 
   if (length(histories) == 1L) {
@@ -125,6 +151,7 @@ join_segment_histories <- function(analysed,
     if (segment > 1L) {
       previous <- histories[[segment - 1L]]$stopped
       restart_row <- as.integer(segments[[segment]][[1L]])
+      restart_type <- if (restart_row %in% forced) "forced" else "after gap"
       from <- if (is.null(previous)) NA_integer_ else previous$counter
 
       # a move to where the counter already is is not recorded, as in
@@ -135,7 +162,11 @@ join_segment_histories <- function(analysed,
           data.frame(
             from = as.integer(from),
             to = restart_row,
-            reason = "forced restart"
+            reason = if (restart_type == "forced") {
+              "forced restart"
+            } else {
+              "restart after gap"
+            }
           )
         )
       }
@@ -144,6 +175,7 @@ join_segment_histories <- function(analysed,
         restarts,
         data.frame(
           row = restart_row,
+          type = restart_type,
           counter = as.integer(from),
           previous_segment_ended = if (is.null(previous)) {
             NA_character_
@@ -182,7 +214,7 @@ join_segment_histories <- function(analysed,
 
 #' Join the segments' analysed tables into one
 #'
-#' Each segment after a forced restart has its periods numbered after the
+#' Each segment after a restart has its periods numbered after the
 #' observations of the segments before it, so that no two segments share a
 #' `plot_period`. Its first observation is a break point where the segment has
 #' limits, and its `cl_change` is the direction from the last centre line

@@ -114,7 +114,7 @@ prepare_data.autospc_chart_mr <- function(chart) {
 }
 
 
-#' Prepare one segment of a series that starts at a forced restart
+#' Prepare one segment of a series that starts at a restart
 #'
 #' Each moving range is the difference between a value and the one before it,
 #' so the moving range at the segment's first row was taken from the last value
@@ -140,10 +140,21 @@ prepare_segment_data.autospc_chart_mr <- function(chart,
 #' stays in the series, so that a calculation period spans `period_min` points
 #' of the series the moving ranges were derived from.
 #'
+#' With `location = TRUE`, the rows where the X chart has a value. An MR series
+#' keeps the X values in `y`, so these are the rows where `y` is not missing.
+#' A missing X value leaves the moving range missing both at its own row and at
+#' the next, so a gap in the moving ranges is one point longer than the gap in
+#' the X values.
+#'
 #' @return A logical vector, one element per row of `data`.
 #' @noRd
 observed_rows.autospc_chart_mr <- function(chart,
-                                           data) {
+                                           data,
+                                           location = FALSE) {
+  if (location) {
+    return(!is.na(data$y))
+  }
+
   observed <- NextMethod()
   observed[1L] <- TRUE
 

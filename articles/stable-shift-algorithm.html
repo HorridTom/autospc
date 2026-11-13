@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -557,8 +557,18 @@ described in the following table. This shorthand forms the content of the
 <tbody>
 <tr class="odd">
 <td align="left">0</td>
-<td align="left">0000</td>
-<td align="left">Restart forced by force_restart_at. The counter is set to the first point of the new segment, and the algorithm continues from step 2.</td>
+<td align="left">00xx</td>
+<td align="left">Restart. The counter is set to the first point of the new segment, and the algorithm continues from step 2.</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">xx = 00: Forced by force_restart_at</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">xx = 10: After a gap of at least restart_after_gap points with no value</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>

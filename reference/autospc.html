@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +71,7 @@ by default the Stable Shift Algorithm.</p>
 <span>  overhanging_reversions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  force_restart_at <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prevent_establishment_in <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  restart_after_gap <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_ends_run <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  max_exclusions <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  highlight_exclusions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -244,7 +245,21 @@ points. A shift that starts inside a range and continues at least
 <code>shift_rule_threshold</code> points past the end of that range can still
 re-establish limits after the end of the range. The first calculation period
 of the series, and the first after each restart, are not affected. Ranges
-outside the data are ignored.</p><div class="section">
+outside the data are ignored.</p></dd>
+
+
+<dt id="arg-restart-after-gap">restart_after_gap<a class="anchor" aria-label="anchor" href="#arg-restart-after-gap"></a></dt>
+<dd><p>The number of consecutive points (subgroups) with
+missing value at or above which the algorithm restarts. Defaults to
+<code>period_min</code>; <code>Inf</code> turns this feature off. The algorithm restarts at the
+first point with a value after such a gap, as it does at a value of
+<code>force_restart_at</code>, and the gap is left without limits. An <code>x</code> value with no
+row in the data is not part of a gap. For a location-dispersion pair of
+charts, gaps are counted on the location chart, and both charts restart at
+the same point. Where a gap ends inside a range given by
+<code>prevent_establishment_in</code>, the algorithm restarts at the first point with a
+value after that range instead, and the points between have no limits. Gaps
+at the start or end of the series are ignored.</p><div class="section">
 <h3 id="spc-parameters">SPC Parameters<a class="anchor" aria-label="anchor" href="#spc-parameters"></a></h3>
 
 

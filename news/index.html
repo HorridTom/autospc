@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9008</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9009</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,20 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9009" id="autospc-0209009">autospc 0.2.0.9009<a class="anchor" aria-label="anchor" href="#autospc-0209009"></a></h2>
+<div class="section level3">
+<h3 id="restarting-after-a-long-gap-0-2-0-9009">Restarting after a long gap<a class="anchor" aria-label="anchor" href="#restarting-after-a-long-gap-0-2-0-9009"></a></h3>
+<ul><li>New argument <code>restart_after_gap</code>: after a run of at least this many consecutive points with missing value, the algorithm restarts at the first point with a value, as it does at a value of <code>force_restart_at</code> (#325). It defaults to <code>period_min</code>, so results change for a series with a gap that long: a calculation period before the gap no longer takes points from after it, and limits are no longer carried across the gap. <code>Inf</code> turns this off. A time point with no row in the data is not part of a gap; to make one, add a row with the value <code>NA</code>. Gaps at the start or end of the series are ignored.</li>
+<li>For a location and dispersion pair, gaps are counted on the location chart, so both charts restart at the same point. A subgroup of one, which has a mean but no standard deviation, is not part of a gap.</li>
+<li>Where a gap ends inside a range given by <code>prevent_establishment_in</code>, the algorithm restarts at the first point with a value after the range instead, and the points between are drawn without limits.</li>
+<li>A restart after a gap is drawn as a dotted line, with the legend entry “Restart after gap”. The <code>restart</code> column is <code>TRUE</code> there, and the log records it with the new code <code>0010</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="floating-median-0-2-0-9009">Floating median<a class="anchor" aria-label="anchor" href="#floating-median-0-2-0-9009"></a></h3>
+<ul><li>The floating median is now drawn only as far as the last point with a value in its segment, not across missing values after it.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9008" id="autospc-0209008">autospc 0.2.0.9008<a class="anchor" aria-label="anchor" href="#autospc-0209008"></a></h2>
 <div class="section level3">

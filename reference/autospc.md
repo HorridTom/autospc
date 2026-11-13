@@ -24,6 +24,7 @@ autospc(
   overhanging_reversions = TRUE,
   force_restart_at = NULL,
   prevent_establishment_in = NULL,
+  restart_after_gap = NULL,
   na_ends_run = TRUE,
   max_exclusions = 3L,
   highlight_exclusions = TRUE,
@@ -208,6 +209,20 @@ autospc(
   re-establish limits after the end of the range. The first calculation
   period of the series, and the first after each restart, are not
   affected. Ranges outside the data are ignored.
+
+- restart_after_gap:
+
+  The number of consecutive points (subgroups) with missing value at or
+  above which the algorithm restarts. Defaults to `period_min`; `Inf`
+  turns this feature off. The algorithm restarts at the first point with
+  a value after such a gap, as it does at a value of `force_restart_at`,
+  and the gap is left without limits. An `x` value with no row in the
+  data is not part of a gap. For a location-dispersion pair of charts,
+  gaps are counted on the location chart, and both charts restart at the
+  same point. Where a gap ends inside a range given by
+  `prevent_establishment_in`, the algorithm restarts at the first point
+  with a value after that range instead, and the points between have no
+  limits. Gaps at the start or end of the series are ignored.
 
   ### SPC Parameters
 

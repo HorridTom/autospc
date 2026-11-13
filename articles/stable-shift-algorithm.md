@@ -509,7 +509,9 @@ log_exp_tab %>%
 
 | algorithm_step | shorthand | explanation |
 |:---|:---|:---|
-| 0 | 0000 | Restart forced by force_restart_at. The counter is set to the first point of the new segment, and the algorithm continues from step 2. |
+| 0 | 00xx | Restart. The counter is set to the first point of the new segment, and the algorithm continues from step 2. |
+|  |  | xx = 00: Forced by force_restart_at |
+|  |  | xx = 10: After a gap of at least restart_after_gap points with no value |
 | 1 | 0100 | Initialise algorithm. Counter = 1. |
 | 2 | 02xx | Check whether there are sufficient data to form at least one set of limits. |
 |  |  | xx = 00: Yes |

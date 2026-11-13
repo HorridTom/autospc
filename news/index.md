@@ -1,5 +1,33 @@
 # Changelog
 
+## autospc 0.2.0.9009
+
+### Restarting after a long gap
+
+- New argument `restart_after_gap`: after a run of at least this many
+  consecutive points with missing value, the algorithm restarts at the
+  first point with a value, as it does at a value of `force_restart_at`
+  (#325). It defaults to `period_min`, so results change for a series
+  with a gap that long: a calculation period before the gap no longer
+  takes points from after it, and limits are no longer carried across
+  the gap. `Inf` turns this off. A time point with no row in the data is
+  not part of a gap; to make one, add a row with the value `NA`. Gaps at
+  the start or end of the series are ignored.
+- For a location and dispersion pair, gaps are counted on the location
+  chart, so both charts restart at the same point. A subgroup of one,
+  which has a mean but no standard deviation, is not part of a gap.
+- Where a gap ends inside a range given by `prevent_establishment_in`,
+  the algorithm restarts at the first point with a value after the range
+  instead, and the points between are drawn without limits.
+- A restart after a gap is drawn as a dotted line, with the legend entry
+  “Restart after gap”. The `restart` column is `TRUE` there, and the log
+  records it with the new code `0010`.
+
+### Floating median
+
+- The floating median is now drawn only as far as the last point with a
+  value in its segment, not across missing values after it.
+
 ## autospc 0.2.0.9008
 
 ### Forced restarts and preventing re-establishment

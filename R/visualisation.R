@@ -127,7 +127,10 @@ create_spc_plot <- function(plot_data,
     )
 
   spc_plot <- add_restart_lines(spc_plot,
-    lines = restart_line_positions(table, window = axis_extents$window),
+    lines = restart_line_positions(chart,
+      table = table,
+      window = axis_extents$window
+    ),
     line_width_sf = visualisation_params$line_width_sf
   )
 
@@ -308,7 +311,10 @@ create_timeseries_plot <- function(table,
     )
 
   time_series_plot <- add_restart_lines(time_series_plot,
-    lines = restart_line_positions(table, window = axis_extents$window),
+    lines = restart_line_positions(chart,
+      table = table,
+      window = axis_extents$window
+    ),
     line_width_sf = visualisation_params$line_width_sf
   )
 

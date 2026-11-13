@@ -1,27 +1,51 @@
-# Drawing forced restarts and the ranges where establishment is prevented
+# Drawing restarts and the ranges where re-establishment is prevented
 
 
-#' Where the chart marks a forced restart
+#' Where the chart marks a restart, and which type it is
 #'
 #' Each row where `restart` is TRUE, kept with its facet where the plot is
-#' faceted. Where only part of the horizontal axis is shown, only the restarts
-#' inside it.
+#' faceted. A restart is forced where it is the first point of its facet at or
+#' after a value of `force_restart_at`, which is where `forced_restart_rows()`
+#' puts a forced restart in the series. Any other restart came after a gap.
+#' Where only part of the horizontal axis is shown, only the restarts inside it
+#' are kept.
 #'
+#' @param chart The chart drawn, read for `force_restart_at`.
 #' @param table The table drawn, one row per point.
 #' @param window The range of the horizontal axis shown, or NULL for all of it.
 #'
-#' @return A data frame holding `x`, and `stage` where the table has it.
+#' @return A data frame holding `x`, `type` ("Forced restart" or "Restart
+#'   after gap"), and `stage` where the table has it.
 #' @noRd
-restart_line_positions <- function(table,
+restart_line_positions <- function(chart,
+                                   table,
                                    window) {
   if (!"restart" %in% names(table)) {
-    return(dplyr::slice_head(dplyr::select(table, x), n = 0L))
+    return(data.frame(x = table$x[0L], type = character(0)))
   }
 
+  at <- chart$force_restart_at
+
+  # For each restart, previous_x is the x of the row just before the restart
+  # in its facet; the rows are in order of x within each facet. The restart
+  # was forced if a value of force_restart_at is greater than previous_x and
+  # no greater than the restart's x, because the restart is then the first
+  # point at or after that value.
   lines <- table %>%
+    dplyr::group_by(dplyr::across(dplyr::any_of("stage"))) %>%
+    dplyr::mutate(previous_x = dplyr::lag(x)) %>%
+    dplyr::ungroup() %>%
     dplyr::filter(dplyr::coalesce(restart, FALSE)) %>%
-    dplyr::select(x, dplyr::any_of("stage")) %>%
-    dplyr::distinct()
+    dplyr::distinct(x, previous_x, dplyr::across(dplyr::any_of("stage"))) %>%
+    dplyr::mutate(
+      forced = vapply(
+        seq_along(x),
+        function(i) any(at > previous_x[[i]] & at <= x[[i]]),
+        logical(1L)
+      ),
+      type = dplyr::if_else(forced, "Forced restart", "Restart after gap")
+    ) %>%
+    dplyr::select(x, type, dplyr::any_of("stage"))
 
   if (!is.null(window)) {
     lines <- lines %>%
@@ -163,16 +187,17 @@ add_prevented_ranges <- function(spc_plot,
 }
 
 
-#' Mark each forced restart with a vertical line
+#' Mark each restart with a vertical line
 #'
-#' Its legend entry comes last.
+#' A solid line for a forced restart and a dotted one for a restart after a
+#' gap. Their legend entries come after the chart's own legends.
 #'
 #' @param spc_plot The plot.
 #' @param lines Where the lines go, as `restart_line_positions()` gives them.
 #' @param line_width_sf The scale factor for line widths.
 #'
-#' @return The plot, with the lines and their legend entry added where there is
-#'   a restart.
+#' @return The plot, with the lines and their legend entries added where there
+#'   is a restart.
 #' @noRd
 add_restart_lines <- function(spc_plot,
                               lines,
@@ -181,16 +206,25 @@ add_restart_lines <- function(spc_plot,
     return(spc_plot)
   }
 
+  colours <- c("Forced restart" = "grey30", "Restart after gap" = "grey30")
+  linetypes <- c("Forced restart" = "solid", "Restart after gap" = "13")
+
   spc_plot <- spc_plot +
     ggnewscale::new_scale_colour() +
+    ggnewscale::new_scale("linetype") +
     ggplot2::geom_vline(
       data = lines,
-      ggplot2::aes(xintercept = x, colour = "Forced restart"),
+      ggplot2::aes(xintercept = x, colour = type, linetype = type),
       linewidth = 0.6 * line_width_sf
     ) +
     ggplot2::scale_colour_manual(
       name = NULL,
-      values = c("Forced restart" = "grey30"),
+      values = colours,
+      guide = ggplot2::guide_legend(order = 4L)
+    ) +
+    ggplot2::scale_linetype_manual(
+      name = NULL,
+      values = linetypes,
       guide = ggplot2::guide_legend(order = 4L)
     )
 

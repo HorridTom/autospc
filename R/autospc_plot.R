@@ -243,6 +243,7 @@ visualisation_param_names <- function() {
     "r1_col",
     "r2_col",
     "floating_median_style",
+    "floating_median_labels",
     "point_size",
     "line_width_sf",
     "highlight_exclusions",

@@ -1161,6 +1161,12 @@ validate_argument_values <- function(arguments,
     call = call
   )
 
+  arguments$floating_median_labels <- match_choice(
+    arguments$floating_median_labels,
+    "floating_median_labels",
+    call = call
+  )
+
   for (name in autospc_flag_arguments()) {
     arguments[[name]] <- match_flag(arguments[[name]], name, call = call)
   }

@@ -138,8 +138,7 @@ create_spc_plot <- function(plot_data,
   if (floating_median_shown(table, axis_extents$window)) {
     spc_plot <- add_floating_median(
       spc_plot = spc_plot,
-      table = long_table %>%
-        dplyr::filter(plotted_line == "cl"),
+      table = table,
       chart = chart,
       visualisation_params = visualisation_params,
       ylimhigh = axis_extents$ylimhigh,

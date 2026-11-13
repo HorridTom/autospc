@@ -853,3 +853,212 @@ test_that("a window showing only an unlabelled floating median leaves no space f
     ggplot2::ggplot_build(without_median)$layout$panel_params[[1]]$x.range
   )
 })
+
+
+# Which floating medians are labelled: floating_median_labels
+
+# A shift upwards at x = 31, cut short by a gap of 21 points at 41 to 61, so
+# that the series restarts at 62. With a forced restart at 85 there are three
+# medians, ending at 40, 84 and 100.
+labels_series <- function() {
+  data <- data.frame(
+    x = 1:100,
+    y = c(rep(c(9L, 11L), 15L), rep(c(14L, 16L), 15L), rep(c(9L, 11L), 20L))
+  )
+  data$y[41:61] <- NA
+
+  return(data)
+}
+
+labels_plot <- function(data = labels_series(), chart_type = "C", ...) {
+  autospc(data,
+    chart_type = chart_type,
+    max_exclusions = 0L,
+    floating_median = "yes",
+    ...
+  )
+}
+
+# The x of the last point of each labelled median. A label sits less than one
+# point after its median's last point
+labelled_median_ends <- function(plot) {
+  label <- median_drawing(plot)$label
+
+  return(sort(floor(label$x)))
+}
+
+x_range <- function(plot) {
+  return(ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$x.range)
+}
+
+
+test_that("floating_median_labels labels only the last median by default", {
+  plot <- labels_plot(force_restart_at = 85)
+
+  expect_identical(labelled_median_ends(plot), 100)
+})
+
+
+test_that("floating_median_labels = 'all' labels every median", {
+  plot <- labels_plot(force_restart_at = 85, floating_median_labels = "all")
+
+  expect_identical(labelled_median_ends(plot), c(40, 84, 100))
+})
+
+
+test_that("floating_median_labels = 'gaps' labels the last median and those before gaps", {
+  plot <- labels_plot(force_restart_at = 85, floating_median_labels = "gaps")
+
+  expect_identical(labelled_median_ends(plot), c(40, 100))
+})
+
+
+test_that("floating_median_labels = 'none' labels no median and leaves no space", {
+  plot <- labels_plot(force_restart_at = 85, floating_median_labels = "none")
+  unlabelled <- autospc(labels_series(),
+    chart_type = "C",
+    max_exclusions = 0L,
+    force_restart_at = 85
+  )
+
+  expect_identical(NROW(median_drawing(plot)$label), 0L)
+  expect_identical(x_range(plot), x_range(unlabelled))
+})
+
+
+test_that("'gaps' labels no median before a gap when restart_after_gap is Inf", {
+  plot <- labels_plot(floating_median_labels = "gaps", restart_after_gap = Inf)
+
+  expect_identical(labelled_median_ends(plot), 100)
+})
+
+
+test_that("'gaps' counts a gap shorter than restart_after_gap as no gap", {
+  plot <- labels_plot(
+    floating_median_labels = "gaps",
+    force_restart_at = 62,
+    restart_after_gap = 22L
+  )
+
+  expect_identical(labelled_median_ends(plot), 100)
+})
+
+
+test_that("'gaps' labels the median before a gap that ends in a prevented range", {
+  plot <- labels_plot(
+    floating_median_labels = "gaps",
+    prevent_establishment_in = c(55, 70)
+  )
+
+  expect_identical(labelled_median_ends(plot), c(40, 100))
+})
+
+
+test_that("'gaps' labels the median before a forced restart at the end of a gap", {
+  plot <- labels_plot(floating_median_labels = "gaps", force_restart_at = 62)
+
+  expect_identical(labelled_median_ends(plot), c(40, 100))
+})
+
+
+test_that("'last' labels nothing where the last segment is too short for a median", {
+  # the segment from 95 to 100 has six points, too few for a median
+  plot <- suppressWarnings(labels_plot(force_restart_at = 95))
+  gaps <- suppressWarnings(
+    labels_plot(force_restart_at = 95, floating_median_labels = "gaps")
+  )
+
+  expect_identical(NROW(median_drawing(plot)$label), 0L)
+  expect_identical(labelled_median_ends(gaps), 40)
+})
+
+
+test_that("'gaps' counts a missing denominator as part of a gap", {
+  data <- labels_series()
+  data$n <- 40L
+  data$y[41:61] <- 10L
+  data$n[41:61] <- NA
+
+  plot <- labels_plot(data, chart_type = "P", floating_median_labels = "gaps")
+
+  expect_identical(labelled_median_ends(plot), c(40, 100))
+})
+
+
+test_that("both panels of a pair label the median before a gap", {
+  plot <- labels_plot(chart_type = "XMR", floating_median_labels = "gaps")
+  params <- autospc_plot_visualisation_params(plot)
+  plot_data <- build_plot_data(autospc_plot_charts(plot), params)
+
+  location <- create_spc_plot(list(plot_data$location), params)
+  dispersion <- draw_dispersion_panel(plot_data$dispersion, params)
+
+  expect_identical(labelled_median_ends(location), c(40, 100))
+  expect_identical(labelled_median_ends(dispersion), c(40, 100))
+})
+
+
+test_that("both panels of a pair measure a gap on the X chart", {
+  # the gap in the moving ranges, at 41 to 62, is one point longer than the
+  # gap in the X values
+  plot <- labels_plot(
+    chart_type = "XMR",
+    floating_median_labels = "gaps",
+    force_restart_at = 62,
+    restart_after_gap = 22L
+  )
+  params <- autospc_plot_visualisation_params(plot)
+  plot_data <- build_plot_data(autospc_plot_charts(plot), params)
+
+  location <- create_spc_plot(list(plot_data$location), params)
+  dispersion <- draw_dispersion_panel(plot_data$dispersion, params)
+
+  expect_identical(labelled_median_ends(location), 100)
+  expect_identical(labelled_median_ends(dispersion), 100)
+})
+
+
+test_that("floating_median_labels applies within each facet", {
+  plot <- facet_stages(labels_series(),
+    split_at = c(50L, 100L), chart_type = "C", max_exclusions = 0L,
+    floating_median = "yes", floating_median_labels = "all"
+  )
+  label <- median_drawing(plot)$label
+  label <- label[order(label$PANEL, label$x), ]
+
+  # stage 1 ends at 50, with one median; stage 2 has one each side of the gap
+  expect_identical(as.integer(label$PANEL), c(1L, 2L, 2L))
+  expect_identical(floor(label$x), c(40, 40, 100))
+})
+
+
+test_that("'last' labels the last median of each facet", {
+  plot <- facet_stages(labels_series(),
+    split_at = c(50L, 100L), chart_type = "C", max_exclusions = 0L,
+    floating_median = "yes", floating_median_labels = "last"
+  )
+  label <- median_drawing(plot)$label
+  label <- label[order(label$PANEL, label$x), ]
+
+  expect_identical(as.integer(label$PANEL), c(1L, 2L))
+  expect_identical(floor(label$x), c(40, 100))
+})
+
+
+test_that("a median whose end the window does not reach is not labelled", {
+  plot <- labels_plot(
+    force_restart_at = 85,
+    floating_median_labels = "all",
+    display_window = c(1, 70)
+  )
+
+  expect_identical(labelled_median_ends(plot), 40)
+})
+
+
+test_that("floating_median_labels takes only the values it accepts", {
+  expect_error(
+    labels_plot(floating_median_labels = "first"),
+    "must be one of"
+  )
+})

@@ -305,7 +305,9 @@ medians_before_gaps <- function(table,
   median_ends <- table %>%
     dplyr::filter(!is.na(median)) %>%
     dplyr::group_by(dplyr::across(dplyr::any_of("stage")), median_segment) %>%
-    dplyr::summarise(x = max(x), .groups = "drop")
+    # the table is in order of x. Unlike max(), last() doesn't warn when there
+    # is no median, and so no rows: dplyr still evaluates it once then.
+    dplyr::summarise(x = dplyr::last(x), .groups = "drop")
 
   return(median_ends %>%
     dplyr::inner_join(gaps_after,

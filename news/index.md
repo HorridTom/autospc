@@ -1,5 +1,19 @@
 # Changelog
 
+## autospc 0.2.0.9010
+
+### Floating median
+
+- New argument `floating_median_labels` chooses which floating medians
+  are labelled where a series restarts and so has more than one (#330):
+  `"last"`, the default, labels only the median of the last segment, as
+  before; `"all"` labels every median; `"gaps"` labels the median of the
+  last segment and every median followed by a gap of at least
+  `restart_after_gap` points with no value; `"none"` labels no median,
+  and leaves no space for a label on the right of the chart. In
+  [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md),
+  this applies within each facet.
+
 ## autospc 0.2.0.9009
 
 ### Restarting after a long gap

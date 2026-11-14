@@ -54,6 +54,7 @@ autospc(
   r2_col = "steelblue3",
   floating_median_style = list(colour = "firebrick3", linetype = "longdash", linewidth =
     0.75),
+  floating_median_labels = c("last", "all", "gaps", "none"),
   point_size = 2,
   line_width_sf = 1,
   include_annotations = TRUE,
@@ -410,6 +411,16 @@ autospc(
   their defaults: `"firebrick3"`, `"longdash"` and 0.75. The width is
   multiplied by `line_width_sf`, as the other lines are. The median's
   label is drawn in `colour`.
+
+- floating_median_labels:
+
+  Which floating medians to label, where a series restarts and so has
+  more than one: "last" - the median of the last segment of the series
+  only; "all" - every median; "gaps" - the median of the last segment,
+  and every median whose last point is followed by a gap of at least
+  `restart_after_gap` points with no value; "none" - no median. In
+  [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md),
+  this applies within each facet.
 
 - point_size:
 

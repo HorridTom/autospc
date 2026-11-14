@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9009</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9010</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,6 +101,7 @@ by default the Stable Shift Algorithm.</p>
 <span>  r2_col <span class="op">=</span> <span class="st">"steelblue3"</span>,</span>
 <span>  floating_median_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"firebrick3"</span>, linetype <span class="op">=</span> <span class="st">"longdash"</span>, linewidth <span class="op">=</span></span>
 <span>    <span class="fl">0.75</span><span class="op">)</span>,</span>
+<span>  floating_median_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"last"</span>, <span class="st">"all"</span>, <span class="st">"gaps"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  point_size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  line_width_sf <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  include_annotations <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -450,6 +451,15 @@ drawn, with any of the elements <code>colour</code>, <code>linetype</code> and <
 Elements not given take their defaults: <code>"firebrick3"</code>, <code>"longdash"</code> and
 0.75. The width is multiplied by <code>line_width_sf</code>, as the other lines are. The
 median's label is drawn in <code>colour</code>.</p></dd>
+
+
+<dt id="arg-floating-median-labels">floating_median_labels<a class="anchor" aria-label="anchor" href="#arg-floating-median-labels"></a></dt>
+<dd><p>Which floating medians to label, where a
+series restarts and so has more than one: "last" - the median of the last
+segment of the series only; "all" - every median; "gaps" - the median of the
+last segment, and every median whose last point is followed by a gap of at
+least <code>restart_after_gap</code> points with no value; "none" - no median. In
+<code><a href="facet_stages.html">facet_stages()</a></code>, this applies within each facet.</p></dd>
 
 
 <dt id="arg-point-size">point_size<a class="anchor" aria-label="anchor" href="#arg-point-size"></a></dt>

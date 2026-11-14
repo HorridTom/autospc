@@ -225,7 +225,11 @@ axis_specifications <- function(table,
   data_end_x <- max(x_max, x_pad_end)
   end_x <- data_end_x
 
-  labelled <- labelled_floating_medians(table, window = NULL)
+  labelled <- labelled_floating_medians(table,
+    window = NULL,
+    chart = chart,
+    labels = visualisation_params$floating_median_labels
+  )
 
   if (has_floating_median(labelled)) {
     end_x <- max(end_x, floating_median_label_end(labelled))
@@ -241,7 +245,11 @@ axis_specifications <- function(table,
   )
 
   if (!is.null(window)) {
-    labelled <- labelled_floating_medians(table, window = window)
+    labelled <- labelled_floating_medians(table,
+      window = window,
+      chart = chart,
+      labels = visualisation_params$floating_median_labels
+    )
 
     if (has_floating_median(labelled)) {
       window[[2L]] <- max(

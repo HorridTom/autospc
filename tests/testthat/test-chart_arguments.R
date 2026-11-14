@@ -154,6 +154,7 @@ test_that("every visualisation parameter reaches the plot object", {
         x_date_format = "%b %Y",
         r1_col = "red",
         r2_col = "blue",
+        floating_median_labels = "all",
         "given"
       )
     }

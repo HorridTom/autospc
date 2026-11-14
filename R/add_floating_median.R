@@ -16,18 +16,21 @@ has_floating_median <- function(table) {
 #'
 #' One median for each segment of the series that has one, in each facet. Each
 #' is drawn in the style the caller gave, with its width multiplied by
-#' `line_width_sf`, and has no legend entry. Only the median of the last
-#' segment is labelled, because the label of an earlier one would sit on the
-#' next segment. The label sits just after the last point the median is taken
-#' over, centred on the line, and gives its value. Where only part of the
+#' `line_width_sf`, and has no legend entry. `floating_median_labels` sets
+#' which medians are labelled, and `labelled_floating_medians()` finds them. A
+#' label sits just after the last point its median is taken over, centred on
+#' the line, and gives the median's value. Where only part of the
 #' horizontal axis is shown, a median is drawn only where the range shown
 #' reaches its last point.
 #'
-#' @param table One row per point, holding `x` and `median`.
+#' @param table One row per point, holding `x`, `median`, `restart`, and the
+#'   columns `observed_rows()` reads.
 #' @param spc_plot The plot to add the median to.
-#' @param chart The chart the median belongs to, which sets the label's format.
+#' @param chart The chart the median belongs to, which sets the label's format
+#'   and, for `floating_median_labels = "gaps"`, where the gaps are.
 #' @param visualisation_params The visualisation parameters, from which
-#'   `floating_median_style`, `line_width_sf` and `annotation_size` are read.
+#'   `floating_median_style`, `floating_median_labels`, `line_width_sf` and
+#'   `annotation_size` are read.
 #' @param ylimhigh The upper end of the vertical axis, which the label's format
 #'   can depend on.
 #' @param window The range of the horizontal axis shown, or NULL for all of it.
@@ -53,8 +56,12 @@ add_floating_median <- function(table,
 
   label_gap <- floating_median_spacing(extent_x, fraction = 0.01)
 
-  # one row for the labelled median of each facet
-  label_rows <- labelled_floating_medians(table, window = window) %>%
+  # one row for each labelled median, in each facet
+  label_rows <- labelled_floating_medians(table,
+    window = window,
+    chart = chart,
+    labels = visualisation_params$floating_median_labels
+  ) %>%
     dplyr::filter(!is.na(median)) %>%
     dplyr::group_by(dplyr::across(dplyr::any_of("stage")), median_segment) %>%
     dplyr::slice_max(x, n = 1L, with_ties = FALSE) %>%
@@ -204,42 +211,120 @@ shown_floating_medians <- function(table,
 }
 
 
-#' The floating median that is labelled
+#' The floating medians that are labelled
 #'
-#' The median of the last segment of the series, in each facet, where it is
-#' drawn.
+#' Of the medians that are drawn, in each facet: with `labels = "last"`, the
+#' median of the last segment of the series, so none where that segment has no
+#' median; with `"all"`, every median; with `"gaps"`, the median of the last
+#' segment and every median that `medians_before_gaps()` finds; with `"none"`,
+#' none.
 #'
-#' @param table One row per point, holding `x`, `median` and `restart`.
+#' @param table One row per point, holding `x`, `median`, `restart`, and, for
+#'   `labels = "gaps"`, the columns `observed_rows()` reads.
 #' @param window The range of the horizontal axis shown, or NULL for all of it.
+#' @param chart The chart drawn, which says where the gaps are.
+#' @param labels The value of `floating_median_labels`.
 #'
 #' @return `table`, with `median_segment` added, and `median` NA everywhere but
-#'   the labelled median.
+#'   the labelled medians.
 #' @noRd
 labelled_floating_medians <- function(table,
-                                      window) {
-  table <- shown_floating_medians(table, window = window) %>%
+                                      window,
+                                      chart,
+                                      labels) {
+  table <- shown_floating_medians(table, window = window)
+
+  before_gaps <- if (labels == "gaps") {
+    medians_before_gaps(table, chart = chart)
+  } else {
+    dplyr::slice_head(
+      dplyr::select(table, dplyr::any_of("stage"), median_segment),
+      n = 0L
+    )
+  }
+
+  table <- table %>%
     dplyr::group_by(dplyr::across(dplyr::any_of("stage"))) %>%
-    dplyr::mutate(median = dplyr::if_else(
-      median_segment == max(median_segment),
-      median,
-      NA_real_
-    )) %>%
-    dplyr::ungroup()
+    dplyr::mutate(last_segment = median_segment == max(median_segment)) %>%
+    dplyr::ungroup() %>%
+    dplyr::left_join(
+      dplyr::mutate(before_gaps, before_gap = TRUE),
+      by = c(intersect("stage", names(table)), "median_segment")
+    ) %>%
+    dplyr::mutate(
+      labelled = switch(labels,
+        last = last_segment,
+        all = TRUE,
+        gaps = last_segment | dplyr::coalesce(before_gap, FALSE),
+        none = FALSE
+      ),
+      median = dplyr::if_else(labelled, median, NA_real_)
+    ) %>%
+    dplyr::select(-last_segment, -before_gap, -labelled)
 
   return(table)
+}
+
+
+#' The floating medians that are followed by a long gap
+#'
+#' A median is followed by a long gap where its last point is followed by at
+#' least `restart_after_gap` points with no value on the location chart, and
+#' then by a point with a value. `observed_rows()`, with `location = TRUE`,
+#' says which points have a value.
+#'
+#' @param table One row per point in each facet, in order of `x`, holding `x`,
+#'   `median`, `median_segment`, and the columns `observed_rows()` reads.
+#' @param chart The chart drawn, read for `restart_after_gap`.
+#'
+#' @return A data frame of `median_segment`, and `stage` where the table has
+#'   it, one row for each median followed by a long gap.
+#' @noRd
+medians_before_gaps <- function(table,
+                                chart) {
+  # for each point with a value, the number of points with no value between
+  # it and the next point with a value. The points after the last point with a
+  # value in a facet are not a gap, and neither are those before the first.
+  gaps_after <- table %>%
+    dplyr::mutate(
+      has_value = observed_rows(chart, data = table, location = TRUE)
+    ) %>%
+    dplyr::group_by(dplyr::across(dplyr::any_of("stage"))) %>%
+    dplyr::mutate(value_number = cumsum(has_value)) %>%
+    dplyr::filter(
+      value_number > 0L,
+      value_number < max(value_number)
+    ) %>%
+    dplyr::group_by(dplyr::across(dplyr::any_of("stage")), value_number) %>%
+    dplyr::summarise(
+      x = dplyr::first(x),
+      gap_length = sum(!has_value),
+      .groups = "drop"
+    )
+
+  median_ends <- table %>%
+    dplyr::filter(!is.na(median)) %>%
+    dplyr::group_by(dplyr::across(dplyr::any_of("stage")), median_segment) %>%
+    dplyr::summarise(x = max(x), .groups = "drop")
+
+  return(median_ends %>%
+    dplyr::inner_join(gaps_after,
+      by = c(intersect("stage", names(table)), "x")
+    ) %>%
+    dplyr::filter(gap_length >= !!chart$restart_after_gap) %>%
+    dplyr::select(dplyr::any_of("stage"), median_segment))
 }
 
 
 #' Number the segments of the series, so that each floating median is drawn on
 #' its own
 #'
-#' A row belongs to the segment of the last forced restart at or before its
-#' `x`, counting from 0 for the rows before the first, within each facet. Read
-#' from `x` rather than from the order of the rows, because the plotted table
-#' holds extra rows that connect the limits across periods.
+#' A row belongs to the segment of the last restart at or before its `x`,
+#' whether forced or after a gap, counting from 0 for the rows before the
+#' first, within each facet.
 #'
-#' @param table One row per point, holding `x` and, where the series was
-#'   analysed with forced restarts, `restart`.
+#' @param table One row per point, holding `x` and, where the table has it,
+#'   `restart`.
 #'
 #' @return `table`, with `median_segment` added.
 #' @noRd

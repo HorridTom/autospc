@@ -926,6 +926,38 @@ test_that("floating_median_labels = 'none' labels no median and leaves no space"
 })
 
 
+test_that("'gaps' gives no warning when there is no floating median", {
+  # the warning from summarise() that the medians before gaps gave. Other
+  # warnings, such as that ggrepel and ggpp are missing, don't count here.
+  summarise_warning <- "dplyr::summarise|non-missing"
+
+  expect_no_warning(
+    autospc(labels_series(),
+      chart_type = "C",
+      max_exclusions = 0L,
+      floating_median = "no",
+      floating_median_labels = "gaps"
+    ),
+    message = summarise_warning
+  )
+
+  # with "auto", a series that breaks no rule has no median
+  stable <- data.frame(x = 1:100, y = rep(c(9L, 11L), 50L))
+  stable$y[41:60] <- NA
+  plot <- expect_no_warning(
+    autospc(stable,
+      chart_type = "C",
+      max_exclusions = 0L,
+      floating_median = "auto",
+      floating_median_labels = "gaps",
+      restart_after_gap = 10L
+    ),
+    message = summarise_warning
+  )
+  expect_identical(NROW(median_drawing(plot)$label), 0L)
+})
+
+
 test_that("'gaps' labels no median before a gap when restart_after_gap is Inf", {
   plot <- labels_plot(floating_median_labels = "gaps", restart_after_gap = Inf)
 

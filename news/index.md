@@ -1,5 +1,10 @@
 # Changelog
 
+## autospc 0.2.0.9011
+
+- `floating_median_labels = "gaps"` no longer gives a warning when the
+  chart has no floating median (#332).
+
 ## autospc 0.2.0.9010
 
 ### Floating median

@@ -9,7 +9,12 @@ form_calculation_limits <- function(data,
     data = data,
     chart = chart,
     counter = counter,
-    period_length = period_length
+    period_length = period_length,
+    excluded_first = mirrored_exclusions(chart,
+      data = data,
+      counter = counter,
+      period_length = period_length
+    )
   )
 
   calculation_period <- data[counter:(counter + period_length - 1), ]
@@ -58,7 +63,7 @@ form_calculation_limits <- function(data,
 
 
   # First period does not already have the additional columns
-  if (counter == 1) {
+  if (!"break_point" %in% names(data)) {
     # Joins limits to the existing data
     limits_table <- data %>%
       dplyr::left_join(calculation_period, by = "x") %>%
@@ -201,16 +206,18 @@ form_calculation_and_display_limits <- function(
 #' same way as the algorithm does for a period it establishes. The last period's
 #' display limits run to the end of `data`.
 #'
-#' @param data A data frame with one row per point of the series that holds an
+#' @param data A data frame with one row per point of the series that has an
 #'   observation, in order of `x`, as `compact_series()` returns it. It has the
 #'   columns `x` and `series`, and any others the chart's limit calculation
 #'   reads, such as `n` for a P chart.
 #' @param periods A data frame with one row per calculation period, in order of
-#'   `x`, and the columns `first_x` and `last_x`. A period holds every row of
-#'   `data` whose `x` is at least `first_x` and at most `last_x`, so both end
-#'   points are included. The first period also holds any rows of `data` before
-#'   its `first_x`, so that it starts at the first row of `data`. Each period
-#'   holds at least one row of `data`.
+#'   `x`, and the columns `first_x` and `last_x`. The rows of `data` in a period
+#'   are those whose `x` is at least `first_x` and at most `last_x`, so both end
+#'   points are included. The first period also includes any rows of `data`
+#'   before its `first_x`, so that it starts at the first row of `data`. Where
+#'   no row of `data` is in a period, the rows from its `first_x` up to the next
+#'   period have no centre line and no limits; where that period is the first,
+#'   the rows before the first period with a row of `data` have none either.
 #' @param chart The chart being analysed.
 #'
 #' @return `data`, one row per row, with the centre line, the limits, the period
@@ -220,10 +227,22 @@ form_limits_over_periods <- function(data,
                                      periods,
                                      chart) {
   limits_table <- data
+  formed <- FALSE
 
   for (period in seq_len(nrow(periods))) {
     in_period <- data$x >= periods$first_x[[period]] &
       data$x <= periods$last_x[[period]]
+
+    if (!any(in_period)) {
+      if (formed) {
+        limits_table <- form_period_without_points(limits_table,
+          counter = match(TRUE, data$x >= periods$first_x[[period]]),
+          chart = chart
+        )
+      }
+
+      next
+    }
 
     if (period == 1L) {
       counter <- 1L
@@ -239,15 +258,87 @@ form_limits_over_periods <- function(data,
       period_length = period_length,
       chart = chart
     )
+    formed <- TRUE
   }
 
   return(limits_table)
 }
 
 
+#' Positions in a calculation period excluded because the period mirrors the
+#' location chart's
+#'
+#' For a chart with `location_periods` where `mirrored_period_start_excluded()`
+#' is TRUE, the point at the first `x` of each of the location chart's periods,
+#' except the point in the first row of `data`, which starts the first period
+#' of the segment.
+#'
+#' @param chart The chart being analysed.
+#' @param data The series being analysed, as in `form_calculation_limits()`.
+#' @param counter The row of `data` at which the period starts.
+#' @param period_length The number of rows of `data` in the period.
+#'
+#' @return Positions in the period, counted from 1; empty for every other chart.
+#' @noRd
+mirrored_exclusions <- function(chart,
+                                data,
+                                counter,
+                                period_length) {
+  if (is.null(chart$location_periods) ||
+    !mirrored_period_start_excluded(chart)) {
+    return(integer(0))
+  }
+
+  period_x <- data$x[counter:(counter + period_length - 1L)]
+  period_starts <- setdiff(chart$location_periods$first_x, data$x[[1L]])
+
+  return(which(period_x %in% period_starts))
+}
+
+
+#' Remove the centre line and limits from the rows after the start of a period
+#' with no points
+#'
+#' The rows from `counter` to the end of the table become display rows with no
+#' centre line, no limits and no period statistics, starting a new period at
+#' `counter`, and the rule breaks are marked again, as where a period is
+#' established.
+#'
+#' @param limits_table The limits table being built, holding an earlier
+#'   period's limits.
+#' @param counter The first row at or after the start of the period, or NA where
+#'   there is none.
+#' @param chart The chart being analysed.
+#'
+#' @return `limits_table`, with those rows changed.
+#' @noRd
+form_period_without_points <- function(limits_table,
+                                       counter,
+                                       chart) {
+  if (is.na(counter)) {
+    return(limits_table)
+  }
+
+  rows <- counter:nrow(limits_table)
+
+  for (column in c("cl", "ucl", "lcl", period_statistics_columns(chart))) {
+    limits_table[[column]][rows] <- NA_real_
+  }
+  limits_table$period_type[rows] <- "display"
+  limits_table$break_point[counter] <- TRUE
+
+  return(add_rule_breaks_respecting_periods(
+    limits_table = limits_table,
+    counter = counter,
+    centre_line_tolerance = chart$centre_line_tolerance,
+    shift_rule_threshold = chart$shift_rule_threshold
+  ))
+}
+
+
 #' The calculation periods in an analysed table
 #'
-#' @param table An analysed table, as `chart$result$table` holds it.
+#' @param table An analysed table, `chart$result$table`.
 #'
 #' @return A data frame with one row per calculation period, in order of `x`:
 #'   `first_x` and `last_x`, the `x` of the period's first and last rows, both

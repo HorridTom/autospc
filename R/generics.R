@@ -87,6 +87,23 @@ observed_rows <- function(chart,
 }
 
 
+#' Whether the point at the start of a mirrored calculation period is excluded
+#' from that period's calculation
+#'
+#' Read only for the dispersion chart of a pair whose
+#' `dispersion_chart_establishment` is not "independent", at each calculation
+#' period after the first in a segment. An excluded point is marked
+#' `excluded = TRUE` and does not count towards `max_exclusions`.
+#'
+#' @param chart The chart being analysed.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+mirrored_period_start_excluded <- function(chart) {
+  UseMethod("mirrored_period_start_excluded")
+}
+
+
 #' Number of points available for analysis
 #'
 #' Used to decide whether there is enough data to form a period.

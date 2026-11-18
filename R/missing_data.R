@@ -174,11 +174,22 @@ carry_limits_across_gaps <- function(restored,
 
   # each gap takes the period of the observation before it
   period_of <- restored$plot_period
-  period_of[gaps] <- period_of[positions[findInterval(gaps, positions)]]
+  before <- positions[findInterval(gaps, positions)]
+  period_of[gaps] <- period_of[before]
 
-  for (period in unique(period_of[gaps])) {
+  if (!is.null(chart$location_periods)) {
+    period_of[gaps] <- location_period_of_gaps(restored,
+      gaps = gaps,
+      before = before,
+      after = positions[findInterval(gaps, positions) + 1L],
+      period_of = period_of,
+      chart = chart
+    )
+  }
+
+  for (period in unique(stats::na.omit(period_of[gaps]))) {
     period_rows <- restored[observed & period_of == period, , drop = FALSE]
-    rows <- gaps[period_of[gaps] == period]
+    rows <- gaps[period_of[gaps] %in% period]
 
     gap_rows <- restored[rows, , drop = FALSE]
 
@@ -221,6 +232,57 @@ carry_limits_across_gaps <- function(restored,
   }
 
   return(restored)
+}
+
+
+#' The periods of the rows in gaps, for a chart with `location_periods`
+#'
+#' A row in a gap has no observation. Its location period is the period in
+#' `location_periods` whose `first_x` is the last at or before the row's `x`.
+#' The row's `plot_period` is chosen by comparing that location period with
+#' the location periods of the observations before and after the gap:
+#'
+#' * the observation before the gap is in the same location period: the row
+#'   keeps the `plot_period` of that observation, as for any chart;
+#' * the observation before the gap is in an earlier location period, and the
+#'   observation after the gap is in the same location period as the row: the
+#'   row has the `plot_period` of the observation after the gap. This is the
+#'   case of a row at the start of a location period with no observation, such
+#'   as a subgroup of one at the start of a period on an S chart;
+#' * the observation before the gap is in an earlier location period, and the
+#'   observation after the gap is in a later one: the row has no period, because
+#'   this chart has no observation in that location period.
+#'
+#' @param restored The analysed table, one row per row of the prepared series.
+#' @param gaps The rows in gaps.
+#' @param before,after For each row in `gaps`, the row of the observation before
+#'   it and after it.
+#' @param period_of The `plot_period` of each row of `restored`, where each row
+#'   in a gap has the `plot_period` of the observation before it.
+#' @param chart The chart being analysed, with `location_periods`.
+#'
+#' @return The `plot_period` for each row in `gaps`, NA for no period.
+#' @noRd
+location_period_of_gaps <- function(restored,
+                                    gaps,
+                                    before,
+                                    after,
+                                    period_of,
+                                    chart) {
+  location_period <- findInterval(
+    restored$x,
+    chart$location_periods$first_x
+  )
+
+  periods <- period_of[gaps]
+  before_in_earlier <- location_period[before] != location_period[gaps]
+  after_in_same <- location_period[after] == location_period[gaps]
+
+  periods[before_in_earlier & after_in_same] <-
+    period_of[after[before_in_earlier & after_in_same]]
+  periods[before_in_earlier & !after_in_same] <- NA_character_
+
+  return(periods)
 }
 
 

@@ -87,6 +87,11 @@ validate_autospc_chart <- function(x) {
 #' data_original is a derived field retaining (by convention only) a copy of the
 #' data passed by the user
 #'
+#' location_periods is NULL except on the dispersion chart of a pair whose
+#' `dispersion_chart_establishment` is not "independent". There it is the
+#' location chart's calculation periods, in the form `calculation_periods()`
+#' returns, and the dispersion chart's calculation periods are these periods.
+#'
 #' @return A character vector of element names.
 #' @noRd
 autospc_chart_elements <- function() {
@@ -115,6 +120,7 @@ autospc_chart_elements <- function() {
     "extend_limits_to",
     "keep_candidate_tables",
     "data_original",
+    "location_periods",
     # the analysis
     "result",
     "history"
@@ -158,7 +164,7 @@ autospc_chart_parameters <- function() {
     autospc_chart_elements(),
     c(
       "data", "x", "y", "n",
-      "data_original", "result", "history"
+      "data_original", "location_periods", "result", "history"
     )
   ))
 }
@@ -442,6 +448,7 @@ assemble_chart_list <- function(
     keep_candidate_tables = keep_candidate_tables,
     # derived fields
     data_original = data,
+    location_periods = NULL,
     # the analysis, empty until the algorithm runs
     result = list(),
     history = list()
@@ -512,6 +519,19 @@ observed_rows.autospc_chart <- function(chart,
                                         data,
                                         location = FALSE) {
   return(!is.na(data$series))
+}
+
+
+#' Whether the point at the start of a mirrored calculation period is excluded
+#' from that period's calculation
+#'
+#' Not excluded: the point at the start of the period is included in the
+#' period's calculation, as every other point is.
+#'
+#' @return FALSE
+#' @noRd
+mirrored_period_start_excluded.autospc_chart <- function(chart) {
+  return(FALSE)
 }
 
 
@@ -745,6 +765,13 @@ print.autospc_chart <- function(x, ...) {
   cat("\nCalculation periods\n")
   cat(format_calculation_periods(x$result$table), sep = "\n")
 
+  if (!is.null(x$location_periods)) {
+    cat(sprintf(
+      "Calculation periods mirror the %s chart\n",
+      mirrored_location_chart_type(x)
+    ))
+  }
+
   if (length(x$result$re_establish_rows) > 0L) {
     cat(sprintf(
       "\nLimits re-established at %s\n",
@@ -852,4 +879,24 @@ format_calculation_periods <- function(table,
   }
 
   return(unname(lines))
+}
+
+
+#' The chart type of the location chart a dispersion chart mirrors
+#'
+#' @param chart The dispersion chart of a pair, such as an MR or S chart.
+#'
+#' @return The location chart type of the pair whose dispersion chart type is
+#'   that of `chart`: "X" for an MR chart, "Xbar" for an S chart.
+#' @noRd
+mirrored_location_chart_type <- function(chart) {
+  dispersion <- chart_type_label(chart)
+
+  for (pair in autospc_pair_types()) {
+    if (identical(pair[["dispersion"]], dispersion)) {
+      return(pair[["location"]])
+    }
+  }
+
+  stop("Not the dispersion chart of a pair.", call. = FALSE)
 }

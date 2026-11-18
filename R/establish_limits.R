@@ -92,6 +92,13 @@ analyse_segment <- function(chart,
                             rows,
                             first_segment,
                             last_segment) {
+  if (!is.null(chart$location_periods)) {
+    return(analyse_segment_over_location_periods(chart,
+      rows = rows,
+      first_segment = first_segment
+    ))
+  }
+
   prepared_data <- segment_data(chart,
     rows = rows,
     first_segment = first_segment
@@ -453,4 +460,102 @@ analyse_segment <- function(chart,
     has_limits = TRUE,
     observed = nrow(observed_data) + stranded_points
   ))
+}
+
+
+#' Analyse one segment of a series over the location chart's periods
+#'
+#' Used in place of `analyse_segment()` for the dispersion chart of a pair whose
+#' `dispersion_chart_establishment` is not "independent". The algorithm is not
+#' run: the calculation periods are the periods in `chart$location_periods` that
+#' start in the segment, and limits are formed over them. Where
+#' `mirrored_period_start_excluded()` is TRUE, the point at the start of each
+#' period after the first is excluded from that period's calculation. Nothing is
+#' recorded in the history.
+#'
+#' @param chart The chart being analysed.
+#' @param rows The rows of `chart$data` that make up the segment.
+#' @param first_segment Whether the segment starts at the first row of the
+#'   series.
+#'
+#' @return A list, as `analyse_segment()` returns it.
+#' @noRd
+analyse_segment_over_location_periods <- function(chart,
+                                                  rows,
+                                                  first_segment) {
+  prepared_data <- segment_data(chart,
+    rows = rows,
+    first_segment = first_segment
+  )
+  stranded_points <- sum(rows %in% gap_restarts(chart)$stranded_points)
+
+  chart$data <- prepared_data
+  chart$history <- list()
+  chart$result <- list()
+
+  observed_data <- compact_series(chart,
+    data = prepared_data,
+    na_ends_run = chart$na_ends_run
+  )
+
+  limits_table <- form_limits_over_periods(observed_data,
+    periods = segment_location_periods(chart, data = prepared_data),
+    chart = chart
+  )
+
+  if (!"cl" %in% names(limits_table)) {
+    chart$result$table <- prepared_data
+
+    return(list(
+      chart = chart,
+      has_limits = FALSE,
+      observed = nrow(observed_data) + stranded_points
+    ))
+  }
+
+  limits_table <- add_period_columns(limits_table)
+
+  # rows before this chart's first calculation period have no period type.
+  # add_period_columns() numbers each of them as a period of its own, so their
+  # period columns are set to missing
+  no_period <- is.na(limits_table$period_type)
+  limits_table$limit_change[no_period] <- NA
+  limits_table$period_start[no_period] <- NA_integer_
+  limits_table$plot_period[no_period] <- NA_character_
+  limits_table$cl_change[no_period] <- NA_real_
+
+  chart$result$table <- restore_missing_rows(
+    limits_table = limits_table,
+    data = prepared_data,
+    chart = chart
+  )
+
+  return(list(
+    chart = chart,
+    has_limits = TRUE,
+    observed = nrow(observed_data) + stranded_points
+  ))
+}
+
+
+#' The location chart's calculation periods that start in one segment
+#'
+#' @param chart The chart being analysed, holding `location_periods`.
+#' @param data The segment's rows of `chart$data`.
+#'
+#' @return The rows of `chart$location_periods` whose `first_x` lies from the
+#'   segment's first `x` to its last.
+#' @noRd
+segment_location_periods <- function(chart,
+                                     data) {
+  periods <- chart$location_periods
+
+  if (nrow(data) == 0L) {
+    return(periods[0L, , drop = FALSE])
+  }
+
+  return(
+    periods %>%
+      dplyr::filter(first_x >= min(data$x), first_x <= max(data$x))
+  )
 }

@@ -21,12 +21,27 @@ enough_data_for_new_period <- function(data,
 #'
 #' Whether the prepared series is long enough for the algorithm to form one
 #' calculation period, at the first point of the series or at any forced
-#' restart. Read from `chart$data` and the chart's parameters.
+#' restart. Read from `chart$data` and the chart's parameters. For a chart with
+#' `location_periods`: whether at least one of those periods has a point with a
+#' value on this chart.
 #'
 #' @return TRUE or FALSE
 #' @noRd
 enough_data_for_limits <- function(chart) {
   segments <- segment_rows(chart)
+
+  if (!is.null(chart$location_periods)) {
+    for (segment in seq_along(segments)) {
+      if (location_period_has_value(chart,
+        rows = segments[[segment]],
+        first_segment = segment == 1L
+      )) {
+        return(TRUE)
+      }
+    }
+
+    return(FALSE)
+  }
 
   enough <- vapply(
     seq_along(segments),
@@ -47,17 +62,52 @@ enough_data_for_limits <- function(chart) {
 }
 
 
+#' Whether a period in `location_periods` has a point with a value in a segment
+#'
+#' @param chart The chart being analysed, with `location_periods`.
+#' @param rows The rows of `chart$data` that make up the segment.
+#' @param first_segment Whether the segment starts at the first row of the
+#'   series.
+#'
+#' @return TRUE where a point of the segment with a value has an `x` from the
+#'   `first_x` to the `last_x` of one of the location chart's periods that start
+#'   in the segment; otherwise FALSE.
+#' @noRd
+location_period_has_value <- function(chart,
+                                      rows,
+                                      first_segment) {
+  data <- segment_data(chart, rows = rows, first_segment = first_segment)
+  periods <- segment_location_periods(chart, data = data)
+  x_with_value <- data$x[!is.na(data$series)]
+
+  for (period in seq_len(nrow(periods))) {
+    in_period <- x_with_value >= periods$first_x[[period]] &
+      x_with_value <= periods$last_x[[period]]
+
+    if (any(in_period)) {
+      return(TRUE)
+    }
+  }
+
+  return(FALSE)
+}
+
+
 # Function to find most extreme points outside of control limits and return
 # their positions
 # period_length is the length of *this* period, which is baseline_length for
 # the first one, so it is not chart$period_min and cannot be read off the chart.
+# excluded_first: positions in the period that are excluded before any extreme
+# is looked for. They are returned with the extremes, and do not count towards
+# max_exclusions.
 find_extremes <- function(data,
                           chart,
                           counter,
-                          period_length) {
+                          period_length,
+                          excluded_first = integer(0)) {
   # initialise variables
   i <- 1
-  exclusion_points <- NULL
+  exclusion_points <- if (length(excluded_first) > 0L) excluded_first else NULL
   furthest_extremes <- NULL
 
   while (i <= chart$max_exclusions) {
@@ -110,8 +160,11 @@ find_extremes <- function(data,
 
   # Check whether there are more than max_exclusions exclusion points (due to
   # ties)
-  if (length(exclusion_points) > chart$max_exclusions) {
-    exclusion_points <- exclusion_points[1:chart$max_exclusions]
+  if (length(exclusion_points) >
+    length(excluded_first) + chart$max_exclusions) {
+    exclusion_points <- exclusion_points[
+      seq_len(length(excluded_first) + chart$max_exclusions)
+    ]
   }
 
   if (length(exclusion_points) == 0) {

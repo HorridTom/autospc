@@ -659,10 +659,7 @@ segment_log_entries <- function(chart,
   add(first_row, restart_log_code(chart, segment = segment, row = first_row))
 
   if (!enough_data_for_new_period(
-    data = segment_data(chart,
-      rows = this_segment,
-      first_segment = segment == 1L
-    ),
+    data = segment_data(chart, rows = this_segment),
     counter = 1L,
     chart = chart
   )) {

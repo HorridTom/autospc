@@ -14,7 +14,6 @@ establish_limits <- function(chart) {
     analyse_segment(
       chart = chart,
       rows = segments[[segment]],
-      first_segment = segment == 1L,
       last_segment = segment == length(segments)
     )
   })
@@ -76,8 +75,6 @@ establish_limits <- function(chart) {
 #'
 #' @param chart The chart being analysed.
 #' @param rows The rows of `chart$data` that make up the segment.
-#' @param first_segment Whether the segment starts at the first row of the
-#'   series.
 #' @param last_segment Whether the segment ends at the last row of the series.
 #'   Any other segment ends at a restart, so no more points can join its
 #'   final run.
@@ -90,19 +87,12 @@ establish_limits <- function(chart) {
 #' @noRd
 analyse_segment <- function(chart,
                             rows,
-                            first_segment,
                             last_segment) {
   if (!is.null(chart$location_periods)) {
-    return(analyse_segment_over_location_periods(chart,
-      rows = rows,
-      first_segment = first_segment
-    ))
+    return(analyse_segment_over_location_periods(chart, rows = rows))
   }
 
-  prepared_data <- segment_data(chart,
-    rows = rows,
-    first_segment = first_segment
-  )
+  prepared_data <- segment_data(chart, rows = rows)
   rows_before <- if (length(rows) > 0L) rows[[1L]] - 1L else 0L
   stranded_points <- sum(rows %in% gap_restarts(chart)$stranded_points)
 
@@ -475,18 +465,12 @@ analyse_segment <- function(chart,
 #'
 #' @param chart The chart being analysed.
 #' @param rows The rows of `chart$data` that make up the segment.
-#' @param first_segment Whether the segment starts at the first row of the
-#'   series.
 #'
 #' @return A list, as `analyse_segment()` returns it.
 #' @noRd
 analyse_segment_over_location_periods <- function(chart,
-                                                  rows,
-                                                  first_segment) {
-  prepared_data <- segment_data(chart,
-    rows = rows,
-    first_segment = first_segment
-  )
+                                                  rows) {
+  prepared_data <- segment_data(chart, rows = rows)
   stranded_points <- sum(rows %in% gap_restarts(chart)$stranded_points)
 
   chart$data <- prepared_data

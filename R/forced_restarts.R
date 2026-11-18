@@ -86,14 +86,15 @@ segment_rows <- function(chart) {
 #'
 #' @param chart The chart being analysed.
 #' @param rows The rows of `chart$data` that make up the segment.
-#' @param first_segment Whether the segment starts at the first row of the
-#'   series.
 #'
 #' @return The segment's rows of `chart$data`.
 #' @noRd
 segment_data <- function(chart,
-                         rows,
-                         first_segment) {
+                         rows) {
+  # TRUE for the first segment: the segment starting at row 1, or the one
+  # segment, with no rows, of a series with no rows
+  first_segment <- length(rows) == 0L || rows[[1L]] == 1L
+
   if (first_segment && length(rows) == nrow(chart$data)) {
     data <- chart$data
   } else {

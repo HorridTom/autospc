@@ -32,10 +32,7 @@ enough_data_for_limits <- function(chart) {
 
   if (!is.null(chart$location_periods)) {
     for (segment in seq_along(segments)) {
-      if (location_period_has_value(chart,
-        rows = segments[[segment]],
-        first_segment = segment == 1L
-      )) {
+      if (location_period_has_value(chart, rows = segments[[segment]])) {
         return(TRUE)
       }
     }
@@ -47,10 +44,7 @@ enough_data_for_limits <- function(chart) {
     seq_along(segments),
     function(segment) {
       enough_data_for_new_period(
-        data = segment_data(chart,
-          rows = segments[[segment]],
-          first_segment = segment == 1L
-        ),
+        data = segment_data(chart, rows = segments[[segment]]),
         counter = 1L,
         chart = chart
       )
@@ -66,17 +60,14 @@ enough_data_for_limits <- function(chart) {
 #'
 #' @param chart The chart being analysed, with `location_periods`.
 #' @param rows The rows of `chart$data` that make up the segment.
-#' @param first_segment Whether the segment starts at the first row of the
-#'   series.
 #'
 #' @return TRUE where a point of the segment with a value has an `x` from the
 #'   `first_x` to the `last_x` of one of the location chart's periods that start
 #'   in the segment; otherwise FALSE.
 #' @noRd
 location_period_has_value <- function(chart,
-                                      rows,
-                                      first_segment) {
-  data <- segment_data(chart, rows = rows, first_segment = first_segment)
+                                      rows) {
+  data <- segment_data(chart, rows = rows)
   periods <- segment_location_periods(chart, data = data)
   x_with_value <- data$x[!is.na(data$series)]
 

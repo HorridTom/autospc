@@ -175,13 +175,17 @@ test_that("calculation_periods puts the periods in order of x", {
   table <- data.frame(
     x = 1:12,
     period_type = rep(
-      c("calculation", "display", "calculation", "display", "calculation",
-        "display"),
+      c(
+        "calculation", "display", "calculation", "display", "calculation",
+        "display"
+      ),
       c(2L, 2L, 2L, 3L, 2L, 1L)
     ),
     plot_period = rep(
-      c("calculation1", "display3", "calculation5", "display7",
-        "calculation10", "display12"),
+      c(
+        "calculation1", "display3", "calculation5", "display7",
+        "calculation10", "display12"
+      ),
       c(2L, 2L, 2L, 3L, 2L, 1L)
     )
   )

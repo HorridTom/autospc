@@ -1,6 +1,7 @@
 # The checks on arguments that accept a fixed set of values: floating_median,
-# the Boolean arguments, and verbosity. Both entry points run them, and the
-# chart object holds the matched value whatever built it.
+# dispersion_chart_establishment, the Boolean arguments, and verbosity. Both
+# entry points run them, and the chart object holds the matched value whatever
+# built it.
 
 values_data <- data.frame(
   x = 1:30,
@@ -85,6 +86,214 @@ test_that("the chart holds one floating_median value however it was built", {
   )
 
   expect_identical(chart$floating_median, "no")
+})
+
+
+# dispersion_chart_establishment
+
+# three observations at each x, so that an XbarS chart has subgroups of three
+pair_data <- data.frame(
+  x = rep(1:30, each = 3L),
+  y = rep(c(10, 12, 11, 13, 9, 14), 15L)
+)
+
+# data each chart type accepts: the X, MR and XMR charts refuse a repeated x,
+# and the P and U charts need a denominator
+data_for <- function(chart_type) {
+  if (chart_type %in% c("XMR", "X", "MR")) {
+    return(values_data)
+  }
+
+  if (chart_type %in% c("P", "P\'", "U", "U\'")) {
+    return(dplyr::mutate(pair_data, n = 100))
+  }
+
+  return(pair_data)
+}
+
+analyse_type <- function(chart_type, ...) {
+  autospc(data_for(chart_type),
+    chart_type = chart_type,
+    x = "x",
+    y = "y",
+    plot_chart = FALSE,
+    ...
+  )
+}
+
+# the chart objects a call builds, for reading the values they hold
+charts_of <- function(chart_type, ...) {
+  plot <- autospc(data_for(chart_type),
+    chart_type = chart_type,
+    x = x,
+    y = y,
+    ...
+  )
+
+  return(autospc_plot_charts(plot))
+}
+
+
+test_that("dispersion_chart_establishment takes each of the values it accepts", {
+  for (value in c("independent", "forced", "shared")) {
+    for (chart_type in names(autospc_pair_types())) {
+      charts <- charts_of(chart_type, dispersion_chart_establishment = value)
+
+      expect_identical(
+        charts$location$dispersion_chart_establishment,
+        value,
+        info = paste(chart_type, value)
+      )
+      expect_identical(
+        charts$dispersion$dispersion_chart_establishment,
+        value,
+        info = paste(chart_type, value)
+      )
+    }
+  }
+})
+
+
+test_that("dispersion_chart_establishment defaults to independent", {
+  charts <- charts_of("XMR")
+
+  expect_identical(
+    charts$location$dispersion_chart_establishment,
+    "independent"
+  )
+  expect_identical(
+    charts$dispersion$dispersion_chart_establishment,
+    "independent"
+  )
+})
+
+
+test_that("the dispersion_chart_establishment error names the argument and the value", {
+  expect_error(
+    analyse_type("XMR", dispersion_chart_establishment = "banana"),
+    "`dispersion_chart_establishment`.*\"banana\""
+  )
+})
+
+
+test_that("the dispersion_chart_establishment error names the function the caller called", {
+  caught <- tryCatch(
+    analyse_type("XMR", dispersion_chart_establishment = "banana"),
+    error = function(e) e
+  )
+
+  expect_identical(as.character(conditionCall(caught)[[1L]]), "autospc")
+})
+
+
+test_that("dispersion_chart_establishment does not accept a different case or an abbreviation", {
+  expect_error(
+    analyse_type("XMR", dispersion_chart_establishment = "Forced"),
+    "must be one of"
+  )
+  expect_error(
+    analyse_type("XMR", dispersion_chart_establishment = "f"),
+    "must be one of"
+  )
+})
+
+
+test_that("dispersion_chart_establishment set for a pair gives no warning", {
+  for (chart_type in names(autospc_pair_types())) {
+    expect_no_warning(
+      analyse_type(chart_type, dispersion_chart_establishment = "forced"),
+      class = "autospc_dispersion_chart_establishment_ignored_warning"
+    )
+  }
+})
+
+
+test_that("dispersion_chart_establishment set for a chart type that is not a pair warns", {
+  pairs <- names(autospc_pair_types())
+
+  for (chart_type in setdiff(autospc_chart_types(), pairs)) {
+    expect_warning(
+      analyse_type(chart_type, dispersion_chart_establishment = "forced"),
+      paste0(
+        "`dispersion_chart_establishment` applies only to the pairs \"XMR\" ",
+        "and \"XbarS\", so it is ignored for chart_type = \"",
+        chart_type, "\"."
+      ),
+      fixed = TRUE,
+      class = "autospc_dispersion_chart_establishment_ignored_warning",
+      info = chart_type
+    )
+  }
+})
+
+
+test_that("dispersion_chart_establishment set to its default for a chart type that is not a pair warns", {
+  expect_warning(
+    analyse_type("C", dispersion_chart_establishment = "independent"),
+    class = "autospc_dispersion_chart_establishment_ignored_warning"
+  )
+})
+
+
+test_that("dispersion_chart_establishment left unset for a chart type that is not a pair gives no warning", {
+  expect_no_warning(
+    analyse_type("C"),
+    class = "autospc_dispersion_chart_establishment_ignored_warning"
+  )
+})
+
+
+test_that("facet_stages warns where dispersion_chart_establishment is set for a chart type that is not a pair", {
+  facets <- function(chart_type, ...) {
+    facet_stages(data_for(chart_type),
+      split_at = 20,
+      chart_type = chart_type,
+      x = "x",
+      y = "y",
+      period_min = 10L,
+      plot_chart = FALSE,
+      ...
+    )
+  }
+
+  expect_warning(
+    facets("C", dispersion_chart_establishment = "forced"),
+    class = "autospc_dispersion_chart_establishment_ignored_warning"
+  )
+  expect_no_warning(
+    facets("XMR", dispersion_chart_establishment = "forced"),
+    class = "autospc_dispersion_chart_establishment_ignored_warning"
+  )
+  expect_no_warning(
+    facets("C"),
+    class = "autospc_dispersion_chart_establishment_ignored_warning"
+  )
+})
+
+
+test_that("facet_stages checks the dispersion_chart_establishment value", {
+  expect_error(
+    facet_stages(values_data,
+      split_at = 20,
+      chart_type = "XMR",
+      x = "x",
+      y = "y",
+      dispersion_chart_establishment = "banana"
+    ),
+    "must be one of"
+  )
+})
+
+
+test_that("a chart built without dispersion_chart_establishment holds independent", {
+  chart <- autospc_chart(
+    chart_type = "C\'",
+    data = values_data,
+    x = "x",
+    y = "y"
+  )
+
+  expect_identical(chart$dispersion_chart_establishment, "independent")
 })
 
 

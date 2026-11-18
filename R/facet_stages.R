@@ -121,6 +121,10 @@ facet_stages <- function(data,
 
   validate_chart_type(arguments$chart_type)
 
+  if ("dispersion_chart_establishment" %in% names(given)) {
+    warn_dispersion_chart_establishment_ignored(arguments$chart_type)
+  }
+
   # facet_stages() draws no pairs, so a pair is faceted as its location chart.
   chart_type <- location_chart_type(arguments$chart_type)
 

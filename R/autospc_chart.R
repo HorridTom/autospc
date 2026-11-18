@@ -105,6 +105,7 @@ autospc_chart_elements <- function() {
     "force_restart_at",
     "prevent_establishment_in",
     "restart_after_gap",
+    "dispersion_chart_establishment",
     "na_ends_run",
     "max_exclusions",
     "mr_screen_max_loops",
@@ -378,6 +379,8 @@ assemble_chart_list <- function(
     force_restart_at = autospc_default("force_restart_at"),
     prevent_establishment_in = autospc_default("prevent_establishment_in"),
     restart_after_gap = autospc_default("restart_after_gap"),
+    dispersion_chart_establishment =
+      autospc_default("dispersion_chart_establishment"),
     na_ends_run = autospc_default("na_ends_run"),
     max_exclusions = autospc_default("max_exclusions"),
     mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
@@ -398,6 +401,11 @@ assemble_chart_list <- function(
   }
 
   floating_median <- match_choice(floating_median, "floating_median")
+
+  dispersion_chart_establishment <- match_choice(
+    dispersion_chart_establishment,
+    "dispersion_chart_establishment"
+  )
 
   # prevent_establishment_in may be given as one range of x values in which
   # limits may not be established, or as a list of such ranges. One range is
@@ -423,6 +431,7 @@ assemble_chart_list <- function(
     force_restart_at = force_restart_at,
     prevent_establishment_in = prevent_establishment_in,
     restart_after_gap = restart_after_gap,
+    dispersion_chart_establishment = dispersion_chart_establishment,
     na_ends_run = na_ends_run,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,

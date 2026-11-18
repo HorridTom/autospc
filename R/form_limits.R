@@ -1,14 +1,10 @@
 # Function to form calculation limits for a period
-# data has columns x and series
+# data has columns x and series; the period is the period_length rows of data
+# starting at row counter
 form_calculation_limits <- function(data,
                                     counter,
+                                    period_length,
                                     chart) {
-  if (counter == 1L) {
-    period_length <- baseline_period_length(chart, data = data)
-  } else {
-    period_length <- chart$period_min
-  }
-
   exclusion_points <- find_extremes(
     data = data,
     chart = chart,
@@ -167,23 +163,18 @@ form_display_limits <- function(limits_table, counter, chart) {
 form_calculation_and_display_limits <- function(
     data,
     counter_at_period_start,
+    period_length,
     chart) {
   # form calculation limits for first period
   limits_table <- form_calculation_limits(
     data = data,
     counter = counter_at_period_start,
+    period_length = period_length,
     chart = chart
   )
 
 
   # extend display limits to end
-
-  if (counter_at_period_start == 1L) {
-    period_length <- baseline_period_length(chart, data = data)
-  } else {
-    period_length <- chart$period_min
-  }
-
   limits_table <- form_display_limits(
     limits_table = limits_table,
     counter = counter_at_period_start +
@@ -200,4 +191,77 @@ form_calculation_and_display_limits <- function(
   )
 
   return(limits_table)
+}
+
+
+#' Form limits over calculation periods specified in advance
+#'
+#' Takes calculation periods as given, and for each in turn forms
+#' calculation limits from the period's points, applies display limits for
+#' subsequent points prior to the next period, and marks the rule breaks, in the
+#' same way as the algorithm does for a period it establishes. The last period's
+#' display limits run to the end of `data`.
+#'
+#' @param data A data frame with one row per point of the series that holds an
+#'   observation, in order of `x`, as `compact_series()` returns it. It has the
+#'   columns `x` and `series`, and any others the chart's limit calculation
+#'   reads, such as `n` for a P chart.
+#' @param periods A data frame with one row per calculation period, in order of
+#'   `x`, and the columns `first_x` and `last_x`. A period holds every row of
+#'   `data` whose `x` is at least `first_x` and at most `last_x`, so both end
+#'   points are included. The first period also holds any rows of `data` before
+#'   its `first_x`, so that it starts at the first row of `data`. Each period
+#'   holds at least one row of `data`.
+#' @param chart The chart being analysed.
+#'
+#' @return `data`, one row per row, with the centre line, the limits, the period
+#'   type, the excluded points and the rule breaks added.
+#' @noRd
+form_limits_over_periods <- function(data,
+                                     periods,
+                                     chart) {
+  limits_table <- data
+
+  for (period in seq_len(nrow(periods))) {
+    in_period <- data$x >= periods$first_x[[period]] &
+      data$x <= periods$last_x[[period]]
+
+    if (period == 1L) {
+      counter <- 1L
+      period_length <- max(which(in_period))
+    } else {
+      counter <- which(in_period)[[1L]]
+      period_length <- sum(in_period)
+    }
+
+    limits_table <- form_calculation_and_display_limits(
+      data = limits_table,
+      counter_at_period_start = counter,
+      period_length = period_length,
+      chart = chart
+    )
+  }
+
+  return(limits_table)
+}
+
+
+#' The calculation periods in an analysed table
+#'
+#' @param table An analysed table, as `chart$result$table` holds it.
+#'
+#' @return A data frame with one row per calculation period, in order of `x`:
+#'   `first_x` and `last_x`, the `x` of the period's first and last rows, both
+#'   rows being part of the period.
+#' @noRd
+calculation_periods <- function(table) {
+  return(
+    table %>%
+      dplyr::filter(period_type == "calculation") %>%
+      dplyr::group_by(plot_period) %>%
+      dplyr::summarise(first_x = min(x), last_x = max(x)) %>%
+      dplyr::arrange(first_x) %>%
+      dplyr::select(first_x, last_x) %>%
+      as.data.frame()
+  )
 }

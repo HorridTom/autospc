@@ -128,14 +128,16 @@ analyse_segment <- function(chart,
     ))
   } else {
     # [2] There are enough data points to form one period
+    baseline_rows <- baseline_period_length(chart, data = observed_data)
+
     limits_table <- form_calculation_and_display_limits(
       data = observed_data,
       counter_at_period_start = counter,
+      period_length = baseline_rows,
       chart = chart
     )
 
     # Set counter to first point after end of first period
-    baseline_rows <- baseline_period_length(chart, data = observed_data)
     chart$history$baseline <- list(length = baseline_rows)
     counter <- counter + baseline_rows
     chart <- record_counter_move(chart,
@@ -280,6 +282,7 @@ analyse_segment <- function(chart,
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
                 counter_at_period_start = counter,
+                period_length = chart$period_min,
                 chart = chart
               )
 

@@ -84,17 +84,16 @@ form_calculation_limits <- function(data,
         break_point
       )
   } else {
-    # copy the new period's values into its rows of data, replacing the display
-    # limits there. calculation_period was taken from data starting at row
-    # counter, so its rows are rows counter onwards of data. A missing value
-    # leaves the value already there, and rows beyond the end of data are
-    # skipped
+    # copy the new period's values into its rows of data, missing values
+    # included, replacing the display limits there. calculation_period was
+    # taken from data starting at row counter, so its rows are rows counter
+    # onwards of data. Rows beyond the end of data are skipped
     limits_table <- data
     rows <- counter:(counter + nrow(calculation_period) - 1L)
+    in_table <- rows <= nrow(limits_table)
     for (column in setdiff(names(calculation_period), "x")) {
       new <- calculation_period[[column]]
-      has_value <- !is.na(new) & rows <= nrow(limits_table)
-      limits_table[[column]][rows[has_value]] <- new[has_value]
+      limits_table[[column]][rows[in_table]] <- new[in_table]
     }
 
     # the first row of the new period is a break point

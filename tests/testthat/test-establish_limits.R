@@ -369,3 +369,83 @@ test_that("no break disappears when a point is added to the series", {
     )
   ))
 })
+
+
+# a period with no standard deviation estimate
+
+
+test_that("a C' chart re-establishes limits after a first period with no variation", {
+  # every point of the first period is 0, so sigma_z is 0/0
+  set.seed(1)
+  data <- data.frame(x = 1:60, y = c(rep(0, 30), stats::rpois(30, 70)))
+
+  table <- autospc(data,
+    chart_type = "C'",
+    max_exclusions = 3L,
+    plot_chart = FALSE
+  )
+
+  expect_identical(which(table$break_point %in% TRUE), 31L)
+  expect_identical(table$cl[22:30], rep(0, 9L))
+  expect_true(all(is.na(table$ucl[1:30])))
+  expect_equal(table$cl[31], 72.66667, tolerance = 1e-6)
+})
+
+
+test_that("a P' chart re-establishes limits after a first period at 100%", {
+  set.seed(2)
+  data <- data.frame(
+    x = 1:60,
+    y = c(rep(100L, 30), stats::rbinom(30, 100, 0.8)),
+    n = 100L
+  )
+
+  table <- autospc(data,
+    chart_type = "P'",
+    max_exclusions = 3L,
+    plot_chart = FALSE
+  )
+
+  expect_identical(which(table$break_point %in% TRUE), 31L)
+  expect_identical(table$cl[22:30], rep(100, 9L))
+})
+
+
+test_that("a later C' period with no variation keeps its centre line and has no limits", {
+  set.seed(3)
+  data <- data.frame(x = 1:70, y = c(stats::rpois(30, 40), rep(0L, 40)))
+
+  table <- autospc(data,
+    chart_type = "C'",
+    max_exclusions = 3L,
+    plot_chart = FALSE
+  )
+
+  expect_identical(which(table$break_point %in% TRUE), 31L)
+  expect_identical(table$cl[31:70], rep(0, 40L))
+  expect_true(all(is.na(table$ucl[31:70])))
+  expect_true(all(is.na(table$lcl[31:70])))
+  # the earlier period's limits are not carried into it
+  expect_false(is.na(table$ucl[30]))
+})
+
+
+test_that("an Xbar period of subgroups of one has no sbar, and the subgroups after it no limits", {
+  set.seed(1)
+  data <- rbind(
+    data.frame(x = rep(1:30, each = 4L), y = stats::rnorm(120, 10)),
+    data.frame(x = 31:70, y = stats::rnorm(40, 20)),
+    data.frame(x = rep(71:75, each = 4L), y = stats::rnorm(20, 20))
+  )
+
+  plot <- autospc(data, chart_type = "Xbar", max_exclusions = 3L)
+  table <- autospc_plot_charts(plot)[[1]]$result$table
+
+  expect_identical(which(table$break_point %in% TRUE), 31L)
+  expect_true(all(is.na(table$sbar[31:75])))
+  # x = 71 to 75 are subgroups of four, in the display rows of the period that
+  # starts at x = 31
+  expect_identical(table$period_type[71:75], rep("display", 5L))
+  expect_true(all(is.na(table$ucl[71:75])))
+  expect_identical(table$cl[71:75], rep(table$cl[31], 5L))
+})

@@ -121,8 +121,41 @@ test_that("period_statistics is NULL where a column is absent", {
 })
 
 
-test_that("period_statistics is NULL where no row holds both", {
+test_that("period_statistics gives the centre line and no estimate where no row holds both", {
   rows <- data.frame(cl = c(10, NA_real_), sd_estimate = c(NA_real_, 150))
+
+  expect_identical(
+    period_statistics(rows),
+    list(cl = 10, sd_estimate = NA_real_)
+  )
+
+  # a C' period with no variation, whose estimate is 0/0
+  no_variation <- data.frame(cl = c(0, 0), sd_estimate = c(NaN, NaN))
+
+  expect_identical(
+    period_statistics(no_variation),
+    list(cl = 0, sd_estimate = NA_real_)
+  )
+})
+
+
+test_that("period_statistics gives sbar as NA where no row holds an estimate or sbar", {
+  # an Xbar period made up only of subgroups of one
+  rows <- data.frame(
+    cl = c(19.7, 19.7),
+    sd_estimate = c(NA_real_, NA_real_),
+    sbar = c(NA_real_, NA_real_)
+  )
+
+  expect_identical(
+    period_statistics(rows),
+    list(cl = 19.7, sd_estimate = NA_real_, sbar = NA_real_)
+  )
+})
+
+
+test_that("period_statistics is NULL where no row holds a centre line", {
+  rows <- data.frame(cl = c(NA_real_, NA_real_), sd_estimate = c(4, 4))
 
   expect_null(period_statistics(rows))
 })

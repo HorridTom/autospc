@@ -86,6 +86,7 @@ form_calculation_limits <- function(data,
         period_type, excluded,
         dplyr::any_of("run_break"),
         dplyr::any_of("log"),
+        dplyr::any_of("dispersion_observed"),
         break_point
       )
   } else {
@@ -115,7 +116,8 @@ form_calculation_limits <- function(data,
       "period_type", "excluded",
       containing("break_point"), containing("rule"),
       containing("above_or_below"), containing("highlight"),
-      containing("run"), intersect("log", columns)
+      containing("run"), intersect("log", columns),
+      intersect("dispersion_observed", columns)
     ))]
   }
 

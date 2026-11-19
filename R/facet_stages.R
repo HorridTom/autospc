@@ -126,7 +126,16 @@ facet_stages <- function(data,
   }
 
   # facet_stages() draws no pairs, so a pair is faceted as its location chart.
+  # Each facet is analysed as the pair where dispersion_chart_establishment is
+  # not "independent", because "shared" changes the location chart's periods.
   chart_type <- location_chart_type(arguments$chart_type)
+  facet_chart_type <- if (
+    arguments$chart_type %in% names(autospc_pair_types()) &&
+      !identical(arguments$dispersion_chart_establishment, "independent")) {
+    arguments$chart_type
+  } else {
+    chart_type
+  }
 
   # Construct one chart from the whole series. It is not analysed: it is
   # constructed for chart$data, which has the columns renamed to x, y, n and s,
@@ -176,7 +185,7 @@ facet_stages <- function(data,
       # The split came from the chart of the whole series, so its columns are
       # already named x, y, n and s.
       facet <- rlang::exec(build_charts,
-        chart_type = chart_type,
+        chart_type = facet_chart_type,
         data = split,
         x = "x",
         y = "y",

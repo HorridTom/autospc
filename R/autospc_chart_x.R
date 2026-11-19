@@ -96,6 +96,32 @@ autospc_chart_x <- function(data,
 # No aggregate_data() method: X charts plot the observations as supplied, so the
 # superclass default - return the chart unchanged - is the correct behaviour.
 
+#' The rows of a segment where the MR chart has a value
+#'
+#' A moving range has a value where the point and the point before it in the
+#' segment both have a value.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+dispersion_observed_rows.autospc_chart_x <- function(chart,
+                                                     data) {
+  return(!is.na(data$series) & !is.na(dplyr::lag(data$series)))
+}
+
+
+#' The number of points the MR chart has in a calculation period of each length
+#'
+#' One more than the moving ranges with a value after the first row of the
+#' period, as `n_effective_points()` counts an MR chart's points. The moving
+#' range at the first row is excluded from the period's calculation.
+#'
+#' @return An integer vector the length of `available`.
+#' @noRd
+dispersion_point_counts.autospc_chart_x <- function(chart,
+                                                    available) {
+  return(1L + cumsum(available) - available[[1L]])
+}
+
 #' Calculate control limits for a subset of X-chart data
 #'
 #' Centre line is the mean of the non-excluded points, with the standard

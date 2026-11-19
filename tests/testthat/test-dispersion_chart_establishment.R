@@ -472,3 +472,233 @@ test_that("the S chart has limits where only a later segment has S points in a p
   expect_true(all(is.na(s_cl_at(charts, 1:30))))
   expect_false(anyNA(s_cl_at(charts, 31:60)))
 })
+
+
+# dispersion_chart_establishment = "shared": each calculation period is extended
+# until both charts have period_min points in it, and both charts use it.
+
+per_periods <- function(chart) {
+  return(calculation_periods(chart$result$table))
+}
+
+
+test_that("shared extends the X chart's periods until the MR chart has period_min points", {
+  charts <- pair(gapped_series,
+    chart_type = "XMR",
+    dispersion_chart_establishment = "shared"
+  )
+
+  # x = 5 and 92 are missing, so the periods containing them hold 19 moving
+  # ranges in 22 rows, and are extended by one row
+  expect_identical(
+    per_periods(charts$location),
+    data.frame(first_x = c(1L, 53L, 74L), last_x = c(23L, 73L, 96L))
+  )
+  expect_identical(per_periods(charts$dispersion), per_periods(charts$location))
+  expect_identical(charts$location$history$baseline$length, 22L)
+
+  # the counter moves to the first row after each extended period
+  moves <- charts$location$history$counter_path
+  moves <- moves[moves$reason %in% c(
+    "first period established", "limits re-established"
+  ), ]
+  expect_identical(moves$to, c(24L, 74L, 97L))
+})
+
+
+test_that("shared extends the Xbar chart's periods until the S chart has period_min points", {
+  charts <- pair(subgroup_series,
+    chart_type = "XbarS",
+    dispersion_chart_establishment = "shared"
+  )
+
+  # subgroups of one at x = 5 and 12 in the first period, and 46 and 60 in the
+  # second
+  expect_identical(
+    per_periods(charts$location),
+    data.frame(first_x = c(1L, 46L), last_x = c(23L, 68L))
+  )
+  expect_identical(per_periods(charts$dispersion), per_periods(charts$location))
+})
+
+
+test_that("shared gives the same charts as forced where the dispersion chart has a point wherever the location chart does", {
+  complete <- subgroup_series[!subgroup_series$x %in% c(5L, 12L, 46L, 60L), ]
+
+  for (case in list(
+    list(example_series_1, chart_type = "XMR"),
+    list(complete, chart_type = "XbarS")
+  )) {
+    forced <- rlang::exec(pair, !!!case,
+      dispersion_chart_establishment = "forced"
+    )
+    shared <- rlang::exec(pair, !!!case,
+      dispersion_chart_establishment = "shared"
+    )
+
+    expect_identical(
+      shared$location$result$table,
+      forced$location$result$table
+    )
+    expect_identical(
+      shared$dispersion$result$table,
+      forced$dispersion$result$table
+    )
+  }
+})
+
+
+test_that("shared does not re-establish where the dispersion chart has too few points after the shift", {
+  # subgroups of four to x = 30, then around 20 with every other subgroup a
+  # subgroup of one
+  set.seed(8)
+  data <- rbind(
+    data.frame(x = rep(1:30, each = 4L), y = stats::rnorm(120L, mean = 10)),
+    do.call(rbind, lapply(31:60, function(x) {
+      data.frame(x = x, y = stats::rnorm(if (x %% 2L == 0L) 1L else 4L, 20))
+    }))
+  )
+
+  forced <- pair(data,
+    chart_type = "XbarS",
+    dispersion_chart_establishment = "forced"
+  )
+  shared <- pair(data,
+    chart_type = "XbarS",
+    dispersion_chart_establishment = "shared"
+  )
+
+  expect_identical(per_periods(forced$location)$first_x, c(1L, 27L))
+  expect_identical(per_periods(shared$location)$first_x, 1L)
+  expect_identical(
+    shared$location$history$stopped$reason,
+    "too few points after the shift rule break"
+  )
+})
+
+
+test_that("a first period whose dispersion chart never has baseline_length points runs to the end of the data", {
+  chart <- autospc_chart_x(
+    data = data.frame(x = 1:50, y = 1:50),
+    x = "x",
+    y = "y",
+    baseline_length = 40L,
+    dispersion_chart_establishment = "shared"
+  )
+  # 30 moving ranges in 50 rows: the MR chart has 31 points, fewer than 40
+  data <- data.frame(
+    x = 1:50,
+    dispersion_observed = c(FALSE, rep(TRUE, 30), rep(FALSE, 19))
+  )
+
+  expect_identical(calculation_period_length(chart, data, counter = 1L), 50L)
+})
+
+
+test_that("an X chart drawn alone ignores shared", {
+  alone <- autospc(gapped_series,
+    chart_type = "X",
+    max_exclusions = 3L,
+    plot_chart = FALSE
+  )
+  shared <- suppressWarnings(
+    autospc(gapped_series,
+      chart_type = "X",
+      max_exclusions = 3L,
+      dispersion_chart_establishment = "shared",
+      plot_chart = FALSE
+    ),
+    classes = "autospc_dispersion_chart_establishment_ignored_warning"
+  )
+
+  expect_identical(shared, alone)
+})
+
+
+test_that("facet_stages analyses each facet as the pair under shared", {
+  facets <- function(mode) {
+    table <- facet_stages(gapped_series,
+      split_at = 60L,
+      chart_type = "XMR",
+      dispersion_chart_establishment = mode,
+      max_exclusions = 3L,
+      plot_chart = FALSE
+    )
+
+    return(
+      table %>%
+        dplyr::filter(period_type == "calculation") %>%
+        dplyr::group_by(stage, plot_period) %>%
+        dplyr::summarise(
+          first_x = min(x),
+          last_x = max(x),
+          .groups = "drop"
+        ) %>%
+        dplyr::arrange(stage, first_x) %>%
+        dplyr::select(stage, first_x, last_x) %>%
+        as.data.frame()
+    )
+  }
+
+  expect_identical(
+    facets("independent")$last_x,
+    c(22L, 22L, 73L, 95L)
+  )
+  expect_identical(
+    facets("shared")$last_x,
+    c(23L, 23L, 73L, 96L)
+  )
+})
+
+
+test_that("under shared, the next candidate starts after the extended period", {
+  # a shift up at x = 22, with x = 26 missing, so that its period is extended
+  # by one row to x = 44, and a further shift up starting at x = 44
+  y <- c(
+    rep(c(9, 11), length.out = 21L),
+    rep(c(19, 21), length.out = 22L),
+    rep(c(29, 31), length.out = 26L)
+  )
+  y[26L] <- NA
+  data <- data.frame(x = seq_along(y), y = y)
+
+  charts <- pair(data,
+    chart_type = "XMR",
+    dispersion_chart_establishment = "shared",
+    no_regrets = FALSE,
+    na_ends_run = FALSE,
+    max_exclusions = 0L
+  )
+
+  expect_identical(
+    per_periods(charts$location),
+    data.frame(first_x = c(1L, 22L, 45L), last_x = c(21L, 44L, 65L))
+  )
+})
+
+
+test_that("under shared, an opposite rule break in the extension rows is found", {
+  # a shift up at x = 22, with x = 24 and 30 missing, so that its period is
+  # extended by two rows to x = 46, and a run of eight below its centre line
+  # at x = 39 to 46, which ends in the extension rows
+  y <- c(
+    rep(c(9, 11), length.out = 21L),
+    rep(c(21, 23), length.out = 17L),
+    rep(c(15, 17), length.out = 8L)
+  )
+  y[c(24L, 30L)] <- NA
+  data <- data.frame(x = seq_along(y), y = y)
+
+  table <- autospc(data,
+    chart_type = "XMR",
+    dispersion_chart_establishment = "shared",
+    overhanging_reversions = FALSE,
+    no_regrets = FALSE,
+    na_ends_run = FALSE,
+    max_exclusions = 0L,
+    plot_chart = FALSE
+  )
+
+  expect_identical(which(table$break_point %in% TRUE), integer(0))
+})
+

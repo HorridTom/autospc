@@ -107,6 +107,10 @@ segment_data <- function(chart,
 
   data$series[rows %in% gap_restarts(chart)$stranded_points] <- NA
 
+  if (shares_calculation_periods(chart)) {
+    data$dispersion_observed <- dispersion_observed_rows(chart, data = data)
+  }
+
   return(data)
 }
 

@@ -241,6 +241,31 @@ aggregate_data.autospc_chart_xbar <- function(chart) {
 }
 
 
+#' The rows of a segment where the S chart has a value
+#'
+#' A subgroup has a standard deviation where it has a mean and more than one
+#' observation.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+dispersion_observed_rows.autospc_chart_xbar <- function(chart,
+                                                        data) {
+  return(!is.na(data$series) & !is.na(data$s))
+}
+
+
+#' The number of points the S chart has in a calculation period of each length
+#'
+#' The subgroups with a standard deviation.
+#'
+#' @return An integer vector the length of `available`.
+#' @noRd
+dispersion_point_counts.autospc_chart_xbar <- function(chart,
+                                                       available) {
+  return(cumsum(available))
+}
+
+
 #' Calculate control limits for a subset of Xbar-chart data
 #'
 #' The centre line is the mean of the subgroup means weighted by subgroup size,

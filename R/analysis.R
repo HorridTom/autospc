@@ -208,6 +208,10 @@ finish_analysis_table <- function(chart) {
   chart$result$table <- chart$result$table %>%
     dplyr::mutate(restart = dplyr::row_number() %in% restart_at)
 
+  # dispersion_observed is used only while the calculation periods are formed,
+  # where shares_calculation_periods() is TRUE
+  chart$result$table$dispersion_observed <- NULL
+
   chart$result$table <- chart$result$table %>%
     dplyr::select(
       dplyr::all_of(analysis_table_columns(chart)),

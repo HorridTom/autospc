@@ -125,7 +125,10 @@ analyse_segment <- function(chart,
     ))
   } else {
     # [2] There are enough data points to form one period
-    baseline_rows <- baseline_period_length(chart, data = observed_data)
+    baseline_rows <- calculation_period_length(chart,
+      data = observed_data,
+      counter = counter
+    )
 
     limits_table <- form_calculation_and_display_limits(
       data = observed_data,
@@ -272,14 +275,19 @@ analyse_segment <- function(chart,
 
               break
             } else {
-              # [6a] There are sufficient points. Establish candidate limits
-              # using the first period_min points from the counter as
-              # calculation period
+              # [6a] There are sufficient points. Establish candidate limits,
+              # with a calculation period from the counter of the length
+              # calculation_period_length() returns
+
+              candidate_length <- calculation_period_length(chart,
+                data = limits_table,
+                counter = counter
+              )
 
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
                 counter_at_period_start = counter,
-                period_length = chart$period_min,
+                period_length = candidate_length,
                 chart = chart
               )
 
@@ -289,7 +297,7 @@ analyse_segment <- function(chart,
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
                 counter = counter,
-                period_min = chart$period_min,
+                period_min = candidate_length,
                 triggering_rule_break_direction =
                   triggering_rule_break_direction,
                 centre_line_tolerance = chart$centre_line_tolerance,
@@ -325,7 +333,7 @@ analyse_segment <- function(chart,
               # because each one is a copy of the whole limits table and there
               # is one per candidate.
               period_end <- min(
-                counter + chart$period_min - 1L,
+                counter + candidate_length - 1L,
                 nrow(limits_table)
               )
               chart$history$candidates <- c(
@@ -357,12 +365,13 @@ analyse_segment <- function(chart,
 
                 # and set the counter to the first point after the end of the
                 # new calculation period
+                next_counter <- counter + candidate_length
                 chart <- record_counter_move(chart,
                   from = counter,
-                  to = counter + chart$period_min,
+                  to = next_counter,
                   reason = "limits re-established"
                 )
-                counter <- counter + chart$period_min
+                counter <- next_counter
               } else if (!opposite_rule_break &
                 chart$no_regrets == TRUE &
                 final_run_prevents) {

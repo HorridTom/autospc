@@ -194,13 +194,20 @@ build_charts <- function(chart_type,
                          s,
                          ...) {
   chart_types <- autospc_pair_types()[[chart_type]]
+  construct <- autospc_chart
 
   if (is.null(chart_types)) {
     chart_types <- chart_type
+
+    # only the two charts of a pair read dispersion_chart_establishment, so any
+    # other chart is built with "independent", whatever was given
+    construct <- function(..., dispersion_chart_establishment = NULL) {
+      autospc_chart(..., dispersion_chart_establishment = "independent")
+    }
   }
 
   charts <- lapply(chart_types, function(type) {
-    autospc_chart(
+    construct(
       chart_type = type,
       data = data,
       x = x,

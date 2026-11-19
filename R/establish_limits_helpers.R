@@ -13,6 +13,13 @@ enough_data_for_new_period <- function(data,
 
   enough_data <- num_remaining_non_missing_data_points >= chart$period_min
 
+  if (enough_data && shares_calculation_periods(chart)) {
+    dispersion_points <- dispersion_point_counts(chart,
+      available = remaining_data$dispersion_observed
+    )
+    enough_data <- max(dispersion_points) >= chart$period_min
+  }
+
   return(enough_data)
 }
 
@@ -622,6 +629,68 @@ counter_at_rule_break <- function(table,
   result <- sum(!is.na(side) & side != 0L) >= shift_rule_threshold
 
   return(result)
+}
+
+
+#' Whether a chart's calculation periods are extended for its dispersion chart
+#'
+#' TRUE for the location chart of a pair whose `dispersion_chart_establishment`
+#' is "shared". Every other chart records "independent" or has
+#' `location_periods`.
+#'
+#' @param chart The chart being analysed.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+shares_calculation_periods <- function(chart) {
+  return(
+    identical(chart$dispersion_chart_establishment, "shared") &&
+      is.null(chart$location_periods)
+  )
+}
+
+
+#' The number of rows in a calculation period starting at a given row
+#'
+#' `baseline_period_length()` at the first row, and `period_min` at any later
+#' row. Where `shares_calculation_periods()` is TRUE, the period is extended,
+#' one row at a time, until the dispersion chart also has that many points in
+#' it, as `dispersion_point_counts()` counts them. A first period whose
+#' dispersion chart never has that many points runs to the end of `data`.
+#'
+#' @param chart The chart being analysed.
+#' @param data The series being analysed, one row per point with an
+#'   observation, with the column `dispersion_observed` where
+#'   `shares_calculation_periods()` is TRUE.
+#' @param counter The row of `data` at which the period starts.
+#'
+#' @return The number of rows of `data` in the period.
+#' @noRd
+calculation_period_length <- function(chart,
+                                      data,
+                                      counter) {
+  if (counter == 1L) {
+    period_length <- baseline_period_length(chart, data = data)
+    points_needed <- chart$baseline_length
+  } else {
+    period_length <- chart$period_min
+    points_needed <- chart$period_min
+  }
+
+  if (!shares_calculation_periods(chart)) {
+    return(period_length)
+  }
+
+  counts <- dispersion_point_counts(chart,
+    available = data$dispersion_observed[seq(counter, nrow(data))]
+  )
+  enough <- which(counts >= points_needed)
+
+  if (length(enough) == 0L) {
+    return(nrow(data) - counter + 1L)
+  }
+
+  return(max(period_length, enough[[1L]]))
 }
 
 

@@ -162,6 +162,19 @@ observed_rows.autospc_chart_mr <- function(chart,
 }
 
 
+#' Whether the point at the start of a mirrored calculation period is excluded
+#' from that period's calculation
+#'
+#' Excluded: the moving range at the start of the period is the difference
+#' between the period's first value and the last value before the period.
+#'
+#' @return TRUE
+#' @noRd
+mirrored_period_start_excluded.autospc_chart_mr <- function(chart) {
+  return(TRUE)
+}
+
+
 #' Number of points available for analysis
 #'
 #' One more than the non-missing moving ranges. `moving_ranges()` prepends `NA`,

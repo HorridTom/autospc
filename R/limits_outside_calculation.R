@@ -73,10 +73,15 @@ limits_at_rows <- function(chart,
 #' size, one `sbar`, so any such row serves. A subgroup of one on an Xbar chart
 #' holds `sbar` but no estimate, because the estimate is formed at its size.
 #'
+#' Where no row holds either, the period has no standard deviation estimate,
+#' such as an Xbar period of subgroups of one, or a C' period with no variation:
+#' the centre line is read from the first row that holds one, and the standard
+#' deviation estimate and `sbar` are NA.
+#'
 #' @param rows Rows of a limits table.
 #'
 #' @return list of single values named cl and sd_estimate, and sbar where the
-#'   table has it, or NULL where no row holds them
+#'   table has it, or NULL where no row holds a centre line
 #' @noRd
 period_statistics <- function(rows) {
   if (!all(c("cl", "sd_estimate") %in% names(rows))) {
@@ -92,7 +97,22 @@ period_statistics <- function(rows) {
   holding <- which(holding)
 
   if (length(holding) == 0L) {
-    return(NULL)
+    with_cl <- which(!is.na(rows$cl))
+
+    if (length(with_cl) == 0L) {
+      return(NULL)
+    }
+
+    statistics <- list(
+      cl = as.numeric(rows$cl[with_cl[1L]]),
+      sd_estimate = NA_real_
+    )
+
+    if ("sbar" %in% names(rows)) {
+      statistics$sbar <- NA_real_
+    }
+
+    return(statistics)
   }
 
   first <- holding[1L]

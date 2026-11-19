@@ -141,6 +141,33 @@ validate_algorithm_parameters <- function(arguments,
 }
 
 
+#' Warn that `dispersion_chart_establishment` has no effect on a chart type
+#'
+#' Called by `autospc()` and `facet_stages()` when the caller set
+#' `dispersion_chart_establishment`. Warns where `chart_type` is not a pair,
+#' because only the dispersion chart of a pair reads the argument.
+#'
+#' @param chart_type The chart type the caller gave, already accepted by
+#'   `validate_chart_type()`.
+#'
+#' @return NULL, invisibly.
+#' @noRd
+warn_dispersion_chart_establishment_ignored <- function(chart_type) {
+  if (!chart_type %in% names(autospc_pair_types())) {
+    rlang::warn(
+      paste0(
+        "`dispersion_chart_establishment` applies only to the pairs \"",
+        paste(names(autospc_pair_types()), collapse = "\" and \""),
+        "\", so it is ignored for chart_type = \"", chart_type, "\"."
+      ),
+      class = "autospc_dispersion_chart_establishment_ignored_warning"
+    )
+  }
+
+  return(invisible(NULL))
+}
+
+
 #' Stop unless a column is present in the data
 #'
 #' The error text is passed in as `message` so that each class can give the
@@ -1164,6 +1191,12 @@ validate_argument_values <- function(arguments,
   arguments$floating_median_labels <- match_choice(
     arguments$floating_median_labels,
     "floating_median_labels",
+    call = call
+  )
+
+  arguments$dispersion_chart_establishment <- match_choice(
+    arguments$dispersion_chart_establishment,
+    "dispersion_chart_establishment",
     call = call
   )
 

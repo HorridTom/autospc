@@ -25,6 +25,7 @@ chart_argument_alternatives <- list(
   # the chart as a list containing it
   prevent_establishment_in = list(c(5, 10)),
   restart_after_gap = 3L,
+  dispersion_chart_establishment = "forced",
   na_ends_run = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,
@@ -87,6 +88,12 @@ test_that("every chart parameter autospc takes reaches the chart", {
         )
       )
       expected <- validated$overhanging_reversions
+    }
+
+    # a C chart is not half of a pair, so records "independent" whatever it
+    # is given; test-argument_values.R tests the value on both charts of a pair
+    if (identical(parameter, "dispersion_chart_establishment")) {
+      expected <- "independent"
     }
 
     expect_identical(autospc_plot_charts(from_autospc)[[1]][[parameter]],

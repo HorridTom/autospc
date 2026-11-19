@@ -13,6 +13,13 @@ enough_data_for_new_period <- function(data,
 
   enough_data <- num_remaining_non_missing_data_points >= chart$period_min
 
+  if (enough_data && shares_calculation_periods(chart)) {
+    dispersion_points <- dispersion_point_counts(chart,
+      available = remaining_data$dispersion_observed
+    )
+    enough_data <- max(dispersion_points) >= chart$period_min
+  }
+
   return(enough_data)
 }
 
@@ -21,21 +28,30 @@ enough_data_for_new_period <- function(data,
 #'
 #' Whether the prepared series is long enough for the algorithm to form one
 #' calculation period, at the first point of the series or at any forced
-#' restart. Read from `chart$data` and the chart's parameters.
+#' restart. Read from `chart$data` and the chart's parameters. For a chart with
+#' `location_periods`: whether at least one of those periods has a point with a
+#' value on this chart.
 #'
 #' @return TRUE or FALSE
 #' @noRd
 enough_data_for_limits <- function(chart) {
   segments <- segment_rows(chart)
 
+  if (!is.null(chart$location_periods)) {
+    for (segment in seq_along(segments)) {
+      if (location_period_has_value(chart, rows = segments[[segment]])) {
+        return(TRUE)
+      }
+    }
+
+    return(FALSE)
+  }
+
   enough <- vapply(
     seq_along(segments),
     function(segment) {
       enough_data_for_new_period(
-        data = segment_data(chart,
-          rows = segments[[segment]],
-          first_segment = segment == 1L
-        ),
+        data = segment_data(chart, rows = segments[[segment]]),
         counter = 1L,
         chart = chart
       )
@@ -47,17 +63,49 @@ enough_data_for_limits <- function(chart) {
 }
 
 
+#' Whether a period in `location_periods` has a point with a value in a segment
+#'
+#' @param chart The chart being analysed, with `location_periods`.
+#' @param rows The rows of `chart$data` that make up the segment.
+#'
+#' @return TRUE where a point of the segment with a value has an `x` from the
+#'   `first_x` to the `last_x` of one of the location chart's periods that start
+#'   in the segment; otherwise FALSE.
+#' @noRd
+location_period_has_value <- function(chart,
+                                      rows) {
+  data <- segment_data(chart, rows = rows)
+  periods <- segment_location_periods(chart, data = data)
+  x_with_value <- data$x[!is.na(data$series)]
+
+  for (period in seq_len(nrow(periods))) {
+    in_period <- x_with_value >= periods$first_x[[period]] &
+      x_with_value <= periods$last_x[[period]]
+
+    if (any(in_period)) {
+      return(TRUE)
+    }
+  }
+
+  return(FALSE)
+}
+
+
 # Function to find most extreme points outside of control limits and return
 # their positions
 # period_length is the length of *this* period, which is baseline_length for
 # the first one, so it is not chart$period_min and cannot be read off the chart.
+# excluded_first: positions in the period that are excluded before any extreme
+# is looked for. They are returned with the extremes, and do not count towards
+# max_exclusions.
 find_extremes <- function(data,
                           chart,
                           counter,
-                          period_length) {
+                          period_length,
+                          excluded_first = integer(0)) {
   # initialise variables
   i <- 1
-  exclusion_points <- NULL
+  exclusion_points <- if (length(excluded_first) > 0L) excluded_first else NULL
   furthest_extremes <- NULL
 
   while (i <= chart$max_exclusions) {
@@ -110,8 +158,11 @@ find_extremes <- function(data,
 
   # Check whether there are more than max_exclusions exclusion points (due to
   # ties)
-  if (length(exclusion_points) > chart$max_exclusions) {
-    exclusion_points <- exclusion_points[1:chart$max_exclusions]
+  if (length(exclusion_points) >
+    length(excluded_first) + chart$max_exclusions) {
+    exclusion_points <- exclusion_points[
+      seq_len(length(excluded_first) + chart$max_exclusions)
+    ]
   }
 
   if (length(exclusion_points) == 0) {
@@ -578,6 +629,68 @@ counter_at_rule_break <- function(table,
   result <- sum(!is.na(side) & side != 0L) >= shift_rule_threshold
 
   return(result)
+}
+
+
+#' Whether a chart's calculation periods are extended for its dispersion chart
+#'
+#' TRUE for the location chart of a pair whose `dispersion_chart_establishment`
+#' is "shared". Every other chart records "independent" or has
+#' `location_periods`.
+#'
+#' @param chart The chart being analysed.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+shares_calculation_periods <- function(chart) {
+  return(
+    identical(chart$dispersion_chart_establishment, "shared") &&
+      is.null(chart$location_periods)
+  )
+}
+
+
+#' The number of rows in a calculation period starting at a given row
+#'
+#' `baseline_period_length()` at the first row, and `period_min` at any later
+#' row. Where `shares_calculation_periods()` is TRUE, the period is extended,
+#' one row at a time, until the dispersion chart also has that many points in
+#' it, as `dispersion_point_counts()` counts them. A first period whose
+#' dispersion chart never has that many points runs to the end of `data`.
+#'
+#' @param chart The chart being analysed.
+#' @param data The series being analysed, one row per point with an
+#'   observation, with the column `dispersion_observed` where
+#'   `shares_calculation_periods()` is TRUE.
+#' @param counter The row of `data` at which the period starts.
+#'
+#' @return The number of rows of `data` in the period.
+#' @noRd
+calculation_period_length <- function(chart,
+                                      data,
+                                      counter) {
+  if (counter == 1L) {
+    period_length <- baseline_period_length(chart, data = data)
+    points_needed <- chart$baseline_length
+  } else {
+    period_length <- chart$period_min
+    points_needed <- chart$period_min
+  }
+
+  if (!shares_calculation_periods(chart)) {
+    return(period_length)
+  }
+
+  counts <- dispersion_point_counts(chart,
+    available = data$dispersion_observed[seq(counter, nrow(data))]
+  )
+  enough <- which(counts >= points_needed)
+
+  if (length(enough) == 0L) {
+    return(nrow(data) - counter + 1L)
+  }
+
+  return(max(period_length, enough[[1L]]))
 }
 
 

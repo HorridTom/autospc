@@ -87,6 +87,11 @@ validate_autospc_chart <- function(x) {
 #' data_original is a derived field retaining (by convention only) a copy of the
 #' data passed by the user
 #'
+#' location_periods is NULL except on the dispersion chart of a pair whose
+#' `dispersion_chart_establishment` is not "independent". There it is the
+#' location chart's calculation periods, in the form `calculation_periods()`
+#' returns, and the dispersion chart's calculation periods are these periods.
+#'
 #' @return A character vector of element names.
 #' @noRd
 autospc_chart_elements <- function() {
@@ -105,6 +110,7 @@ autospc_chart_elements <- function() {
     "force_restart_at",
     "prevent_establishment_in",
     "restart_after_gap",
+    "dispersion_chart_establishment",
     "na_ends_run",
     "max_exclusions",
     "mr_screen_max_loops",
@@ -114,6 +120,7 @@ autospc_chart_elements <- function() {
     "extend_limits_to",
     "keep_candidate_tables",
     "data_original",
+    "location_periods",
     # the analysis
     "result",
     "history"
@@ -157,7 +164,7 @@ autospc_chart_parameters <- function() {
     autospc_chart_elements(),
     c(
       "data", "x", "y", "n",
-      "data_original", "result", "history"
+      "data_original", "location_periods", "result", "history"
     )
   ))
 }
@@ -187,13 +194,20 @@ build_charts <- function(chart_type,
                          s,
                          ...) {
   chart_types <- autospc_pair_types()[[chart_type]]
+  construct <- autospc_chart
 
   if (is.null(chart_types)) {
     chart_types <- chart_type
+
+    # only the two charts of a pair read dispersion_chart_establishment, so any
+    # other chart is built with "independent", whatever was given
+    construct <- function(..., dispersion_chart_establishment = NULL) {
+      autospc_chart(..., dispersion_chart_establishment = "independent")
+    }
   }
 
   charts <- lapply(chart_types, function(type) {
-    autospc_chart(
+    construct(
       chart_type = type,
       data = data,
       x = x,
@@ -378,6 +392,8 @@ assemble_chart_list <- function(
     force_restart_at = autospc_default("force_restart_at"),
     prevent_establishment_in = autospc_default("prevent_establishment_in"),
     restart_after_gap = autospc_default("restart_after_gap"),
+    dispersion_chart_establishment =
+      autospc_default("dispersion_chart_establishment"),
     na_ends_run = autospc_default("na_ends_run"),
     max_exclusions = autospc_default("max_exclusions"),
     mr_screen_max_loops = autospc_default("mr_screen_max_loops"),
@@ -398,6 +414,11 @@ assemble_chart_list <- function(
   }
 
   floating_median <- match_choice(floating_median, "floating_median")
+
+  dispersion_chart_establishment <- match_choice(
+    dispersion_chart_establishment,
+    "dispersion_chart_establishment"
+  )
 
   # prevent_establishment_in may be given as one range of x values in which
   # limits may not be established, or as a list of such ranges. One range is
@@ -423,6 +444,7 @@ assemble_chart_list <- function(
     force_restart_at = force_restart_at,
     prevent_establishment_in = prevent_establishment_in,
     restart_after_gap = restart_after_gap,
+    dispersion_chart_establishment = dispersion_chart_establishment,
     na_ends_run = na_ends_run,
     max_exclusions = max_exclusions,
     mr_screen_max_loops = mr_screen_max_loops,
@@ -433,6 +455,7 @@ assemble_chart_list <- function(
     keep_candidate_tables = keep_candidate_tables,
     # derived fields
     data_original = data,
+    location_periods = NULL,
     # the analysis, empty until the algorithm runs
     result = list(),
     history = list()
@@ -503,6 +526,19 @@ observed_rows.autospc_chart <- function(chart,
                                         data,
                                         location = FALSE) {
   return(!is.na(data$series))
+}
+
+
+#' Whether the point at the start of a mirrored calculation period is excluded
+#' from that period's calculation
+#'
+#' Not excluded: the point at the start of the period is included in the
+#' period's calculation, as every other point is.
+#'
+#' @return FALSE
+#' @noRd
+mirrored_period_start_excluded.autospc_chart <- function(chart) {
+  return(FALSE)
 }
 
 
@@ -736,6 +772,13 @@ print.autospc_chart <- function(x, ...) {
   cat("\nCalculation periods\n")
   cat(format_calculation_periods(x$result$table), sep = "\n")
 
+  if (!is.null(x$location_periods)) {
+    cat(sprintf(
+      "Calculation periods mirror the %s chart\n",
+      mirrored_location_chart_type(x)
+    ))
+  }
+
   if (length(x$result$re_establish_rows) > 0L) {
     cat(sprintf(
       "\nLimits re-established at %s\n",
@@ -843,4 +886,24 @@ format_calculation_periods <- function(table,
   }
 
   return(unname(lines))
+}
+
+
+#' The chart type of the location chart a dispersion chart mirrors
+#'
+#' @param chart The dispersion chart of a pair, such as an MR or S chart.
+#'
+#' @return The location chart type of the pair whose dispersion chart type is
+#'   that of `chart`: "X" for an MR chart, "Xbar" for an S chart.
+#' @noRd
+mirrored_location_chart_type <- function(chart) {
+  dispersion <- chart_type_label(chart)
+
+  for (pair in autospc_pair_types()) {
+    if (identical(pair[["dispersion"]], dispersion)) {
+      return(pair[["location"]])
+    }
+  }
+
+  stop("Not the dispersion chart of a pair.", call. = FALSE)
 }

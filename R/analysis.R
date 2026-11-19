@@ -3,7 +3,10 @@
 #' Analyse each chart
 #'
 #' Aggregate the series, order it, prepare it, and run the limit algorithm over
-#' it, for each chart in turn.
+#' it, for each chart in turn. For a pair whose `dispersion_chart_establishment`
+#' is not "independent", the location chart is analysed first, and its
+#' calculation periods are recorded in `location_periods` on the dispersion
+#' chart.
 #'
 #' @param charts A list of `autospc_chart` objects, as `build_charts()` gives
 #'   them.
@@ -11,17 +14,58 @@
 #' @return A list of `autospc_chart` objects, each with `chart$result` set.
 #' @noRd
 analyse_charts <- function(charts) {
-  analysed <- lapply(charts, function(chart) {
-    chart <- aggregate_data(chart)
-    chart <- order_series(chart)
-    chart <- prepare_data(chart)
+  if (mirrors_location_periods(charts)) {
+    # the dispersion chart uses the location chart's calculation periods, so
+    # the location chart is analysed first
+    charts$location <- analyse_chart(charts$location)
+    charts$dispersion$location_periods <- calculation_periods(
+      charts$location$result$table
+    )
+    charts$dispersion <- analyse_chart(charts$dispersion)
 
-    chart <- establish_limits(chart)
+    return(charts)
+  }
 
-    return(chart)
-  })
+  return(lapply(charts, analyse_chart))
+}
 
-  return(analysed)
+
+#' Analyse one chart
+#'
+#' Aggregate the series, order it, prepare it, and run the limit algorithm over
+#' it.
+#'
+#' @param chart An `autospc_chart` object.
+#'
+#' @return The chart, with `chart$result` set.
+#' @noRd
+analyse_chart <- function(chart) {
+  chart <- aggregate_data(chart)
+  chart <- order_series(chart)
+  chart <- prepare_data(chart)
+
+  chart <- establish_limits(chart)
+
+  return(chart)
+}
+
+
+#' Whether the dispersion chart's calculation periods mirror the location
+#' chart's
+#'
+#' True for a pair whose `dispersion_chart_establishment` is not
+#' "independent".
+#'
+#' @param charts A list of `autospc_chart` objects, as `build_charts()` returns
+#'   them.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+mirrors_location_periods <- function(charts) {
+  return(
+    identical(names(charts), c("location", "dispersion")) &&
+      !identical(charts$location$dispersion_chart_establishment, "independent")
+  )
 }
 
 
@@ -163,6 +207,10 @@ finish_analysis_table <- function(chart) {
 
   chart$result$table <- chart$result$table %>%
     dplyr::mutate(restart = dplyr::row_number() %in% restart_at)
+
+  # dispersion_observed is used only while the calculation periods are formed,
+  # where shares_calculation_periods() is TRUE
+  chart$result$table$dispersion_observed <- NULL
 
   chart$result$table <- chart$result$table %>%
     dplyr::select(

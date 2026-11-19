@@ -14,7 +14,6 @@ establish_limits <- function(chart) {
     analyse_segment(
       chart = chart,
       rows = segments[[segment]],
-      first_segment = segment == 1L,
       last_segment = segment == length(segments)
     )
   })
@@ -76,8 +75,6 @@ establish_limits <- function(chart) {
 #'
 #' @param chart The chart being analysed.
 #' @param rows The rows of `chart$data` that make up the segment.
-#' @param first_segment Whether the segment starts at the first row of the
-#'   series.
 #' @param last_segment Whether the segment ends at the last row of the series.
 #'   Any other segment ends at a restart, so no more points can join its
 #'   final run.
@@ -90,12 +87,12 @@ establish_limits <- function(chart) {
 #' @noRd
 analyse_segment <- function(chart,
                             rows,
-                            first_segment,
                             last_segment) {
-  prepared_data <- segment_data(chart,
-    rows = rows,
-    first_segment = first_segment
-  )
+  if (!is.null(chart$location_periods)) {
+    return(analyse_segment_over_location_periods(chart, rows = rows))
+  }
+
+  prepared_data <- segment_data(chart, rows = rows)
   rows_before <- if (length(rows) > 0L) rows[[1L]] - 1L else 0L
   stranded_points <- sum(rows %in% gap_restarts(chart)$stranded_points)
 
@@ -128,14 +125,19 @@ analyse_segment <- function(chart,
     ))
   } else {
     # [2] There are enough data points to form one period
+    baseline_rows <- calculation_period_length(chart,
+      data = observed_data,
+      counter = counter
+    )
+
     limits_table <- form_calculation_and_display_limits(
       data = observed_data,
       counter_at_period_start = counter,
+      period_length = baseline_rows,
       chart = chart
     )
 
     # Set counter to first point after end of first period
-    baseline_rows <- baseline_period_length(chart, data = observed_data)
     chart$history$baseline <- list(length = baseline_rows)
     counter <- counter + baseline_rows
     chart <- record_counter_move(chart,
@@ -273,13 +275,19 @@ analyse_segment <- function(chart,
 
               break
             } else {
-              # [6a] There are sufficient points. Establish candidate limits
-              # using the first period_min points from the counter as
-              # calculation period
+              # [6a] There are sufficient points. Establish candidate limits,
+              # with a calculation period from the counter of the length
+              # calculation_period_length() returns
+
+              candidate_length <- calculation_period_length(chart,
+                data = limits_table,
+                counter = counter
+              )
 
               candidate_limits_table <- form_calculation_and_display_limits(
                 data = limits_table,
                 counter_at_period_start = counter,
+                period_length = candidate_length,
                 chart = chart
               )
 
@@ -289,7 +297,7 @@ analyse_segment <- function(chart,
               opposite_rule_break <- identify_opposite_break(
                 candidate_limits_table,
                 counter = counter,
-                period_min = chart$period_min,
+                period_min = candidate_length,
                 triggering_rule_break_direction =
                   triggering_rule_break_direction,
                 centre_line_tolerance = chart$centre_line_tolerance,
@@ -325,7 +333,7 @@ analyse_segment <- function(chart,
               # because each one is a copy of the whole limits table and there
               # is one per candidate.
               period_end <- min(
-                counter + chart$period_min - 1L,
+                counter + candidate_length - 1L,
                 nrow(limits_table)
               )
               chart$history$candidates <- c(
@@ -357,12 +365,13 @@ analyse_segment <- function(chart,
 
                 # and set the counter to the first point after the end of the
                 # new calculation period
+                next_counter <- counter + candidate_length
                 chart <- record_counter_move(chart,
                   from = counter,
-                  to = counter + chart$period_min,
+                  to = next_counter,
                   reason = "limits re-established"
                 )
-                counter <- counter + chart$period_min
+                counter <- next_counter
               } else if (!opposite_rule_break &
                 chart$no_regrets == TRUE &
                 final_run_prevents) {
@@ -450,4 +459,96 @@ analyse_segment <- function(chart,
     has_limits = TRUE,
     observed = nrow(observed_data) + stranded_points
   ))
+}
+
+
+#' Analyse one segment of a series over the location chart's periods
+#'
+#' Used in place of `analyse_segment()` for the dispersion chart of a pair whose
+#' `dispersion_chart_establishment` is not "independent". The algorithm is not
+#' run: the calculation periods are the periods in `chart$location_periods` that
+#' start in the segment, and limits are formed over them. Where
+#' `mirrored_period_start_excluded()` is TRUE, the point at the start of each
+#' period after the first is excluded from that period's calculation. Nothing is
+#' recorded in the history.
+#'
+#' @param chart The chart being analysed.
+#' @param rows The rows of `chart$data` that make up the segment.
+#'
+#' @return A list, as `analyse_segment()` returns it.
+#' @noRd
+analyse_segment_over_location_periods <- function(chart,
+                                                  rows) {
+  prepared_data <- segment_data(chart, rows = rows)
+  stranded_points <- sum(rows %in% gap_restarts(chart)$stranded_points)
+
+  chart$data <- prepared_data
+  chart$history <- list()
+  chart$result <- list()
+
+  observed_data <- compact_series(chart,
+    data = prepared_data,
+    na_ends_run = chart$na_ends_run
+  )
+
+  limits_table <- form_limits_over_periods(observed_data,
+    periods = segment_location_periods(chart, data = prepared_data),
+    chart = chart
+  )
+
+  if (!"cl" %in% names(limits_table)) {
+    chart$result$table <- prepared_data
+
+    return(list(
+      chart = chart,
+      has_limits = FALSE,
+      observed = nrow(observed_data) + stranded_points
+    ))
+  }
+
+  limits_table <- add_period_columns(limits_table)
+
+  # rows before this chart's first calculation period have no period type.
+  # add_period_columns() numbers each of them as a period of its own, so their
+  # period columns are set to missing
+  no_period <- is.na(limits_table$period_type)
+  limits_table$limit_change[no_period] <- NA
+  limits_table$period_start[no_period] <- NA_integer_
+  limits_table$plot_period[no_period] <- NA_character_
+  limits_table$cl_change[no_period] <- NA_real_
+
+  chart$result$table <- restore_missing_rows(
+    limits_table = limits_table,
+    data = prepared_data,
+    chart = chart
+  )
+
+  return(list(
+    chart = chart,
+    has_limits = TRUE,
+    observed = nrow(observed_data) + stranded_points
+  ))
+}
+
+
+#' The location chart's calculation periods that start in one segment
+#'
+#' @param chart The chart being analysed, holding `location_periods`.
+#' @param data The segment's rows of `chart$data`.
+#'
+#' @return The rows of `chart$location_periods` whose `first_x` lies from the
+#'   segment's first `x` to its last.
+#' @noRd
+segment_location_periods <- function(chart,
+                                     data) {
+  periods <- chart$location_periods
+
+  if (nrow(data) == 0L) {
+    return(periods[0L, , drop = FALSE])
+  }
+
+  return(
+    periods %>%
+      dplyr::filter(first_x >= min(data$x), first_x <= max(data$x))
+  )
 }

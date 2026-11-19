@@ -13,7 +13,8 @@ test_chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
 test_that("Calculation period is formed correctly", {
   result_counter_one <- form_calculation_limits(test_data,
     chart = test_chart,
-    counter = 1
+    counter = 1,
+    period_length = 21L
   )
   result_counter_one_ucl <- result_counter_one$ucl[1:21]
   result_counter_one_cl <- result_counter_one$cl[1:21]
@@ -21,7 +22,8 @@ test_that("Calculation period is formed correctly", {
 
   result_counter_100 <- form_calculation_limits(result_counter_one,
     chart = test_chart,
-    counter = 100
+    counter = 100,
+    period_length = 21L
   )
   result_counter_100_ucl <- result_counter_100$ucl[100:120]
   result_counter_100_cl <- result_counter_100$cl[100:120]

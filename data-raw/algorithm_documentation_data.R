@@ -154,6 +154,18 @@ get_log_explanation_table <- function() {
       " counter moves to the first point after the",
       " range."
     ),
+    "8", "08xx", paste0(
+      "Dispersion chart of a pair, when",
+      " dispersion_chart_establishment is \"forced\" or",
+      " \"shared\": limits are formed over a calculation",
+      " period of the location chart. The log of",
+      " this chart records steps 0 and 8 only."
+    ),
+    "", "", "xx = 00: Limits established - forced by location chart.",
+    "", "", paste0(
+      "xx = 10: Limits re-established - forced by",
+      " location chart."
+    ),
     "", "co@n|", paste0(
       "Prefix to an entry that belongs at point n,",
       " past the last point of the data or of a",

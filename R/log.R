@@ -222,6 +222,15 @@ interpret_log_entry <- function(entry,
         interpretation <- "Undefined branch at step 07."
       }
     },
+    "08" = {
+      if (branch == "00") {
+        interpretation <- "Limits established - forced by location chart."
+      } else if (branch == "10") {
+        interpretation <- "Limits re-established - forced by location chart."
+      } else {
+        interpretation <- "Undefined branch at step 08."
+      }
+    },
     {
       interpretation <- "Undefined log entry"
     }
@@ -514,6 +523,10 @@ render_log <- function(chart) {
   n_rows <- nrow(chart$result$table)
   segments <- segment_rows(chart)
 
+  if (!is.null(chart$location_periods)) {
+    return(location_periods_log(chart, segments = segments))
+  }
+
   rows <- integer(0)
   codes <- character(0)
 
@@ -527,6 +540,54 @@ render_log <- function(chart) {
   }
 
   return(collect_log_entries(rows, codes = codes, n_rows = n_rows))
+}
+
+
+#' Build the log column of a chart with `location_periods`
+#'
+#' `0000` or `0010` at the first row of each segment after the first, as
+#' `restart_log_code()` returns it, `0800` at the first row of the first period
+#' in each segment, and `0810` at the first row of each later period.
+#'
+#' @param chart The chart, with its table set.
+#' @param segments The rows of each segment, as `segment_rows()` returns them.
+#'
+#' @return character vector, one element per row of the table, NA where nothing
+#'   is recorded
+#' @noRd
+location_periods_log <- function(chart,
+                                 segments) {
+  rows <- integer(0)
+  codes <- character(0)
+
+  for (segment in seq_along(segments)) {
+    this_segment <- segments[[segment]]
+
+    if (length(this_segment) == 0L) {
+      next
+    }
+
+    if (segment > 1L) {
+      rows <- c(rows, this_segment[[1L]])
+      codes <- c(codes, restart_log_code(chart,
+        segment = segment,
+        row = this_segment[[1L]]
+      ))
+    }
+
+    periods <- segment_location_periods(chart,
+      data = dplyr::slice(chart$data, this_segment)
+    )
+    starts <- match(periods$first_x, chart$data$x)
+
+    rows <- c(rows, starts)
+    codes <- c(codes, c("0800", "0810")[pmin(seq_along(starts), 2L)])
+  }
+
+  return(collect_log_entries(rows,
+    codes = codes,
+    n_rows = nrow(chart$result$table)
+  ))
 }
 
 
@@ -598,10 +659,7 @@ segment_log_entries <- function(chart,
   add(first_row, restart_log_code(chart, segment = segment, row = first_row))
 
   if (!enough_data_for_new_period(
-    data = segment_data(chart,
-      rows = this_segment,
-      first_segment = segment == 1L
-    ),
+    data = segment_data(chart, rows = this_segment),
     counter = 1L,
     chart = chart
   )) {

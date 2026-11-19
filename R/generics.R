@@ -60,6 +60,24 @@ prepare_segment_data <- function(chart,
 }
 
 
+#' The rows of a location chart's segment where its dispersion chart has a
+#' value
+#'
+#' Used only for the location chart of a pair whose
+#' `dispersion_chart_establishment` is "shared".
+#'
+#' @param chart The location chart being analysed.
+#' @param data One segment's rows of `chart$data`, as `segment_data()` returns
+#'   them before this column is added.
+#'
+#' @return A logical vector, one element per row of `data`.
+#' @noRd
+dispersion_observed_rows <- function(chart,
+                                     data) {
+  UseMethod("dispersion_observed_rows")
+}
+
+
 #' The rows of a prepared series that hold an observation
 #'
 #' A row whose `series` value is missing because there was never a value to
@@ -87,6 +105,23 @@ observed_rows <- function(chart,
 }
 
 
+#' Whether the point at the start of a mirrored calculation period is excluded
+#' from that period's calculation
+#'
+#' Read only for the dispersion chart of a pair whose
+#' `dispersion_chart_establishment` is not "independent", at each calculation
+#' period after the first in a segment. An excluded point is marked
+#' `excluded = TRUE` and does not count towards `max_exclusions`.
+#'
+#' @param chart The chart being analysed.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+mirrored_period_start_excluded <- function(chart) {
+  UseMethod("mirrored_period_start_excluded")
+}
+
+
 #' Number of points available for analysis
 #'
 #' Used to decide whether there is enough data to form a period.
@@ -98,6 +133,28 @@ observed_rows <- function(chart,
 n_effective_points <- function(chart,
                                data) {
   UseMethod("n_effective_points")
+}
+
+
+#' The number of points the dispersion chart has in a calculation period of
+#' each length
+#'
+#' Used only for the location chart of a pair whose
+#' `dispersion_chart_establishment` is "shared". Counted as the dispersion
+#' chart counts towards `period_min`.
+#'
+#' @param chart The location chart being analysed.
+#' @param available For each row from the start of the period onwards, whether
+#'   the dispersion chart has a value there, as `dispersion_observed_rows()`
+#'   returns it.
+#'
+#' @return An integer vector the length of `available`: element `i` is the
+#'   number of points the dispersion chart has in a period of the first `i`
+#'   rows.
+#' @noRd
+dispersion_point_counts <- function(chart,
+                                    available) {
+  UseMethod("dispersion_point_counts")
 }
 
 

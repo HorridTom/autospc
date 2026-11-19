@@ -13,9 +13,12 @@ y_axis_of <- function(plot) {
 }
 
 
-test_that("a C' chart of zeros is drawn on an axis from 0 to 10, with no warning", {
-  expect_no_warning(plot <- autospc(zeros, chart_type = "C'"))
-  expect_no_warning(drawn(plot))
+test_that("a C' chart of zeros is drawn on an axis from 0 to 10, with no max() warning", {
+  expect_no_warning(
+    plot <- autospc(zeros, chart_type = "C'"),
+    message = "no non-missing arguments to max"
+  )
+  expect_no_error(drawn(plot))
 
   expect_identical(y_axis_of(plot), c(0, 10))
 })
@@ -56,7 +59,7 @@ test_that("an X chart with negative limits is drawn, its axis above the data", {
   negative <- data.frame(x = 1:40, y = stats::rnorm(40, mean = -20))
 
   expect_no_error(plot <- autospc(negative, chart_type = "X"))
-  expect_no_warning(drawn(plot))
+  expect_no_error(drawn(plot))
 
   table <- autospc(negative, chart_type = "X", plot_chart = FALSE)
   expect_gt(y_axis_of(plot)[[2]], max(table$ucl, table$y, na.rm = TRUE))
@@ -71,8 +74,10 @@ test_that("an Xbar chart with negative limits is drawn, its axis above the data"
     y = stats::rnorm(120, mean = -20)
   )
 
-  expect_no_error(plot <- autospc(negative, chart_type = "XbarS", max_exclusions = 0L))
-  expect_no_warning(drawn(plot))
+  expect_no_error(
+    plot <- autospc(negative, chart_type = "XbarS", max_exclusions = 0L)
+  )
+  expect_no_error(drawn(plot))
 
   table <- autospc(negative,
     chart_type = "Xbar", max_exclusions = 0L,

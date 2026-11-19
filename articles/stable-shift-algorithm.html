@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -545,9 +545,9 @@ described in the following table. This shorthand forms the content of the
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="7%">
+<col width="6%">
 <col width="5%">
-<col width="86%">
+<col width="88%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">algorithm_step</th>
@@ -711,6 +711,21 @@ described in the following table. This shorthand forms the content of the
 <td align="left">xx = 30: Not considered - the candidate is in a range given by prevent_establishment_in, so no candidate limits are formed. The counter moves to the first point after the range.</td>
 </tr>
 <tr class="even">
+<td align="left">8</td>
+<td align="left">08xx</td>
+<td align="left">Dispersion chart of a pair, when dispersion_chart_establishment is “forced” or “shared”: limits are formed over a calculation period of the location chart. The log of this chart records steps 0 and 8 only.</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">xx = 00: Limits established - forced by location chart.</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">xx = 10: Limits re-established - forced by location chart.</td>
+</tr>
+<tr class="odd">
 <td align="left"></td>
 <td align="left">co@n|</td>
 <td align="left">Prefix to an entry that belongs at point n, past the last point of the data or of a segment. The entry is recorded at that last point.</td>

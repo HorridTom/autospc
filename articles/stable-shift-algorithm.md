@@ -540,4 +540,7 @@ log_exp_tab %>%
 |  |  | xx = 10: No |
 |  |  | xx = 20: No - insufficient data to establish a stable new process, as the final run of the candidate calculation period is not complete. |
 |  |  | xx = 30: Not considered - the candidate is in a range given by prevent_establishment_in, so no candidate limits are formed. The counter moves to the first point after the range. |
+| 8 | 08xx | Dispersion chart of a pair, when dispersion_chart_establishment is “forced” or “shared”: limits are formed over a calculation period of the location chart. The log of this chart records steps 0 and 8 only. |
+|  |  | xx = 00: Limits established - forced by location chart. |
+|  |  | xx = 10: Limits re-established - forced by location chart. |
 |  | co@n\| | Prefix to an entry that belongs at point n, past the last point of the data or of a segment. The entry is recorded at that last point. |

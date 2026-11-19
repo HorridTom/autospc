@@ -181,3 +181,16 @@ test_that("the C' chart y axis leaves headroom above the upper limit", {
     list(low = 0, high = 18 + 18 / 10 + 10)
   )
 })
+
+
+test_that("the C' chart y axis has headroom of 10 where no row has an upper limit", {
+  # a period with no variation around a centre line of zero has NaN limits
+  no_limits <- data.frame(x = 1:5, y = 0, cl = 0, lcl = NaN, ucl = NaN)
+  no_limits$ucl[4:5] <- NA_real_
+
+  expect_no_warning(
+    range <- y_axis_range(test_chart_cp(), data = no_limits),
+    message = "no non-missing arguments to max"
+  )
+  expect_identical(range, list(low = 0, high = 10))
+})

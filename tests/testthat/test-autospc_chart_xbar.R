@@ -237,3 +237,27 @@ test_that("the Xbar chart names and titles itself", {
   expect_identical(y_axis_title(chart), "Xbar")
   expect_identical(period_statistics_columns(chart), c("sd_estimate", "sbar"))
 })
+
+
+test_that("Xbar chart labels are rounded to the scale of a negative axis top", {
+  chart <- autospc_chart_xbar(data = xbar_data(), x = "x", y = "y")
+
+  expect_identical(label_accuracy(chart, ylimhigh = -1000), 0.1)
+})
+
+
+test_that("the Xbar chart y axis is padded away from the data when it is all negative", {
+  chart <- autospc_chart_xbar(data = xbar_data(), x = "x", y = "y")
+  all_below_zero <- data.frame(
+    x = 1:5,
+    series = c(-10, -12, -11, -13, -14),
+    cl = -12,
+    lcl = -18,
+    ucl = -6
+  )
+
+  expect_identical(
+    y_axis_range(chart, data = all_below_zero),
+    list(low = -18 * 1.1, high = -6 * 0.9)
+  )
+})

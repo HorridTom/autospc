@@ -45,15 +45,19 @@ add_annotation_data <- function(table,
       flip_labels = flip_labels,
       upper_annotation_level = dplyr::if_else(
         align_labels,
-        max(c(-Inf, ucl[in_window]),
-          na.rm = TRUE
-        ) * upper_annotation_sf,
-        ucl * upper_annotation_sf
+        label_position(
+          max(c(-Inf, ucl[in_window]), na.rm = TRUE),
+          scale_factor = upper_annotation_sf
+        ),
+        label_position(ucl, scale_factor = upper_annotation_sf)
       ),
       lower_level = dplyr::if_else(
         align_labels,
-        min(c(Inf, lcl[in_window]), na.rm = TRUE) * lower_annotation_sf,
-        lcl * lower_annotation_sf
+        label_position(
+          min(c(Inf, lcl[in_window]), na.rm = TRUE),
+          scale_factor = lower_annotation_sf
+        ),
+        label_position(lcl, scale_factor = lower_annotation_sf)
       ),
       lower_annotation_level = dplyr::if_else(
         labels_stay_above(chart) | !flip_labels,
@@ -250,4 +254,26 @@ add_annotations_to_plot_basic <- function(spc_plot,
     )
 
   return(annotated_plot)
+}
+
+
+#' The height of a centre line label placed beyond a control limit
+#'
+#' The label is placed `abs(scale_factor - 1)` times the size of the limit
+#' outside the limit. So a positive limit is multiplied by `scale_factor`, and a
+#' negative limit is multiplied by `2 - scale_factor`.
+#'
+#' @param limit The control limits, upper or lower.
+#' @param scale_factor `upper_annotation_sf` for an upper limit,
+#'   `lower_annotation_sf` for a lower one.
+#'
+#' @return numeric vector, one element per limit
+#' @noRd
+label_position <- function(limit,
+                           scale_factor) {
+  return(dplyr::if_else(
+    limit < 0,
+    limit * (2 - scale_factor),
+    limit * scale_factor
+  ))
 }

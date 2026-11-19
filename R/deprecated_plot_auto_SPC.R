@@ -140,9 +140,11 @@
 #' labels on different sides of the centre line depending on the direction of
 #' change from the previous period
 #' @param upper_annotation_sf Numeric scale factor specifying upper vertical
-#' position of centre line labels as a multiple of the upper control limit
+#' position of centre line labels as a multiple of the upper control limit. A
+#' negative limit is multiplied by `2 - upper_annotation_sf`.
 #' @param lower_annotation_sf Numeric scale factor specifying lower vertical
-#' position of centre line labels as a multiple of the lower control limit
+#' position of centre line labels as a multiple of the lower control limit. A
+#' negative limit is multiplied by `2 - lower_annotation_sf`.
 #' @param annotation_arrows Boolean specifying whether or not to display arrows
 #' connecting centre line labels to the centre line they refer to
 #' @param annotation_arrow_curve Numeric curvature of the annotation arrows

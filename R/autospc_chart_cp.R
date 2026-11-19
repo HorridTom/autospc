@@ -166,19 +166,25 @@ chart_type_label.autospc_chart_cp <- function(chart) {
 
 #' Lower and upper ends of the y axis
 #'
-#' Headroom above the highest point or limit, so the annotations have room.
+#' Headroom above the highest point or limit, so the annotations have room: a
+#' tenth of the highest upper limit, plus 10. Where no row has an upper limit,
+#' as where every value is zero, the headroom is 10.
 #'
 #' @return list of two numbers, low and high
 #' @noRd
 y_axis_range.autospc_chart_cp <- function(chart,
                                           data) {
+  limit_headroom <- 0
+
+  if (any(!is.na(data$ucl))) {
+    limit_headroom <- max(data$ucl, na.rm = TRUE) / 10
+  }
+
   high <- max(data$ucl,
     data$y,
     na.rm = TRUE
   ) +
-    max(data$ucl,
-      na.rm = TRUE
-    ) / 10 +
+    limit_headroom +
     10
 
   return(list(

@@ -23,8 +23,15 @@ geom_data <- function(plot, geom) {
   return(built[is_geom])
 }
 
-# The text of each legend, top to bottom, as one string per legend
+# The text of each legend, top to bottom, as one string per legend.
+#
+# ggplotGrob() needs a graphics device; with none open R opens the default one,
+# pdf(), which leaves an Rplots.pdf in tests/testthat, so a null device is
+# opened for it, as drawn() does.
 legend_texts <- function(plot) {
+  pdf(NULL)
+  on.exit(dev.off())
+
   grob <- ggplot2::ggplotGrob(plot)
   box <- grob$grobs[[which(grob$layout$name == "guide-box-right")]]
   is_legend <- vapply(box$grobs, inherits, logical(1L), what = "gtable")

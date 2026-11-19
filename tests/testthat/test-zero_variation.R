@@ -1,5 +1,6 @@
 # Charts with no variation, short series, and charts whose limits are all
-# negative are drawn on a y axis that contains the data (#314).
+# negative are drawn on a y axis that contains the data, with centre line
+# labels beyond the limits (#314).
 
 zeros <- data.frame(x = 1:40, y = 0L)
 zero_rates <- data.frame(x = 1:40, y = 0L, n = 10L)
@@ -78,4 +79,35 @@ test_that("an Xbar chart with negative limits is drawn, its axis above the data"
     plot_chart = FALSE
   )
   expect_gt(y_axis_of(plot)[[2]], max(table$ucl, na.rm = TRUE))
+})
+
+
+test_that("a centre line label is outside a limit of either sign", {
+  expect_equal(
+    label_position(c(10, -10, 0, NA), scale_factor = 1.1),
+    c(11, -9, 0, NA)
+  )
+  expect_equal(
+    label_position(c(10, -10), scale_factor = 0.9),
+    c(9, -11)
+  )
+})
+
+
+test_that("the label of an X chart with negative limits is above the upper limit", {
+  set.seed(4)
+  negative <- data.frame(x = 1:40, y = stats::rnorm(40, mean = -20))
+  plot <- autospc(negative, chart_type = "X")
+  table <- autospc(negative, chart_type = "X", plot_chart = FALSE)
+
+  levels <- plot$data$annotation_level[
+    plot$data$plotted_line == "cl" &
+      !is.na(plot$data$cl_label) &
+      plot$data$cl_label != ""
+  ]
+
+  expect_length(levels, 1L)
+  expect_gt(levels, max(table$ucl, na.rm = TRUE))
+  # at the top of the axis, as on an X chart with positive limits
+  expect_equal(levels, autospc_plot_axis_extents(plot, value = "ylimhigh"))
 })

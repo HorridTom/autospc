@@ -14,6 +14,10 @@
 * An X or Xbar chart whose upper limit is negative no longer fails with
   "invalid 'nsmall' argument". The top of its vertical axis is now above the
   data.
+* A centre line label is now drawn outside a negative control limit, as for a
+  positive one: a negative limit is multiplied by `2 - upper_annotation_sf` (or
+  `2 - lower_annotation_sf`) instead of the factor itself, which put the label
+  inside the limits.
 
 # autospc 0.2.0.9012
 

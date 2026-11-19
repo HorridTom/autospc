@@ -259,16 +259,17 @@ axis_specifications <- function(table,
     }
   }
 
-  if (!enough_data_for_limits(chart)) {
-    ylimlow <- min(table$series, na.rm = TRUE)
-    ylimhigh <- max(table$series, na.rm = TRUE)
-  } else {
-    y_range <- y_axis_range(
-      chart = chart,
-      data = table
-    )
-    ylimlow <- y_range$low
-    ylimhigh <- y_range$high
+  y_range <- y_axis_range(
+    chart = chart,
+    data = table
+  )
+  ylimlow <- y_range$low
+  ylimhigh <- y_range$high
+
+  # Where every value, centre line and limit is the same, as where they are all
+  # zero, the range has no width, so the axis runs from that value to one more.
+  if (ylimhigh <= ylimlow) {
+    ylimhigh <- ylimlow + 1
   }
 
   if (!is.null(visualisation_params$override_y_lim)) {

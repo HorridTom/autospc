@@ -218,3 +218,12 @@ test_that("the C chart y axis leaves headroom above the upper limit", {
     list(low = 0, high = 18 + 18 / 10 + 10)
   )
 })
+
+
+test_that("the C chart y axis has headroom of 10 where no row has an upper limit", {
+  no_limits <- limits_data
+  no_limits$ucl <- NA_real_
+
+  expect_no_warning(range <- y_axis_range(test_chart_c(), data = no_limits))
+  expect_identical(range, list(low = 0, high = 14 + 10))
+})

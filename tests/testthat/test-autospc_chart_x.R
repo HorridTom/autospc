@@ -191,6 +191,11 @@ test_that("X chart labels are rounded to the scale of the axis", {
 })
 
 
+test_that("X chart labels are rounded to the scale of a negative axis top", {
+  expect_identical(label_accuracy(test_chart_x(), ylimhigh = -1000), 0.1)
+})
+
+
 test_that("the X chart y axis follows the data below as well as above", {
   expect_identical(
     y_axis_range(test_chart_x(), data = limits_data),
@@ -206,5 +211,17 @@ test_that("a negative X chart lower limit is padded downwards", {
   expect_identical(
     y_axis_range(test_chart_x(), data = below_zero)$low,
     -4 * 1.1
+  )
+})
+
+
+test_that("a negative X chart upper limit is padded upwards", {
+  all_below_zero <- limits_data
+  all_below_zero$series <- -all_below_zero$series
+  all_below_zero$ucl <- -4
+
+  expect_identical(
+    y_axis_range(test_chart_x(), data = all_below_zero)$high,
+    -4 * 0.9
   )
 })

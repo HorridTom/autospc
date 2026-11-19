@@ -157,19 +157,23 @@ chart_type_label.autospc_chart_x <- function(chart) {
 #' Rounding accuracy for centre line labels
 #'
 #' Four significant figures at the scale of the axis, because the values are in
-#' the units of the measure rather than percentages.
+#' the units of the measure rather than percentages. The scale is that of the
+#' top of the axis, whatever its sign.
 #'
 #' @return number, passed to scales::number(accuracy =)
 #' @noRd
 label_accuracy.autospc_chart_x <- function(chart,
                                            ylimhigh) {
-  accuracy <- 10^(ceiling(log10(ylimhigh)) - 4)
+  accuracy <- 10^(ceiling(log10(abs(ylimhigh))) - 4)
 
   return(accuracy)
 }
 
 
 #' Lower and upper ends of the y axis
+#'
+#' The lowest and highest point or limit, each moved a tenth of its value away
+#' from the data, whatever its sign.
 #'
 #' @return list of two numbers, low and high
 #' @noRd
@@ -189,7 +193,13 @@ y_axis_range.autospc_chart_x <- function(chart,
   high <- max(data$ucl,
     data$series,
     na.rm = TRUE
-  ) * 1.1
+  )
+
+  if (sign(high) != -1) {
+    high <- high * 1.1
+  } else {
+    high <- high * 0.9
+  }
 
   return(list(
     low = low,

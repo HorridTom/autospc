@@ -478,12 +478,14 @@ autospc(
 - upper_annotation_sf:
 
   Numeric scale factor specifying upper vertical position of centre line
-  labels as a multiple of the upper control limit
+  labels as a multiple of the upper control limit. A negative limit is
+  multiplied by `2 - upper_annotation_sf`.
 
 - lower_annotation_sf:
 
   Numeric scale factor specifying lower vertical position of centre line
-  labels as a multiple of the lower control limit
+  labels as a multiple of the lower control limit. A negative limit is
+  multiplied by `2 - lower_annotation_sf`.
 
 - annotation_arrows:
 

@@ -17,7 +17,7 @@ by default the Stable Shift Algorithm."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9012</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9013</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -517,12 +517,14 @@ change from the previous period</p></dd>
 
 <dt id="arg-upper-annotation-sf">upper_annotation_sf<a class="anchor" aria-label="anchor" href="#arg-upper-annotation-sf"></a></dt>
 <dd><p>Numeric scale factor specifying upper vertical
-position of centre line labels as a multiple of the upper control limit</p></dd>
+position of centre line labels as a multiple of the upper control limit. A
+negative limit is multiplied by <code>2 - upper_annotation_sf</code>.</p></dd>
 
 
 <dt id="arg-lower-annotation-sf">lower_annotation_sf<a class="anchor" aria-label="anchor" href="#arg-lower-annotation-sf"></a></dt>
 <dd><p>Numeric scale factor specifying lower vertical
-position of centre line labels as a multiple of the lower control limit</p></dd>
+position of centre line labels as a multiple of the lower control limit. A
+negative limit is multiplied by <code>2 - lower_annotation_sf</code>.</p></dd>
 
 
 <dt id="arg-annotation-arrows">annotation_arrows<a class="anchor" aria-label="anchor" href="#arg-annotation-arrows"></a></dt>

@@ -1,5 +1,28 @@
 # Changelog
 
+## autospc 0.2.0.9013
+
+### Vertical axis
+
+- A C′ chart where every value is zero no longer warns “no non-missing
+  arguments to max”, and is drawn with a vertical axis from 0 to 10, as
+  a C chart of zeros is (#314).
+- A chart whose values, centre line and limits are all equal, as where
+  they are all zero, is drawn with a vertical axis from that value to
+  one more. U, U′, X, MR, Xbar and S charts of zeros were drawn from
+  -0.05 to 0.05.
+- A series too short for limits is drawn on the same vertical axis as a
+  chart of its type with limits, so the axis of a count, rate or
+  proportion chart starts at zero. It was drawn from the lowest to the
+  highest value.
+- An X or Xbar chart whose upper limit is negative no longer fails with
+  “invalid ‘nsmall’ argument”. The top of its vertical axis is now above
+  the data.
+- A centre line label is now drawn outside a negative control limit, as
+  for a positive one: a negative limit is multiplied by
+  `2 - upper_annotation_sf` (or `2 - lower_annotation_sf`) instead of
+  the factor itself, which put the label inside the limits.
+
 ## autospc 0.2.0.9012
 
 ### Dispersion chart calculation periods

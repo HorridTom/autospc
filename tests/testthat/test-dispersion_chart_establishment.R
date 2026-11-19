@@ -701,4 +701,3 @@ test_that("under shared, an opposite rule break in the extension rows is found",
 
   expect_identical(which(table$break_point %in% TRUE), integer(0))
 })
-

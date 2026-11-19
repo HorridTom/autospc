@@ -1,3 +1,42 @@
+# autospc 0.2.0.9012
+
+## Dispersion chart calculation periods
+
+* New argument `dispersion_chart_establishment` sets how the dispersion chart
+  of a pair (the MR chart of `"XMR"`, the S chart of `"XbarS"`) establishes its
+  limits (#115):
+  * `"independent"`, the default, runs the algorithm on the dispersion chart
+    separately from the location chart, as before;
+  * `"forced"` uses the location chart's calculation periods, so the dispersion
+    chart's limits change where the location chart's do. In a period where the
+    dispersion chart has fewer points with a value than the location chart, its
+    limits are calculated from fewer than `period_min` points;
+  * `"shared"` extends each calculation period until both charts have at least
+    `period_min` points with a value in it, and both charts use these periods,
+    so the location chart's limits can differ from those it has with
+    `"independent"` or `"forced"`.
+
+  The argument is ignored, with a warning, for a chart type that is not a pair.
+* With `"forced"` or `"shared"`, an MR chart leaves the moving range at the
+  first point of each calculation period after the first in a segment out of
+  that period's limits, because it is the difference from the last point of the
+  previous period. It does not count towards `max_exclusions`.
+* With `"forced"` or `"shared"`, the dispersion chart's log records restarts
+  and the new codes `0800` (limits established - forced by location chart) at
+  the first period of each segment and `0810` (limits re-established - forced
+  by location chart) at each later period. Printing the chart adds the line
+  "Calculation periods mirror the ... chart".
+* In `facet_stages()`, a pair is drawn as its location chart, as before. With
+  `"shared"`, each facet's location chart has the shared calculation periods.
+
+## Periods with no standard deviation estimate
+
+* A calculation period whose standard deviation cannot be estimated (a C′ or
+  P′ period with no variation, or an Xbar period made up only of subgroups of
+  one) no longer inherits limits or `sbar` from the previous period. Its display
+  rows retain its centre line and have no limits, and the shift rule applies to
+  them as usual, so limits can be re-established after it (#310).
+
 # autospc 0.2.0.9011
 
 * `floating_median_labels = "gaps"` no longer gives a warning when the chart

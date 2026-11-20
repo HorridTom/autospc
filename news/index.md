@@ -1,5 +1,20 @@
 # Changelog
 
+## autospc 0.2.0.9014
+
+### Missing first values
+
+- Where the first value of the series is missing, the MR chart’s
+  calculation period now starts at the same point as the X chart’s, the
+  first non-missing point of the series (the same applies after a
+  restart). Previously, it started on the first row of the series or
+  segment, so the MR chart had limits on rows where neither chart had a
+  value (#326).
+- There is now a label for the first centre line on a chart whose first
+  value is missing. This also labels the first centre line of a
+  dispersion chart whose first calculation period starts later than the
+  location chart’s.
+
 ## autospc 0.2.0.9013
 
 ### Vertical axis

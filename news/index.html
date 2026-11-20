@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,14 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9014" id="autospc-0209014">autospc 0.2.0.9014<a class="anchor" aria-label="anchor" href="#autospc-0209014"></a></h2>
+<div class="section level3">
+<h3 id="missing-first-values-0-2-0-9014">Missing first values<a class="anchor" aria-label="anchor" href="#missing-first-values-0-2-0-9014"></a></h3>
+<ul><li>Where the first value of the series is missing, the MR chart’s calculation period now starts at the same point as the X chart’s, the first non-missing point of the series (the same applies after a restart). Previously, it started on the first row of the series or segment, so the MR chart had limits on rows where neither chart had a value (#326).</li>
+<li>There is now a label for the first centre line on a chart whose first value is missing. This also labels the first centre line of a dispersion chart whose first calculation period starts later than the location chart’s.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9013" id="autospc-0209013">autospc 0.2.0.9013<a class="anchor" aria-label="anchor" href="#autospc-0209013"></a></h2>
 <div class="section level3">

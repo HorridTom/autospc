@@ -69,6 +69,12 @@ test_that("every chart parameter autospc takes reaches the chart", {
   for (parameter in autospc_chart_parameters()) {
     given <- chart_argument_alternatives[parameter]
 
+    # overhanging_reversions = FALSE is an error with no_regrets = TRUE, the
+    # default, so it is given with no_regrets = FALSE
+    if (identical(parameter, "overhanging_reversions")) {
+      given <- c(given, no_regrets = FALSE)
+    }
+
     from_autospc <- suppressWarnings(
       rlang::exec(autospc,
         argument_data,
@@ -77,22 +83,7 @@ test_that("every chart parameter autospc takes reaches the chart", {
       )
     )
 
-    # autospc() changes the value of overhanging_reversions when it is FALSE
-    # and no_regrets is TRUE, through validate_algorithm_parameters(), so the
-    # comparison is against the validated value rather than the value passed in
     expected <- given[[parameter]]
-
-    if (identical(parameter, "overhanging_reversions")) {
-      validated <- suppressWarnings(
-        validate_algorithm_parameters(
-          list(
-            no_regrets = autospc_default("no_regrets"),
-            overhanging_reversions = expected
-          )
-        )
-      )
-      expected <- validated$overhanging_reversions
-    }
 
     # a C chart is not half of a pair, so records "independent" whatever it
     # is given; test-argument_values.R tests the value on both charts of a pair

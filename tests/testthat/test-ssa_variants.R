@@ -126,8 +126,8 @@ test_that(
 )
 
 
-test_that("warning is issued if incompatible variant requested", {
-  expect_warning(
+test_that("an error is given if an incompatible variant is requested", {
+  expect_error(
     autospc(
       ed_attendances_monthly,
       chart_type = "C'",
@@ -137,6 +137,6 @@ test_that("warning is issued if incompatible variant requested", {
       no_regrets = TRUE,
       overhanging_reversions = FALSE
     ),
-    "no_regrets requires consideration of overhanging reversions"
+    class = "autospc_inconsistent_ssa_parameters_error"
   )
 })

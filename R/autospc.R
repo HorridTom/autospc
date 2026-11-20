@@ -71,7 +71,8 @@
 #' @param overhanging_reversions Boolean determining whether rule breaks in the
 #' opposite direction to a rule break triggering a candidate re-establishment
 #' prevent limits being re-established, even where they overhang the end of the
-#' candidate calculation period. Set to FALSE only with no_regrets = FALSE.
+#' candidate calculation period. FALSE requires `no_regrets = FALSE`; with
+#' `no_regrets = TRUE` it is an error.
 #' @param force_restart_at Optional, one or more values on the horizontal axis
 #' at which the algorithm restarts. The series is analysed in segments, each
 #' starting at the first point at or after one of these values, and each
@@ -371,10 +372,7 @@ autospc <- function(data,
     x_values = data[[x_name]]
   )
 
-  arguments <- validate_algorithm_parameters(
-    arguments,
-    user_env = rlang::caller_env()
-  )
+  arguments <- validate_algorithm_parameters(arguments)
 
   # The validated analysis parameters
   chart_args <- arguments[autospc_chart_parameters()]

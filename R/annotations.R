@@ -18,11 +18,18 @@ add_annotation_data <- function(table,
       table$x <= window[[2L]]
   }
 
-  # a facet wholly outside the window has no labels
-  first_row <- 0L
+  # the first label goes on the first row in the window, from the chart's
+  # earliest label row on, that has a centre line; a facet wholly outside the
+  # window, or with no centre line, has none
+  first_row <- match(
+    TRUE,
+    in_window &
+      !is.na(table$cl) &
+      seq_len(nrow(table)) >= first_label_row(chart, cl = table$cl)
+  )
 
-  if (any(in_window)) {
-    first_row <- max(first_label_row(chart), match(TRUE, in_window))
+  if (is.na(first_row)) {
+    first_row <- 0L
   }
 
   labels <- centre_line_label(

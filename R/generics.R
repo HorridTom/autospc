@@ -300,11 +300,14 @@ chart_type_label <- function(chart) {
 }
 
 
-#' Row that carries the first centre line label
+#' The earliest row that can carry the first centre line label
 #'
-#' @return integer, row number
+#' @param cl The centre line, one element per row of the analysis table.
+#'
+#' @return integer, row number, or `NA` where no row has a centre line
 #' @noRd
-first_label_row <- function(chart) {
+first_label_row <- function(chart,
+                            cl) {
   UseMethod("first_label_row")
 }
 

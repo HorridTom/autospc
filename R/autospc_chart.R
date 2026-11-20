@@ -664,12 +664,15 @@ centre_line_label.autospc_chart <- function(chart,
 }
 
 
-#' Row that carries the first centre line label
+#' The earliest row that can carry the first centre line label
 #'
-#' @return integer, row number
+#' The first row with a centre line.
+#'
+#' @return integer, row number, or `NA` where no row has a centre line
 #' @noRd
-first_label_row.autospc_chart <- function(chart) {
-  return(1L)
+first_label_row.autospc_chart <- function(chart,
+                                          cl) {
+  return(match(TRUE, !is.na(cl)))
 }
 
 

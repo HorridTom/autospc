@@ -341,3 +341,20 @@ test_that("a series with no rows to analyse returns the same columns", {
 
   expect_identical(names(from_none), names(from_full))
 })
+
+
+test_that("a chart without limits labels its vertical axis at the scale of its breaks", {
+  short_series <- data.frame(x = 1:10, y = rep(c(10L, 12L), 5L))
+
+  plot <- suppressWarnings(autospc(short_series, chart_type = "MR"))
+  # the labels drawn are those of the panel, whose range the coordinates set;
+  # building it needs a graphics device, so a null one is opened, as drawn()
+  # does, rather than leave an Rplots.pdf
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  panel <- ggplot2::ggplot_build(plot)$layout$panel_params[[1L]]
+  labels <- panel$y$get_labels()
+  labels <- labels[!is.na(labels)]
+
+  expect_identical(labels, c("0.0", "0.5", "1.0", "1.5", "2.0"))
+})

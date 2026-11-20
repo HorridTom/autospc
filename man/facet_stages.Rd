@@ -4,7 +4,7 @@
 \alias{facet_stages}
 \title{Plot SPC charts at successive stages of a series}
 \usage{
-facet_stages(data, split_at, plot_chart = TRUE, ..., split_rows = deprecated())
+facet_stages(data, split_at, plot_chart = TRUE, ...)
 }
 \arguments{
 \item{data}{A data frame. For column requirements by chart type, see
@@ -19,10 +19,6 @@ subgroup-aggregated data is returned with centre line, control limits and
 other analytic output appended as columns.}
 
 \item{...}{Arguments passed to \code{\link[=autospc]{autospc()}}}
-
-\item{split_rows}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{split_at} instead.
-The positions it takes are now counted in the analysed series rather than in
-the data as supplied. It will be removed in autospc 0.3.0.}
 }
 \value{
 With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: one

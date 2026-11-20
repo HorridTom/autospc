@@ -222,6 +222,21 @@ test_that("specific log entries are interpreted correctly", {
 
 # The log column is built by render_log() from the chart's history.
 
+test_that("a step 4 entry with no further shift rule break says only that there is enough data", {
+  expect_identical(
+    interpret_log_entry("0401NA", verbosity = 2),
+    "Sufficient data to proceed."
+  )
+  expect_identical(
+    interpret_log_entry("040136", verbosity = 2),
+    paste(
+      "Sufficient data to proceed. Moving counter to the next shift rule",
+      "break, commencing at point 36."
+    )
+  )
+})
+
+
 test_that("the log records the algorithm's decisions", {
   analyse <- function(data, ...) {
     suppressWarnings(establish_limits(prepare_data(

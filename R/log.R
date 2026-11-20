@@ -82,7 +82,9 @@ interpret_log_entry <- function(entry,
         interpretation <- "Undefined branch at step 04."
       }
 
-      if (!is.na(entry_data) & stringr::str_sub(
+      # The position is "NA" where there is no further shift rule break.
+      # The next entry, 0510, states this.
+      if (!is.na(entry_data) & entry_data != "NA" & stringr::str_sub(
         branch,
         2L,
         2L

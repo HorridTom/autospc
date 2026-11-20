@@ -296,10 +296,7 @@ create_timeseries_plot <- function(table,
     ) +
     ggplot2::scale_y_continuous(
       breaks = scales::breaks_pretty(),
-      labels = scales::number_format(
-        accuracy = 1,
-        big.mark = ","
-      )
+      labels = scales::label_number(big.mark = ",")
     ) +
     ggplot2::coord_cartesian(
       xlim = axis_extents$window,

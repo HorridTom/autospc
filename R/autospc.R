@@ -120,10 +120,7 @@
 #' positive shift rule break arising from missing data; FALSE minimises the risk
 #' of a false negative.
 #' @param max_exclusions The maximum number of extreme points to exclude from
-#' limit calculations. The default will change from 3 to 0 in autospc 0.3.0, so
-#' that points are excluded only where the caller asks for it. Until then, a
-#' call that leaves `max_exclusions` unset and excludes points warns that its
-#' results will change.
+#' limit calculations. The default, 0, excludes none.
 #' @param highlight_exclusions Boolean signifying whether excluded points are
 #' greyed out.
 #' @param mr_screen_max_loops Integer or Inf specifying maximum number of times
@@ -301,7 +298,7 @@ autospc <- function(data,
                     ),
                     ## SPC Parameters
                     na_ends_run = TRUE,
-                    max_exclusions = 3L,
+                    max_exclusions = 0L,
                     highlight_exclusions = TRUE,
                     mr_screen_max_loops = 1L,
                     centre_line_tolerance = 0,
@@ -399,10 +396,6 @@ autospc <- function(data,
 
   # Run the analysis
   charts <- analyse_charts(charts)
-
-  if (missing(max_exclusions)) {
-    warn_max_exclusions_default(charts)
-  }
 
   # Resolve visualisation parameters, based on chart type. The chart asked is
   # the one drawn in the main panel: the location chart of a pair, or the only

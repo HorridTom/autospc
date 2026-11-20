@@ -119,7 +119,8 @@ test_that("the reproduced cases have more than one period, excluded points and m
 
   p_prime <- analysed_charts(ed_attendances_monthly,
     chart_type = "P'",
-    x = month_start, y = within_4h, n = att_all
+    x = month_start, y = within_4h, n = att_all,
+    max_exclusions = 3L
   )[[1]]
   expect_gt(sum(p_prime$result$table$excluded %in% TRUE), 0L)
 

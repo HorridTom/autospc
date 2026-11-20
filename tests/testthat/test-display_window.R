@@ -11,6 +11,7 @@ p_chart <- function(...) {
     y = within_4h,
     n = att_all,
     chart_type = "P'",
+    max_exclusions = 3L,
     ...
   )))
 }

@@ -24,7 +24,7 @@ autospc(
   restart_after_gap = NULL,
   dispersion_chart_establishment = c("independent", "forced", "shared"),
   na_ends_run = TRUE,
-  max_exclusions = 3L,
+  max_exclusions = 0L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
@@ -202,10 +202,7 @@ positive shift rule break arising from missing data; FALSE minimises the risk
 of a false negative.}
 
 \item{max_exclusions}{The maximum number of extreme points to exclude from
-limit calculations. The default will change from 3 to 0 in autospc 0.3.0, so
-that points are excluded only where the caller asks for it. Until then, a
-call that leaves \code{max_exclusions} unset and excludes points warns that its
-results will change.}
+limit calculations. The default, 0, excludes none.}
 
 \item{highlight_exclusions}{Boolean signifying whether excluded points are
 greyed out.}

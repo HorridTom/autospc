@@ -157,10 +157,6 @@ facet_stages <- function(data,
     stage_names <- as.character(seq_along(charts))
   }
 
-  if (!"max_exclusions" %in% names(given)) {
-    warn_max_exclusions_default(charts)
-  }
-
   # A facet is named for its stage rather than for its chart type
   report_analysis(
     charts = charts,

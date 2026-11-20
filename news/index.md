@@ -1,5 +1,18 @@
 # Changelog
 
+## autospc 0.2.0.9015
+
+### Vertical axis and log
+
+- A chart without limits (too few points, or `show_limits = FALSE`)
+  labels its vertical axis at the scale of the breaks, as a chart with
+  limits does. The labels were rounded to whole numbers, so a narrow
+  axis repeated them: an MR chart’s axis from 0 to 2 read 0, 0, 1, 2, 2
+  (#339).
+- Where there is no further shift rule break, the log reads “Sufficient
+  data to proceed.” It added “Moving counter to the next shift rule
+  break, commencing at point NA.” (#340).
+
 ## autospc 0.2.0.9014
 
 ### Missing first values

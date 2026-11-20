@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,14 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0.9015" id="autospc-0209015">autospc 0.2.0.9015<a class="anchor" aria-label="anchor" href="#autospc-0209015"></a></h2>
+<div class="section level3">
+<h3 id="vertical-axis-and-log-0-2-0-9015">Vertical axis and log<a class="anchor" aria-label="anchor" href="#vertical-axis-and-log-0-2-0-9015"></a></h3>
+<ul><li>A chart without limits (too few points, or <code>show_limits = FALSE</code>) labels its vertical axis at the scale of the breaks, as a chart with limits does. The labels were rounded to whole numbers, so a narrow axis repeated them: an MR chart’s axis from 0 to 2 read 0, 0, 1, 2, 2 (#339).</li>
+<li>Where there is no further shift rule break, the log reads “Sufficient data to proceed.” It added “Moving counter to the next shift rule break, commencing at point NA.” (#340).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9014" id="autospc-0209014">autospc 0.2.0.9014<a class="anchor" aria-label="anchor" href="#autospc-0209014"></a></h2>
 <div class="section level3">

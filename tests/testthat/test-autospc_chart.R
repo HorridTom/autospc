@@ -425,10 +425,12 @@ test_that("centre line labels sit a tenth above the upper limit by default", {
 
 # first_label_row(), label_accuracy(), y_axis_range()
 
-test_that("the first centre line label goes on row one by default", {
+test_that("the first centre line label goes on the first row with a centre line by default", {
   chart <- autospc_chart(chart_type = "C", data = test_data, x = "x", y = "y")
 
-  expect_identical(first_label_row(chart), 1L)
+  expect_identical(first_label_row(chart, cl = c(5, 5, 5)), 1L)
+  expect_identical(first_label_row(chart, cl = c(NA, NA, 5)), 3L)
+  expect_identical(first_label_row(chart, cl = c(NA, NA)), NA_integer_)
 })
 
 

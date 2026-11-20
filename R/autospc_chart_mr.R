@@ -135,10 +135,11 @@ prepare_segment_data.autospc_chart_mr <- function(chart,
 
 #' The rows of a prepared MR series that hold an observation
 #'
-#' The first row of an MR series holds no moving range because there is no
-#' earlier point to measure one against, not because a value is missing. It
+#' The first row with a value of `y` holds no moving range because there is no
+#' earlier value to measure one against, not because a value is missing. It
 #' stays in the series, so that a calculation period spans `period_min` points
-#' of the series the moving ranges were derived from.
+#' of the series the moving ranges were derived from. Rows before it, where `y`
+#' is missing, are not observations, as on the X chart.
 #'
 #' With `location = TRUE`, the rows where the X chart has a value. An MR series
 #' keeps the X values in `y`, so these are the rows where `y` is not missing.
@@ -156,7 +157,11 @@ observed_rows.autospc_chart_mr <- function(chart,
   }
 
   observed <- NextMethod()
-  observed[1L] <- TRUE
+  first_value <- match(TRUE, !is.na(data$y))
+
+  if (!is.na(first_value)) {
+    observed[first_value] <- TRUE
+  }
 
   return(observed)
 }
@@ -275,14 +280,16 @@ chart_type_label.autospc_chart_mr <- function(chart) {
 }
 
 
-#' Row that carries the first centre line label
+#' The earliest row that can carry the first centre line label
 #'
-#' The first moving range is undefined, so the label goes on the second row.
+#' The row after the first row with a centre line, because the moving range on
+#' that first row is undefined.
 #'
-#' @return integer, row number
+#' @return integer, row number, or `NA` where no row has a centre line
 #' @noRd
-first_label_row.autospc_chart_mr <- function(chart) {
-  return(2L)
+first_label_row.autospc_chart_mr <- function(chart,
+                                             cl) {
+  return(NextMethod() + 1L)
 }
 
 

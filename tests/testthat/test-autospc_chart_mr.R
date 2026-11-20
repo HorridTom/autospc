@@ -213,8 +213,9 @@ test_that("prepare_data takes the series from the moving ranges", {
 })
 
 
-test_that("the first MR centre line label goes on row two", {
-  expect_identical(first_label_row(test_chart_mr()), 2L)
+test_that("the first MR centre line label goes on the row after the first centre line", {
+  expect_identical(first_label_row(test_chart_mr(), cl = c(1, 1, 1)), 2L)
+  expect_identical(first_label_row(test_chart_mr(), cl = c(NA, 1, 1)), 3L)
 })
 
 
@@ -271,5 +272,19 @@ test_that("observed_rows reads the moving ranges, or y for the location chart", 
   expect_identical(
     observed_rows(test_chart_mr(), data = prepared, location = TRUE),
     c(TRUE, FALSE, TRUE, TRUE, TRUE)
+  )
+})
+
+
+test_that("observed_rows keeps the first row with a value of y, not row one", {
+  prepared <- data.frame(
+    x = 1:5,
+    y = c(NA, NA, 3, 4, 5),
+    series = c(NA, NA, NA, 1, 1)
+  )
+
+  expect_identical(
+    observed_rows(test_chart_mr(), data = prepared),
+    c(FALSE, FALSE, TRUE, TRUE, TRUE)
   )
 })

@@ -32,8 +32,6 @@ autospc(
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
-  show_mr = deprecated(),
-  write_table = deprecated(),
   verbosity = 0L,
   log_file_path = NULL,
   keep_candidate_tables = FALSE,
@@ -245,17 +243,6 @@ other analytic output appended as columns.}
 
 \item{show_limits}{Boolean controlling whether or not to display centre line
 and control limits}
-
-\item{show_mr}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{chart_type} instead.
-\code{chart_type = "XMR"} draws the pair and \code{chart_type = "X"} draws the X
-chart on its own, which is what \code{show_mr = FALSE} did. It will be removed in
-autospc 0.3.0.}
-
-\item{write_table}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Save the results
-yourself instead. \code{autospc(plot_chart = FALSE)} returns them as a data frame,
-and \code{as.data.frame()} on the \code{autospc_plot} object \code{autospc()} returns does
-the same, either of which can be written to a path of your choosing with
-e.g. \code{write.csv()}. It will be removed in autospc 0.3.0.}
 
 \item{verbosity}{Integer 0-2 specifying how talkative the algorithm is in the
 standard output log; the higher the number the more information is provided,

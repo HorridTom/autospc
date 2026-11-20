@@ -153,15 +153,6 @@
 #' other analytic output appended as columns.
 #' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
-#' @param show_mr `r lifecycle::badge("deprecated")` Use `chart_type` instead.
-#' `chart_type = "XMR"` draws the pair and `chart_type = "X"` draws the X
-#' chart on its own, which is what `show_mr = FALSE` did. It will be removed in
-#' autospc 0.3.0.
-#' @param write_table `r lifecycle::badge("deprecated")` Save the results
-#' yourself instead. `autospc(plot_chart = FALSE)` returns them as a data frame,
-#' and `as.data.frame()` on the `autospc_plot` object `autospc()` returns does
-#' the same, either of which can be written to a path of your choosing with
-#' e.g. `write.csv()`. It will be removed in autospc 0.3.0.
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
 #' none if 0. A value outside the range is taken as the nearest end of it, and a
@@ -318,8 +309,6 @@ autospc <- function(data,
                     ## Output Type
                     plot_chart = TRUE,
                     show_limits = TRUE,
-                    show_mr = deprecated(),
-                    write_table = deprecated(),
                     verbosity = 0L,
                     log_file_path = NULL,
                     keep_candidate_tables = FALSE,
@@ -354,40 +343,6 @@ autospc <- function(data,
                     lower_annotation_sf = NULL,
                     annotation_arrows = FALSE,
                     annotation_arrow_curve = 0.3) {
-  if (lifecycle::is_present(write_table)) {
-    lifecycle::deprecate_warn(
-      when = "0.1.0",
-      what = "autospc(write_table)",
-      details = paste(
-        "Save the results yourself instead:",
-        "autospc(plot_chart = FALSE) returns them as a data",
-        "frame, and as.data.frame() on the autospc_plot object",
-        "autospc() returns does the same. Either can be written",
-        "to a path of your choosing with e.g. write.csv().",
-        "No file has been written. write_table will be removed in",
-        "autospc 0.3.0."
-      )
-    )
-  }
-
-  if (lifecycle::is_present(show_mr)) {
-    lifecycle::deprecate_warn(
-      when = "0.1.0",
-      what = "autospc(show_mr)",
-      with = "autospc(chart_type)",
-      details = paste(
-        'chart_type = "X" draws the X chart on its own, which',
-        'is what show_mr = FALSE did, and chart_type = "XMR"',
-        "draws the pair. show_mr will be removed in autospc 0.3.0."
-      )
-    )
-
-    # show_mr = FALSE drew the location chart of a pair on its own
-    if (isFALSE(show_mr)) {
-      chart_type <- location_chart_type(chart_type)
-    }
-  }
-
   x_name <- resolve_column_name(rlang::enquo(x), fallback = "x")
   y_name <- resolve_column_name(rlang::enquo(y), fallback = "y")
   n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")
@@ -400,7 +355,7 @@ autospc <- function(data,
   data <- drop_missing_x(data, x_column = x_name)
 
   # Named list of every argument of the call by name, apart from the data,
-  # the columns, and the deprecated arguments dealt with above.
+  # the columns, and any deprecated arguments.
   arguments <- mget(setdiff(
     names(formals()),
     c(

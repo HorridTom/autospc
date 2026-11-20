@@ -40,13 +40,17 @@ chart_argument_alternatives <- list(
 
 test_that("the deprecated arguments are the ones autospc declares as deprecated", {
   # the deprecated arguments are found by their default rather than named, and
-  # this is the list that is expected
-  expect_setequal(
-    autospc_deprecated_arguments(),
-    c(
-      "show_mr",
-      "write_table"
-    )
+  # this is the list that is expected: none, since 0.3.0 removed show_mr and
+  # write_table
+  expect_identical(autospc_deprecated_arguments(), character(0))
+})
+
+
+test_that("show_mr and write_table are no longer arguments of autospc", {
+  expect_false(any(c("show_mr", "write_table") %in% names(formals(autospc))))
+  expect_error(
+    autospc(data.frame(x = 1:30, y = 1:30), chart_type = "X", show_mr = FALSE),
+    "unused argument"
   )
 })
 

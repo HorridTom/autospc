@@ -65,29 +65,6 @@ facet_stages <- function(data,
 
   dots_exprs <- rlang::exprs(...)
 
-  if ("show_mr" %in% names(dots_exprs)) {
-    if (isTRUE(dots_exprs$show_mr)) {
-      warning(paste(
-        "`facet_stages()` does not support `show_mr = TRUE`.",
-        "The X chart is faceted on its own. To facet an MR chart",
-        "by stages use `facet_stages()` with `chart_type = MR`."
-      ))
-    }
-
-    lifecycle::deprecate_warn(
-      when = "0.1.0",
-      what = "facet_stages(show_mr)",
-      with = "facet_stages(chart_type)",
-      details = paste(
-        'chart_type = "X" facets the X chart on its own, which',
-        "is what facet_stages() has always drawn for",
-        'chart_type = "XMR". show_mr will be removed in autospc 0.3.0.'
-      )
-    )
-
-    dots_exprs$show_mr <- NULL
-  }
-
   column_exprs <- dots_exprs[
     which(names(dots_exprs) %in% autospc_column_arguments())
   ]
@@ -304,10 +281,9 @@ create_splits_list <- function(data,
 #' default from `autospc()`'s signature where the caller gave none.
 #'
 #' `data`, `x`, `y`, `n` and `s` are not among them. `data` is the data itself,
-#' and the other four hold column names rather than values. The deprecated
+#' and the other four hold column names rather than values. Any deprecated
 #' arguments are not among them either: their default is a sentinel rather than
-#' a value, and `facet_stages()` deals with the one it supports before this is
-#' called.
+#' a value.
 #'
 #' @param given A named list of the argument values the caller supplied.
 #'

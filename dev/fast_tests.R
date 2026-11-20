@@ -23,7 +23,6 @@ slow_test_files <- c(
   "chart_arguments",                 # 5.4s
   "ruleLengths",                     # 4.9s
   "establish_limits",                # 4.9s
-  "show_mr_deprecated",              # 4.4s
   "no_regrets",                      # 4.3s
   "history",                         # 2.7s
   "log_file",                        # 2.6s

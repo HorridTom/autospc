@@ -1,315 +1,229 @@
 # Changelog
 
-## autospc 0.2.0.9015
+## autospc 0.3.0
 
-### Vertical axis and log
+This release adds U and U’ charts, restarts of the algorithm (forced,
+and after a long gap), ranges in which limits may not be re-established,
+and a choice of how the dispersion chart of a pair establishes its
+limits. It makes the changes announced in 0.2.0: the default of
+`max_exclusions` is now 0, `show_mr`, `write_table` and
+`facet_stages(split_rows)` are removed, and `no_regrets = TRUE` with
+`overhanging_reversions = FALSE` is an error. It brings together
+development versions 0.2.0.9001 to 0.2.0.9015.
 
-- A chart without limits (too few points, or `show_limits = FALSE`)
-  labels its vertical axis at the scale of the breaks, as a chart with
-  limits does. The labels were rounded to whole numbers, so a narrow
-  axis repeated them: an MR chart’s axis from 0 to 2 read 0, 0, 1, 2, 2
-  (#339).
-- Where there is no further shift rule break, the log reads “Sufficient
-  data to proceed.” It added “Moving counter to the next shift rule
-  break, commencing at point NA.” (#340).
+### Lifecycle changes
 
-## autospc 0.2.0.9014
+#### Breaking changes
 
-### Missing first values
+##### Defaults that change results
 
-- Where the first value of the series is missing, the MR chart’s
-  calculation period now starts at the same point as the X chart’s, the
-  first non-missing point of the series (the same applies after a
-  restart). Previously, it started on the first row of the series or
-  segment, so the MR chart had limits on rows where neither chart had a
-  value (#326).
-- There is now a label for the first centre line on a chart whose first
-  value is missing. This also labels the first centre line of a
-  dispersion chart whose first calculation period starts later than the
-  location chart’s.
+- **The default of `max_exclusions` is now 0** (#282), so that points
+  are excluded from a period’s limits only when you ask for it. Whenever
+  points were excluded under the old default of 3, the limits will
+  differ under the default, and where they are re-established can
+  change. Set `max_exclusions = 3` to keep the results of 0.2.0. The
+  warning 0.2.0 gave when `max_exclusions` was left unset is gone.
 
-## autospc 0.2.0.9013
+- **The algorithm restarts after a long gap** (#325). The new argument
+  `restart_after_gap` defaults to `period_min`, so results change for a
+  series with a run of at least that many consecutive points with no
+  value: a calculation period before the gap no longer takes points from
+  after it, and limits are no longer carried across the gap.
+  `restart_after_gap = Inf` keeps the behaviour of 0.2.0.
 
-### Vertical axis
+##### Results that change
 
-- A C′ chart where every value is zero no longer warns “no non-missing
-  arguments to max”, and is drawn with a vertical axis from 0 to 10, as
-  a C chart of zeros is (#314).
-- A chart whose values, centre line and limits are all equal, as where
-  they are all zero, is drawn with a vertical axis from that value to
-  one more. U, U′, X, MR, Xbar and S charts of zeros were drawn from
-  -0.05 to 0.05.
-- A series too short for limits is drawn on the same vertical axis as a
-  chart of its type with limits, so the axis of a count, rate or
-  proportion chart starts at zero. It was drawn from the lowest to the
-  highest value.
-- An X or Xbar chart whose upper limit is negative no longer fails with
-  “invalid ‘nsmall’ argument”. The top of its vertical axis is now above
-  the data.
-- A centre line label is now drawn outside a negative control limit, as
-  for a positive one: a negative limit is multiplied by
-  `2 - upper_annotation_sf` (or `2 - lower_annotation_sf`) instead of
-  the factor itself, which put the label inside the limits.
+- **With `no_regrets = TRUE`, the default, adding a point to the end of
+  a series can no longer move a re-establishment of limits to an earlier
+  point** (#308). This happened when the final run of a candidate
+  calculation period was on the opposite side of the candidate centre
+  line and continued to the end of the data. The algorithm now stops at
+  such a candidate, so some re-establishments are made only once a few
+  more points have been added. Only the end of a series is affected.
 
-## autospc 0.2.0.9012
+- **A calculation period whose standard deviation cannot be estimated**
+  (a C’ or P’ period with no variation, or an Xbar period made up only
+  of subgroups of one) no longer takes limits or `sbar` from the
+  previous period (#310). Its display rows keep its centre line and have
+  no limits, and the shift rule applies to them as usual, so limits can
+  be re-established after it.
 
-### Dispersion chart calculation periods
+- **Where the first value of the series, or of a segment after a
+  restart, is missing**, the MR chart’s calculation period now starts at
+  the same point as the X chart’s, the first point with a value (#326).
+  It started at the first row, so the MR chart had limits on rows where
+  neither chart had a value.
 
-- New argument `dispersion_chart_establishment` sets how the dispersion
-  chart of a pair (the MR chart of `"XMR"`, the S chart of `"XbarS"`)
-  establishes its limits (#115):
+##### Changes to the drawing
+
+- **The floating median is drawn in `firebrick3` with long dashes**, in
+  place of grey, which was often hard to see (#315). Its label sits just
+  after the end of the line, at `annotation_size`, and the horizontal
+  axis is extended to make room for it (#316). It is drawn only as far
+  as the last point with a value in its segment.
+
+- **The line joining the points breaks at each row whose value is
+  missing**, rather than running straight across it (#321). Time points
+  absent from the data are not treated as missing: to break the line
+  there, add a row with the value `NA`. The analysis is unchanged.
+
+- **The vertical axis.** A series too short for limits is drawn on the
+  same axis as a chart of its type with limits, so the axis of a count,
+  rate or proportion chart starts at zero, and its labels follow the
+  scale of the breaks rather than being rounded to whole numbers (#339).
+  A chart whose values, centre line and limits are all equal, as where
+  they are all zero, is drawn from that value to one more (#314).
+
+- **The legends always appear in the same order**: “Rule triggered”,
+  then “Period Type”, then the legends for restarts and prevented
+  ranges. Before, ggplot2 chose the order.
+
+##### The table `plot_chart = FALSE` returns
+
+- A new column, `restart`, is `TRUE` at the first row of each segment
+  after a restart, forced or after a gap.
+
+##### Removed
+
+- **`autospc(show_mr)`, `facet_stages(show_mr)` and
+  `autospc(write_table)`**, deprecated since 0.1.0, are removed (#240,
+  \#244). Supplying `show_mr` or `write_table` to
+  [`autospc()`](https://horridtom.github.io/autospc/reference/autospc.md)
+  is now R’s own “unused argument” error. Use `chart_type = "X"` (or
+  `"Xbar"`) for the location chart on its own, and `plot_chart = FALSE`,
+  or [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on
+  the plot, for the results table.
+
+- **`facet_stages(split_rows)`**, deprecated in 0.2.0, is removed. Use
+  `split_at`, which counts points in the analysed series rather than
+  rows of the data; where the data already holds one row per subgroup,
+  in `x` order, the two are the same.
+
+- **`no_regrets = TRUE` with `overhanging_reversions = FALSE` is an
+  error** (#243), of class
+  `"autospc_inconsistent_ssa_parameters_error"`. It was deprecated in
+  0.2.0, and changed `overhanging_reversions` to TRUE with a warning.
+  Set `overhanging_reversions = TRUE`, or leave it at its default, or
+  set `no_regrets = FALSE`.
+
+### New features
+
+- **U and U’ charts** (#227). `chart_type = "U"` draws a U chart of
+  rates: a count of events `y` over the area of opportunity `n` in which
+  they could occur, such as infections per 1,000 central line days. Its
+  control limits vary with `n`. `chart_type = "U'"` draws Laney’s U’
+  chart (Laney, 2002), whose limits are also widened where the rates
+  vary from subgroup to subgroup by more than a Poisson count would. `n`
+  need not be a whole number, and rows that share an `x` are summed into
+  one subgroup. See
+  [`vignette("data-requirements")`](https://horridtom.github.io/autospc/articles/data-requirements.md).
+
+- **Forced restarts** (#119). `force_restart_at` makes the algorithm
+  restart at one or more values on the horizontal axis. Each segment is
+  analysed as if it were a series of its own: its first calculation
+  period is `baseline_length` points, a segment with fewer than
+  `period_min` points has no limits, and no run counts towards the shift
+  rule across a restart. Each restart is drawn as a solid vertical line,
+  with the legend entry “Forced restart”. A floating median can be drawn
+  at the end of each segment long enough for one.
+
+- **Restarts after a long gap** (#325). `restart_after_gap` (see above)
+  restarts the algorithm at the first point with a value after a run of
+  at least that many points with no value. For a pair, gaps are counted
+  on the location chart, so both charts restart at the same point. A
+  restart after a gap is drawn as a dotted line, with the legend entry
+  “Restart after gap”.
+
+- **Ranges in which limits may not be re-established** (#119).
+  `prevent_establishment_in` gives one or more ranges of the horizontal
+  axis in which the algorithm may not establish new limits; the first
+  calculation period of the series, and the first after each restart,
+  are not affected. Each range is shaded light grey, with the legend
+  entry “Re-establishment prevented”.
+
+- **How the dispersion chart of a pair establishes its limits** (#115).
+  The new argument `dispersion_chart_establishment` applies to the MR
+  chart of `"XMR"` and the S chart of `"XbarS"`:
+
   - `"independent"`, the default, runs the algorithm on the dispersion
     chart separately from the location chart, as before;
   - `"forced"` uses the location chart’s calculation periods, so the
-    dispersion chart’s limits change where the location chart’s do. In a
-    period where the dispersion chart has fewer points with a value than
-    the location chart, its limits are calculated from fewer than
-    `period_min` points;
+    dispersion chart’s limits change where the location chart’s do;
   - `"shared"` extends each calculation period until both charts have at
     least `period_min` points with a value in it, and both charts use
-    these periods, so the location chart’s limits can differ from those
-    it has with `"independent"` or `"forced"`.
+    these periods.
 
-  The argument is ignored, with a warning, for a chart type that is not
-  a pair.
-- With `"forced"` or `"shared"`, an MR chart leaves the moving range at
-  the first point of each calculation period after the first in a
-  segment out of that period’s limits, because it is the difference from
-  the last point of the previous period. It does not count towards
-  `max_exclusions`.
-- With `"forced"` or `"shared"`, the dispersion chart’s log records
-  restarts and the new codes `0800` (limits established - forced by
-  location chart) at the first period of each segment and `0810` (limits
-  re-established - forced by location chart) at each later period.
-  Printing the chart adds the line “Calculation periods mirror the …
-  chart”.
-- In
+  With `"forced"` or `"shared"`, an MR chart leaves the moving range at
+  the start of each later calculation period out of that period’s
+  limits, because it spans two periods; this does not count towards
+  `max_exclusions`. Printing the chart adds the line “Calculation
+  periods mirror the … chart”. In
   [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md),
-  a pair is drawn as its location chart, as before. With `"shared"`,
-  each facet’s location chart has the shared calculation periods.
+  which draws a pair as its location chart, `"shared"` gives each
+  facet’s location chart the shared periods. The argument is ignored,
+  with a warning, for a chart type that is not a pair.
 
-### Periods with no standard deviation estimate
-
-- A calculation period whose standard deviation cannot be estimated (a
-  C′ or P′ period with no variation, or an Xbar period made up only of
-  subgroups of one) no longer inherits limits or `sbar` from the
-  previous period. Its display rows retain its centre line and have no
-  limits, and the shift rule applies to them as usual, so limits can be
-  re-established after it (#310).
-
-## autospc 0.2.0.9011
-
-- `floating_median_labels = "gaps"` no longer gives a warning when the
-  chart has no floating median (#332).
-
-## autospc 0.2.0.9010
-
-### Floating median
-
-- New argument `floating_median_labels` chooses which floating medians
-  are labelled where a series restarts and so has more than one (#330):
-  `"last"`, the default, labels only the median of the last segment, as
-  before; `"all"` labels every median; `"gaps"` labels the median of the
-  last segment and every median followed by a gap of at least
-  `restart_after_gap` points with no value; `"none"` labels no median,
-  and leaves no space for a label on the right of the chart. In
-  [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md),
-  this applies within each facet.
-
-## autospc 0.2.0.9009
-
-### Restarting after a long gap
-
-- New argument `restart_after_gap`: after a run of at least this many
-  consecutive points with missing value, the algorithm restarts at the
-  first point with a value, as it does at a value of `force_restart_at`
-  (#325). It defaults to `period_min`, so results change for a series
-  with a gap that long: a calculation period before the gap no longer
-  takes points from after it, and limits are no longer carried across
-  the gap. `Inf` turns this off. A time point with no row in the data is
-  not part of a gap; to make one, add a row with the value `NA`. Gaps at
-  the start or end of the series are ignored.
-- For a location and dispersion pair, gaps are counted on the location
-  chart, so both charts restart at the same point. A subgroup of one,
-  which has a mean but no standard deviation, is not part of a gap.
-- Where a gap ends inside a range given by `prevent_establishment_in`,
-  the algorithm restarts at the first point with a value after the range
-  instead, and the points between are drawn without limits.
-- A restart after a gap is drawn as a dotted line, with the legend entry
-  “Restart after gap”. The `restart` column is `TRUE` there, and the log
-  records it with the new code `0010`.
-
-### Floating median
-
-- The floating median is now drawn only as far as the last point with a
-  value in its segment, not across missing values after it.
-
-## autospc 0.2.0.9008
-
-### Forced restarts and preventing re-establishment
-
-- New argument `force_restart_at` makes the algorithm restart at one or
-  more values on the horizontal axis (#119). The series is analysed in
-  segments, each starting at the first point of the series or the first
-  point at or after a forced restart. Each segment is analysed as if it
-  were a series of its own: its first calculation period is
-  `baseline_length` points, a segment with fewer than `period_min`
-  points has no limits, and no run counts towards the shift rule across
-  a restart. Each restart is drawn as a solid vertical line, with the
-  legend entry “Forced restart”. Values outside the data are ignored.
-- New argument `prevent_establishment_in` gives a range of the
-  horizontal axis in which the algorithm may not establish new limits
-  (#119): two values, with `NA` for an open end, or a list of such
-  ranges. A range includes both its end points. A shift that starts
-  inside a range and continues past its end can still re-establish
-  limits after the range. The first calculation period of the series,
-  and the first after each restart, are not affected. Each range is
-  shaded light grey, with the legend entry “Re-establishment prevented”.
-  Ranges outside the data are ignored.
-- The table returned with `plot_chart = FALSE` has a new column,
-  `restart`, which is `TRUE` at the first row of each segment after a
-  forced restart.
-- The algorithm log records a forced restart with the new code `0000`,
-  and a candidate in a range given by `prevent_establishment_in` with
-  the new code `0730`, “Not considered”. The table of log codes in the
-  “Stable Shift Algorithm” vignette now lists every code the log can
-  record, including these two and the prefix `co@n|`.
-- With forced restarts, a floating median can be drawn at the end of
-  each segment that holds at least `floating_median_n` points, not only
-  at the end of the series. Only the last is labelled.
-
-### Chart legends
-
-- The legends now always appear in the same order: “Rule triggered”,
-  then “Period Type”, then “Re-establishment prevented” and “Forced
-  restart”. Before, ggplot2 chose the order, and it differed between
-  charts and between versions of ggplot2.
-- The “Period Type” legend now shows “Calculation” when the first rows
-  of the chart have no limits: a series that begins with missing values,
-  a faceted chart whose first stage is too short for limits, or a series
-  whose first segment is too short for limits. Before, it showed only
-  “Display”.
-- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-  now labels the floating median in every facet that has one, not only
-  in the last.
-
-## autospc 0.2.0.9007
-
-### Bugfix: Missing values
-
-- Fixed a bug introduced in 0.2.0.9006. With `na_ends_run = TRUE`,
-  limits are now re-established after a gap in the data (#323). When a
-  gap ended a run and the run after the gap was on the same side of the
-  centre line, the algorithm took the second run to be a continuation of
-  the first. If the first run started before the point the algorithm had
-  reached, no rule 2 break was found, so the limits were never
-  re-established after the gap. A rule 2 break now starts correctly
-  where a run that breaks rule 2 commences, so a run after a gap is
-  treated as a new run. Results are unchanged for data with no gaps, and
-  with `na_ends_run = FALSE`.
-
-## autospc 0.2.0.9006
-
-### Missing values
-
-- The line joining the series points now breaks at each row whose value
-  is missing, rather than running straight across it (#321). The points,
-  centre line and limits are drawn as before, and the analysis is
-  unchanged. This behaviour is independent of `na_ends_run`. Time points
-  absent from the data are not treated as missing: to break the line
-  there, add a row for each missing time point with the value `NA`.
-
-## autospc 0.2.0.9005
-
-### Speed
-
-- The analysis runs about ten times faster, and a drawn chart about two
-  and a half to three times faster. The helpers the algorithm calls
-  repeatedly while it looks for new periods now use base R in place of
-  dplyr, and `find_extremes()` no longer works out rule 2 and
-  highlighting, which it did not use. Results are unchanged.
-
-## autospc 0.2.0.9004
-
-### Showing part of a chart
-
-- New argument `display_window = c(start, end)` shows part of the
-  horizontal axis without changing the analysis (#317). The plot is
-  zoomed to the range, so lines run on to its edges. Every calculation
-  period that overlaps the range has its centre line labelled, a period
-  that starts before the range at its first point, and `align_labels`
-  uses the limits within the range. `NA` at either end leaves that end
-  where the chart would put it. The vertical axis is still set from the
-  whole series, and `override_y_lim` is checked against the points
-  within the range only. The floating median is still taken over the end
-  of the whole series, and is drawn only when the range reaches the end
-  of the data.
+- **`display_window = c(start, end)`** shows part of the horizontal axis
+  without changing the analysis (#317). Every calculation period that
+  overlaps the range has its centre line labelled, and
   [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
   applies the range to every facet.
 
-## autospc 0.2.0.9003
+- **`floating_median_style`**, a list of `colour`, `linetype` and
+  `linewidth`, sets how the floating median is drawn (#315), and
+  **`floating_median_labels`** chooses which floating medians are
+  labelled where a series restarts and so has more than one: `"last"`
+  (the default), `"all"`, `"gaps"` or `"none"` (#330).
 
-### Floating median
+- **The algorithm log** records the new events with new codes: `0000` (a
+  forced restart), `0010` (a restart after a gap), `0720` (a candidate
+  rejected because its final run is not complete), `0730` (a candidate
+  in a prevented range, not considered), and `0800` and `0810` (limits
+  established or re-established on a dispersion chart, forced by the
+  location chart). The table of log codes in
+  [`vignette("stable-shift-algorithm")`](https://horridtom.github.io/autospc/articles/stable-shift-algorithm.md)
+  lists every code the log can record.
 
-- New argument `floating_median_style`, a list of `colour`, `linetype`
-  and `linewidth`, sets how the floating median is drawn (#315). The
-  default is now `firebrick3` with long dashes, in place of grey, which
-  was often hard to see. The median’s width follows `line_width_sf`, as
-  the other lines do.
-- The floating median’s label now sits just after the end of the median
-  line, at `annotation_size` (#316). The horizontal axis is extended to
-  make room for it.
-- The floating median is no longer drawn behind the keys of the “Rule
-  triggered” legend, and
-  [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
-  draws its label only in the facet that holds the median.
-
-## autospc 0.2.0.9002
+- **Speed.** The analysis runs about ten times faster, and a drawn chart
+  about two and a half to three times faster. Results are unchanged.
 
 ### Bug fixes
 
-- With `no_regrets = TRUE`, the default, adding a point to the end of a
-  series could move a re-establishment of limits to an earlier point
-  (#308). This happened when the final run of a candidate calculation
-  period was on the opposite side of the candidate centre line and
-  continued to the end of the data. The candidate limits were rejected,
-  the algorithm went on to consider later points, and a later candidate
-  could be accepted; once more data ended that run, the earlier
-  candidate was accepted instead. The algorithm now stops at such a
-  candidate. Only the end of a series is affected. Some
-  re-establishments are now made only once a few more points have been
-  added to the series.
-- The algorithm log records this outcome with a new code, `0720`:
-  “Candidate limits rejected: insufficient data to establish a stable
-  new process. The final run of the candidate calculation period is not
-  complete.” The description of the algorithm in
-  [`vignette("stable-shift-algorithm")`](https://horridtom.github.io/autospc/articles/stable-shift-algorithm.md),
-  its flow chart, and the explanation of the log codes are updated to
-  match.
+- An X or Xbar chart whose upper limit is negative no longer fails with
+  “invalid ‘nsmall’ argument”; the top of its vertical axis is above the
+  data, and its centre line labels are drawn outside the limits rather
+  than inside them (#314).
 
-## autospc 0.2.0.9001
+- A C’ chart where every value is zero no longer warns “no non-missing
+  arguments to max”, and is drawn with a vertical axis from 0 to 10
+  (#314).
 
-### U and U’ charts
+- A chart whose first value is missing labels its first centre line, as
+  does a dispersion chart whose first calculation period starts later
+  than the location chart’s (#326).
 
-`chart_type = "U"` draws a U chart of rates: a count of events `y` over
-the area of opportunity `n` in which they could occur, such as
-infections per 1,000 central line days. Its control limits vary with
-`n`. `chart_type = "U'"` draws Laney’s U’ chart (Laney, 2002), whose
-limits are also widened where the rates vary from subgroup to subgroup
-by more than a Poisson count would. The chart plots `y / n`, so the unit
-of `n` sets the unit of the rate, and `n` need not be a whole number.
-Rows that share an `x` are summed into one subgroup. See
-[`vignette("data-requirements")`](https://horridtom.github.io/autospc/articles/data-requirements.md)
-for the data each needs.
+- Where there is no further shift rule break, the log reads “Sufficient
+  data to proceed.” rather than adding “Moving counter to the next shift
+  rule break, commencing at point NA.” (#340).
+
+- The “Period Type” legend shows “Calculation” when the first rows of
+  the chart have no limits, as for a series that begins with missing
+  values. It showed only “Display”.
+
+- [`facet_stages()`](https://horridtom.github.io/autospc/reference/facet_stages.md)
+  labels the floating median in every facet that has one, not only in
+  the last, and draws a median’s label only in the facet that holds it.
+
+- The floating median is no longer drawn behind the keys of the “Rule
+  triggered” legend.
 
 ### Documentation
 
-- `mr_screen_max_loops` applies to the screening of moving ranges in C’
-  and P’ charts as well as X charts, and now to U’ charts too. Its
-  documentation said only X charts; it now says which, and that 0 turns
-  the screening off.
-- The `autospc.rounded_constants` option documentation now names C’ and
-  P’ charts, which use d2, and D4 in their screening of moving ranges.
+- `mr_screen_max_loops` applies to the screening of moving ranges in C’,
+  P’ and U’ charts as well as X charts; its documentation now says so,
+  and that 0 turns the screening off. The `autospc.rounded_constants`
+  option documentation names the C’ and P’ charts, which use d2, and D4
+  in their screening of moving ranges.
 
 ## autospc 0.2.0
 

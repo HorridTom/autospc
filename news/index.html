@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autospc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,154 +42,77 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9015" id="autospc-0209015">autospc 0.2.0.9015<a class="anchor" aria-label="anchor" href="#autospc-0209015"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.0" id="autospc-030">autospc 0.3.0<a class="anchor" aria-label="anchor" href="#autospc-030"></a></h2>
+<p>This release adds U and U’ charts, restarts of the algorithm (forced, and after a long gap), ranges in which limits may not be re-established, and a choice of how the dispersion chart of a pair establishes its limits. It makes the changes announced in 0.2.0: the default of <code>max_exclusions</code> is now 0, <code>show_mr</code>, <code>write_table</code> and <code>facet_stages(split_rows)</code> are removed, and <code>no_regrets = TRUE</code> with <code>overhanging_reversions = FALSE</code> is an error. It brings together development versions 0.2.0.9001 to 0.2.0.9015.</p>
 <div class="section level3">
-<h3 id="vertical-axis-and-log-0-2-0-9015">Vertical axis and log<a class="anchor" aria-label="anchor" href="#vertical-axis-and-log-0-2-0-9015"></a></h3>
-<ul><li>A chart without limits (too few points, or <code>show_limits = FALSE</code>) labels its vertical axis at the scale of the breaks, as a chart with limits does. The labels were rounded to whole numbers, so a narrow axis repeated them: an MR chart’s axis from 0 to 2 read 0, 0, 1, 2, 2 (#339).</li>
-<li>Where there is no further shift rule break, the log reads “Sufficient data to proceed.” It added “Moving counter to the next shift rule break, commencing at point NA.” (#340).</li>
+<h3 id="lifecycle-changes-0-3-0">Lifecycle changes<a class="anchor" aria-label="anchor" href="#lifecycle-changes-0-3-0"></a></h3>
+<div class="section level4">
+<h4 id="breaking-changes-0-3-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-3-0"></a></h4>
+<div class="section level5">
+<h5 id="defaults-that-change-results-0-3-0">Defaults that change results<a class="anchor" aria-label="anchor" href="#defaults-that-change-results-0-3-0"></a></h5>
+<ul><li><p><strong>The default of <code>max_exclusions</code> is now 0</strong> (#282), so that points are excluded from a period’s limits only when you ask for it. Whenever points were excluded under the old default of 3, the limits will differ under the default, and where they are re-established can change. Set <code>max_exclusions = 3</code> to keep the results of 0.2.0. The warning 0.2.0 gave when <code>max_exclusions</code> was left unset is gone.</p></li>
+<li><p><strong>The algorithm restarts after a long gap</strong> (#325). The new argument <code>restart_after_gap</code> defaults to <code>period_min</code>, so results change for a series with a run of at least that many consecutive points with no value: a calculation period before the gap no longer takes points from after it, and limits are no longer carried across the gap. <code>restart_after_gap = Inf</code> keeps the behaviour of 0.2.0.</p></li>
+</ul></div>
+<div class="section level5">
+<h5 id="results-that-change-0-3-0">Results that change<a class="anchor" aria-label="anchor" href="#results-that-change-0-3-0"></a></h5>
+<ul><li><p><strong>With <code>no_regrets = TRUE</code>, the default, adding a point to the end of a series can no longer move a re-establishment of limits to an earlier point</strong> (#308). This happened when the final run of a candidate calculation period was on the opposite side of the candidate centre line and continued to the end of the data. The algorithm now stops at such a candidate, so some re-establishments are made only once a few more points have been added. Only the end of a series is affected.</p></li>
+<li><p><strong>A calculation period whose standard deviation cannot be estimated</strong> (a C’ or P’ period with no variation, or an Xbar period made up only of subgroups of one) no longer takes limits or <code>sbar</code> from the previous period (#310). Its display rows keep its centre line and have no limits, and the shift rule applies to them as usual, so limits can be re-established after it.</p></li>
+<li><p><strong>Where the first value of the series, or of a segment after a restart, is missing</strong>, the MR chart’s calculation period now starts at the same point as the X chart’s, the first point with a value (#326). It started at the first row, so the MR chart had limits on rows where neither chart had a value.</p></li>
+</ul></div>
+<div class="section level5">
+<h5 id="changes-to-the-drawing-0-3-0">Changes to the drawing<a class="anchor" aria-label="anchor" href="#changes-to-the-drawing-0-3-0"></a></h5>
+<ul><li><p><strong>The floating median is drawn in <code>firebrick3</code> with long dashes</strong>, in place of grey, which was often hard to see (#315). Its label sits just after the end of the line, at <code>annotation_size</code>, and the horizontal axis is extended to make room for it (#316). It is drawn only as far as the last point with a value in its segment.</p></li>
+<li><p><strong>The line joining the points breaks at each row whose value is missing</strong>, rather than running straight across it (#321). Time points absent from the data are not treated as missing: to break the line there, add a row with the value <code>NA</code>. The analysis is unchanged.</p></li>
+<li><p><strong>The vertical axis.</strong> A series too short for limits is drawn on the same axis as a chart of its type with limits, so the axis of a count, rate or proportion chart starts at zero, and its labels follow the scale of the breaks rather than being rounded to whole numbers (#339). A chart whose values, centre line and limits are all equal, as where they are all zero, is drawn from that value to one more (#314).</p></li>
+<li><p><strong>The legends always appear in the same order</strong>: “Rule triggered”, then “Period Type”, then the legends for restarts and prevented ranges. Before, ggplot2 chose the order.</p></li>
+</ul></div>
+<div class="section level5">
+<h5 id="the-table-plot_chart--false-returns-0-3-0">The table <code>plot_chart = FALSE</code> returns<a class="anchor" aria-label="anchor" href="#the-table-plot_chart--false-returns-0-3-0"></a></h5>
+<ul><li>A new column, <code>restart</code>, is <code>TRUE</code> at the first row of each segment after a restart, forced or after a gap.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="removed-0-3-0">Removed<a class="anchor" aria-label="anchor" href="#removed-0-3-0"></a></h5>
+<ul><li><p><strong><code>autospc(show_mr)</code>, <code>facet_stages(show_mr)</code> and <code>autospc(write_table)</code></strong>, deprecated since 0.1.0, are removed (#240, #244). Supplying <code>show_mr</code> or <code>write_table</code> to <code><a href="../reference/autospc.html">autospc()</a></code> is now R’s own “unused argument” error. Use <code>chart_type = "X"</code> (or <code>"Xbar"</code>) for the location chart on its own, and <code>plot_chart = FALSE</code>, or <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on the plot, for the results table.</p></li>
+<li><p><strong><code>facet_stages(split_rows)</code></strong>, deprecated in 0.2.0, is removed. Use <code>split_at</code>, which counts points in the analysed series rather than rows of the data; where the data already holds one row per subgroup, in <code>x</code> order, the two are the same.</p></li>
+<li><p><strong><code>no_regrets = TRUE</code> with <code>overhanging_reversions = FALSE</code> is an error</strong> (#243), of class <code>"autospc_inconsistent_ssa_parameters_error"</code>. It was deprecated in 0.2.0, and changed <code>overhanging_reversions</code> to TRUE with a warning. Set <code>overhanging_reversions = TRUE</code>, or leave it at its default, or set <code>no_regrets = FALSE</code>.</p></li>
 </ul></div>
 </div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9014" id="autospc-0209014">autospc 0.2.0.9014<a class="anchor" aria-label="anchor" href="#autospc-0209014"></a></h2>
-<div class="section level3">
-<h3 id="missing-first-values-0-2-0-9014">Missing first values<a class="anchor" aria-label="anchor" href="#missing-first-values-0-2-0-9014"></a></h3>
-<ul><li>Where the first value of the series is missing, the MR chart’s calculation period now starts at the same point as the X chart’s, the first non-missing point of the series (the same applies after a restart). Previously, it started on the first row of the series or segment, so the MR chart had limits on rows where neither chart had a value (#326).</li>
-<li>There is now a label for the first centre line on a chart whose first value is missing. This also labels the first centre line of a dispersion chart whose first calculation period starts later than the location chart’s.</li>
-</ul></div>
 </div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9013" id="autospc-0209013">autospc 0.2.0.9013<a class="anchor" aria-label="anchor" href="#autospc-0209013"></a></h2>
 <div class="section level3">
-<h3 id="vertical-axis-0-2-0-9013">Vertical axis<a class="anchor" aria-label="anchor" href="#vertical-axis-0-2-0-9013"></a></h3>
-<ul><li>A C′ chart where every value is zero no longer warns “no non-missing arguments to max”, and is drawn with a vertical axis from 0 to 10, as a C chart of zeros is (#314).</li>
-<li>A chart whose values, centre line and limits are all equal, as where they are all zero, is drawn with a vertical axis from that value to one more. U, U′, X, MR, Xbar and S charts of zeros were drawn from -0.05 to 0.05.</li>
-<li>A series too short for limits is drawn on the same vertical axis as a chart of its type with limits, so the axis of a count, rate or proportion chart starts at zero. It was drawn from the lowest to the highest value.</li>
-<li>An X or Xbar chart whose upper limit is negative no longer fails with “invalid ‘nsmall’ argument”. The top of its vertical axis is now above the data.</li>
-<li>A centre line label is now drawn outside a negative control limit, as for a positive one: a negative limit is multiplied by <code>2 - upper_annotation_sf</code> (or <code>2 - lower_annotation_sf</code>) instead of the factor itself, which put the label inside the limits.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9012" id="autospc-0209012">autospc 0.2.0.9012<a class="anchor" aria-label="anchor" href="#autospc-0209012"></a></h2>
-<div class="section level3">
-<h3 id="dispersion-chart-calculation-periods-0-2-0-9012">Dispersion chart calculation periods<a class="anchor" aria-label="anchor" href="#dispersion-chart-calculation-periods-0-2-0-9012"></a></h3>
-<ul><li>New argument <code>dispersion_chart_establishment</code> sets how the dispersion chart of a pair (the MR chart of <code>"XMR"</code>, the S chart of <code>"XbarS"</code>) establishes its limits (#115):
+<h3 id="new-features-0-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
+<ul><li><p><strong>U and U’ charts</strong> (#227). <code>chart_type = "U"</code> draws a U chart of rates: a count of events <code>y</code> over the area of opportunity <code>n</code> in which they could occur, such as infections per 1,000 central line days. Its control limits vary with <code>n</code>. <code>chart_type = "U'"</code> draws Laney’s U’ chart (Laney, 2002), whose limits are also widened where the rates vary from subgroup to subgroup by more than a Poisson count would. <code>n</code> need not be a whole number, and rows that share an <code>x</code> are summed into one subgroup. See <code><a href="../articles/data-requirements.html">vignette("data-requirements")</a></code>.</p></li>
+<li><p><strong>Forced restarts</strong> (#119). <code>force_restart_at</code> makes the algorithm restart at one or more values on the horizontal axis. Each segment is analysed as if it were a series of its own: its first calculation period is <code>baseline_length</code> points, a segment with fewer than <code>period_min</code> points has no limits, and no run counts towards the shift rule across a restart. Each restart is drawn as a solid vertical line, with the legend entry “Forced restart”. A floating median can be drawn at the end of each segment long enough for one.</p></li>
+<li><p><strong>Restarts after a long gap</strong> (#325). <code>restart_after_gap</code> (see above) restarts the algorithm at the first point with a value after a run of at least that many points with no value. For a pair, gaps are counted on the location chart, so both charts restart at the same point. A restart after a gap is drawn as a dotted line, with the legend entry “Restart after gap”.</p></li>
+<li><p><strong>Ranges in which limits may not be re-established</strong> (#119). <code>prevent_establishment_in</code> gives one or more ranges of the horizontal axis in which the algorithm may not establish new limits; the first calculation period of the series, and the first after each restart, are not affected. Each range is shaded light grey, with the legend entry “Re-establishment prevented”.</p></li>
+<li>
+<p><strong>How the dispersion chart of a pair establishes its limits</strong> (#115). The new argument <code>dispersion_chart_establishment</code> applies to the MR chart of <code>"XMR"</code> and the S chart of <code>"XbarS"</code>:</p>
 <ul><li>
 <code>"independent"</code>, the default, runs the algorithm on the dispersion chart separately from the location chart, as before;</li>
 <li>
-<code>"forced"</code> uses the location chart’s calculation periods, so the dispersion chart’s limits change where the location chart’s do. In a period where the dispersion chart has fewer points with a value than the location chart, its limits are calculated from fewer than <code>period_min</code> points;</li>
+<code>"forced"</code> uses the location chart’s calculation periods, so the dispersion chart’s limits change where the location chart’s do;</li>
 <li>
-<code>"shared"</code> extends each calculation period until both charts have at least <code>period_min</code> points with a value in it, and both charts use these periods, so the location chart’s limits can differ from those it has with <code>"independent"</code> or <code>"forced"</code>.</li>
-</ul>
-The argument is ignored, with a warning, for a chart type that is not a pair.</li>
-<li>With <code>"forced"</code> or <code>"shared"</code>, an MR chart leaves the moving range at the first point of each calculation period after the first in a segment out of that period’s limits, because it is the difference from the last point of the previous period. It does not count towards <code>max_exclusions</code>.</li>
-<li>With <code>"forced"</code> or <code>"shared"</code>, the dispersion chart’s log records restarts and the new codes <code>0800</code> (limits established - forced by location chart) at the first period of each segment and <code>0810</code> (limits re-established - forced by location chart) at each later period. Printing the chart adds the line “Calculation periods mirror the … chart”.</li>
-<li>In <code><a href="../reference/facet_stages.html">facet_stages()</a></code>, a pair is drawn as its location chart, as before. With <code>"shared"</code>, each facet’s location chart has the shared calculation periods.</li>
+<code>"shared"</code> extends each calculation period until both charts have at least <code>period_min</code> points with a value in it, and both charts use these periods.</li>
+</ul><p>With <code>"forced"</code> or <code>"shared"</code>, an MR chart leaves the moving range at the start of each later calculation period out of that period’s limits, because it spans two periods; this does not count towards <code>max_exclusions</code>. Printing the chart adds the line “Calculation periods mirror the … chart”. In <code><a href="../reference/facet_stages.html">facet_stages()</a></code>, which draws a pair as its location chart, <code>"shared"</code> gives each facet’s location chart the shared periods. The argument is ignored, with a warning, for a chart type that is not a pair.</p>
+</li>
+<li><p><strong><code>display_window = c(start, end)</code></strong> shows part of the horizontal axis without changing the analysis (#317). Every calculation period that overlaps the range has its centre line labelled, and <code><a href="../reference/facet_stages.html">facet_stages()</a></code> applies the range to every facet.</p></li>
+<li><p><strong><code>floating_median_style</code></strong>, a list of <code>colour</code>, <code>linetype</code> and <code>linewidth</code>, sets how the floating median is drawn (#315), and <strong><code>floating_median_labels</code></strong> chooses which floating medians are labelled where a series restarts and so has more than one: <code>"last"</code> (the default), <code>"all"</code>, <code>"gaps"</code> or <code>"none"</code> (#330).</p></li>
+<li><p><strong>The algorithm log</strong> records the new events with new codes: <code>0000</code> (a forced restart), <code>0010</code> (a restart after a gap), <code>0720</code> (a candidate rejected because its final run is not complete), <code>0730</code> (a candidate in a prevented range, not considered), and <code>0800</code> and <code>0810</code> (limits established or re-established on a dispersion chart, forced by the location chart). The table of log codes in <code><a href="../articles/stable-shift-algorithm.html">vignette("stable-shift-algorithm")</a></code> lists every code the log can record.</p></li>
+<li><p><strong>Speed.</strong> The analysis runs about ten times faster, and a drawn chart about two and a half to three times faster. Results are unchanged.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="periods-with-no-standard-deviation-estimate-0-2-0-9012">Periods with no standard deviation estimate<a class="anchor" aria-label="anchor" href="#periods-with-no-standard-deviation-estimate-0-2-0-9012"></a></h3>
-<ul><li>A calculation period whose standard deviation cannot be estimated (a C′ or P′ period with no variation, or an Xbar period made up only of subgroups of one) no longer inherits limits or <code>sbar</code> from the previous period. Its display rows retain its centre line and have no limits, and the shift rule applies to them as usual, so limits can be re-established after it (#310).</li>
+<h3 id="bug-fixes-0-3-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-0"></a></h3>
+<ul><li><p>An X or Xbar chart whose upper limit is negative no longer fails with “invalid ‘nsmall’ argument”; the top of its vertical axis is above the data, and its centre line labels are drawn outside the limits rather than inside them (#314).</p></li>
+<li><p>A C’ chart where every value is zero no longer warns “no non-missing arguments to max”, and is drawn with a vertical axis from 0 to 10 (#314).</p></li>
+<li><p>A chart whose first value is missing labels its first centre line, as does a dispersion chart whose first calculation period starts later than the location chart’s (#326).</p></li>
+<li><p>Where there is no further shift rule break, the log reads “Sufficient data to proceed.” rather than adding “Moving counter to the next shift rule break, commencing at point NA.” (#340).</p></li>
+<li><p>The “Period Type” legend shows “Calculation” when the first rows of the chart have no limits, as for a series that begins with missing values. It showed only “Display”.</p></li>
+<li><p><code><a href="../reference/facet_stages.html">facet_stages()</a></code> labels the floating median in every facet that has one, not only in the last, and draws a median’s label only in the facet that holds it.</p></li>
+<li><p>The floating median is no longer drawn behind the keys of the “Rule triggered” legend.</p></li>
 </ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9011" id="autospc-0209011">autospc 0.2.0.9011<a class="anchor" aria-label="anchor" href="#autospc-0209011"></a></h2>
+<div class="section level3">
+<h3 id="documentation-0-3-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-3-0"></a></h3>
 <ul><li>
-<code>floating_median_labels = "gaps"</code> no longer gives a warning when the chart has no floating median (#332).</li>
-</ul></div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9010" id="autospc-0209010">autospc 0.2.0.9010<a class="anchor" aria-label="anchor" href="#autospc-0209010"></a></h2>
-<div class="section level3">
-<h3 id="floating-median-0-2-0-9010">Floating median<a class="anchor" aria-label="anchor" href="#floating-median-0-2-0-9010"></a></h3>
-<ul><li>New argument <code>floating_median_labels</code> chooses which floating medians are labelled where a series restarts and so has more than one (#330): <code>"last"</code>, the default, labels only the median of the last segment, as before; <code>"all"</code> labels every median; <code>"gaps"</code> labels the median of the last segment and every median followed by a gap of at least <code>restart_after_gap</code> points with no value; <code>"none"</code> labels no median, and leaves no space for a label on the right of the chart. In <code><a href="../reference/facet_stages.html">facet_stages()</a></code>, this applies within each facet.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9009" id="autospc-0209009">autospc 0.2.0.9009<a class="anchor" aria-label="anchor" href="#autospc-0209009"></a></h2>
-<div class="section level3">
-<h3 id="restarting-after-a-long-gap-0-2-0-9009">Restarting after a long gap<a class="anchor" aria-label="anchor" href="#restarting-after-a-long-gap-0-2-0-9009"></a></h3>
-<ul><li>New argument <code>restart_after_gap</code>: after a run of at least this many consecutive points with missing value, the algorithm restarts at the first point with a value, as it does at a value of <code>force_restart_at</code> (#325). It defaults to <code>period_min</code>, so results change for a series with a gap that long: a calculation period before the gap no longer takes points from after it, and limits are no longer carried across the gap. <code>Inf</code> turns this off. A time point with no row in the data is not part of a gap; to make one, add a row with the value <code>NA</code>. Gaps at the start or end of the series are ignored.</li>
-<li>For a location and dispersion pair, gaps are counted on the location chart, so both charts restart at the same point. A subgroup of one, which has a mean but no standard deviation, is not part of a gap.</li>
-<li>Where a gap ends inside a range given by <code>prevent_establishment_in</code>, the algorithm restarts at the first point with a value after the range instead, and the points between are drawn without limits.</li>
-<li>A restart after a gap is drawn as a dotted line, with the legend entry “Restart after gap”. The <code>restart</code> column is <code>TRUE</code> there, and the log records it with the new code <code>0010</code>.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="floating-median-0-2-0-9009">Floating median<a class="anchor" aria-label="anchor" href="#floating-median-0-2-0-9009"></a></h3>
-<ul><li>The floating median is now drawn only as far as the last point with a value in its segment, not across missing values after it.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9008" id="autospc-0209008">autospc 0.2.0.9008<a class="anchor" aria-label="anchor" href="#autospc-0209008"></a></h2>
-<div class="section level3">
-<h3 id="forced-restarts-and-preventing-re-establishment-0-2-0-9008">Forced restarts and preventing re-establishment<a class="anchor" aria-label="anchor" href="#forced-restarts-and-preventing-re-establishment-0-2-0-9008"></a></h3>
-<ul><li>New argument <code>force_restart_at</code> makes the algorithm restart at one or more values on the horizontal axis (#119). The series is analysed in segments, each starting at the first point of the series or the first point at or after a forced restart. Each segment is analysed as if it were a series of its own: its first calculation period is <code>baseline_length</code> points, a segment with fewer than <code>period_min</code> points has no limits, and no run counts towards the shift rule across a restart. Each restart is drawn as a solid vertical line, with the legend entry “Forced restart”. Values outside the data are ignored.</li>
-<li>New argument <code>prevent_establishment_in</code> gives a range of the horizontal axis in which the algorithm may not establish new limits (#119): two values, with <code>NA</code> for an open end, or a list of such ranges. A range includes both its end points. A shift that starts inside a range and continues past its end can still re-establish limits after the range. The first calculation period of the series, and the first after each restart, are not affected. Each range is shaded light grey, with the legend entry “Re-establishment prevented”. Ranges outside the data are ignored.</li>
-<li>The table returned with <code>plot_chart = FALSE</code> has a new column, <code>restart</code>, which is <code>TRUE</code> at the first row of each segment after a forced restart.</li>
-<li>The algorithm log records a forced restart with the new code <code>0000</code>, and a candidate in a range given by <code>prevent_establishment_in</code> with the new code <code>0730</code>, “Not considered”. The table of log codes in the “Stable Shift Algorithm” vignette now lists every code the log can record, including these two and the prefix <code>co@n|</code>.</li>
-<li>With forced restarts, a floating median can be drawn at the end of each segment that holds at least <code>floating_median_n</code> points, not only at the end of the series. Only the last is labelled.</li>
-</ul></div>
-<div class="section level3">
-<h3 id="chart-legends-0-2-0-9008">Chart legends<a class="anchor" aria-label="anchor" href="#chart-legends-0-2-0-9008"></a></h3>
-<ul><li>The legends now always appear in the same order: “Rule triggered”, then “Period Type”, then “Re-establishment prevented” and “Forced restart”. Before, ggplot2 chose the order, and it differed between charts and between versions of ggplot2.</li>
-<li>The “Period Type” legend now shows “Calculation” when the first rows of the chart have no limits: a series that begins with missing values, a faceted chart whose first stage is too short for limits, or a series whose first segment is too short for limits. Before, it showed only “Display”.</li>
-<li>
-<code><a href="../reference/facet_stages.html">facet_stages()</a></code> now labels the floating median in every facet that has one, not only in the last.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9007" id="autospc-0209007">autospc 0.2.0.9007<a class="anchor" aria-label="anchor" href="#autospc-0209007"></a></h2>
-<div class="section level3">
-<h3 id="bugfix-missing-values-0-2-0-9007">Bugfix: Missing values<a class="anchor" aria-label="anchor" href="#bugfix-missing-values-0-2-0-9007"></a></h3>
-<ul><li>Fixed a bug introduced in 0.2.0.9006. With <code>na_ends_run = TRUE</code>, limits are now re-established after a gap in the data (#323). When a gap ended a run and the run after the gap was on the same side of the centre line, the algorithm took the second run to be a continuation of the first. If the first run started before the point the algorithm had reached, no rule 2 break was found, so the limits were never re-established after the gap. A rule 2 break now starts correctly where a run that breaks rule 2 commences, so a run after a gap is treated as a new run. Results are unchanged for data with no gaps, and with <code>na_ends_run = FALSE</code>.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9006" id="autospc-0209006">autospc 0.2.0.9006<a class="anchor" aria-label="anchor" href="#autospc-0209006"></a></h2>
-<div class="section level3">
-<h3 id="missing-values-0-2-0-9006">Missing values<a class="anchor" aria-label="anchor" href="#missing-values-0-2-0-9006"></a></h3>
-<ul><li>The line joining the series points now breaks at each row whose value is missing, rather than running straight across it (#321). The points, centre line and limits are drawn as before, and the analysis is unchanged. This behaviour is independent of <code>na_ends_run</code>. Time points absent from the data are not treated as missing: to break the line there, add a row for each missing time point with the value <code>NA</code>.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9005" id="autospc-0209005">autospc 0.2.0.9005<a class="anchor" aria-label="anchor" href="#autospc-0209005"></a></h2>
-<div class="section level3">
-<h3 id="speed-0-2-0-9005">Speed<a class="anchor" aria-label="anchor" href="#speed-0-2-0-9005"></a></h3>
-<ul><li>The analysis runs about ten times faster, and a drawn chart about two and a half to three times faster. The helpers the algorithm calls repeatedly while it looks for new periods now use base R in place of dplyr, and <code>find_extremes()</code> no longer works out rule 2 and highlighting, which it did not use. Results are unchanged.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9004" id="autospc-0209004">autospc 0.2.0.9004<a class="anchor" aria-label="anchor" href="#autospc-0209004"></a></h2>
-<div class="section level3">
-<h3 id="showing-part-of-a-chart-0-2-0-9004">Showing part of a chart<a class="anchor" aria-label="anchor" href="#showing-part-of-a-chart-0-2-0-9004"></a></h3>
-<ul><li>New argument <code>display_window = c(start, end)</code> shows part of the horizontal axis without changing the analysis (#317). The plot is zoomed to the range, so lines run on to its edges. Every calculation period that overlaps the range has its centre line labelled, a period that starts before the range at its first point, and <code>align_labels</code> uses the limits within the range. <code>NA</code> at either end leaves that end where the chart would put it. The vertical axis is still set from the whole series, and <code>override_y_lim</code> is checked against the points within the range only. The floating median is still taken over the end of the whole series, and is drawn only when the range reaches the end of the data. <code><a href="../reference/facet_stages.html">facet_stages()</a></code> applies the range to every facet.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9003" id="autospc-0209003">autospc 0.2.0.9003<a class="anchor" aria-label="anchor" href="#autospc-0209003"></a></h2>
-<div class="section level3">
-<h3 id="floating-median-0-2-0-9003">Floating median<a class="anchor" aria-label="anchor" href="#floating-median-0-2-0-9003"></a></h3>
-<ul><li>New argument <code>floating_median_style</code>, a list of <code>colour</code>, <code>linetype</code> and <code>linewidth</code>, sets how the floating median is drawn (#315). The default is now <code>firebrick3</code> with long dashes, in place of grey, which was often hard to see. The median’s width follows <code>line_width_sf</code>, as the other lines do.</li>
-<li>The floating median’s label now sits just after the end of the median line, at <code>annotation_size</code> (#316). The horizontal axis is extended to make room for it.</li>
-<li>The floating median is no longer drawn behind the keys of the “Rule triggered” legend, and <code><a href="../reference/facet_stages.html">facet_stages()</a></code> draws its label only in the facet that holds the median.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9002" id="autospc-0209002">autospc 0.2.0.9002<a class="anchor" aria-label="anchor" href="#autospc-0209002"></a></h2>
-<div class="section level3">
-<h3 id="bug-fixes-0-2-0-9002">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0-9002"></a></h3>
-<ul><li>With <code>no_regrets = TRUE</code>, the default, adding a point to the end of a series could move a re-establishment of limits to an earlier point (#308). This happened when the final run of a candidate calculation period was on the opposite side of the candidate centre line and continued to the end of the data. The candidate limits were rejected, the algorithm went on to consider later points, and a later candidate could be accepted; once more data ended that run, the earlier candidate was accepted instead. The algorithm now stops at such a candidate. Only the end of a series is affected. Some re-establishments are now made only once a few more points have been added to the series.</li>
-<li>The algorithm log records this outcome with a new code, <code>0720</code>: “Candidate limits rejected: insufficient data to establish a stable new process. The final run of the candidate calculation period is not complete.” The description of the algorithm in <code><a href="../articles/stable-shift-algorithm.html">vignette("stable-shift-algorithm")</a></code>, its flow chart, and the explanation of the log codes are updated to match.</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9001" id="autospc-0209001">autospc 0.2.0.9001<a class="anchor" aria-label="anchor" href="#autospc-0209001"></a></h2>
-<div class="section level3">
-<h3 id="u-and-u-charts-0-2-0-9001">U and U’ charts<a class="anchor" aria-label="anchor" href="#u-and-u-charts-0-2-0-9001"></a></h3>
-<p><code>chart_type = "U"</code> draws a U chart of rates: a count of events <code>y</code> over the area of opportunity <code>n</code> in which they could occur, such as infections per 1,000 central line days. Its control limits vary with <code>n</code>. <code>chart_type = "U'"</code> draws Laney’s U’ chart (Laney, 2002), whose limits are also widened where the rates vary from subgroup to subgroup by more than a Poisson count would. The chart plots <code>y / n</code>, so the unit of <code>n</code> sets the unit of the rate, and <code>n</code> need not be a whole number. Rows that share an <code>x</code> are summed into one subgroup. See <code><a href="../articles/data-requirements.html">vignette("data-requirements")</a></code> for the data each needs.</p>
-</div>
-<div class="section level3">
-<h3 id="documentation-0-2-0-9001">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0-9001"></a></h3>
-<ul><li>
-<code>mr_screen_max_loops</code> applies to the screening of moving ranges in C’ and P’ charts as well as X charts, and now to U’ charts too. Its documentation said only X charts; it now says which, and that 0 turns the screening off.</li>
-<li>The <code>autospc.rounded_constants</code> option documentation now names C’ and P’ charts, which use d2, and D4 in their screening of moving ranges.</li>
+<code>mr_screen_max_loops</code> applies to the screening of moving ranges in C’, P’ and U’ charts as well as X charts; its documentation now says so, and that 0 turns the screening off. The <code>autospc.rounded_constants</code> option documentation names the C’ and P’ charts, which use d2, and D4 in their screening of moving ranges.</li>
 </ul></div>
 </div>
     <div class="section level2">

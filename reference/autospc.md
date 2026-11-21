@@ -27,7 +27,7 @@ autospc(
   restart_after_gap = NULL,
   dispersion_chart_establishment = c("independent", "forced", "shared"),
   na_ends_run = TRUE,
-  max_exclusions = 3L,
+  max_exclusions = 0L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
   centre_line_tolerance = 0,
@@ -35,8 +35,6 @@ autospc(
   floating_median_n = 12L,
   plot_chart = TRUE,
   show_limits = TRUE,
-  show_mr = deprecated(),
-  write_table = deprecated(),
   verbosity = 0L,
   log_file_path = NULL,
   keep_candidate_tables = FALSE,
@@ -188,8 +186,8 @@ autospc(
   Boolean determining whether rule breaks in the opposite direction to a
   rule break triggering a candidate re-establishment prevent limits
   being re-established, even where they overhang the end of the
-  candidate calculation period. Set to FALSE only with no_regrets =
-  FALSE.
+  candidate calculation period. FALSE requires `no_regrets = FALSE`;
+  with `no_regrets = TRUE` it is an error.
 
 - force_restart_at:
 
@@ -257,10 +255,7 @@ autospc(
 - max_exclusions:
 
   The maximum number of extreme points to exclude from limit
-  calculations. The default will change from 3 to 0 in autospc 0.3.0, so
-  that points are excluded only where the caller asks for it. Until
-  then, a call that leaves `max_exclusions` unset and excludes points
-  warns that its results will change.
+  calculations. The default, 0, excludes none.
 
 - highlight_exclusions:
 
@@ -312,23 +307,6 @@ autospc(
 
   Boolean controlling whether or not to display centre line and control
   limits
-
-- show_mr:
-
-  **\[deprecated\]** Use `chart_type` instead. `chart_type = "XMR"`
-  draws the pair and `chart_type = "X"` draws the X chart on its own,
-  which is what `show_mr = FALSE` did. It will be removed in autospc
-  0.3.0.
-
-- write_table:
-
-  **\[deprecated\]** Save the results yourself instead.
-  `autospc(plot_chart = FALSE)` returns them as a data frame, and
-  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on the
-  `autospc_plot` object `autospc()` returns does the same, either of
-  which can be written to a path of your choosing with e.g.
-  [`write.csv()`](https://rdrr.io/r/utils/write.table.html). It will be
-  removed in autospc 0.3.0.
 
 - verbosity:
 

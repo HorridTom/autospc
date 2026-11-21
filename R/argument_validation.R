@@ -99,42 +99,33 @@ check_x_type <- function(x) {
 
 #' Check the algorithm parameters against each other
 #'
-#' The checks on parameters that are not independent of one another. Where a
-#' pair is inconsistent, one of the two is changed and the caller is warned.
+#' The checks on parameters that are not independent of one another. Where they
+#' are inconsistent, the call fails with an error of class
+#' `autospc_inconsistent_ssa_parameters_error`.
 #'
-#' `no_regrets = TRUE` with `overhanging_reversions = FALSE` sets
-#' `overhanging_reversions` to TRUE. That combination is deprecated and will be
-#' an error, so the warning is a deprecation warning.
+#' `no_regrets = TRUE` requires `overhanging_reversions = TRUE`.
 #'
 #' Called once per call to `autospc()` or `facet_stages()`.
 #'
 #' @param arguments A named list of the argument values for one call.
-#' @param user_env The environment the deprecation warning names as the place
-#'   the combination was used. `autospc()` and `facet_stages()` pass their own
-#'   caller, because they are the functions the user calls.
+#' @param call The call the error names. `autospc()` and `facet_stages()` pass
+#'   their own, because they are the functions the user calls.
 #'
-#' @return `arguments`, with any value the checks changed.
+#' @return `arguments`, unchanged.
 #' @noRd
 validate_algorithm_parameters <- function(arguments,
-                                          user_env = rlang::caller_env()) {
+                                          call = rlang::caller_env()) {
   if (arguments$no_regrets & !arguments$overhanging_reversions) {
-    lifecycle::deprecate_warn(
-      when = "0.2.0",
-      what = I(paste(
-        "Setting `no_regrets = TRUE` with",
-        "`overhanging_reversions = FALSE`"
-      )),
-      details = paste(
-        "no_regrets requires consideration of overhanging reversions,",
-        "so the combination does not make sense. overhanging_reversions",
-        "has been changed to TRUE for this call. It will be an error in",
-        "autospc 0.3.0: set overhanging_reversions = TRUE, or leave it at",
-        "its default, or set no_regrets = FALSE."
+    rlang::abort(
+      paste(
+        "`no_regrets = TRUE` requires `overhanging_reversions = TRUE`,",
+        "because no_regrets requires consideration of overhanging",
+        "reversions. Set `overhanging_reversions = TRUE`, or leave it at",
+        "its default, or set `no_regrets = FALSE`."
       ),
-      user_env = user_env
+      class = "autospc_inconsistent_ssa_parameters_error",
+      call = call
     )
-
-    arguments$overhanging_reversions <- TRUE
   }
 
   return(arguments)

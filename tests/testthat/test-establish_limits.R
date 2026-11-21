@@ -168,7 +168,10 @@ test_that("the result lists the points excluded as extremes", {
     x = ed_attendances_monthly$month_start,
     y = ed_attendances_monthly$att_all
   )
-  chart <- autospc_chart(chart_type = "C\'", data = ed, x = "x", y = "y")
+  chart <- autospc_chart(
+    chart_type = "C\'", data = ed, x = "x", y = "y",
+    max_exclusions = 3L
+  )
   analysed <- establish_limits(prepare_data(chart))
 
   expect_identical(

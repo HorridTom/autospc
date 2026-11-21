@@ -58,3 +58,14 @@ test_that("aggregation_na_rm reaches the aggregation before the split", {
 
   expect_identical(first_stage$y[2L], 21L)
 })
+
+
+test_that("split_rows is no longer an argument of facet_stages", {
+  expect_false("split_rows" %in% names(formals(facet_stages)))
+  expect_error(
+    facet_stages(example_series_1,
+      split_rows = c(40L, 80L), chart_type = "X", max_exclusions = 0L
+    ),
+    "split_at"
+  )
+})

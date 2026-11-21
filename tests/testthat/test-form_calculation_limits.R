@@ -6,9 +6,12 @@ test_data$series <- test_data$y
 
 # form_calculation_limits() takes its configuration from the chart object,
 # so the settings these figures were produced with live on the chart. They are
-# the defaults: period_min 21, no baseline_length, shift_rule_threshold 8,
-# centre_line_tolerance 0, max_exclusions 3.
-test_chart <- autospc_chart_c(data = test_data, x = "x", y = "y")
+# the defaults - period_min 21, no baseline_length, shift_rule_threshold 8,
+# centre_line_tolerance 0 - and max_exclusions 3, the default before 0.3.0.
+test_chart <- autospc_chart_c(
+  data = test_data, x = "x", y = "y",
+  max_exclusions = 3L
+)
 
 test_that("Calculation period is formed correctly", {
   result_counter_one <- form_calculation_limits(test_data,

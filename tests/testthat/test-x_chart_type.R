@@ -24,20 +24,18 @@ test_that("an X run gives an autospc_chart_x", {
 })
 
 
-test_that("X gives the same result as XMR without the moving range chart", {
-  # this equivalence is what let show_mr be deprecated
-  expect_equal(
-    autospc(x_type_data,
-      chart_type = "X", period_min = 21L,
-      plot_chart = FALSE
-    ),
-    suppressWarnings(
-      autospc(x_type_data,
-        chart_type = "XMR", show_mr = FALSE,
-        period_min = 21L, plot_chart = FALSE
-      )
-    )
+test_that("X gives the same result as the location chart of XMR", {
+  x_table <- autospc(x_type_data,
+    chart_type = "X", period_min = 21L,
+    plot_chart = FALSE
   )
+  # the XMR table holds the X chart's columns and the MR chart's beside them
+  xmr_table <- autospc(x_type_data,
+    chart_type = "XMR", period_min = 21L,
+    plot_chart = FALSE
+  )
+
+  expect_equal(x_table, xmr_table[names(x_table)])
 })
 
 

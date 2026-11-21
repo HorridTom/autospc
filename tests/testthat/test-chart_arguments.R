@@ -40,13 +40,17 @@ chart_argument_alternatives <- list(
 
 test_that("the deprecated arguments are the ones autospc declares as deprecated", {
   # the deprecated arguments are found by their default rather than named, and
-  # this is the list that is expected
-  expect_setequal(
-    autospc_deprecated_arguments(),
-    c(
-      "show_mr",
-      "write_table"
-    )
+  # this is the list that is expected: none, since 0.3.0 removed show_mr and
+  # write_table
+  expect_identical(autospc_deprecated_arguments(), character(0))
+})
+
+
+test_that("show_mr and write_table are no longer arguments of autospc", {
+  expect_false(any(c("show_mr", "write_table") %in% names(formals(autospc))))
+  expect_error(
+    autospc(data.frame(x = 1:30, y = 1:30), chart_type = "X", show_mr = FALSE),
+    "unused argument"
   )
 })
 
@@ -65,6 +69,12 @@ test_that("every chart parameter autospc takes reaches the chart", {
   for (parameter in autospc_chart_parameters()) {
     given <- chart_argument_alternatives[parameter]
 
+    # overhanging_reversions = FALSE is an error with no_regrets = TRUE, the
+    # default, so it is given with no_regrets = FALSE
+    if (identical(parameter, "overhanging_reversions")) {
+      given <- c(given, no_regrets = FALSE)
+    }
+
     from_autospc <- suppressWarnings(
       rlang::exec(autospc,
         argument_data,
@@ -73,22 +83,7 @@ test_that("every chart parameter autospc takes reaches the chart", {
       )
     )
 
-    # autospc() changes the value of overhanging_reversions when it is FALSE
-    # and no_regrets is TRUE, through validate_algorithm_parameters(), so the
-    # comparison is against the validated value rather than the value passed in
     expected <- given[[parameter]]
-
-    if (identical(parameter, "overhanging_reversions")) {
-      validated <- suppressWarnings(
-        validate_algorithm_parameters(
-          list(
-            no_regrets = autospc_default("no_regrets"),
-            overhanging_reversions = expected
-          )
-        )
-      )
-      expected <- validated$overhanging_reversions
-    }
 
     # a C chart is not half of a pair, so records "independent" whatever it
     # is given; test-argument_values.R tests the value on both charts of a pair

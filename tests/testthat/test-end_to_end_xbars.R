@@ -191,19 +191,3 @@ test_that("facets give the same analysis from observations and summaries", {
 
   expect_equal(from_summaries[compared], from_observations[compared])
 })
-
-
-test_that("show_mr = FALSE with XbarS draws the Xbar chart on its own", {
-  lifecycle::expect_deprecated(
-    table <- autospc(xbars_observations(),
-      chart_type = "XbarS",
-      show_mr = FALSE,
-      plot_chart = FALSE
-    )
-  )
-
-  expect_identical(
-    table,
-    autospc(xbars_observations(), chart_type = "Xbar", plot_chart = FALSE)
-  )
-})

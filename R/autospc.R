@@ -71,7 +71,8 @@
 #' @param overhanging_reversions Boolean determining whether rule breaks in the
 #' opposite direction to a rule break triggering a candidate re-establishment
 #' prevent limits being re-established, even where they overhang the end of the
-#' candidate calculation period. Set to FALSE only with no_regrets = FALSE.
+#' candidate calculation period. FALSE requires `no_regrets = FALSE`; with
+#' `no_regrets = TRUE` it is an error.
 #' @param force_restart_at Optional, one or more values on the horizontal axis
 #' at which the algorithm restarts. The series is analysed in segments, each
 #' starting at the first point at or after one of these values, and each
@@ -119,10 +120,7 @@
 #' positive shift rule break arising from missing data; FALSE minimises the risk
 #' of a false negative.
 #' @param max_exclusions The maximum number of extreme points to exclude from
-#' limit calculations. The default will change from 3 to 0 in autospc 0.3.0, so
-#' that points are excluded only where the caller asks for it. Until then, a
-#' call that leaves `max_exclusions` unset and excludes points warns that its
-#' results will change.
+#' limit calculations. The default, 0, excludes none.
 #' @param highlight_exclusions Boolean signifying whether excluded points are
 #' greyed out.
 #' @param mr_screen_max_loops Integer or Inf specifying maximum number of times
@@ -153,15 +151,6 @@
 #' other analytic output appended as columns.
 #' @param show_limits Boolean controlling whether or not to display centre line
 #' and control limits
-#' @param show_mr `r lifecycle::badge("deprecated")` Use `chart_type` instead.
-#' `chart_type = "XMR"` draws the pair and `chart_type = "X"` draws the X
-#' chart on its own, which is what `show_mr = FALSE` did. It will be removed in
-#' autospc 0.3.0.
-#' @param write_table `r lifecycle::badge("deprecated")` Save the results
-#' yourself instead. `autospc(plot_chart = FALSE)` returns them as a data frame,
-#' and `as.data.frame()` on the `autospc_plot` object `autospc()` returns does
-#' the same, either of which can be written to a path of your choosing with
-#' e.g. `write.csv()`. It will be removed in autospc 0.3.0.
 #' @param verbosity Integer 0-2 specifying how talkative the algorithm is in the
 #' standard output log; the higher the number the more information is provided,
 #' none if 0. A value outside the range is taken as the nearest end of it, and a
@@ -309,7 +298,7 @@ autospc <- function(data,
                     ),
                     ## SPC Parameters
                     na_ends_run = TRUE,
-                    max_exclusions = 3L,
+                    max_exclusions = 0L,
                     highlight_exclusions = TRUE,
                     mr_screen_max_loops = 1L,
                     centre_line_tolerance = 0,
@@ -318,8 +307,6 @@ autospc <- function(data,
                     ## Output Type
                     plot_chart = TRUE,
                     show_limits = TRUE,
-                    show_mr = deprecated(),
-                    write_table = deprecated(),
                     verbosity = 0L,
                     log_file_path = NULL,
                     keep_candidate_tables = FALSE,
@@ -354,40 +341,6 @@ autospc <- function(data,
                     lower_annotation_sf = NULL,
                     annotation_arrows = FALSE,
                     annotation_arrow_curve = 0.3) {
-  if (lifecycle::is_present(write_table)) {
-    lifecycle::deprecate_warn(
-      when = "0.1.0",
-      what = "autospc(write_table)",
-      details = paste(
-        "Save the results yourself instead:",
-        "autospc(plot_chart = FALSE) returns them as a data",
-        "frame, and as.data.frame() on the autospc_plot object",
-        "autospc() returns does the same. Either can be written",
-        "to a path of your choosing with e.g. write.csv().",
-        "No file has been written. write_table will be removed in",
-        "autospc 0.3.0."
-      )
-    )
-  }
-
-  if (lifecycle::is_present(show_mr)) {
-    lifecycle::deprecate_warn(
-      when = "0.1.0",
-      what = "autospc(show_mr)",
-      with = "autospc(chart_type)",
-      details = paste(
-        'chart_type = "X" draws the X chart on its own, which',
-        'is what show_mr = FALSE did, and chart_type = "XMR"',
-        "draws the pair. show_mr will be removed in autospc 0.3.0."
-      )
-    )
-
-    # show_mr = FALSE drew the location chart of a pair on its own
-    if (isFALSE(show_mr)) {
-      chart_type <- location_chart_type(chart_type)
-    }
-  }
-
   x_name <- resolve_column_name(rlang::enquo(x), fallback = "x")
   y_name <- resolve_column_name(rlang::enquo(y), fallback = "y")
   n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")
@@ -400,7 +353,7 @@ autospc <- function(data,
   data <- drop_missing_x(data, x_column = x_name)
 
   # Named list of every argument of the call by name, apart from the data,
-  # the columns, and the deprecated arguments dealt with above.
+  # the columns, and any deprecated arguments.
   arguments <- mget(setdiff(
     names(formals()),
     c(
@@ -416,10 +369,7 @@ autospc <- function(data,
     x_values = data[[x_name]]
   )
 
-  arguments <- validate_algorithm_parameters(
-    arguments,
-    user_env = rlang::caller_env()
-  )
+  arguments <- validate_algorithm_parameters(arguments)
 
   # The validated analysis parameters
   chart_args <- arguments[autospc_chart_parameters()]
@@ -446,10 +396,6 @@ autospc <- function(data,
 
   # Run the analysis
   charts <- analyse_charts(charts)
-
-  if (missing(max_exclusions)) {
-    warn_max_exclusions_default(charts)
-  }
 
   # Resolve visualisation parameters, based on chart type. The chart asked is
   # the one drawn in the main panel: the location chart of a pair, or the only

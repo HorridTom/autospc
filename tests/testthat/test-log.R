@@ -321,7 +321,10 @@ test_that("the log covers the other chart types", {
     y = ed_attendances_monthly$att_all
   )
   fitted_mr <- establish_limits(prepare_data(
-    autospc_chart(chart_type = "MR", data = ed, x = "x", y = "y")
+    autospc_chart(
+      chart_type = "MR", data = ed, x = "x", y = "y",
+      max_exclusions = 3L
+    )
   ))
 
   expect_identical(

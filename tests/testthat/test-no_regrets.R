@@ -102,7 +102,7 @@ test_that("a break does not move when a point is added (#308)", {
 })
 
 
-# no_regrets and overhanging_reversions are resolved once per call
+# no_regrets = TRUE with overhanging_reversions = FALSE is an error (#243)
 
 
 inconsistent_pair <- data.frame(
@@ -110,137 +110,64 @@ inconsistent_pair <- data.frame(
   y = rep(c(10L, 12L, 11L, 13L, 9L, 14L, 10L, 12L), 5L)
 )
 
-count_pair_warnings <- function(result) {
-  warnings_given <- character()
 
-  withCallingHandlers(
-    force(result),
-    warning = function(w) {
-      warnings_given <<- c(warnings_given, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
-
-  sum(grepl("does not make sense", warnings_given, fixed = TRUE))
-}
-
-
-# the condition itself, for assertions about its class and its text
-pair_warning <- function(result) {
-  warnings_given <- list()
-
-  withCallingHandlers(
-    force(result),
-    warning = function(w) {
-      warnings_given[[length(warnings_given) + 1L]] <<- w
-      invokeRestart("muffleWarning")
-    }
-  )
-
-  is_pair <- vapply(
-    warnings_given,
-    function(w) {
-      grepl("does not make sense", conditionMessage(w), fixed = TRUE)
-    },
-    logical(1L)
-  )
-
-  if (!any(is_pair)) {
-    return(NULL)
-  }
-
-  return(warnings_given[is_pair][[1L]])
-}
-
-
-test_that("an inconsistent pair is warned about once for a single chart", {
-  count <- count_pair_warnings(
+test_that("an inconsistent pair is an error for a single chart", {
+  expect_error(
     autospc(inconsistent_pair,
       chart_type = "C", period_min = 21L,
       overhanging_reversions = FALSE, plot_chart = FALSE
-    )
+    ),
+    class = "autospc_inconsistent_ssa_parameters_error"
   )
-
-  expect_identical(count, 1L)
 })
 
 
-test_that("an XmR pair is warned about once, not once per chart", {
-  count <- count_pair_warnings(
+test_that("an inconsistent pair is an error for an XmR pair", {
+  expect_error(
     autospc(inconsistent_pair,
       chart_type = "XMR", period_min = 21L,
       overhanging_reversions = FALSE, plot_chart = FALSE
-    )
+    ),
+    class = "autospc_inconsistent_ssa_parameters_error"
   )
-
-  expect_identical(count, 1L)
 })
 
 
-test_that("a faceted chart is warned about once, not once per facet", {
-  count <- count_pair_warnings(
+test_that("an inconsistent pair is an error for facet_stages", {
+  expect_error(
     facet_stages(inconsistent_pair,
       split_at = c(20L, 40L), chart_type = "C",
       period_min = 21L, overhanging_reversions = FALSE,
       plot_chart = FALSE
-    )
+    ),
+    class = "autospc_inconsistent_ssa_parameters_error"
   )
-
-  expect_identical(count, 1L)
 })
 
 
-test_that("the resolved value is what the chart carries", {
-  plot <- suppressWarnings(
+test_that("the error names the caller's call and says what to set", {
+  given <- tryCatch(
     autospc(inconsistent_pair,
       chart_type = "C", period_min = 21L,
-      overhanging_reversions = FALSE
-    )
+      overhanging_reversions = FALSE, plot_chart = FALSE
+    ),
+    autospc_inconsistent_ssa_parameters_error = function(e) e
   )
 
-  expect_true(autospc_plot_charts(plot)[[1]]$overhanging_reversions)
+  expect_identical(rlang::call_name(given$call), "autospc")
+  expect_match(
+    conditionMessage(given),
+    "`no_regrets = TRUE` requires `overhanging_reversions = TRUE`",
+    fixed = TRUE
+  )
 })
 
 
-test_that("a consistent pair is left alone and doesn't warn of inconsistency", {
-  count <- count_pair_warnings(
-    plot <- autospc(inconsistent_pair,
-      chart_type = "C", period_min = 21L,
-      no_regrets = FALSE, overhanging_reversions = FALSE
-    )
+test_that("a consistent pair runs and keeps overhanging_reversions = FALSE", {
+  plot <- autospc(inconsistent_pair,
+    chart_type = "C", period_min = 21L, max_exclusions = 0L,
+    no_regrets = FALSE, overhanging_reversions = FALSE
   )
-
-  expect_identical(count, 0L)
 
   expect_false(autospc_plot_charts(plot)[[1]]$overhanging_reversions)
-})
-
-
-test_that("the inconsistent pair is a deprecation warning", {
-  given <- pair_warning(
-    autospc(inconsistent_pair,
-      chart_type = "C", period_min = 21L,
-      overhanging_reversions = FALSE, plot_chart = FALSE
-    )
-  )
-
-  expect_s3_class(given, "lifecycle_warning_deprecated")
-
-  # the warning names the caller's own call rather than the package's use of
-  # validate_algorithm_parameters(), so it does not ask for a bug report
-  expect_no_match(conditionMessage(given), "report the issue")
-})
-
-
-test_that("facet_stages gives the same deprecation warning", {
-  given <- pair_warning(
-    facet_stages(inconsistent_pair,
-      chart_type = "C", period_min = 21L, split_at = 30L,
-      overhanging_reversions = FALSE, plot_chart = FALSE
-    )
-  )
-
-  expect_s3_class(given, "lifecycle_warning_deprecated")
-
-  expect_no_match(conditionMessage(given), "report the issue")
 })

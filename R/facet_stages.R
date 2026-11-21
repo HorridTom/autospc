@@ -11,9 +11,6 @@
 #' one point per subgroup in x order, specifying the stages to display results
 #' at. Names specify facet strip labels.
 #' @param ... Arguments passed to [autospc::autospc()]
-#' @param split_rows `r lifecycle::badge("deprecated")` Use `split_at` instead.
-#' The positions it takes are now counted in the analysed series rather than in
-#' the data as supplied. It will be removed in autospc 0.3.0.
 #'
 #' @returns With `plot_chart = TRUE` (the default), an `autospc_plot`: one
 #' ggplot, faceted by stage, which also carries the analysed chart behind each
@@ -38,55 +35,12 @@
 facet_stages <- function(data,
                          split_at,
                          plot_chart = TRUE,
-                         ...,
-                         split_rows = deprecated()) {
+                         ...) {
   caller <- parent.frame()
-
-  if (lifecycle::is_present(split_rows)) {
-    lifecycle::deprecate_warn(
-      when = "0.2.0",
-      what = "facet_stages(split_rows)",
-      with = "facet_stages(split_at)",
-      details = paste(
-        "The positions are now counted in the analysed series, which",
-        "holds one point per subgroup in x order, rather than in the",
-        "data as supplied. Where the data already holds one row per",
-        "subgroup, in x order, nothing changes. split_rows will be removed",
-        "in autospc 0.3.0."
-      )
-    )
-
-    if (missing(split_at)) {
-      split_at <- split_rows
-    }
-  }
 
   plot_chart <- match_flag(plot_chart, "plot_chart")
 
   dots_exprs <- rlang::exprs(...)
-
-  if ("show_mr" %in% names(dots_exprs)) {
-    if (isTRUE(dots_exprs$show_mr)) {
-      warning(paste(
-        "`facet_stages()` does not support `show_mr = TRUE`.",
-        "The X chart is faceted on its own. To facet an MR chart",
-        "by stages use `facet_stages()` with `chart_type = MR`."
-      ))
-    }
-
-    lifecycle::deprecate_warn(
-      when = "0.1.0",
-      what = "facet_stages(show_mr)",
-      with = "facet_stages(chart_type)",
-      details = paste(
-        'chart_type = "X" facets the X chart on its own, which',
-        "is what facet_stages() has always drawn for",
-        'chart_type = "XMR". show_mr will be removed in autospc 0.3.0.'
-      )
-    )
-
-    dots_exprs$show_mr <- NULL
-  }
 
   column_exprs <- dots_exprs[
     which(names(dots_exprs) %in% autospc_column_arguments())
@@ -111,10 +65,7 @@ facet_stages <- function(data,
     x_values = data[[column_name_of(column_exprs, field = "x")]]
   )
 
-  arguments <- validate_algorithm_parameters(
-    arguments,
-    user_env = rlang::caller_env()
-  )
+  arguments <- validate_algorithm_parameters(arguments)
 
   chart_args <- arguments[autospc_chart_parameters()]
   visualisation_params <- arguments[visualisation_param_names()]
@@ -204,10 +155,6 @@ facet_stages <- function(data,
 
   if (is.null(stage_names)) {
     stage_names <- as.character(seq_along(charts))
-  }
-
-  if (!"max_exclusions" %in% names(given)) {
-    warn_max_exclusions_default(charts)
   }
 
   # A facet is named for its stage rather than for its chart type
@@ -304,10 +251,9 @@ create_splits_list <- function(data,
 #' default from `autospc()`'s signature where the caller gave none.
 #'
 #' `data`, `x`, `y`, `n` and `s` are not among them. `data` is the data itself,
-#' and the other four hold column names rather than values. The deprecated
+#' and the other four hold column names rather than values. Any deprecated
 #' arguments are not among them either: their default is a sentinel rather than
-#' a value, and `facet_stages()` deals with the one it supports before this is
-#' called.
+#' a value.
 #'
 #' @param given A named list of the argument values the caller supplied.
 #'

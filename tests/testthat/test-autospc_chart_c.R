@@ -53,7 +53,7 @@ test_that("defaults populated as expected", {
   expect_identical(chart$establish_every_shift, FALSE)
   expect_identical(chart$no_regrets, TRUE)
   expect_identical(chart$overhanging_reversions, TRUE)
-  expect_identical(chart$max_exclusions, 3L)
+  expect_identical(chart$max_exclusions, 0L)
   expect_identical(chart$mr_screen_max_loops, 1L)
   expect_identical(chart$centre_line_tolerance, 0)
 })

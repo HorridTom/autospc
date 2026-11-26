@@ -1,34 +1,32 @@
-# Code to add rule break columns to a dataframe x
-# Assumes the following columns in x:
-# series : the values under analysis
-# cl     : the centre line
-# lcl    : the lower control limit
-# ucl    : the upper control limit
-
+#' Add the rule break columns
+#'
+#' `rule1` (the point is outside the limits), `rule2` (the point is in a run of
+#' at least `shift_rule_threshold` points on one side of the centre line),
+#' `highlight` (the rule whose colour the point is drawn in, with rule 2 taking
+#' precedence over rule 1), and the columns `add_shift_columns()` adds, apart
+#' from `shift`, which `rule2` replaces.
+#'
+#' @param x A table with the columns `series`, `cl`, `lcl` and `ucl`.
+#' @param centre_line_tolerance As for `add_shift_columns()`.
+#' @param shift_rule_threshold As for `add_shift_columns()`.
+#'
+#' @return `x`, with the columns added.
+#' @noRd
 add_rule_breaks <- function(x,
                             centre_line_tolerance,
                             shift_rule_threshold) {
+  x <- add_shift_columns(x,
+    centre_line_tolerance = centre_line_tolerance,
+    shift_rule_threshold = shift_rule_threshold
+  )
+
   # rule 1: the point is outside the limits
   rule1 <- (x$series > x$ucl) | (x$series < x$lcl)
+  rule2 <- x$shift
 
-  # which side of the centre line each point is: 1 above, -1 below, 0 on it
-  # (within centre_line_tolerance), NA where it cannot be compared
-  difference <- x$series - x$cl
-  side <- rep(NA_integer_, length(difference))
-  side[which(difference %<<% -centre_line_tolerance)] <- -1L
-  side[which(difference %>>% centre_line_tolerance)] <- 1L
-  side[which(abs(difference) %<=% centre_line_tolerance)] <- 0L
   x[["rule1"]] <- rule1
-  x[["above_or_below_cl"]] <- side
-
-  x <- add_rule_two(x, shift_rule_threshold = shift_rule_threshold)
-
-  # a point on the centre line is not marked as a rule 2 break
-  rule2 <- x$rule2
-  on_cl <- rule2 & side == 0L
-  rule2[which(on_cl)] <- FALSE
-  rule2[is.na(on_cl)] <- NA
   x[["rule2"]] <- rule2
+  x[["shift"]] <- NULL
 
   # rule 2 takes precedence over rule 1 in the highlight
   highlight <- rep("None", length(rule1))
@@ -36,20 +34,105 @@ add_rule_breaks <- function(x,
   highlight[which(rule2)] <- "Rule 2"
   x[["highlight"]] <- highlight
 
-  # put above_or_below_cl immediately after rule2
-  others <- setdiff(names(x), "above_or_below_cl")
-  before <- seq_len(match("rule2", others))
-  x <- x[c(others[before], "above_or_below_cl", others[-before])]
+  return(x)
 }
 
-add_rule_two <- function(table, shift_rule_threshold) {
+
+#' Add the rule break columns to each period of a table separately
+#'
+#' A run does not continue from one period into the next. The periods are
+#' separated at the rows where `break_point` is TRUE.
+#'
+#' @param limits_table The table the algorithm formed, with a `break_point`
+#'   column.
+#' @param chart The chart being analysed.
+#'
+#' @return `limits_table`, with the columns `add_rule_breaks()` adds.
+#' @noRd
+add_rule_breaks_by_period <- function(limits_table,
+                                      chart) {
+  if (nrow(limits_table) == 0L) {
+    return(add_rule_breaks(limits_table,
+      centre_line_tolerance = chart$centre_line_tolerance,
+      shift_rule_threshold = chart$shift_rule_threshold
+    ))
+  }
+
+  period <- cumsum(dplyr::coalesce(limits_table$break_point, FALSE))
+
+  tables <- lapply(
+    split(seq_len(nrow(limits_table)), period),
+    function(rows) {
+      add_rule_breaks(dplyr::slice(limits_table, rows),
+        centre_line_tolerance = chart$centre_line_tolerance,
+        shift_rule_threshold = chart$shift_rule_threshold
+      )
+    }
+  )
+
+  return(dplyr::bind_rows(tables))
+}
+
+
+#' Add the columns the algorithm uses to find shifts
+#'
+#' `above_or_below_cl` (which side of the centre line each point is),
+#' `run_start` (whether the point is the first of a run on one side of the
+#' centre line) and `shift` (whether the point is in a run of at least
+#' `shift_rule_threshold` points on one side of the centre line).
+#'
+#' @param x A table with the columns `series` and `cl`, and optionally
+#'   `run_break`.
+#' @param centre_line_tolerance The distance from the centre line within which
+#'   a point is taken to be on it.
+#' @param shift_rule_threshold The number of points a run needs to break the
+#'   shift rule.
+#'
+#' @return `x`, with the columns added.
+#' @noRd
+add_shift_columns <- function(x,
+                              centre_line_tolerance,
+                              shift_rule_threshold) {
+  # which side of the centre line each point is: 1 above, -1 below, 0 on it
+  # (within centre_line_tolerance), NA where it cannot be compared
+  difference <- x$series - x$cl
+  side <- rep(NA_integer_, length(difference))
+  side[which(difference %<<% -centre_line_tolerance)] <- -1L
+  side[which(difference %>>% centre_line_tolerance)] <- 1L
+  side[which(abs(difference) %<=% centre_line_tolerance)] <- 0L
+  x[["above_or_below_cl"]] <- side
+
+  x <- add_run_columns(x, shift_rule_threshold = shift_rule_threshold)
+
+  # a point on the centre line is not part of a shift
+  shift <- x$shift
+  on_cl <- shift & side == 0L
+  shift[which(on_cl)] <- FALSE
+  shift[is.na(on_cl)] <- NA
+  x[["shift"]] <- shift
+
+  return(x)
+}
+
+
+#' Add `run_start` and the run length test
+#'
+#' @param table A table with the column `above_or_below_cl`, and optionally
+#'   `run_break`.
+#' @param shift_rule_threshold The number of points a run needs to break the
+#'   shift rule.
+#'
+#' @return `table`, with `run_start` and `shift` added. `shift` is TRUE for
+#'   every point of a run of at least `shift_rule_threshold` points.
+#' @noRd
+add_run_columns <- function(table, shift_rule_threshold) {
   # which side of the centre line each point is: 1 above, -1 below, 0 on it
   # (within centre_line_tolerance), NA where there is no point or no centre
   # line to compare it with
   side <- unlist(table$above_or_below_cl)
 
   if (length(side) == 0L) {
-    table$rule2 <- logical(0)
+    table$shift <- logical(0)
     table$run_start <- logical(0)
 
     return(table)
@@ -84,7 +167,7 @@ add_rule_two <- function(table, shift_rule_threshold) {
   in_a_run <- run > 0L
   length_of_run[in_a_run] <- run_lengths[run[in_a_run]]
 
-  table$rule2 <- length_of_run >= shift_rule_threshold
+  table$shift <- length_of_run >= shift_rule_threshold
 
   table
 }

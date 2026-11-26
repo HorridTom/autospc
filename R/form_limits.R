@@ -70,7 +70,7 @@ form_calculation_limits <- function(data,
       dplyr::mutate(
         series = dplyr::if_else(is.na(series.y), series.x, series.y),
         # the first point is not classed as a break point, for compatibility
-        # with (at least) add_rule_breaks_respecting_periods
+        # with (at least) add_shift_columns_respecting_periods
         break_point = dplyr::if_else(dplyr::row_number() == counter,
           NA,
           FALSE
@@ -114,7 +114,7 @@ form_calculation_limits <- function(data,
     limits_table <- limits_table[unique(c(
       "x", "series", extra_columns, "ucl", "lcl", "cl", statistic_columns,
       "period_type", "excluded",
-      containing("break_point"), containing("rule"),
+      containing("break_point"), intersect("shift", columns),
       containing("above_or_below"), containing("highlight"),
       containing("run"), intersect("log", columns),
       intersect("dispersion_observed", columns)
@@ -188,8 +188,8 @@ form_calculation_and_display_limits <- function(
     chart = chart
   )
 
-  # add rule breaks considering where periods are
-  limits_table <- add_rule_breaks_respecting_periods(
+  # add the shift columns considering where periods are
+  limits_table <- add_shift_columns_respecting_periods(
     limits_table = limits_table,
     counter = counter_at_period_start,
     centre_line_tolerance = chart$centre_line_tolerance,
@@ -204,9 +204,9 @@ form_calculation_and_display_limits <- function(
 #'
 #' Takes calculation periods as given, and for each in turn forms
 #' calculation limits from the period's points, applies display limits for
-#' subsequent points prior to the next period, and marks the rule breaks, in the
-#' same way as the algorithm does for a period it establishes. The last period's
-#' display limits run to the end of `data`.
+#' subsequent points prior to the next period, and adds the shift columns, in
+#' the same way as the algorithm does for a period it establishes. The last
+#' period's display limits run to the end of `data`.
 #'
 #' @param data A data frame with one row per point of the series that has an
 #'   observation, in order of `x`, as `compact_series()` returns it. It has the
@@ -223,7 +223,7 @@ form_calculation_and_display_limits <- function(
 #' @param chart The chart being analysed.
 #'
 #' @return `data`, one row per row, with the centre line, the limits, the period
-#'   type, the excluded points and the rule breaks added.
+#'   type, the excluded points and the shift columns added.
 #' @noRd
 form_limits_over_periods <- function(data,
                                      periods,
@@ -303,7 +303,7 @@ mirrored_exclusions <- function(chart,
 #'
 #' The rows from `counter` to the end of the table become display rows with no
 #' centre line, no limits and no period statistics, starting a new period at
-#' `counter`, and the rule breaks are marked again, as where a period is
+#' `counter`, and the shift columns are added again, as where a period is
 #' established.
 #'
 #' @param limits_table The limits table being built, holding an earlier
@@ -329,7 +329,7 @@ form_period_without_points <- function(limits_table,
   limits_table$period_type[rows] <- "display"
   limits_table$break_point[counter] <- TRUE
 
-  return(add_rule_breaks_respecting_periods(
+  return(add_shift_columns_respecting_periods(
     limits_table = limits_table,
     counter = counter,
     centre_line_tolerance = chart$centre_line_tolerance,

@@ -182,7 +182,7 @@ rule2_break_start_positions <- function(limits_table, counter) {
   # continue into the run after the gap, even when both are on the same side of
   # the centre line.
   limits_table <- limits_table %>%
-    dplyr::mutate(start_of_rule2_break = rule2 & run_start)
+    dplyr::mutate(start_of_rule2_break = shift & run_start)
 
   next_rule_break_positions <-
     (which(limits_table$start_of_rule2_break[
@@ -220,7 +220,7 @@ identify_opposite_break <- function(limits_table,
   }
 
   limits_table_candidate <- limits_table[candidate_start:candidate_end, ]
-  limits_table_candidate <- add_rule_breaks(
+  limits_table_candidate <- add_shift_columns(
     limits_table_candidate,
     centre_line_tolerance = centre_line_tolerance,
     shift_rule_threshold = shift_rule_threshold
@@ -239,7 +239,7 @@ identify_opposite_break <- function(limits_table,
   # run is not counted: if it is in the same direction as the triggering run
   # it cannot be an opposite break, and if it is in the opposite direction it
   # is only the move to the new level
-  limits_table_candidate[["opposite_break"]] <- limits_table_candidate$rule2 &
+  limits_table_candidate[["opposite_break"]] <- limits_table_candidate$shift &
     (side != triggering_rule_break_direction) & run_count > 1
 
   if (!overhanging_reversions & nrow(limits_table) > candidate_end) {
@@ -353,14 +353,14 @@ final_run_prevents_re_establishment <- function(
 }
 
 
-# Function to add rule breaks to data with many periods. Avoids issues with
-# highlighting across periods. NB this function counts actual break points, not
-# period starts, hence it relies on the break_point column not being TRUE on the
-# first row.
-add_rule_breaks_respecting_periods <- function(limits_table,
-                                               counter,
-                                               centre_line_tolerance,
-                                               shift_rule_threshold) {
+# Function to add the shift columns to data with many periods, so that a run
+# does not continue from one period into the next. NB this function counts
+# actual break points, not period starts, hence it relies on the break_point
+# column not being TRUE on the first row.
+add_shift_columns_respecting_periods <- function(limits_table,
+                                                 counter,
+                                                 centre_line_tolerance,
+                                                 shift_rule_threshold) {
   # get breakpoint positions
   breakpoints <- which(limits_table$break_point)
 
@@ -368,8 +368,8 @@ add_rule_breaks_respecting_periods <- function(limits_table,
   if (counter == 1 | length(breakpoints) == 0L) {
     # for first period, or cases where there is only one period
 
-    # add rule breaks to all of data
-    limits_table <- add_rule_breaks(
+    # add the shift columns to all of data
+    limits_table <- add_shift_columns(
       x = limits_table,
       centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold
@@ -381,13 +381,13 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     limits_table_top <- limits_table[1:(counter - 1), ]
     limits_table_bottom <- limits_table[counter:nrow(limits_table), ]
 
-    # add rule breaks to the old and new periods separately
-    limits_table_top <- add_rule_breaks(
+    # add the shift columns to the old and new periods separately
+    limits_table_top <- add_shift_columns(
       x = limits_table_top,
       centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold
     )
-    limits_table_bottom <- add_rule_breaks(
+    limits_table_bottom <- add_shift_columns(
       x = limits_table_bottom,
       centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold
@@ -400,7 +400,7 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     )
   } else if (length(breakpoints) >= 2) {
     # for data with 3 or more periods,
-    # only re-run rule breaks on most recent 2 periods
+    # only re-run the shift columns on most recent 2 periods
 
     # find start of previous period
     no_of_breakpoints <- length(breakpoints)
@@ -411,13 +411,13 @@ add_rule_breaks_respecting_periods <- function(limits_table,
     limits_table_mid <- limits_table[penultimate_breakpoint:(counter - 1L), ]
     limits_table_bottom <- limits_table[counter:nrow(limits_table), ]
 
-    # add rule breaks to the penultimate and new periods only
-    limits_table_mid <- add_rule_breaks(
+    # add the shift columns to the penultimate and new periods only
+    limits_table_mid <- add_shift_columns(
       x = limits_table_mid,
       centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold
     )
-    limits_table_bottom <- add_rule_breaks(
+    limits_table_bottom <- add_shift_columns(
       x = limits_table_bottom,
       centre_line_tolerance = centre_line_tolerance,
       shift_rule_threshold = shift_rule_threshold
@@ -609,7 +609,7 @@ counter_at_rule_break <- function(table,
                                   counter,
                                   shift_rule_threshold) {
   # no rule 2 break at counter
-  if (!(table$rule2[seq_len(nrow(table)) == counter])) {
+  if (!(table$shift[seq_len(nrow(table)) == counter])) {
     return(FALSE)
   }
 
@@ -622,8 +622,8 @@ counter_at_rule_break <- function(table,
     start_of_next_run <- nrow(table) + 1L
   }
 
-  # counted the same way add_rule_two() counts a run, so that the two agree on
-  # whether the threshold is reached: points on the centre line do not count
+  # counted the same way add_run_columns() counts a run, so that the two agree
+  # on whether the threshold is reached: points on the centre line do not count
   side <- unlist(table$above_or_below_cl)[counter:(start_of_next_run - 1L)]
 
   result <- sum(!is.na(side) & side != 0L) >= shift_rule_threshold

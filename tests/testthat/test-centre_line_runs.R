@@ -17,7 +17,7 @@ runs_in <- function(side, threshold = 3L, run_break = NULL) {
     table$run_break <- run_break
   }
 
-  return(add_rule_two(table, shift_rule_threshold = threshold))
+  return(add_run_columns(table, shift_rule_threshold = threshold))
 }
 
 
@@ -28,7 +28,7 @@ test_that("a table with no points has no runs", {
   result <- runs_in(numeric(0))
 
   expect_identical(result$run_start, logical(0))
-  expect_identical(result$rule2, logical(0))
+  expect_identical(result$shift, logical(0))
 })
 
 
@@ -45,8 +45,8 @@ test_that("a point on the centre line does not end the run it sits in", {
 test_that("a point on the centre line does not count towards run length", {
   # three points above the line, so a threshold of three is reached and one of
   # four is not, whichever side of the run the centre line point falls
-  expect_true(all(runs_in(c(1, 1, 0, 1), threshold = 3L)$rule2))
-  expect_false(any(runs_in(c(1, 1, 0, 1), threshold = 4L)$rule2))
+  expect_true(all(runs_in(c(1, 1, 0, 1), threshold = 3L)$shift))
+  expect_false(any(runs_in(c(1, 1, 0, 1), threshold = 4L)$shift))
 })
 
 
@@ -57,7 +57,7 @@ test_that("a run reaches across however many centre line points it meets", {
   result <- runs_in(c(1, 0, 0, 0, 0, 1), threshold = 2L)
 
   expect_identical(result$run_start, c(TRUE, rep(FALSE, 5L)))
-  expect_true(all(result$rule2))
+  expect_true(all(result$shift))
 })
 
 
@@ -76,7 +76,7 @@ test_that("points on the centre line before any run belong to none", {
   # run that follows them reaches the threshold
   result <- runs_in(c(0, 0, 1, 1, 1), threshold = 3L)
 
-  expect_identical(result$rule2, c(FALSE, FALSE, TRUE, TRUE, TRUE))
+  expect_identical(result$shift, c(FALSE, FALSE, TRUE, TRUE, TRUE))
 })
 
 
@@ -84,7 +84,7 @@ test_that("points on the centre line after a run belong to it", {
   result <- runs_in(c(1, 1, 1, 0, 0), threshold = 3L)
 
   expect_identical(result$run_start, c(TRUE, rep(FALSE, 4L)))
-  expect_true(all(result$rule2))
+  expect_true(all(result$shift))
 })
 
 
@@ -102,7 +102,7 @@ test_that("points that are all on the centre line form no run", {
   result <- runs_in(c(0, 0, 0, 0), threshold = 1L)
 
   expect_false(any(result$run_start))
-  expect_false(any(result$rule2))
+  expect_false(any(result$shift))
 })
 
 
@@ -213,7 +213,7 @@ test_that("counter_at_rule_break counts the points of a run, not its rows", {
   # of eight and six points do not, so the two measures disagree here
   table <- data.frame(
     above_or_below_cl = c(1, 1, 1, 0, 1, 1, 0, 1, 0, 1, -1),
-    rule2 = c(rep(TRUE, 10L), FALSE),
+    shift = c(rep(TRUE, 10L), FALSE),
     run_start = c(TRUE, rep(FALSE, 9L), TRUE)
   )
 
@@ -230,7 +230,7 @@ test_that("counter_at_rule_break is reached when the points do follow", {
   # points above the line follow the counter
   table <- data.frame(
     above_or_below_cl = c(rep(1, 10L), -1),
-    rule2 = c(rep(TRUE, 10L), FALSE),
+    shift = c(rep(TRUE, 10L), FALSE),
     run_start = c(TRUE, rep(FALSE, 9L), TRUE)
   )
 

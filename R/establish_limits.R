@@ -397,7 +397,7 @@ analyse_segment <- function(chart,
                 # [shift_rule_threshold] points of the run following
                 if (is.na(rule2_break_positions[2]) |
                   all(
-                    limits_table$rule2[
+                    limits_table$shift[
                       counter:(counter + chart$shift_rule_threshold - 1)
                     ]
                   )) {
@@ -435,6 +435,8 @@ analyse_segment <- function(chart,
       chart <- record_stop(chart, counter = counter, reason = "baseline only")
     } # end of: [3] !baseline_only
 
+
+    limits_table <- add_rule_breaks_by_period(limits_table, chart = chart)
 
     limits_table <- add_period_columns(limits_table)
 
@@ -505,6 +507,8 @@ analyse_segment_over_location_periods <- function(chart,
       observed = nrow(observed_data) + stranded_points
     ))
   }
+
+  limits_table <- add_rule_breaks_by_period(limits_table, chart = chart)
 
   limits_table <- add_period_columns(limits_table)
 

@@ -113,6 +113,7 @@ utils::globalVariables(c(
   "series.x",
   "series.y",
   "series_polyline",
+  "shift",
   "spread",
   "stage",
   "subgroup_mean",

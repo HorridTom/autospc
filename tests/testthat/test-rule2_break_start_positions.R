@@ -5,7 +5,7 @@ test_data <- readRDS("testdata/test_data_rule2_break.rds")
 test_data$series <- test_data$y
 
 test_that("Start of subsequent rule 2 breaks identified correctly", {
-  test_data <- add_rule_breaks(test_data,
+  test_data <- add_shift_columns(test_data,
     centre_line_tolerance = 0,
     shift_rule_threshold = 8L
   )

@@ -20,7 +20,8 @@ analysed_charts <- function(...) {
 }
 
 # the limits table form_limits_over_periods() gives over the chart's own
-# calculation periods, and the analysed table's rows for the same points
+# calculation periods, with the rule breaks added as the algorithm adds them at
+# the end, and the analysed table's rows for the same points
 reformed <- function(chart) {
   observed <- compact_series(chart,
     data = chart$data,
@@ -31,9 +32,12 @@ reformed <- function(chart) {
     dplyr::filter(x %in% observed$x)
 
   return(list(
-    reformed = form_limits_over_periods(
-      data = observed,
-      periods = calculation_periods(chart$result$table),
+    reformed = add_rule_breaks_by_period(
+      form_limits_over_periods(
+        data = observed,
+        periods = calculation_periods(chart$result$table),
+        chart = chart
+      ),
       chart = chart
     ),
     table = table

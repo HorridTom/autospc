@@ -17,6 +17,14 @@
   unaffected. Set `dispersion_chart_establishment = "independent"` to keep the
   results of 0.3.0.
 
+#### The candidate tables
+
+* The tables kept with `keep_candidate_tables = TRUE` hold the columns the
+  algorithm uses to find shifts: `shift` (whether the point is in a run of at
+  least `shift_rule_threshold` points on one side of the centre line),
+  `run_start` and `above_or_below_cl`, in place of `rule1`, `rule2` and
+  `highlight` (#160).
+
 ### Deprecations
 
 * **`na_ends_run` is renamed `na_ends_pattern`**, in `autospc()` and

@@ -204,9 +204,13 @@ test_that("the history records a prevented candidate as not evaluated", {
 
 
 test_that("both charts of an XMR pair are prevented from re-establishing", {
-  plain <- charts_with(range_series, chart_type = "XMR")
+  plain <- charts_with(range_series,
+    chart_type = "XMR",
+    dispersion_chart_establishment = "independent"
+  )
   ranged <- charts_with(range_series,
     chart_type = "XMR",
+    dispersion_chart_establishment = "independent",
     prevent_establishment_in = c(20, 40)
   )
 

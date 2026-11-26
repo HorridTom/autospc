@@ -154,17 +154,21 @@ test_that("dispersion_chart_establishment takes each of the values it accepts", 
 })
 
 
-test_that("dispersion_chart_establishment defaults to independent", {
-  charts <- charts_of("XMR")
+test_that("dispersion_chart_establishment defaults to forced", {
+  for (chart_type in names(autospc_pair_types())) {
+    charts <- charts_of(chart_type)
 
-  expect_identical(
-    charts$location$dispersion_chart_establishment,
-    "independent"
-  )
-  expect_identical(
-    charts$dispersion$dispersion_chart_establishment,
-    "independent"
-  )
+    expect_identical(
+      charts$location$dispersion_chart_establishment,
+      "forced",
+      info = chart_type
+    )
+    expect_identical(
+      charts$dispersion$dispersion_chart_establishment,
+      "forced",
+      info = chart_type
+    )
+  }
 })
 
 
@@ -285,7 +289,7 @@ test_that("facet_stages checks the dispersion_chart_establishment value", {
 })
 
 
-test_that("a chart built without dispersion_chart_establishment holds independent", {
+test_that("a chart built without dispersion_chart_establishment holds forced", {
   chart <- autospc_chart(
     chart_type = "C\'",
     data = values_data,
@@ -293,7 +297,7 @@ test_that("a chart built without dispersion_chart_establishment holds independen
     y = "y"
   )
 
-  expect_identical(chart$dispersion_chart_establishment, "independent")
+  expect_identical(chart$dispersion_chart_establishment, "forced")
 })
 
 

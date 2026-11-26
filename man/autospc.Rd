@@ -22,7 +22,7 @@ autospc(
   force_restart_at = NULL,
   prevent_establishment_in = NULL,
   restart_after_gap = NULL,
-  dispersion_chart_establishment = c("independent", "forced", "shared"),
+  dispersion_chart_establishment = c("forced", "independent", "shared"),
   na_ends_run = TRUE,
   max_exclusions = 0L,
   highlight_exclusions = TRUE,
@@ -179,12 +179,12 @@ at the start or end of the series are ignored.}
 
 \item{dispersion_chart_establishment}{How the dispersion chart of a pair (the
 MR chart of "XMR", the S chart of "XbarS") establishes its limits:
+"forced" (the default) - the dispersion chart uses the location chart's
+calculation periods, so its limits change where the location chart's do, and
+in a period where it has fewer points with a value than the location chart,
+its limits are calculated from fewer than \code{period_min} points;
 "independent" - the algorithm runs on the dispersion chart separately from
 the location chart, so the two charts' limits can change at different points;
-"forced" - the dispersion chart uses the location chart's calculation
-periods, so its limits change where the location chart's do, and in a period
-where it has fewer points with a value than the location chart, its limits
-are calculated from fewer than \code{period_min} points;
 "shared" - each calculation period is extended until both charts have at
 least \code{period_min} points with a value in it, and both charts use these
 periods, so the location chart's limits can differ from those it has with

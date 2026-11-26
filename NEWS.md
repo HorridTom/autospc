@@ -1,3 +1,30 @@
+# autospc 0.3.0.9001
+
+## Lifecycle changes
+
+### Breaking changes
+
+#### Defaults that change results
+
+* **The default of `dispersion_chart_establishment` is now "forced"** (#160),
+  for both XMR and XbarS. The dispersion chart (the MR chart or the S chart)
+  now takes the location chart's calculation periods, so its limits change
+  where the location chart's do, rather than the algorithm running on it
+  separately. The dispersion chart's limits change wherever they were
+  re-established at different points from the location chart's, and a
+  dispersion chart with too few points of its own to form a period now has
+  limits wherever the location chart has a period. The location chart is
+  unaffected. Set `dispersion_chart_establishment = "independent"` to keep the
+  results of 0.3.0.
+
+## Bug fixes
+
+* A pair with too few points to form a period, with
+  `dispersion_chart_establishment` set to "forced" or "shared", no longer gives
+  the warning "no non-missing arguments to min; returning Inf", and no longer
+  fails with an error when `log_file_path` is given. The dispersion chart's log
+  now records that there are too few points to form control limits.
+
 # autospc 0.3.0
 
 This release adds U and U' charts, restarts of the algorithm (forced, and after

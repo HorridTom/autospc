@@ -492,7 +492,8 @@ test_that("a moving range panel without limits draws its floating median", {
   with_a_gap$y[11] <- NA
 
   plot <- suppressWarnings(autospc(with_a_gap,
-    chart_type = "XMR", period_min = 21L, floating_median = "yes"
+    chart_type = "XMR", period_min = 21L, floating_median = "yes",
+    dispersion_chart_establishment = "independent"
   ))
 
   halves <- autospc_plot_charts(plot)

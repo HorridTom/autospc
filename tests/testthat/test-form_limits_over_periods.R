@@ -52,6 +52,25 @@ test_that("calculation_periods gives the first and last x of each calculation pe
 })
 
 
+test_that("calculation_periods gives no rows, and no warning, for a table with no calculation period", {
+  # the table of a series too short to form a period
+  table <- data.frame(
+    x = 1:3,
+    period_type = NA_character_,
+    plot_period = NA_character_
+  )
+
+  expect_no_warning(
+    periods <- calculation_periods(table),
+    message = "no non-missing arguments"
+  )
+  expect_identical(
+    periods,
+    data.frame(first_x = integer(0), last_x = integer(0))
+  )
+})
+
+
 test_that("a missing value inside a calculation period is within its first and last x", {
   chart <- analysed_charts(gapped_series, chart_type = "X", x = x, y = y)[[1]]
   table <- chart$result$table
@@ -68,9 +87,13 @@ test_that("form_limits_over_periods reproduces the algorithm's limits over its o
       chart_type = "P'",
       x = "month_start", y = "within_4h", n = "att_all"
     ),
-    xmr_with_missing_values = list(gapped_series, chart_type = "XMR"),
+    xmr_with_missing_values = list(gapped_series,
+      chart_type = "XMR",
+      dispersion_chart_establishment = "independent"
+    ),
     xmr_with_baseline_length = list(gapped_series,
       chart_type = "XMR",
+      dispersion_chart_establishment = "independent",
       baseline_length = 30L
     ),
     xbars = list(subgroup_series, chart_type = "XbarS")
@@ -113,7 +136,11 @@ test_that("the reproduced cases have more than one period, excluded points and m
     4L
   )
   expect_identical(
-    unname(periods(gapped_series, chart_type = "XMR", baseline_length = 30L)),
+    unname(periods(gapped_series,
+      chart_type = "XMR",
+      dispersion_chart_establishment = "independent",
+      baseline_length = 30L
+    )),
     c(3L, 2L)
   )
 

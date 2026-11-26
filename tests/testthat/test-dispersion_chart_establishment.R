@@ -219,7 +219,10 @@ test_that("the S chart has limits where the location chart has a period, with fe
   )
 
   # the S chart alone has too few points, so warns and is drawn without limits
-  independent <- suppressWarnings(pair(data, chart_type = "XbarS"))
+  independent <- suppressWarnings(pair(data,
+    chart_type = "XbarS",
+    dispersion_chart_establishment = "independent"
+  ))
   forced <- pair(data,
     chart_type = "XbarS",
     dispersion_chart_establishment = "forced"
@@ -279,7 +282,10 @@ test_that("the history of a chart that takes the location chart's periods record
 
 
 test_that("only the dispersion chart of a mirrored pair holds the location chart's periods", {
-  independent <- pair(gapped_series, chart_type = "XMR")
+  independent <- pair(gapped_series,
+    chart_type = "XMR",
+    dispersion_chart_establishment = "independent"
+  )
   forced <- pair(gapped_series,
     chart_type = "XMR",
     dispersion_chart_establishment = "forced"

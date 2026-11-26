@@ -57,6 +57,29 @@ test_that("a pair with too few points for limits writes both halves too", {
 })
 
 
+test_that("the moving range chart of a forced pair with too few points logs that it has no limits", {
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
+
+  # ten points are too few for the X chart to form a period
+  suppressWarnings(
+    autospc(log_file_data[1:10, ],
+      period_min = 21L, chart_type = "XMR",
+      dispersion_chart_establishment = "forced",
+      plot_chart = FALSE, log_file_path = path
+    )
+  )
+  log_table <- readRDS(path)
+  mr_log <- log_table[log_table$chart == "MR", ]
+
+  expect_identical(mr_log$log_entry, "0210")
+  expect_identical(
+    mr_log$interpretation,
+    "Insufficient data to form control limits."
+  )
+})
+
+
 test_that("the X chart's log is not written over by the moving range chart's", {
   pair <- written_log(chart_type = "XMR")
 

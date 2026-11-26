@@ -25,7 +25,7 @@ chart_argument_alternatives <- list(
   # the chart as a list containing it
   prevent_establishment_in = list(c(5, 10)),
   restart_after_gap = 3L,
-  dispersion_chart_establishment = "forced",
+  dispersion_chart_establishment = "shared",
   na_ends_run = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,

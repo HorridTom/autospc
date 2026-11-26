@@ -549,7 +549,9 @@ render_log <- function(chart) {
 #'
 #' `0000` or `0010` at the first row of each segment after the first, as
 #' `restart_log_code()` returns it, `0800` at the first row of the first period
-#' in each segment, and `0810` at the first row of each later period.
+#' in each segment, and `0810` at the first row of each later period. Where no
+#' segment has a location period, `0210` at the first row, because the chart
+#' has no limits.
 #'
 #' @param chart The chart, with its table set.
 #' @param segments The rows of each segment, as `segment_rows()` returns them.
@@ -584,6 +586,11 @@ location_periods_log <- function(chart,
 
     rows <- c(rows, starts)
     codes <- c(codes, c("0800", "0810")[pmin(seq_along(starts), 2L)])
+  }
+
+  if (!"0800" %in% codes) {
+    rows <- c(1L, rows)
+    codes <- c("0210", codes)
   }
 
   return(collect_log_entries(rows,

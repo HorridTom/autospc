@@ -347,9 +347,19 @@ form_period_without_points <- function(limits_table,
 #'   rows being part of the period.
 #' @noRd
 calculation_periods <- function(table) {
+  calculation_rows <- table %>%
+    dplyr::filter(period_type == "calculation")
+
+  if (nrow(calculation_rows) == 0L) {
+    return(
+      calculation_rows %>%
+        dplyr::mutate(first_x = x, last_x = x, .keep = "none") %>%
+        as.data.frame()
+    )
+  }
+
   return(
-    table %>%
-      dplyr::filter(period_type == "calculation") %>%
+    calculation_rows %>%
       dplyr::group_by(plot_period) %>%
       dplyr::summarise(first_x = min(x), last_x = max(x)) %>%
       dplyr::arrange(first_x) %>%

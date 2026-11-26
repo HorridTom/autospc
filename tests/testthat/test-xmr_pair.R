@@ -120,7 +120,9 @@ test_that("a title passed as an argument wins over one in the data", {
 
 
 test_that("the MR chart of the pair is the one a standalone MR run gives", {
-  pair_mr <- autospc_plot_charts(run_pair())[[2]]
+  pair_mr <- autospc_plot_charts(
+    run_pair(dispersion_chart_establishment = "independent")
+  )[[2]]
 
   alone <- suppressWarnings(
     autospc(pair_data,

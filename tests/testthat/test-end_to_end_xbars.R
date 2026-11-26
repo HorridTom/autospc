@@ -86,6 +86,7 @@ test_that("XbarS agrees with qicharts2 for equal subgroup sizes", {
 test_that("an XbarS table holds the Xbar analysis and the S analysis", {
   pair_table <- autospc(xbars_observations(),
     chart_type = "XbarS",
+    dispersion_chart_establishment = "independent",
     plot_chart = FALSE
   )
 

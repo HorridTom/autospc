@@ -31,6 +31,20 @@
   `facet_stages()` (#160). `na_ends_run` still works, with a warning, and will
   be removed in 0.5.0. Where both are given, `na_ends_pattern` is used.
 
+## New features
+
+* **Rule sets: `rule_set()`, `zone_rule()`, `trend_rule()` and
+  `alternating_rule()`** (#160). `rule_set()` gives one of three named sets of
+  rules for highlighting rule breaks - "provost_murray", "western_electric" and
+  "nelson", each numbered as its source numbers it - or builds a set of your
+  own from rules made by the other three functions. A zone rule is broken
+  where `k` of `m` consecutive points lie in a zone measured in standard
+  deviations from the centre line; a trend rule where `k` consecutive points
+  each rise, or each fall; an alternating rule where they go up and down in
+  turn.
+  Every set also has rule 1, a point outside the limits, and the shift rule,
+  whose id and length the set gives. Printing a set lists its rules.
+
 ## Bug fixes
 
 * A pair with too few points to form a period, with

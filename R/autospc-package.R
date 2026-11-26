@@ -65,6 +65,7 @@ utils::globalVariables(c(
   "half_step",
   "has_value",
   "highlight",
+  "id",
   "in_window",
   "interpretation",
   "label",

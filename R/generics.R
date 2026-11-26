@@ -366,3 +366,19 @@ y_axis_range <- function(chart, data) {
 y_axis_title <- function(chart) {
   UseMethod("y_axis_title")
 }
+
+
+# Rule generics
+
+
+#' Describe a rule in words
+#'
+#' Used for a rule's default label, and when a rule set is printed.
+#'
+#' @param rule An `autospc_rule`.
+#'
+#' @return string
+#' @noRd
+rule_description <- function(rule) {
+  UseMethod("rule_description")
+}

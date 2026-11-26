@@ -17,6 +17,12 @@
   unaffected. Set `dispersion_chart_establishment = "independent"` to keep the
   results of 0.3.0.
 
+### Deprecations
+
+* **`na_ends_run` is renamed `na_ends_pattern`**, in `autospc()` and
+  `facet_stages()` (#160). `na_ends_run` still works, with a warning, and will
+  be removed in 0.5.0. Where both are given, `na_ends_pattern` is used.
+
 ## Bug fixes
 
 * A pair with too few points to form a period, with

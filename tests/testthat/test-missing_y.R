@@ -358,7 +358,7 @@ test_that("compacting a series with no observations gives an empty result", {
   chart <- structure(list(), class = c("autospc_chart_c", "autospc_chart"))
   data <- data.frame(x = 1:3, y = NA_real_)
 
-  compacted <- compact_series(chart, data = data, na_ends_run = TRUE)
+  compacted <- compact_series(chart, data = data, na_ends_pattern = TRUE)
 
   expect_identical(nrow(compacted), 0L)
   expect_identical(compacted$run_break, logical(0))
@@ -407,25 +407,25 @@ test_that("a missing y in an MR series is still treated as a gap", {
 })
 
 
-# na_ends_run
+# na_ends_pattern
 
 
-test_that("na_ends_run TRUE stops a run continuing across a gap", {
+test_that("na_ends_pattern TRUE stops a run continuing across a gap", {
   # 25 points on one side of the centre line, then 12 on the other
   d <- data.frame(x = 1:37, y = as.numeric(c(rep(10, 25), rep(20, 12))))
   d$y[30] <- NA
 
-  result <- analyse(d, shift_rule_threshold = 8L, na_ends_run = TRUE)
+  result <- analyse(d, shift_rule_threshold = 8L, na_ends_pattern = TRUE)
 
   expect_length(which(result$rule2), 0L)
 })
 
 
-test_that("na_ends_run FALSE lets a run continue across a gap", {
+test_that("na_ends_pattern FALSE lets a run continue across a gap", {
   d <- data.frame(x = 1:37, y = as.numeric(c(rep(10, 25), rep(20, 12))))
   d$y[30] <- NA
 
-  result <- analyse(d, shift_rule_threshold = 8L, na_ends_run = FALSE)
+  result <- analyse(d, shift_rule_threshold = 8L, na_ends_pattern = FALSE)
 
   # every point of the run except the one that is missing
   expect_identical(which(result$rule2), c(26:29, 31:37))
@@ -444,7 +444,7 @@ test_that("limits are re-established after a gap that ended a run", {
 
   result <- analyse(d,
     shift_rule_threshold = 8L,
-    na_ends_run = TRUE,
+    na_ends_pattern = TRUE,
     max_exclusions = 3L
   )
 
@@ -454,18 +454,18 @@ test_that("limits are re-established after a gap that ended a run", {
 })
 
 
-test_that("na_ends_run makes no difference to a series with no gaps", {
+test_that("na_ends_pattern makes no difference to a series with no gaps", {
   d <- data.frame(x = 1:37, y = as.numeric(c(rep(10, 25), rep(20, 12))))
 
   expect_identical(
-    analyse(d, shift_rule_threshold = 8L, na_ends_run = TRUE),
-    analyse(d, shift_rule_threshold = 8L, na_ends_run = FALSE)
+    analyse(d, shift_rule_threshold = 8L, na_ends_pattern = TRUE),
+    analyse(d, shift_rule_threshold = 8L, na_ends_pattern = FALSE)
   )
 })
 
 
-test_that("na_ends_run defaults to TRUE", {
-  expect_true(autospc_default("na_ends_run"))
+test_that("na_ends_pattern defaults to TRUE", {
+  expect_true(autospc_default("na_ends_pattern"))
 })
 
 

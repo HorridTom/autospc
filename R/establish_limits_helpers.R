@@ -178,9 +178,9 @@ find_extremes <- function(data,
 rule2_break_start_positions <- function(limits_table, counter) {
   # A rule 2 break starts where a run that is long enough to break rule 2
   # commences. Using run_start, rather than comparing each point with the one
-  # before, means a run that a gap ended (na_ends_run) is not taken to continue
-  # into the run after the gap, even when both are on the same side of the
-  # centre line.
+  # before, means a run that a gap ended (na_ends_pattern) is not taken to
+  # continue into the run after the gap, even when both are on the same side of
+  # the centre line.
   limits_table <- limits_table %>%
     dplyr::mutate(start_of_rule2_break = rule2 & run_start)
 

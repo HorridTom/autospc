@@ -61,7 +61,7 @@ add_rule_two <- function(table, shift_rule_threshold) {
   counts <- !is.na(side) & side != 0L
 
   # a run does not continue into a point with no side, nor into the point after
-  # a gap where na_ends_run asked for that
+  # a gap where na_ends_pattern asked for that
   barrier <- is.na(side)
 
   if ("run_break" %in% names(table)) {

@@ -23,7 +23,7 @@ autospc(
   prevent_establishment_in = NULL,
   restart_after_gap = NULL,
   dispersion_chart_establishment = c("forced", "independent", "shared"),
-  na_ends_run = TRUE,
+  na_ends_pattern = TRUE,
   max_exclusions = 0L,
   highlight_exclusions = TRUE,
   mr_screen_max_loops = 1L,
@@ -61,7 +61,8 @@ autospc(
   upper_annotation_sf = NULL,
   lower_annotation_sf = NULL,
   annotation_arrows = FALSE,
-  annotation_arrow_curve = 0.3
+  annotation_arrow_curve = 0.3,
+  na_ends_run = deprecated()
 )
 }
 \arguments{
@@ -196,10 +197,10 @@ Parameters that control how centre line and control limits are established
 for each period, and details of how SPC rules are applied
 }}
 
-\item{na_ends_run}{Boolean determining whether a missing point starts a new
-run, for the purpose of the shift rule. TRUE minimises the risk of a false
-positive shift rule break arising from missing data; FALSE minimises the risk
-of a false negative.}
+\item{na_ends_pattern}{Boolean determining whether a missing point starts a
+new run, for the purpose of the shift rule. TRUE minimises the risk of a
+false positive shift rule break arising from missing data; FALSE minimises
+the risk of a false negative.}
 
 \item{max_exclusions}{The maximum number of extreme points to exclude from
 limit calculations. The default, 0, excludes none.}
@@ -349,6 +350,9 @@ negative limit is multiplied by \code{2 - lower_annotation_sf}.}
 connecting centre line labels to the centre line they refer to}
 
 \item{annotation_arrow_curve}{Numeric curvature of the annotation arrows}
+
+\item{na_ends_run}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{na_ends_pattern}
+instead. It will be removed in autospc 0.5.0.}
 }
 \value{
 With \code{plot_chart = TRUE} (the default), an \code{autospc_plot}: a ggplot

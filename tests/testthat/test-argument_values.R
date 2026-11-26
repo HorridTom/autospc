@@ -313,7 +313,7 @@ test_that("the Boolean arguments are the ones autospc defaults to TRUE or FALSE"
       "establish_every_shift",
       "no_regrets",
       "overhanging_reversions",
-      "na_ends_run",
+      "na_ends_pattern",
       "highlight_exclusions",
       "plot_chart",
       "show_limits",

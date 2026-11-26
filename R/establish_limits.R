@@ -103,7 +103,7 @@ analyse_segment <- function(chart,
   # Remove missing values from series for analysis
   observed_data <- compact_series(chart,
     data = prepared_data,
-    na_ends_run = chart$na_ends_run
+    na_ends_pattern = chart$na_ends_pattern
   )
 
   # set counter to one
@@ -488,7 +488,7 @@ analyse_segment_over_location_periods <- function(chart,
 
   observed_data <- compact_series(chart,
     data = prepared_data,
-    na_ends_run = chart$na_ends_run
+    na_ends_pattern = chart$na_ends_pattern
   )
 
   limits_table <- form_limits_over_periods(observed_data,

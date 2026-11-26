@@ -90,10 +90,12 @@ test_that("missing values at the start and end of the series do not break the li
 })
 
 
-test_that("the line breaks whatever na_ends_run is set to", {
-  for (na_ends_run in c(TRUE, FALSE)) {
+test_that("the line breaks whatever na_ends_pattern is set to", {
+  for (na_ends_pattern in c(TRUE, FALSE)) {
     expect_equal(
-      series_line_pieces(c_chart_missing(40L, na_ends_run = na_ends_run)),
+      series_line_pieces(
+        c_chart_missing(40L, na_ends_pattern = na_ends_pattern)
+      ),
       2L
     )
   }

@@ -672,7 +672,7 @@ test_that("under shared, the next candidate starts after the extended period", {
     chart_type = "XMR",
     dispersion_chart_establishment = "shared",
     no_regrets = FALSE,
-    na_ends_run = FALSE,
+    na_ends_pattern = FALSE,
     max_exclusions = 0L
   )
 
@@ -700,7 +700,7 @@ test_that("under shared, an opposite rule break in the extension rows is found",
     dispersion_chart_establishment = "shared",
     overhanging_reversions = FALSE,
     no_regrets = FALSE,
-    na_ends_run = FALSE,
+    na_ends_pattern = FALSE,
     max_exclusions = 0L,
     plot_chart = FALSE
   )

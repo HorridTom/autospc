@@ -26,7 +26,7 @@ chart_argument_alternatives <- list(
   prevent_establishment_in = list(c(5, 10)),
   restart_after_gap = 3L,
   dispersion_chart_establishment = "shared",
-  na_ends_run = FALSE,
+  na_ends_pattern = FALSE,
   max_exclusions = 1,
   mr_screen_max_loops = 2L,
   centre_line_tolerance = 0.5,
@@ -40,9 +40,8 @@ chart_argument_alternatives <- list(
 
 test_that("the deprecated arguments are the ones autospc declares as deprecated", {
   # the deprecated arguments are found by their default rather than named, and
-  # this is the list that is expected: none, since 0.3.0 removed show_mr and
-  # write_table
-  expect_identical(autospc_deprecated_arguments(), character(0))
+  # this is the list that is expected
+  expect_identical(autospc_deprecated_arguments(), "na_ends_run")
 })
 
 

@@ -24,7 +24,7 @@ analysed_charts <- function(...) {
 reformed <- function(chart) {
   observed <- compact_series(chart,
     data = chart$data,
-    na_ends_run = chart$na_ends_run
+    na_ends_pattern = chart$na_ends_pattern
   )
 
   table <- chart$result$table %>%
@@ -160,7 +160,7 @@ test_that("the first period starts at the first row of data whatever its first_x
   chart <- analysed_charts(example_series_1, chart_type = "C")[[1]]
   observed <- compact_series(chart,
     data = chart$data,
-    na_ends_run = chart$na_ends_run
+    na_ends_pattern = chart$na_ends_pattern
   )
   periods <- calculation_periods(chart$result$table)
   later_start <- periods
@@ -181,7 +181,7 @@ test_that("a later period holds the rows from its first to its last x, however m
   )[[1]]
   observed <- compact_series(chart,
     data = chart$data,
-    na_ends_run = chart$na_ends_run
+    na_ends_pattern = chart$na_ends_pattern
   )
 
   table <- form_limits_over_periods(observed,

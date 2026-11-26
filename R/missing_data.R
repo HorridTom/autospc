@@ -72,13 +72,13 @@ drop_missing_x <- function(data,
 #' immediately precedes, and is what stops a run continuing across that gap.
 #'
 #' @param data A prepared series, with a `series` column.
-#' @param na_ends_run Whether a gap starts a new run.
+#' @param na_ends_pattern Whether a gap starts a new run.
 #'
 #' @return The rows of `data` that hold an observation, with `run_break` added.
 #' @noRd
 compact_series <- function(chart,
                            data,
-                           na_ends_run) {
+                           na_ends_pattern) {
   observed <- observed_rows(chart, data = data)
   compacted <- data[observed, , drop = FALSE]
 
@@ -91,7 +91,7 @@ compact_series <- function(chart,
   positions <- which(observed)
   after_gap <- c(FALSE, diff(positions) > 1L)
 
-  compacted$run_break <- after_gap & na_ends_run
+  compacted$run_break <- after_gap & na_ends_pattern
 
   return(compacted)
 }

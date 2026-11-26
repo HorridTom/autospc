@@ -115,10 +115,10 @@
 #' ## SPC Parameters
 #' Parameters that control how centre line and control limits are established
 #' for each period, and details of how SPC rules are applied
-#' @param na_ends_run Boolean determining whether a missing point starts a new
-#' run, for the purpose of the shift rule. TRUE minimises the risk of a false
-#' positive shift rule break arising from missing data; FALSE minimises the risk
-#' of a false negative.
+#' @param na_ends_pattern Boolean determining whether a missing point starts a
+#' new run, for the purpose of the shift rule. TRUE minimises the risk of a
+#' false positive shift rule break arising from missing data; FALSE minimises
+#' the risk of a false negative.
 #' @param max_exclusions The maximum number of extreme points to exclude from
 #' limit calculations. The default, 0, excludes none.
 #' @param highlight_exclusions Boolean signifying whether excluded points are
@@ -229,6 +229,8 @@
 #' @param annotation_arrows Boolean specifying whether or not to display arrows
 #' connecting centre line labels to the centre line they refer to
 #' @param annotation_arrow_curve Numeric curvature of the annotation arrows
+#' @param na_ends_run `r lifecycle::badge("deprecated")` Use `na_ends_pattern`
+#' instead. It will be removed in autospc 0.5.0.
 #'
 #' @return With `plot_chart = TRUE` (the default), an `autospc_plot`: a ggplot
 #' of the chart, or of the pair for `chart_type = "XMR"` or `"XbarS"`, which
@@ -297,7 +299,7 @@ autospc <- function(data,
                       "forced", "independent", "shared"
                     ),
                     ## SPC Parameters
-                    na_ends_run = TRUE,
+                    na_ends_pattern = TRUE,
                     max_exclusions = 0L,
                     highlight_exclusions = TRUE,
                     mr_screen_max_loops = 1L,
@@ -340,7 +342,21 @@ autospc <- function(data,
                     upper_annotation_sf = NULL,
                     lower_annotation_sf = NULL,
                     annotation_arrows = FALSE,
-                    annotation_arrow_curve = 0.3) {
+                    annotation_arrow_curve = 0.3,
+                    na_ends_run = deprecated()) {
+  if (lifecycle::is_present(na_ends_run)) {
+    lifecycle::deprecate_warn(
+      when = "0.4.0",
+      what = "autospc(na_ends_run)",
+      with = "autospc(na_ends_pattern)",
+      details = "na_ends_run will be removed in autospc 0.5.0."
+    )
+
+    if (missing(na_ends_pattern)) {
+      na_ends_pattern <- na_ends_run
+    }
+  }
+
   x_name <- resolve_column_name(rlang::enquo(x), fallback = "x")
   y_name <- resolve_column_name(rlang::enquo(y), fallback = "y")
   n_name <- resolve_column_name(rlang::enquo(n), fallback = "n")

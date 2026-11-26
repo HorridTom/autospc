@@ -8,7 +8,7 @@
 #   C a point on the centre line does not count towards run length
 #   D a point on the centre line belongs to the run immediately before it, and
 #     to none where no run precedes it
-#   E na_ends_run decides only whether a gap stops a run continuing
+#   E na_ends_pattern decides only whether a gap stops a run continuing
 
 runs_in <- function(side, threshold = 3L, run_break = NULL) {
   table <- data.frame(above_or_below_cl = side)
@@ -120,7 +120,7 @@ test_that("a run does not continue across a point with no side", {
 
 
 test_that("a gap ends a run, and the centre line point after it does not", {
-  # rule E: na_ends_run puts the break at the point after the gap, and that
+  # rule E: na_ends_pattern puts the break at the point after the gap, and that
   # point being on the centre line does not change where the next run commences
   before <- runs_in(c(1, 1, 0, 1, 1), run_break = c(F, F, T, F, F))
   after <- runs_in(c(1, 1, 0, 1, 1), run_break = c(F, F, F, T, F))

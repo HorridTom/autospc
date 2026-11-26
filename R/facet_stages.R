@@ -54,6 +54,20 @@ facet_stages <- function(data,
     envir = caller
   )
 
+  if ("na_ends_run" %in% names(given)) {
+    lifecycle::deprecate_warn(
+      when = "0.4.0",
+      what = "facet_stages(na_ends_run)",
+      with = "facet_stages(na_ends_pattern)",
+      details = "na_ends_run will be removed in autospc 0.5.0."
+    )
+
+    if (!"na_ends_pattern" %in% names(given)) {
+      given$na_ends_pattern <- given$na_ends_run
+    }
+    given$na_ends_run <- NULL
+  }
+
   arguments <- autospc_argument_values(given)
 
   arguments <- validate_argument_values(arguments)

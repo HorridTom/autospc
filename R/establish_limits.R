@@ -167,8 +167,9 @@ analyse_segment <- function(chart,
           # a new period if indicated.
 
           # Identify the next rule break to consider as a triggering rule break:
-          # Check whether counter is part way through a rule 2 break already,
-          # with at least [shift_rule_threshold] rule 2 break points following.
+          # Check whether counter is part way through a shift rule break
+          # already, with at least [shift_rule_threshold] shift rule break
+          # points following.
           if (counter_at_rule_break(
             table = limits_table,
             counter = counter,
@@ -177,37 +178,38 @@ analyse_segment <- function(chart,
           )
           ) {
             # If so, set next rule break position to the counter.
-            rule2_break_positions <- NA
-            rule2_break_position <- counter
+            shift_break_positions <- NA
+            shift_break_position <- counter
 
             chart <- record_break(chart,
               counter = counter,
-              position = rule2_break_position,
+              position = shift_break_position,
               already_at_break = TRUE,
               limits_table = limits_table
             )
           } else {
-            # If not, i.e. if either the counter is not within a rule 2 break,
-            # or it is but there are fewer than [shift_rule_threshold] points of
-            # the run following, then scan for start of next rule 2 break.
-            rule2_break_positions <- rule2_break_start_positions(
+            # If not, i.e. if either the counter is not within a shift rule
+            # break, or it is but there are fewer than [shift_rule_threshold]
+            # points of the run following, then scan for start of next shift
+            # rule break.
+            shift_break_positions <- shift_break_start_positions(
               limits_table = limits_table,
               counter = counter
             )
 
-            rule2_break_position <- rule2_break_positions[1]
+            shift_break_position <- shift_break_positions[1]
 
             chart <- record_break(chart,
               counter = counter,
-              position = rule2_break_position,
+              position = shift_break_position,
               already_at_break = FALSE,
               limits_table = limits_table
             )
           }
 
-          # [5] Check whether there are any further rule 2 breaks
-          if (is.na(rule2_break_position) |
-            rule2_break_position >= nrow(observed_data)) {
+          # [5] Check whether there are any further shift rule breaks
+          if (is.na(shift_break_position) |
+            shift_break_position >= nrow(observed_data)) {
             # [5b] If not, then there can be no more additional periods
             chart <- record_stop(chart,
               counter = counter,
@@ -224,10 +226,10 @@ analyse_segment <- function(chart,
             chart <- record_counter_move(
               chart,
               from = counter,
-              to = rule2_break_position,
+              to = shift_break_position,
               reason = "moved to shift rule break"
             )
-            counter <- rule2_break_position
+            counter <- shift_break_position
             triggering_rule_break_direction <-
               limits_table$above_or_below_cl[counter]
 
@@ -393,9 +395,9 @@ analyse_segment <- function(chart,
 
                 # Check whether:
                 # 1) no further rule breaks have been identified OR
-                # 2) counter is part way through a rule 2 break with at least
-                # [shift_rule_threshold] points of the run following
-                if (is.na(rule2_break_positions[2]) |
+                # 2) counter is part way through a shift rule break with at
+                # least [shift_rule_threshold] points of the run following
+                if (is.na(shift_break_positions[2]) |
                   all(
                     limits_table$shift[
                       counter:(counter + chart$shift_rule_threshold - 1)
@@ -410,13 +412,14 @@ analyse_segment <- function(chart,
                   )
                   counter <- counter + 1
                 } else {
-                  # If not, move counter to the start of the next rule 2 break
+                  # If not, move counter to the start of the next shift rule
+                  # break
                   chart <- record_counter_move(chart,
                     from = counter,
-                    to = rule2_break_positions[2],
+                    to = shift_break_positions[2],
                     reason = "candidate rejected"
                   )
-                  counter <- rule2_break_positions[2]
+                  counter <- shift_break_positions[2]
                 }
               } # end of: [7b] candidate limits rejected
             } # end of: [6a] establish candidate limits

@@ -173,19 +173,19 @@ find_extremes <- function(data,
 }
 
 
-# Function to scan to see where start of each rule 2 break is -
+# Function to scan to see where start of each shift rule break is -
 # returns list of these points
-rule2_break_start_positions <- function(limits_table, counter) {
-  # A rule 2 break starts where a run that is long enough to break rule 2
-  # commences. Using run_start, rather than comparing each point with the one
-  # before, means a run that a gap ended (na_ends_pattern) is not taken to
-  # continue into the run after the gap, even when both are on the same side of
-  # the centre line.
+shift_break_start_positions <- function(limits_table, counter) {
+  # A shift rule break starts where a run that is long enough to break the
+  # shift rule commences. Using run_start, rather than comparing each point with
+  # the one before, means a run that a gap ended (na_ends_pattern) is not taken
+  # to continue into the run after the gap, even when both are on the same side
+  # of the centre line.
   limits_table <- limits_table %>%
-    dplyr::mutate(start_of_rule2_break = shift & run_start)
+    dplyr::mutate(start_of_shift_break = shift & run_start)
 
   next_rule_break_positions <-
-    (which(limits_table$start_of_rule2_break[
+    (which(limits_table$start_of_shift_break[
       counter:nrow(limits_table)
     ] == T)) + counter - 1
 
@@ -235,10 +235,10 @@ identify_opposite_break <- function(limits_table,
   limits_table_candidate[["new_run"]] <- new_run
   limits_table_candidate[["run_count"]] <- run_count
 
-  # a rule 2 break in the opposite direction to the triggering run. The first
-  # run is not counted: if it is in the same direction as the triggering run
-  # it cannot be an opposite break, and if it is in the opposite direction it
-  # is only the move to the new level
+  # a shift rule break in the opposite direction to the triggering run. The
+  # first run is not counted: if it is in the same direction as the triggering
+  # run it cannot be an opposite break, and if it is in the opposite direction
+  # it is only the move to the new level
   limits_table_candidate[["opposite_break"]] <- limits_table_candidate$shift &
     (side != triggering_rule_break_direction) & run_count > 1
 
@@ -608,7 +608,7 @@ sign_chr <- function(x) {
 counter_at_rule_break <- function(table,
                                   counter,
                                   shift_rule_threshold) {
-  # no rule 2 break at counter
+  # no shift rule break at counter
   if (!(table$shift[seq_len(nrow(table)) == counter])) {
     return(FALSE)
   }

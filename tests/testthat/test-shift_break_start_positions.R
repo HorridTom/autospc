@@ -4,13 +4,13 @@ test_data <- readRDS("testdata/test_data_rule2_break.rds")
 # these functions walk a prepared series, whose analysed values are `series`
 test_data$series <- test_data$y
 
-test_that("Start of subsequent rule 2 breaks identified correctly", {
+test_that("Start of subsequent shift rule breaks identified correctly", {
   test_data <- add_shift_columns(test_data,
     centre_line_tolerance = 0,
     shift_rule_threshold = 8L
   )
 
-  results <- rule2_break_start_positions(test_data, counter = 22)
+  results <- shift_break_start_positions(test_data, counter = 22)
 
   correct_answers <- c(22, 36, 123, 161, 176, 218)
 

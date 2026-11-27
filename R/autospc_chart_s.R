@@ -227,6 +227,22 @@ sd_estimate_at.autospc_chart_s <- function(chart, statistics, rows) {
 }
 
 
+#' Whether the trend rule is applied to a chart
+#'
+#' Applied only where every point's subgroup size is the same, because the
+#' limits vary with the subgroup size.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+trend_rule_applies.autospc_chart_s <- function(chart, table) {
+  sizes <- table %>%
+    dplyr::filter(!is.na(series)) %>%
+    dplyr::pull(n)
+
+  return(length(unique(sizes)) <= 1L)
+}
+
+
 #' Columns the S chart adds when its pair is joined wide
 #'
 #' The subgroup standard deviations and their centre line and limits, as

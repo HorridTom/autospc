@@ -642,6 +642,17 @@ sd_estimate_at.autospc_chart <- function(chart, statistics, rows) {
 }
 
 
+#' Whether the trend rule is applied to a chart
+#'
+#' Applied: the limits do not vary within a period.
+#'
+#' @return TRUE
+#' @noRd
+trend_rule_applies.autospc_chart <- function(chart, table) {
+  return(TRUE)
+}
+
+
 # Presentation methods
 
 

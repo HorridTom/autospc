@@ -261,6 +261,21 @@ sd_estimate_at <- function(chart, statistics, rows) {
 }
 
 
+#' Whether the trend rule is applied to a chart
+#'
+#' The trend rule is not applied where the limits vary within a period. Applied
+#' by default. Overridden by the classes whose limits vary with the
+#' denominator or the subgroup size.
+#'
+#' @param table The analysed table, with one row per point.
+#'
+#' @return TRUE or FALSE
+#' @noRd
+trend_rule_applies <- function(chart, table) {
+  UseMethod("trend_rule_applies")
+}
+
+
 #' Columns a dispersion chart adds when its pair is joined wide
 #'
 #' Only the dispersion chart of a pair has an answer, so there is no default.
@@ -381,4 +396,18 @@ y_axis_title <- function(chart) {
 #' @noRd
 rule_description <- function(rule) {
   UseMethod("rule_description")
+}
+
+
+#' Where a rule is broken
+#'
+#' @param rule An `autospc_rule`.
+#' @param points Each point's distance from the centre line, its side and its
+#'   stretch, as `variables_for_rules()` gives them.
+#'
+#' @return logical, one value per point: TRUE where the point is part of a
+#'   pattern that breaks the rule, NA where the rule is not applied to it
+#' @noRd
+rule_breaks <- function(rule, points) {
+  UseMethod("rule_breaks")
 }

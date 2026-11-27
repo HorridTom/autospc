@@ -315,6 +315,17 @@ limits_table_columns.autospc_chart_p <- function(chart) {
 }
 
 
+#' Whether the trend rule is applied to a chart
+#'
+#' Not applied: the limits vary with the denominator.
+#'
+#' @return FALSE
+#' @noRd
+trend_rule_applies.autospc_chart_p <- function(chart, table) {
+  return(FALSE)
+}
+
+
 # Presentation methods
 
 
